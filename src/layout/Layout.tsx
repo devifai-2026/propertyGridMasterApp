@@ -38,6 +38,7 @@ import {
   LogOut,
   LogIn,
   Building2,
+  TrendingUp,
 } from 'lucide-react-native';
 
 const SideMenu: React.FC<SideMenuProps> = ({
@@ -48,6 +49,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
   onLogoutClick,
 }) => {
   const { height } = useWindowDimensions();
+  const { navigate } = useNavigation();
 
   if (!visible) return null;
 
@@ -78,11 +80,23 @@ const SideMenu: React.FC<SideMenuProps> = ({
             </View>
 
             <ScrollView contentContainerStyle={styles.menuItems}>
-              <TouchableOpacity style={styles.menuItem}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  navigate('/explore-properties');
+                  onClose();
+                }}
+              >
                 <Building2 size={20} color="#666" style={styles.menuItemIcon} />
                 <Text style={styles.menuItemText}>Explore Properties</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  navigate('/calculators');
+                  onClose();
+                }}
+              >
                 <Calculator
                   size={20}
                   color="#666"
@@ -90,10 +104,32 @@ const SideMenu: React.FC<SideMenuProps> = ({
                 />
                 <Text style={styles.menuItemText}>Calculators</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.menuItem}>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  navigate('/explore-brokers');
+                  onClose();
+                }}
+              >
                 <Users size={20} color="#666" style={styles.menuItemIcon} />
                 <Text style={styles.menuItemText}>Explore Brokers</Text>
               </TouchableOpacity>
+              {isLoggedIn && (
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                    navigate('/investors');
+                    onClose();
+                  }}
+                >
+                  <TrendingUp
+                    size={20}
+                    color="#666"
+                    style={styles.menuItemIcon}
+                  />
+                  <Text style={styles.menuItemText}>My Investment</Text>
+                </TouchableOpacity>
+              )}
             </ScrollView>
 
             <View>
@@ -171,13 +207,13 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
 
         {!isMobile && (
           <View style={styles.navLinks}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigate('/explore-properties')}>
               <Text style={styles.navLinkText}>Explore Properties</Text>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigate('/calculators')}>
               <Text style={styles.navLinkText}>Calculators</Text>
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigate('/explore-brokers')}>
               <Text style={styles.navLinkText}>Explore Brokers</Text>
             </TouchableOpacity>
           </View>
