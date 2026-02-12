@@ -15,6 +15,8 @@ const babelLoaderConfiguration = {
     path.resolve(appDirectory, 'App.tsx'),
     path.resolve(appDirectory, 'src'),
     path.resolve(appDirectory, 'node_modules/react-native-uncompiled'),
+    path.resolve(appDirectory, 'node_modules/lucide-react-native'),
+    path.resolve(appDirectory, 'node_modules/@react-native-async-storage'),
   ],
   use: {
     loader: 'babel-loader',
@@ -71,6 +73,8 @@ module.exports = {
     // This will automatically alias 'react-native' to 'react-native-web'
     alias: {
       'react-native$': 'react-native-web',
+      '@react-native-async-storage/async-storage':
+        '@react-native-async-storage/async-storage/lib/commonjs/index.js',
     },
     // If you're working on a multi-platform project, web extensions should be listed first.
     extensions: [
