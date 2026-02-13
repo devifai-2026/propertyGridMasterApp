@@ -11,6 +11,9 @@ import {
 import Layout from '../../layout/Layout';
 import { Mail, Phone, Edit, ArrowRight, User } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
+import PortfolioTab from './components/PortfolioTab';
+import EnquiriesTab from './components/EnquiriesTab';
+import WishlistTab from './components/WishlistTab';
 
 const InvestorsScreen = () => {
   const { user } = useAuth(); // Assuming useAuth provides user object, otherwise mock
@@ -230,25 +233,11 @@ const InvestorsScreen = () => {
               ))}
             </View>
 
-            {/* Tab Content Placeholder */}
+            {/* Tab Content */}
             <View style={styles.tabContent}>
-              {activeTab === 'portfolio' && (
-                <View style={styles.emptyState}>
-                  <Text style={styles.emptyText}>
-                    My Portfolio Content Here
-                  </Text>
-                </View>
-              )}
-              {activeTab === 'enquiries' && (
-                <View style={styles.emptyState}>
-                  <Text style={styles.emptyText}>Enquiries Content Here</Text>
-                </View>
-              )}
-              {activeTab === 'wishlist' && (
-                <View style={styles.emptyState}>
-                  <Text style={styles.emptyText}>Wishlist Content Here</Text>
-                </View>
-              )}
+              {activeTab === 'portfolio' && <PortfolioTab />}
+              {activeTab === 'enquiries' && <EnquiriesTab />}
+              {activeTab === 'wishlist' && <WishlistTab />}
             </View>
           </View>
         </View>
@@ -271,12 +260,11 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   leftColumn: {
-    flex: isDesktop ? 1 : 1,
-    // width: isDesktop ? '30%' : '100%', // flex covers it
+    flex: isDesktop ? 1 : undefined,
     maxWidth: isDesktop ? 400 : '100%',
   },
   rightColumn: {
-    flex: isDesktop ? 2 : 1,
+    flex: isDesktop ? 2 : undefined,
   },
   card: {
     backgroundColor: '#fff',
@@ -445,9 +433,14 @@ const styles = StyleSheet.create({
     color: '#767676',
   },
   assistanceCard: {
-    backgroundColor: '#fff', // Or transparent if text only
+    backgroundColor: '#fff',
     alignItems: 'center',
     padding: 20,
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
   assistanceTitle: {
     color: '#EE2529',
@@ -537,10 +530,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   tabContent: {
-    backgroundColor: '#fff',
-    minHeight: 300,
     borderRadius: 8,
-    padding: 20,
   },
   emptyState: {
     alignItems: 'center',
