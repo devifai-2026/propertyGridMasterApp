@@ -80,19 +80,22 @@ const WhyChooseSection = () => {
         <View
           style={[
             styles.illustrationContainer,
-            isMobile && { marginBottom: 40 },
+            isMobile && { marginBottom: 40, flex: 0, height: 'auto' },
           ]}
         >
           <Image
             source={require('../../../assets/WhyChoose/img.png')}
-            style={styles.illustration}
+            style={[styles.illustration, isMobile && { height: 300 }]}
             resizeMode="contain"
           />
         </View>
 
         {/* Right Side Features */}
         <View
-          style={[styles.featuresContainer, isMobile && { paddingLeft: 0 }]}
+          style={[
+            styles.featuresContainer,
+            isMobile && { paddingLeft: 0, width: '100%', flex: 0 },
+          ]}
         >
           {FEATURES.map(feature => (
             <FeatureItem key={feature.id} item={feature} />
