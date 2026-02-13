@@ -9,6 +9,21 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { ChevronDown, Info } from 'lucide-react-native';
+import CustomDropdown from './CustomDropdown';
+import CustomDatePicker from './CustomDatePicker';
+
+const tenantTypeOptions = [
+  { label: 'Government', value: 'government' },
+  { label: 'Startup', value: 'startup' },
+  { label: 'MNC', value: 'mnc' },
+  { label: 'Corporate', value: 'corporate' },
+  { label: 'Others', value: 'others' },
+];
+
+const maintenanceScopeOptions = [
+  { label: 'Yes, included in rent', value: 'included' },
+  { label: 'No, excluded from rent', value: 'excluded' },
+];
 
 interface LeaseDetailsProps {
   onNext: (data: any) => void;
@@ -16,7 +31,11 @@ interface LeaseDetailsProps {
   initialData?: any;
 }
 
-const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initialData }) => {
+const LeaseDetails: React.FC<LeaseDetailsProps> = ({
+  onNext,
+  onFormValid,
+  initialData,
+}) => {
   const { width } = useWindowDimensions();
   const isSmallScreen = width < 768;
 
@@ -72,47 +91,56 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
         return !value ? 'Tenant Type is required' : '';
       case 'leaseStartDate':
         if (!value) return 'Lease Start Date is required';
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return 'Invalid date format (YYYY-MM-DD)';
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value))
+          return 'Invalid date format (YYYY-MM-DD)';
         return '';
       case 'leaseExpiryDate':
         if (!value) return 'Lease End Date is required';
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return 'Invalid date format (YYYY-MM-DD)';
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value))
+          return 'Invalid date format (YYYY-MM-DD)';
         return '';
       case 'leaseDuration':
         if (!value) return 'Lease Duration is required';
-        if (!/^\d+$/.test(value) || parseInt(value) <= 0) return 'Please enter a valid duration';
+        if (!/^\d+$/.test(value) || parseInt(value) <= 0)
+          return 'Please enter a valid duration';
         return '';
       case 'rentPerSqFt':
         if (formData.rentType === 'perSqFt') {
           if (!value) return 'Rent Per Sq Ft is required';
-          if (!/^\d+(\.\d+)?$/.test(value) || parseFloat(value) <= 0) return 'Please enter a valid amount';
+          if (!/^\d+(\.\d+)?$/.test(value) || parseFloat(value) <= 0)
+            return 'Please enter a valid amount';
         }
         return '';
       case 'totalMonthlyRent':
         if (formData.rentType === 'lumpSum') {
           if (!value) return 'Total Monthly Rent is required';
-          if (!/^\d+(\.\d+)?$/.test(value) || parseFloat(value) <= 0) return 'Please enter a valid amount';
+          if (!/^\d+(\.\d+)?$/.test(value) || parseFloat(value) <= 0)
+            return 'Please enter a valid amount';
         }
         return '';
       case 'securityDepositMonths':
         if (formData.securityDepositType === 'months') {
           if (!value) return 'Deposit (Months) is required';
-          if (!/^\d+$/.test(value) || parseInt(value) <= 0) return 'Please enter a valid number';
+          if (!/^\d+$/.test(value) || parseInt(value) <= 0)
+            return 'Please enter a valid number';
         }
         return '';
       case 'securityDepositAmount':
         if (formData.securityDepositType === 'lumpSum') {
           if (!value) return 'Deposit Amount is required';
-          if (!/^\d+(\.\d+)?$/.test(value) || parseFloat(value) <= 0) return 'Please enter a valid amount';
+          if (!/^\d+(\.\d+)?$/.test(value) || parseFloat(value) <= 0)
+            return 'Please enter a valid amount';
         }
         return '';
       case 'escalationPercentage':
         if (!value) return 'Annual Escalation is required';
-        if (!/^\d+(\.\d+)?$/.test(value)) return 'Please enter a valid percentage';
+        if (!/^\d+(\.\d+)?$/.test(value))
+          return 'Please enter a valid percentage';
         return '';
       case 'escalationFrequency':
         if (!value) return 'Frequency is required';
-        if (!/^\d+$/.test(value) || parseInt(value) <= 0) return 'Please enter a valid number';
+        if (!/^\d+$/.test(value) || parseInt(value) <= 0)
+          return 'Please enter a valid number';
         return '';
       case 'maintenanceScope':
         return !value ? 'Maintenance Costs is required' : '';
@@ -130,32 +158,41 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
     }
   };
 
-  const handleBlur = (name: string) => {
+  const handleBlur = (name: string, value?: string) => {
     setTouched((prev: any) => ({ ...prev, [name]: true }));
-    const error = validateField(name, formData[name as keyof typeof formData] as string);
+    const valueToValidate =
+      value !== undefined
+        ? value
+        : (formData[name as keyof typeof formData] as string);
+    const error = validateField(name, valueToValidate);
     setErrors((prev: any) => ({ ...prev, [name]: error }));
   };
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={[styles.sectionTitle, isSmallScreen && styles.sectionTitleMobile]}>Lease & Tenant</Text>
+      <Text
+        style={[
+          styles.sectionTitle,
+          isSmallScreen && styles.sectionTitleMobile,
+        ]}
+      >
+        Lease & Tenant
+      </Text>
 
       <Text style={styles.subHeader}>Tenant Information</Text>
       <View style={styles.fieldContainer}>
         <Text style={styles.label}>Tenant Type *</Text>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={[
-              styles.input,
-              touched.tenantType && errors.tenantType && styles.inputError,
-            ]}
-            placeholder="Select Tenant Type"
-            value={formData.tenantType}
-            onChangeText={v => handleInputChange('tenantType', v)}
-            onBlur={() => handleBlur('tenantType')}
-          />
-          <ChevronDown size={20} color="#999" style={styles.inputIcon} />
-        </View>
+        <CustomDropdown
+          placeholder="Select Tenant Type"
+          value={formData.tenantType}
+          options={tenantTypeOptions}
+          onChange={v => {
+            handleInputChange('tenantType', v);
+            handleBlur('tenantType', v);
+          }}
+          onBlur={() => handleBlur('tenantType')}
+          error={touched.tenantType && !!errors.tenantType}
+        />
         {touched.tenantType && errors.tenantType && (
           <Text style={styles.errorText}>{errors.tenantType}</Text>
         )}
@@ -165,15 +202,12 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
       <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Lease Start Date *</Text>
-          <TextInput
-            style={[
-              styles.input,
-              touched.leaseStartDate && errors.leaseStartDate && styles.inputError,
-            ]}
-            placeholder="YYYY-MM-DD"
+          <CustomDatePicker
             value={formData.leaseStartDate}
-            onChangeText={v => handleInputChange('leaseStartDate', v)}
+            onChange={v => handleInputChange('leaseStartDate', v)}
             onBlur={() => handleBlur('leaseStartDate')}
+            placeholder="YYYY-MM-DD"
+            error={touched.leaseStartDate && !!errors.leaseStartDate}
           />
           {touched.leaseStartDate && errors.leaseStartDate && (
             <Text style={styles.errorText}>{errors.leaseStartDate}</Text>
@@ -181,15 +215,12 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
         </View>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Lease End Date *</Text>
-          <TextInput
-            style={[
-              styles.input,
-              touched.leaseExpiryDate && errors.leaseExpiryDate && styles.inputError,
-            ]}
-            placeholder="YYYY-MM-DD"
+          <CustomDatePicker
             value={formData.leaseExpiryDate}
-            onChangeText={v => handleInputChange('leaseExpiryDate', v)}
+            onChange={v => handleInputChange('leaseExpiryDate', v)}
             onBlur={() => handleBlur('leaseExpiryDate')}
+            placeholder="YYYY-MM-DD"
+            error={touched.leaseExpiryDate && !!errors.leaseExpiryDate}
           />
           {touched.leaseExpiryDate && errors.leaseExpiryDate && (
             <Text style={styles.errorText}>{errors.leaseExpiryDate}</Text>
@@ -222,13 +253,15 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
           <TextInput
             style={[
               styles.input,
-              touched.leaseDuration && errors.leaseDuration && styles.inputError,
+              touched.leaseDuration &&
+                errors.leaseDuration &&
+                styles.inputError,
             ]}
             placeholder="0"
             keyboardType="numeric"
             value={formData.leaseDuration}
             onChangeText={v => handleInputChange('leaseDuration', v)}
-            onBlur={() => handleBlur('leaseDuration')}
+            onBlur={(e: any) => handleBlur('leaseDuration', e.nativeEvent.text)}
           />
           {touched.leaseDuration && errors.leaseDuration && (
             <Text style={styles.errorText}>{errors.leaseDuration}</Text>
@@ -332,7 +365,7 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
               keyboardType="numeric"
               value={formData.rentPerSqFt}
               onChangeText={v => handleInputChange('rentPerSqFt', v)}
-              onBlur={() => handleBlur('rentPerSqFt')}
+              onBlur={(e: any) => handleBlur('rentPerSqFt', e.nativeEvent.text)}
             />
             {touched.rentPerSqFt && errors.rentPerSqFt && (
               <Text style={styles.errorText}>{errors.rentPerSqFt}</Text>
@@ -344,13 +377,17 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
             <TextInput
               style={[
                 styles.input,
-                touched.totalMonthlyRent && errors.totalMonthlyRent && styles.inputError,
+                touched.totalMonthlyRent &&
+                  errors.totalMonthlyRent &&
+                  styles.inputError,
               ]}
               placeholder="0.00"
               keyboardType="numeric"
               value={formData.totalMonthlyRent}
               onChangeText={v => handleInputChange('totalMonthlyRent', v)}
-              onBlur={() => handleBlur('totalMonthlyRent')}
+              onBlur={(e: any) =>
+                handleBlur('totalMonthlyRent', e.nativeEvent.text)
+              }
             />
             {touched.totalMonthlyRent && errors.totalMonthlyRent && (
               <Text style={styles.errorText}>{errors.totalMonthlyRent}</Text>
@@ -364,16 +401,22 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
             <TextInput
               style={[
                 styles.input,
-                touched.securityDepositMonths && errors.securityDepositMonths && styles.inputError,
+                touched.securityDepositMonths &&
+                  errors.securityDepositMonths &&
+                  styles.inputError,
               ]}
               placeholder="0"
               keyboardType="numeric"
               value={formData.securityDepositMonths}
               onChangeText={v => handleInputChange('securityDepositMonths', v)}
-              onBlur={() => handleBlur('securityDepositMonths')}
+              onBlur={(e: any) =>
+                handleBlur('securityDepositMonths', e.nativeEvent.text)
+              }
             />
             {touched.securityDepositMonths && errors.securityDepositMonths && (
-              <Text style={styles.errorText}>{errors.securityDepositMonths}</Text>
+              <Text style={styles.errorText}>
+                {errors.securityDepositMonths}
+              </Text>
             )}
           </View>
         ) : (
@@ -382,16 +425,22 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
             <TextInput
               style={[
                 styles.input,
-                touched.securityDepositAmount && errors.securityDepositAmount && styles.inputError,
+                touched.securityDepositAmount &&
+                  errors.securityDepositAmount &&
+                  styles.inputError,
               ]}
               placeholder="0.00"
               keyboardType="numeric"
               value={formData.securityDepositAmount}
               onChangeText={v => handleInputChange('securityDepositAmount', v)}
-              onBlur={() => handleBlur('securityDepositAmount')}
+              onBlur={(e: any) =>
+                handleBlur('securityDepositAmount', e.nativeEvent.text)
+              }
             />
             {touched.securityDepositAmount && errors.securityDepositAmount && (
-              <Text style={styles.errorText}>{errors.securityDepositAmount}</Text>
+              <Text style={styles.errorText}>
+                {errors.securityDepositAmount}
+              </Text>
             )}
           </View>
         )}
@@ -404,13 +453,17 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
           <TextInput
             style={[
               styles.input,
-              touched.escalationFrequency && errors.escalationFrequency && styles.inputError,
+              touched.escalationFrequency &&
+                errors.escalationFrequency &&
+                styles.inputError,
             ]}
             placeholder="Every X years"
             keyboardType="numeric"
             value={formData.escalationFrequency}
             onChangeText={v => handleInputChange('escalationFrequency', v)}
-            onBlur={() => handleBlur('escalationFrequency')}
+            onBlur={(e: any) =>
+              handleBlur('escalationFrequency', e.nativeEvent.text)
+            }
           />
           {touched.escalationFrequency && errors.escalationFrequency && (
             <Text style={styles.errorText}>{errors.escalationFrequency}</Text>
@@ -421,13 +474,17 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
           <TextInput
             style={[
               styles.input,
-              touched.escalationPercentage && errors.escalationPercentage && styles.inputError,
+              touched.escalationPercentage &&
+                errors.escalationPercentage &&
+                styles.inputError,
             ]}
             placeholder="0 %"
             keyboardType="numeric"
             value={formData.escalationPercentage}
             onChangeText={v => handleInputChange('escalationPercentage', v)}
-            onBlur={() => handleBlur('escalationPercentage')}
+            onBlur={(e: any) =>
+              handleBlur('escalationPercentage', e.nativeEvent.text)
+            }
           />
           {touched.escalationPercentage && errors.escalationPercentage && (
             <Text style={styles.errorText}>{errors.escalationPercentage}</Text>
@@ -437,26 +494,30 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
 
       <View style={styles.fieldContainer}>
         <Text style={styles.label}>Maintenance Costs *</Text>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={[
-              styles.input,
-              touched.maintenanceScope && errors.maintenanceScope && styles.inputError,
-            ]}
-            placeholder="Are costs included?"
-            value={formData.maintenanceScope}
-            onChangeText={v => handleInputChange('maintenanceScope', v)}
-            onBlur={() => handleBlur('maintenanceScope')}
-          />
-          <ChevronDown size={20} color="#999" style={styles.inputIcon} />
-        </View>
+        <CustomDropdown
+          placeholder="Are maintenance costs included?"
+          value={formData.maintenanceScope}
+          options={maintenanceScopeOptions}
+          onChange={v => {
+            handleInputChange('maintenanceScope', v);
+            handleBlur('maintenanceScope', v);
+          }}
+          onBlur={() => handleBlur('maintenanceScope')}
+          error={touched.maintenanceScope && !!errors.maintenanceScope}
+        />
         {touched.maintenanceScope && errors.maintenanceScope && (
           <Text style={styles.errorText}>{errors.maintenanceScope}</Text>
         )}
       </View>
 
       {formData.maintenanceScope !== '' && (
-        <View style={[styles.row, isSmallScreen && styles.rowColumn, { marginTop: 4 }]}>
+        <View
+          style={[
+            styles.row,
+            isSmallScreen && styles.rowColumn,
+            { marginTop: 4 },
+          ]}
+        >
           <View style={[styles.fieldContainer, { flex: 0.4 }]}>
             <Text style={styles.label}>Type</Text>
             <View style={[styles.inputWrapper]}>

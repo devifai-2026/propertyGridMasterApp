@@ -39,6 +39,10 @@ import {
   LogIn,
   Building2,
   TrendingUp,
+  LifeBuoy,
+  HelpCircle,
+  Mail,
+  LayoutDashboard,
 } from 'lucide-react-native';
 
 const SideMenu: React.FC<SideMenuProps> = ({
@@ -128,22 +132,40 @@ const SideMenu: React.FC<SideMenuProps> = ({
                 />
                 <Text style={styles.menuItemText}>Investors</Text>
               </TouchableOpacity>
-              {isLoggedIn && (
-                <TouchableOpacity
-                  style={styles.menuItem}
-                  onPress={() => {
-                    navigate('/investors');
-                    onClose();
-                  }}
-                >
-                  <TrendingUp
-                    size={20}
-                    color="#666"
-                    style={styles.menuItemIcon}
-                  />
-                  <Text style={styles.menuItemText}>My Investment</Text>
-                </TouchableOpacity>
-              )}
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  navigate('/support');
+                  onClose();
+                }}
+              >
+                <LifeBuoy size={20} color="#666" style={styles.menuItemIcon} />
+                <Text style={styles.menuItemText}>Contact Support</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  navigate('/how-it-works');
+                  onClose();
+                }}
+              >
+                <HelpCircle
+                  size={20}
+                  color="#666"
+                  style={styles.menuItemIcon}
+                />
+                <Text style={styles.menuItemText}>How It Works</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.menuItem}
+                onPress={() => {
+                  navigate('/contact-us');
+                  onClose();
+                }}
+              >
+                <Mail size={20} color="#666" style={styles.menuItemIcon} />
+                <Text style={styles.menuItemText}>Contact Us</Text>
+              </TouchableOpacity>
             </ScrollView>
 
             <View>
@@ -583,6 +605,12 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#F0F0F0',
     marginVertical: 16,
+  },
+  dashboardButton: {
+    backgroundColor: '#FFF0F0',
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: '#EE2529',
   },
 });
 

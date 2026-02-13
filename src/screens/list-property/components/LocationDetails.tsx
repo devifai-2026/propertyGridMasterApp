@@ -9,6 +9,92 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { ChevronDown, Plus, X, Trash2 } from 'lucide-react-native';
+import CustomDropdown from './CustomDropdown';
+
+const INDIAN_STATES = [
+  'Andaman and Nicobar Islands',
+  'Andhra Pradesh',
+  'Arunachal Pradesh',
+  'Assam',
+  'Bihar',
+  'Chandigarh',
+  'Chhattisgarh',
+  'Dadra and Nagar Haveli',
+  'Daman and Diu',
+  'Delhi',
+  'Goa',
+  'Gujarat',
+  'Haryana',
+  'Himachal Pradesh',
+  'Jharkhand',
+  'Karnataka',
+  'Kerala',
+  'Ladakh',
+  'Lakshadweep',
+  'Madhya Pradesh',
+  'Maharashtra',
+  'Manipur',
+  'Meghalaya',
+  'Mizoram',
+  'Nagaland',
+  'Odisha',
+  'Puducherry',
+  'Punjab',
+  'Rajasthan',
+  'Sikkim',
+  'Tamil Nadu',
+  'Telangana',
+  'Tripura',
+  'Uttar Pradesh',
+  'Uttarakhand',
+  'West Bengal',
+];
+
+const CITY_BY_STATE: any = {
+  'Andhra Pradesh': ['Visakhapatnam', 'Vijayawada', 'Amaravati', 'Tirupati'],
+  'Arunachal Pradesh': ['Itanagar', 'Naharlagun'],
+  Assam: ['Guwahati', 'Dibrugarh', 'Silchar'],
+  Bihar: ['Patna', 'Gaya', 'Bhagalpur'],
+  Chandigarh: ['Chandigarh'],
+  Chhattisgarh: ['Raipur', 'Durg', 'Bilaspur'],
+  Delhi: ['New Delhi', 'Delhi'],
+  Goa: ['Panaji', 'Margao'],
+  Gujarat: ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Gandhinagar'],
+  Haryana: ['Gurgaon', 'Faridabad', 'Hisar', 'Panipat'],
+  'Himachal Pradesh': ['Shimla', 'Manali', 'Kangra'],
+  Jharkhand: ['Ranchi', 'Jamshedpur', 'Dhanbad'],
+  Karnataka: ['Bangalore', 'Mysore', 'Pune', 'Mangalore', 'Belgaum'],
+  Kerala: ['Kochi', 'Thiruvananthapuram', 'Kozhikode'],
+  'Madhya Pradesh': ['Indore', 'Bhopal', 'Jabalpur'],
+  Maharashtra: ['Mumbai', 'Pune', 'Nagpur', 'Thane', 'Aurangabad'],
+  Manipur: ['Imphal'],
+  Meghalaya: ['Shillong'],
+  Mizoram: ['Aizawl'],
+  Nagaland: ['Kohima'],
+  Odisha: ['Bhubaneswar', 'Cuttack', 'Rourkela'],
+  Puducherry: ['Puducherry', 'Yanam'],
+  Punjab: ['Chandigarh', 'Ludhiana', 'Amritsar', 'Jalandhar'],
+  Rajasthan: ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota'],
+  Sikkim: ['Gangtok'],
+  'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai', 'Salem'],
+  Telangana: ['Hyderabad', 'Secundrabad', 'Warangal'],
+  Tripura: ['Agartala'],
+  'Uttar Pradesh': ['Lucknow', 'Noida', 'Ghaziabad', 'Kanpur', 'Varanasi'],
+  Uttarakhand: ['Dehradun', 'Haridwar', 'Nainital'],
+  'West Bengal': ['Kolkata', 'Darjeeling', 'Siliguri'],
+};
+
+const CONNECTIVITY_TYPES = [
+  { label: 'Airport', value: 'airport' },
+  { label: 'Railway Station', value: 'railway' },
+  { label: 'Metro Station', value: 'metro' },
+  { label: 'Highway', value: 'highway' },
+  { label: 'Bus Station', value: 'bus-station' },
+  { label: 'Hospital', value: 'hospital' },
+  { label: 'School', value: 'school' },
+  { label: 'Shopping Mall', value: 'shopping' },
+  { label: 'Office Park', value: 'office-park' },
+];
 
 interface LocationDetailsProps {
   onNext: (data: any) => void;
@@ -28,10 +114,14 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
     microMarket: initialData?.microMarket || '',
     city: initialData?.city || '',
     state: initialData?.state || '',
-    connectivity: initialData?.connectivity || [{ id: 1, type: '', name: '', distance: '' }],
+    connectivity: initialData?.connectivity || [
+      { id: 1, type: '', name: '', distance: '' },
+    ],
     demandDrivers: initialData?.demandDrivers || '',
     futureInfrastructure: initialData?.futureInfrastructure || '',
-    faqs: initialData?.faqs || ([] as { id: number; question: string; answer: string }[]),
+    faqs:
+      initialData?.faqs ||
+      ([] as { id: number; question: string; answer: string }[]),
   });
 
   const [errors, setErrors] = useState<any>({});
@@ -53,11 +143,11 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
   const validateField = (name: string, value: string) => {
     switch (name) {
       case 'microMarket':
-        return !value.trim() ? 'Micro Market is required' : '';
+        return !value?.trim() ? 'Micro Market is required' : '';
       case 'city':
-        return !value.trim() ? 'City is required' : '';
+        return !value?.trim() ? 'City is required' : '';
       case 'state':
-        return !value.trim() ? 'State is required' : '';
+        return !value?.trim() ? 'State is required' : '';
       default:
         return '';
     }
@@ -72,9 +162,13 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
     }
   };
 
-  const handleBlur = (name: string) => {
+  const handleBlur = (name: string, value?: string) => {
     setTouched((prev: any) => ({ ...prev, [name]: true }));
-    const error = validateField(name, formData[name as keyof typeof formData] as string);
+    const valueToValidate =
+      value !== undefined
+        ? value
+        : (formData[name as keyof typeof formData] as string);
+    const error = validateField(name, valueToValidate);
     setErrors((prev: any) => ({ ...prev, [name]: error }));
   };
 
@@ -85,7 +179,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
   ) => {
     setFormData(prev => ({
       ...prev,
-      connectivity: prev.connectivity.map((item:any) =>
+      connectivity: prev.connectivity.map((item: any) =>
         item.id === id ? { ...item, [field]: value } : item,
       ),
     }));
@@ -104,7 +198,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
   const removeConnectivity = (id: number) => {
     setFormData(prev => ({
       ...prev,
-      connectivity: prev.connectivity.filter((item:any) => item.id !== id),
+      connectivity: prev.connectivity.filter((item: any) => item.id !== id),
     }));
   };
 
@@ -118,7 +212,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
   const handleFaqChange = (id: number, field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
-      faqs: prev.faqs.map((faq:any) =>
+      faqs: prev.faqs.map((faq: any) =>
         faq.id === id ? { ...faq, [field]: value } : faq,
       ),
     }));
@@ -127,13 +221,20 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
   const removeFaq = (id: number) => {
     setFormData(prev => ({
       ...prev,
-      faqs: prev.faqs.filter((faq:any) => faq.id !== id),
+      faqs: prev.faqs.filter((faq: any) => faq.id !== id),
     }));
   };
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={[styles.sectionTitle, isSmallScreen && styles.sectionTitleMobile]}>Location & Market Details</Text>
+      <Text
+        style={[
+          styles.sectionTitle,
+          isSmallScreen && styles.sectionTitleMobile,
+        ]}
+      >
+        Location & Market Details
+      </Text>
 
       <Text style={styles.subHeader}>Location Details</Text>
       <View style={styles.fieldContainer}>
@@ -146,7 +247,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
           placeholder="Enter Micro Market"
           value={formData.microMarket}
           onChangeText={v => handleInputChange('microMarket', v)}
-          onBlur={() => handleBlur('microMarket')}
+          onBlur={(e: any) => handleBlur('microMarket', e.nativeEvent.text)}
         />
         {touched.microMarket && errors.microMarket && (
           <Text style={styles.errorText}>{errors.microMarket}</Text>
@@ -156,19 +257,20 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
       <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>State *</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={[
-                styles.input,
-                touched.state && errors.state && styles.inputError,
-              ]}
-              placeholder="Select State"
-              value={formData.state}
-              onChangeText={v => handleInputChange('state', v)}
-              onBlur={() => handleBlur('state')}
-            />
-            <ChevronDown size={20} color="#999" style={styles.inputIcon} />
-          </View>
+          <CustomDropdown
+            placeholder="Select State"
+            value={formData.state}
+            options={INDIAN_STATES.map(s => ({ label: s, value: s }))}
+            onChange={v => {
+              handleInputChange('state', v);
+              // Clear city when state changes
+              handleInputChange('city', '');
+              handleBlur('state', v);
+            }}
+            onBlur={() => handleBlur('state')}
+            error={touched.state && !!errors.state}
+            searchable
+          />
           {touched.state && errors.state && (
             <Text style={styles.errorText}>{errors.state}</Text>
           )}
@@ -176,19 +278,25 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
 
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>City *</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={[
-                styles.input,
-                touched.city && errors.city && styles.inputError,
-              ]}
-              placeholder="Select City"
-              value={formData.city}
-              onChangeText={v => handleInputChange('city', v)}
-              onBlur={() => handleBlur('city')}
-            />
-            <ChevronDown size={20} color="#999" style={styles.inputIcon} />
-          </View>
+          <CustomDropdown
+            placeholder="Select City"
+            value={formData.city}
+            options={
+              formData.state && CITY_BY_STATE[formData.state]
+                ? CITY_BY_STATE[formData.state].map((c: string) => ({
+                    label: c,
+                    value: c,
+                  }))
+                : []
+            }
+            onChange={v => {
+              handleInputChange('city', v);
+              handleBlur('city', v);
+            }}
+            onBlur={() => handleBlur('city')}
+            error={touched.city && !!errors.city}
+            searchable
+          />
           {touched.city && errors.city && (
             <Text style={styles.errorText}>{errors.city}</Text>
           )}
@@ -196,7 +304,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
       </View>
 
       <Text style={styles.subHeader}>Connectivity Details</Text>
-      {formData.connectivity.map((item:any, index:number) => (
+      {formData.connectivity.map((item: any, index: number) => (
         <View key={item.id} style={styles.connectivityCard}>
           <View style={styles.connectivityHeader}>
             <Text style={styles.itemNumber}>#{index + 1}</Text>
@@ -208,15 +316,12 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
           </View>
           <View style={styles.fieldContainer}>
             <Text style={styles.labelSmall}>Type</Text>
-            <View style={styles.inputWrapper}>
-              <TextInput
-                style={styles.inputSmall}
-                placeholder="Airport, Railway..."
-                value={item.type}
-                onChangeText={v => handleConnectivityChange(item.id, 'type', v)}
-              />
-              <ChevronDown size={16} color="#999" style={styles.inputIcon} />
-            </View>
+            <CustomDropdown
+              placeholder="Select Type"
+              value={item.type}
+              options={CONNECTIVITY_TYPES}
+              onChange={v => handleConnectivityChange(item.id, 'type', v)}
+            />
           </View>
           <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
             <View style={[styles.fieldContainer, { flex: 2 }]}>
@@ -278,7 +383,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
       </View>
 
       <Text style={styles.subHeader}>Frequently Asked Questions</Text>
-      {formData.faqs.map((faq:any, index:number) => (
+      {formData.faqs.map((faq: any, index: number) => (
         <View key={faq.id} style={styles.faqCard}>
           <View style={styles.faqHeader}>
             <Text style={styles.itemNumber}>FAQ #{index + 1}</Text>
