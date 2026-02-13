@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Easing } from 'react-native';
 import Layout from '../../layout/Layout';
 import Hero from './components/Hero';
 import DiscoveryWizard from './components/DiscoveryWizard';
@@ -7,13 +8,40 @@ import FeaturedSection from './components/FeaturedSection';
 import WhyChooseSection from './components/WhyChooseSection';
 
 const Dashboard = () => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }),
+    ]).start();
+  }, []);
+
   return (
     <Layout>
-      <Hero />
-      <DiscoveryWizard />
-      <FeaturedSection />
-      <CategoriesSection />
-      <WhyChooseSection />
+      <Animated.View
+        style={{
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        }}
+      >
+        <Hero />
+        <DiscoveryWizard />
+        <FeaturedSection />
+        <CategoriesSection />
+        <WhyChooseSection />
+      </Animated.View>
     </Layout>
   );
 };
