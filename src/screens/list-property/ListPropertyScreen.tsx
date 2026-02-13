@@ -185,39 +185,43 @@ const ListPropertyScreen = () => {
         </View>
 
         {/* Form Area */}
-        <View style={[styles.formCard, isMobile && styles.formCardMobile]}>{renderStep()}</View>
+        <View style={styles.formCardWrapper}>
+          <View style={[styles.formCard, isMobile && styles.formCardMobile]}>{renderStep()}</View>
+        </View>
 
         {/* Navigation Actions */}
-        <View style={[styles.footer, isMobile && styles.footerMobile]}>
-          <TouchableOpacity
-            style={[
-              styles.navBtn,
-              styles.backBtn,
-              isMobile && styles.navBtnMobile,
-              currentStep === 1 && styles.btnHidden,
-            ]}
-            onPress={handleBack}
-            disabled={currentStep === 1}
-          >
-            <ChevronLeft size={isMobile ? 18 : 20} color="#666" />
-            <Text style={[styles.backBtnText, isMobile && styles.backBtnTextMobile]}>Previous</Text>
-          </TouchableOpacity>
+        <View style={styles.footerWrapper}>
+          <View style={[styles.footer, isMobile && styles.footerMobile]}>
+            <TouchableOpacity
+              style={[
+                styles.navBtn,
+                styles.backBtn,
+                isMobile && styles.navBtnMobile,
+                currentStep === 1 && styles.btnHidden,
+              ]}
+              onPress={handleBack}
+              disabled={currentStep === 1}
+            >
+              <ChevronLeft size={isMobile ? 18 : 20} color="#666" />
+              <Text style={[styles.backBtnText, isMobile && styles.backBtnTextMobile]}>Previous</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.navBtn,
-              styles.nextBtn,
-              isMobile && styles.navBtnMobile,
-              !isFormValid && styles.nextBtnDisabled,
-            ]}
-            onPress={handleFooterAction}
-            disabled={!isFormValid}
-          >
-            <Text style={[styles.nextBtnText, isMobile && styles.nextBtnTextMobile]}>
-              {currentStep === 6 ? 'List Property' : 'Next Step'}
-            </Text>
-            {currentStep < 6 && <ChevronRight size={isMobile ? 18 : 20} color="#FFF" />}
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.navBtn,
+                styles.nextBtn,
+                isMobile && styles.navBtnMobile,
+                !isFormValid && styles.nextBtnDisabled,
+              ]}
+              onPress={handleFooterAction}
+              disabled={!isFormValid}
+            >
+              <Text style={[styles.nextBtnText, isMobile && styles.nextBtnTextMobile]}>
+                {currentStep === 6 ? 'List Property' : 'Next Step'}
+              </Text>
+              {currentStep < 6 && <ChevronRight size={isMobile ? 18 : 20} color="#FFF" />}
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </Layout>
@@ -362,8 +366,14 @@ const styles = StyleSheet.create({
     marginTop: 12,
     borderRadius: 2,
   },
+  formCardWrapper: {
+    alignItems: 'center',
+    width: '100%',
+  },
   formCard: {
     backgroundColor: '#FFF',
+    width: '80%',
+    maxWidth: 1200,
     margin: 16,
     borderRadius: 12,
     shadowColor: '#000',
@@ -374,17 +384,25 @@ const styles = StyleSheet.create({
     minHeight: 400,
   },
   formCardMobile: {
+    width: '100%',
     margin: 12,
     borderRadius: 10,
+  },
+  footerWrapper: {
+    alignItems: 'center',
+    width: '100%',
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    width: '80%',
+    maxWidth: 1200,
     paddingHorizontal: 16,
     marginTop: 10,
     paddingBottom: 40,
   },
   footerMobile: {
+    width: '100%',
     paddingHorizontal: 12,
     paddingBottom: 24,
     marginTop: 8,
