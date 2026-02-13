@@ -32,6 +32,9 @@ const FinancialDetails: React.FC<FinancialDetailsProps> = ({
     additionalIncome: initialData?.additionalIncome || '',
   });
 
+  const [errors, setErrors] = useState<any>({});
+  const [touched, setTouched] = useState<any>({});
+
   const [metrics, setMetrics] = useState({
     annualGrossRent: '₹0',
     grossRentalYield: '0%',
@@ -57,6 +60,25 @@ const FinancialDetails: React.FC<FinancialDetailsProps> = ({
     );
   };
 
+  const validateField = (name: string, value: string) => {
+    switch (name) {
+      case 'sellingPrice':
+        if (!value) return 'Selling Price is required';
+        if (!/^\d+(\.\d+)?$/.test(value) || parseFloat(value) <= 0) return 'Please enter a valid price';
+        return '';
+      case 'propertyTax':
+        if (!value) return 'Property Tax is required';
+        if (!/^\d+(\.\d+)?$/.test(value)) return 'Please enter a valid amount';
+        return '';
+      case 'insurance':
+        if (!value) return 'Insurance is required';
+        if (!/^\d+(\.\d+)?$/.test(value)) return 'Please enter a valid amount';
+        return '';
+      default:
+        return '';
+    }
+  };
+
   const calculateMetrics = () => {
     // This is a simplified version of the metrics calculation
     // In a real app, these would depend on inputs from previous steps (carpet area, rent)
@@ -76,6 +98,17 @@ const FinancialDetails: React.FC<FinancialDetailsProps> = ({
 
   const handleInputChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (touched[name]) {
+      const error = validateField(name, value);
+      setErrors((prev: any) => ({ ...prev, [name]: error }));
+    }
+  };
+
+  const handleBlur = (name: string) => {
+    setTouched((prev: any) => ({ ...prev, [name]: true }));
+    const error = validateField(name, formData[name as keyof typeof formData]);
+    setErrors((prev: any) => ({ ...prev, [name]: error }));
   };
 
   return (
@@ -89,12 +122,19 @@ const FinancialDetails: React.FC<FinancialDetailsProps> = ({
           <Info size={14} color="#999" />
         </View>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            touched.sellingPrice && errors.sellingPrice && styles.inputError,
+          ]}
           placeholder="Enter Property Selling Price"
           keyboardType="numeric"
           value={formData.sellingPrice}
           onChangeText={v => handleInputChange('sellingPrice', v)}
+          onBlur={() => handleBlur('sellingPrice')}
         />
+        {touched.sellingPrice && errors.sellingPrice && (
+          <Text style={styles.errorText}>{errors.sellingPrice}</Text>
+        )}
       </View>
 
       <Text style={styles.subHeader}>Annual Operating Costs</Text>
@@ -102,22 +142,36 @@ const FinancialDetails: React.FC<FinancialDetailsProps> = ({
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Property Tax (Annual) *</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              touched.propertyTax && errors.propertyTax && styles.inputError,
+            ]}
             placeholder="0"
             keyboardType="numeric"
             value={formData.propertyTax}
             onChangeText={v => handleInputChange('propertyTax', v)}
+            onBlur={() => handleBlur('propertyTax')}
           />
+          {touched.propertyTax && errors.propertyTax && (
+            <Text style={styles.errorText}>{errors.propertyTax}</Text>
+          )}
         </View>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Insurance (Annual) *</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              touched.insurance && errors.insurance && styles.inputError,
+            ]}
             placeholder="0"
             keyboardType="numeric"
             value={formData.insurance}
             onChangeText={v => handleInputChange('insurance', v)}
+            onBlur={() => handleBlur('insurance')}
           />
+          {touched.insurance && errors.insurance && (
+            <Text style={styles.errorText}>{errors.insurance}</Text>
+          )}
         </View>
       </View>
 
@@ -233,6 +287,11 @@ const styles = StyleSheet.create({
     color: '#444',
     marginBottom: 6,
   },
+  errorText: {
+    color: '#EE2529',
+    fontSize: 11,
+    marginTop: 4,
+  },
   input: {
     backgroundColor: '#F2F2F2',
     height: 44,
@@ -240,6 +299,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: 14,
     color: '#333',
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  inputError: {
+    borderColor: '#EE2529',
   },
   totalBox: {
     backgroundColor: '#E0E0E0',

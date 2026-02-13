@@ -40,6 +40,9 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
     maintenanceAmount: initialData?.maintenanceAmount || '',
   });
 
+  const [errors, setErrors] = useState<any>({});
+  const [touched, setTouched] = useState<any>({});
+
   useEffect(() => {
     const isValid = validateFormSilently();
     onFormValid(isValid);
@@ -63,8 +66,74 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
     );
   };
 
+  const validateField = (name: string, value: string) => {
+    switch (name) {
+      case 'tenantType':
+        return !value ? 'Tenant Type is required' : '';
+      case 'leaseStartDate':
+        if (!value) return 'Lease Start Date is required';
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return 'Invalid date format (YYYY-MM-DD)';
+        return '';
+      case 'leaseExpiryDate':
+        if (!value) return 'Lease End Date is required';
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return 'Invalid date format (YYYY-MM-DD)';
+        return '';
+      case 'leaseDuration':
+        if (!value) return 'Lease Duration is required';
+        if (!/^\d+$/.test(value) || parseInt(value) <= 0) return 'Please enter a valid duration';
+        return '';
+      case 'rentPerSqFt':
+        if (formData.rentType === 'perSqFt') {
+          if (!value) return 'Rent Per Sq Ft is required';
+          if (!/^\d+(\.\d+)?$/.test(value) || parseFloat(value) <= 0) return 'Please enter a valid amount';
+        }
+        return '';
+      case 'totalMonthlyRent':
+        if (formData.rentType === 'lumpSum') {
+          if (!value) return 'Total Monthly Rent is required';
+          if (!/^\d+(\.\d+)?$/.test(value) || parseFloat(value) <= 0) return 'Please enter a valid amount';
+        }
+        return '';
+      case 'securityDepositMonths':
+        if (formData.securityDepositType === 'months') {
+          if (!value) return 'Deposit (Months) is required';
+          if (!/^\d+$/.test(value) || parseInt(value) <= 0) return 'Please enter a valid number';
+        }
+        return '';
+      case 'securityDepositAmount':
+        if (formData.securityDepositType === 'lumpSum') {
+          if (!value) return 'Deposit Amount is required';
+          if (!/^\d+(\.\d+)?$/.test(value) || parseFloat(value) <= 0) return 'Please enter a valid amount';
+        }
+        return '';
+      case 'escalationPercentage':
+        if (!value) return 'Annual Escalation is required';
+        if (!/^\d+(\.\d+)?$/.test(value)) return 'Please enter a valid percentage';
+        return '';
+      case 'escalationFrequency':
+        if (!value) return 'Frequency is required';
+        if (!/^\d+$/.test(value) || parseInt(value) <= 0) return 'Please enter a valid number';
+        return '';
+      case 'maintenanceScope':
+        return !value ? 'Maintenance Costs is required' : '';
+      default:
+        return '';
+    }
+  };
+
   const handleInputChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (touched[name]) {
+      const error = validateField(name, value);
+      setErrors((prev: any) => ({ ...prev, [name]: error }));
+    }
+  };
+
+  const handleBlur = (name: string) => {
+    setTouched((prev: any) => ({ ...prev, [name]: true }));
+    const error = validateField(name, formData[name as keyof typeof formData] as string);
+    setErrors((prev: any) => ({ ...prev, [name]: error }));
   };
 
   return (
@@ -76,13 +145,20 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
         <Text style={styles.label}>Tenant Type *</Text>
         <View style={styles.inputWrapper}>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              touched.tenantType && errors.tenantType && styles.inputError,
+            ]}
             placeholder="Select Tenant Type"
             value={formData.tenantType}
             onChangeText={v => handleInputChange('tenantType', v)}
+            onBlur={() => handleBlur('tenantType')}
           />
           <ChevronDown size={20} color="#999" style={styles.inputIcon} />
         </View>
+        {touched.tenantType && errors.tenantType && (
+          <Text style={styles.errorText}>{errors.tenantType}</Text>
+        )}
       </View>
 
       <Text style={styles.subHeader}>Lease Duration & Terms</Text>
@@ -90,20 +166,34 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Lease Start Date *</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              touched.leaseStartDate && errors.leaseStartDate && styles.inputError,
+            ]}
             placeholder="YYYY-MM-DD"
             value={formData.leaseStartDate}
             onChangeText={v => handleInputChange('leaseStartDate', v)}
+            onBlur={() => handleBlur('leaseStartDate')}
           />
+          {touched.leaseStartDate && errors.leaseStartDate && (
+            <Text style={styles.errorText}>{errors.leaseStartDate}</Text>
+          )}
         </View>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Lease End Date *</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              touched.leaseExpiryDate && errors.leaseExpiryDate && styles.inputError,
+            ]}
             placeholder="YYYY-MM-DD"
             value={formData.leaseExpiryDate}
             onChangeText={v => handleInputChange('leaseExpiryDate', v)}
+            onBlur={() => handleBlur('leaseExpiryDate')}
           />
+          {touched.leaseExpiryDate && errors.leaseExpiryDate && (
+            <Text style={styles.errorText}>{errors.leaseExpiryDate}</Text>
+          )}
         </View>
       </View>
 
@@ -130,12 +220,19 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Lease Duration (Years) *</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              touched.leaseDuration && errors.leaseDuration && styles.inputError,
+            ]}
             placeholder="0"
             keyboardType="numeric"
             value={formData.leaseDuration}
             onChangeText={v => handleInputChange('leaseDuration', v)}
+            onBlur={() => handleBlur('leaseDuration')}
           />
+          {touched.leaseDuration && errors.leaseDuration && (
+            <Text style={styles.errorText}>{errors.leaseDuration}</Text>
+          )}
         </View>
       </View>
 
@@ -227,23 +324,37 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>Rent Per Sq Ft *</Text>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                touched.rentPerSqFt && errors.rentPerSqFt && styles.inputError,
+              ]}
               placeholder="0.00"
               keyboardType="numeric"
               value={formData.rentPerSqFt}
               onChangeText={v => handleInputChange('rentPerSqFt', v)}
+              onBlur={() => handleBlur('rentPerSqFt')}
             />
+            {touched.rentPerSqFt && errors.rentPerSqFt && (
+              <Text style={styles.errorText}>{errors.rentPerSqFt}</Text>
+            )}
           </View>
         ) : (
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>Total Monthly Rent *</Text>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                touched.totalMonthlyRent && errors.totalMonthlyRent && styles.inputError,
+              ]}
               placeholder="0.00"
               keyboardType="numeric"
               value={formData.totalMonthlyRent}
               onChangeText={v => handleInputChange('totalMonthlyRent', v)}
+              onBlur={() => handleBlur('totalMonthlyRent')}
             />
+            {touched.totalMonthlyRent && errors.totalMonthlyRent && (
+              <Text style={styles.errorText}>{errors.totalMonthlyRent}</Text>
+            )}
           </View>
         )}
 
@@ -251,23 +362,37 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>Deposit (Months) *</Text>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                touched.securityDepositMonths && errors.securityDepositMonths && styles.inputError,
+              ]}
               placeholder="0"
               keyboardType="numeric"
               value={formData.securityDepositMonths}
               onChangeText={v => handleInputChange('securityDepositMonths', v)}
+              onBlur={() => handleBlur('securityDepositMonths')}
             />
+            {touched.securityDepositMonths && errors.securityDepositMonths && (
+              <Text style={styles.errorText}>{errors.securityDepositMonths}</Text>
+            )}
           </View>
         ) : (
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>Deposit Amount *</Text>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                touched.securityDepositAmount && errors.securityDepositAmount && styles.inputError,
+              ]}
               placeholder="0.00"
               keyboardType="numeric"
               value={formData.securityDepositAmount}
               onChangeText={v => handleInputChange('securityDepositAmount', v)}
+              onBlur={() => handleBlur('securityDepositAmount')}
             />
+            {touched.securityDepositAmount && errors.securityDepositAmount && (
+              <Text style={styles.errorText}>{errors.securityDepositAmount}</Text>
+            )}
           </View>
         )}
       </View>
@@ -277,22 +402,36 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Frequency (Years) *</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              touched.escalationFrequency && errors.escalationFrequency && styles.inputError,
+            ]}
             placeholder="Every X years"
             keyboardType="numeric"
             value={formData.escalationFrequency}
             onChangeText={v => handleInputChange('escalationFrequency', v)}
+            onBlur={() => handleBlur('escalationFrequency')}
           />
+          {touched.escalationFrequency && errors.escalationFrequency && (
+            <Text style={styles.errorText}>{errors.escalationFrequency}</Text>
+          )}
         </View>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Annual Escalation (%) *</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              touched.escalationPercentage && errors.escalationPercentage && styles.inputError,
+            ]}
             placeholder="0 %"
             keyboardType="numeric"
             value={formData.escalationPercentage}
             onChangeText={v => handleInputChange('escalationPercentage', v)}
+            onBlur={() => handleBlur('escalationPercentage')}
           />
+          {touched.escalationPercentage && errors.escalationPercentage && (
+            <Text style={styles.errorText}>{errors.escalationPercentage}</Text>
+          )}
         </View>
       </View>
 
@@ -300,13 +439,20 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initia
         <Text style={styles.label}>Maintenance Costs *</Text>
         <View style={styles.inputWrapper}>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              touched.maintenanceScope && errors.maintenanceScope && styles.inputError,
+            ]}
             placeholder="Are costs included?"
             value={formData.maintenanceScope}
             onChangeText={v => handleInputChange('maintenanceScope', v)}
+            onBlur={() => handleBlur('maintenanceScope')}
           />
           <ChevronDown size={20} color="#999" style={styles.inputIcon} />
         </View>
+        {touched.maintenanceScope && errors.maintenanceScope && (
+          <Text style={styles.errorText}>{errors.maintenanceScope}</Text>
+        )}
       </View>
 
       {formData.maintenanceScope !== '' && (
@@ -384,6 +530,11 @@ const styles = StyleSheet.create({
     color: '#444',
     marginBottom: 6,
   },
+  errorText: {
+    color: '#EE2529',
+    fontSize: 11,
+    marginTop: 4,
+  },
   inputWrapper: {
     position: 'relative',
     justifyContent: 'center',
@@ -395,6 +546,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: 14,
     color: '#333',
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  inputError: {
+    borderColor: '#EE2529',
   },
   inputIcon: {
     position: 'absolute',

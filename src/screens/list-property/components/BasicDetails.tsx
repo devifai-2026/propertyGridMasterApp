@@ -9,7 +9,8 @@ import {
   Platform,
   useWindowDimensions,
 } from 'react-native';
-import { ChevronDown, Info, Upload, FileText, X } from 'lucide-react-native';
+import { Upload } from 'lucide-react-native';
+import CustomDropdown from './CustomDropdown';
 
 interface BasicDetailsProps {
   onNext: (data: any) => void;
@@ -17,22 +18,76 @@ interface BasicDetailsProps {
   initialData?: any;
 }
 
-const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext, onFormValid, initialData }) => {
+const BasicDetails: React.FC<BasicDetailsProps> = ({
+  onNext,
+  onFormValid,
+  initialData,
+}) => {
   const { width } = useWindowDimensions();
   const isSmallScreen = width < 768;
 
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 31 }, (_, i) =>
-    (currentYear - i).toString(),
-  );
+  const yearOptions = Array.from({ length: 31 }, (_, i) => ({
+    label: (currentYear - i).toString(),
+    value: (currentYear - i).toString(),
+  }));
+
+  const propertyTypeOptions = [
+    { label: 'Residential', value: 'residential' },
+    { label: 'Retail', value: 'retail' },
+    { label: 'Offices', value: 'offices' },
+    { label: 'Industrial', value: 'industrial' },
+    { label: 'Others', value: 'others' },
+  ];
+
+  const buildingGradeOptions = [
+    { label: 'Grade A+', value: 'a_plus' },
+    { label: 'Grade A', value: 'a' },
+    { label: 'Grade B+', value: 'b_plus' },
+    { label: 'Grade B', value: 'b' },
+    { label: 'Grade C', value: 'c' },
+  ];
+
+  const ownershipOptions = [
+    { label: 'Freehold', value: 'freehold' },
+    { label: 'Leasehold', value: 'leasehold' },
+    { label: 'Jointly-hold', value: 'jointly_hold' },
+    { label: 'Government Owned', value: 'government_owned' },
+  ];
+
+  const furnishingOptions = [
+    { label: 'Fully Furnished by landowner', value: 'fully_furnished' },
+    { label: 'Semi-Furnished by landowner', value: 'semi_furnished' },
+    { label: 'Not Furnished by landowner', value: 'not_furnished' },
+  ];
+
+  const powerBackupOptions = [
+    { label: 'Yes', value: 'yes' },
+    { label: 'No', value: 'no' },
+  ];
+
+  const hvacOptions = [
+    { label: 'Central AC', value: 'central_ac' },
+    { label: 'Split AC', value: 'split_ac' },
+    { label: 'VRF System', value: 'vrf' },
+    { label: 'Chilled Water System', value: 'chilled_water' },
+    { label: 'None', value: 'none' },
+  ];
 
   const buildingMaintenanceOptions = [
-    'CBRE',
-    'JLL',
-    'Colliers',
-    'Cushman & Wakefield',
-    'In-house',
-    'Owner',
+    { label: 'CBRE', value: 'cbre' },
+    { label: 'JLL (Jones Lang LaSalle)', value: 'jll' },
+    { label: 'Colliers International', value: 'colliers' },
+    { label: 'Cushman & Wakefield', value: 'cushman' },
+    { label: 'Knight Frank', value: 'knight_frank' },
+    { label: 'Savills', value: 'savills' },
+    { label: 'Godrej Properties', value: 'godrej' },
+    { label: 'Prestige Group', value: 'prestige' },
+    { label: 'DLF Limited', value: 'dlf' },
+    { label: 'Sobha Limited', value: 'sobha' },
+    { label: 'Brigade Group', value: 'brigade' },
+    { label: 'In-house Maintenance Team', value: 'inhouse' },
+    { label: 'Self-maintained by Owner', value: 'self_maintained' },
   ];
 
   const [formData, setFormData] = useState({
@@ -75,13 +130,68 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext, onFormValid, initia
     );
   };
 
+  const validateField = (name: string, value: string) => {
+    switch (name) {
+      case 'propertyType':
+        return !value ? 'Property Type is required' : '';
+      case 'builtYear':
+        if (!value) return 'Completion Year is required';
+        if (!/^\d{4}$/.test(value)) return 'Please enter a valid year';
+        const year = parseInt(value);
+        if (year < 1900 || year > currentYear)
+          return `Year must be between 1900 and ${currentYear}`;
+        return '';
+      case 'buildingGrade':
+        return !value ? 'Building Grade is required' : '';
+      case 'carpetArea':
+        if (!value) return 'Carpet Area is required';
+        if (!/^\d+$/.test(value) || parseInt(value) <= 0)
+          return 'Please enter a valid area';
+        return '';
+      case 'ownership':
+        return !value ? 'Ownership is required' : '';
+      case 'fourWheelerParkings':
+        if (!value) return '4 Wheeler Parkings is required';
+        if (!/^\d+$/.test(value)) return 'Please enter a valid number';
+        return '';
+      case 'twoWheelerParkings':
+        if (!value) return '2 Wheeler Parkings is required';
+        if (!/^\d+$/.test(value)) return 'Please enter a valid number';
+        return '';
+      case 'furnishingStatus':
+        return !value ? 'Furnishing Status is required' : '';
+      default:
+        return '';
+    }
+  };
+
   const handleInputChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (touched[name]) {
+      const error = validateField(name, value);
+      setErrors((prev: any) => ({ ...prev, [name]: error }));
+    }
+  };
+
+  const handleBlur = (name: string, value?: string) => {
+    setTouched((prev: any) => ({ ...prev, [name]: true }));
+    const valueToValidate =
+      value !== undefined
+        ? value
+        : (formData[name as keyof typeof formData] as string);
+    const error = validateField(name, valueToValidate);
+    setErrors((prev: any) => ({ ...prev, [name]: error }));
   };
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={[styles.sectionTitle, isSmallScreen && styles.sectionTitleMobile]}>
+      <Text
+        style={[
+          styles.sectionTitle,
+          isSmallScreen && styles.sectionTitleMobile,
+        ]}
+      >
         Property Overview and Basic Details
       </Text>
 
@@ -89,15 +199,20 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext, onFormValid, initia
 
       <View style={styles.fieldContainer}>
         <Text style={styles.label}>Property Type *</Text>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="Select Property Type"
-            value={formData.propertyType}
-            onChangeText={v => handleInputChange('propertyType', v)}
-          />
-          <ChevronDown size={20} color="#999" style={styles.inputIcon} />
-        </View>
+        <CustomDropdown
+          placeholder="Select Property Type"
+          value={formData.propertyType}
+          options={propertyTypeOptions}
+          onChange={v => {
+            handleInputChange('propertyType', v);
+            handleBlur('propertyType', v);
+          }}
+          onBlur={() => handleBlur('propertyType')}
+          error={touched.propertyType && !!errors.propertyType}
+        />
+        {touched.propertyType && errors.propertyType && (
+          <Text style={styles.errorText}>{errors.propertyType}</Text>
+        )}
       </View>
 
       <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
@@ -105,55 +220,80 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext, onFormValid, initia
           <Text style={styles.label}>Carpet Area *</Text>
           <View style={styles.areaInputGroup}>
             <TextInput
-              style={[styles.input, { flex: 1 }]}
+              style={[
+                styles.input,
+                { flex: 1 },
+                touched.carpetArea && errors.carpetArea && styles.inputError,
+              ]}
               placeholder="Area"
               keyboardType="numeric"
               value={formData.carpetArea}
               onChangeText={v => handleInputChange('carpetArea', v)}
+              onBlur={(e: any) => handleBlur('carpetArea', e.nativeEvent.text)}
             />
             <View style={styles.unitSelector}>
               <Text style={styles.unitText}>Sq. Ft.</Text>
             </View>
           </View>
+          {touched.carpetArea && errors.carpetArea && (
+            <Text style={styles.errorText}>{errors.carpetArea}</Text>
+          )}
         </View>
 
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Completion Year *</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              touched.builtYear && errors.builtYear && styles.inputError,
+            ]}
             placeholder="Year"
             keyboardType="numeric"
             value={formData.builtYear}
             onChangeText={v => handleInputChange('builtYear', v)}
+            onBlur={(e: any) => handleBlur('builtYear', e.nativeEvent.text)}
           />
+          {touched.builtYear && errors.builtYear && (
+            <Text style={styles.errorText}>{errors.builtYear}</Text>
+          )}
         </View>
       </View>
 
       <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Building Grade *</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={styles.input}
-              placeholder="Select Grade"
-              value={formData.buildingGrade}
-              onChangeText={v => handleInputChange('buildingGrade', v)}
-            />
-            <ChevronDown size={20} color="#999" style={styles.inputIcon} />
-          </View>
+          <CustomDropdown
+            placeholder="Select Grade"
+            value={formData.buildingGrade}
+            options={buildingGradeOptions}
+            onChange={v => {
+              handleInputChange('buildingGrade', v);
+              handleBlur('buildingGrade', v);
+            }}
+            onBlur={() => handleBlur('buildingGrade')}
+            error={touched.buildingGrade && !!errors.buildingGrade}
+          />
+          {touched.buildingGrade && errors.buildingGrade && (
+            <Text style={styles.errorText}>{errors.buildingGrade}</Text>
+          )}
         </View>
 
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Ownership *</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={styles.input}
-              placeholder="Select Ownership"
-              value={formData.ownership}
-              onChangeText={v => handleInputChange('ownership', v)}
-            />
-            <ChevronDown size={20} color="#999" style={styles.inputIcon} />
-          </View>
+          <CustomDropdown
+            placeholder="Select Ownership"
+            value={formData.ownership}
+            options={ownershipOptions}
+            onChange={v => {
+              handleInputChange('ownership', v);
+              handleBlur('ownership', v);
+            }}
+            onBlur={() => handleBlur('ownership')}
+            error={touched.ownership && !!errors.ownership}
+          />
+          {touched.ownership && errors.ownership && (
+            <Text style={styles.errorText}>{errors.ownership}</Text>
+          )}
         </View>
       </View>
 
@@ -162,22 +302,44 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext, onFormValid, initia
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>4 Wheeler Parkings *</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              touched.fourWheelerParkings &&
+                errors.fourWheelerParkings &&
+                styles.inputError,
+            ]}
             placeholder="Slots"
             keyboardType="numeric"
             value={formData.fourWheelerParkings}
             onChangeText={v => handleInputChange('fourWheelerParkings', v)}
+            onBlur={(e: any) =>
+              handleBlur('fourWheelerParkings', e.nativeEvent.text)
+            }
           />
+          {touched.fourWheelerParkings && errors.fourWheelerParkings && (
+            <Text style={styles.errorText}>{errors.fourWheelerParkings}</Text>
+          )}
         </View>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>2 Wheeler Parkings *</Text>
           <TextInput
-            style={styles.input}
+            style={[
+              styles.input,
+              touched.twoWheelerParkings &&
+                errors.twoWheelerParkings &&
+                styles.inputError,
+            ]}
             placeholder="Slots"
             keyboardType="numeric"
             value={formData.twoWheelerParkings}
             onChangeText={v => handleInputChange('twoWheelerParkings', v)}
+            onBlur={(e: any) =>
+              handleBlur('twoWheelerParkings', e.nativeEvent.text)
+            }
           />
+          {touched.twoWheelerParkings && errors.twoWheelerParkings && (
+            <Text style={styles.errorText}>{errors.twoWheelerParkings}</Text>
+          )}
         </View>
       </View>
 
@@ -185,15 +347,20 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext, onFormValid, initia
       <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Furnishing Status *</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={styles.input}
-              placeholder="Select Status"
-              value={formData.furnishingStatus}
-              onChangeText={v => handleInputChange('furnishingStatus', v)}
-            />
-            <ChevronDown size={20} color="#999" style={styles.inputIcon} />
-          </View>
+          <CustomDropdown
+            placeholder="Select Status"
+            value={formData.furnishingStatus}
+            options={furnishingOptions}
+            onChange={v => {
+              handleInputChange('furnishingStatus', v);
+              handleBlur('furnishingStatus', v);
+            }}
+            onBlur={() => handleBlur('furnishingStatus')}
+            error={touched.furnishingStatus && !!errors.furnishingStatus}
+          />
+          {touched.furnishingStatus && errors.furnishingStatus && (
+            <Text style={styles.errorText}>{errors.furnishingStatus}</Text>
+          )}
         </View>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Number of Lifts</Text>
@@ -203,6 +370,70 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext, onFormValid, initia
             keyboardType="numeric"
             value={formData.numLifts}
             onChangeText={v => handleInputChange('numLifts', v)}
+          />
+        </View>
+      </View>
+
+      <Text style={styles.subHeader}>Building Amenities & Infrastructure</Text>
+      <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Power Backup</Text>
+          <CustomDropdown
+            placeholder="Select Power Backup"
+            value={formData.powerBackup}
+            options={powerBackupOptions}
+            onChange={v => {
+              handleInputChange('powerBackup', v);
+              handleBlur('powerBackup', v);
+            }}
+            onBlur={() => handleBlur('powerBackup')}
+            error={touched.powerBackup && !!errors.powerBackup}
+          />
+        </View>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>HVAC Type</Text>
+          <CustomDropdown
+            placeholder="Select HVAC Type"
+            value={formData.hvacType}
+            options={hvacOptions}
+            onChange={v => {
+              handleInputChange('hvacType', v);
+              handleBlur('hvacType', v);
+            }}
+            onBlur={() => handleBlur('hvacType')}
+            error={touched.hvacType && !!errors.hvacType}
+          />
+        </View>
+      </View>
+
+      <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Building Maintained By</Text>
+          <CustomDropdown
+            placeholder="Select Building Maintenance"
+            value={formData.buildingMaintained}
+            options={buildingMaintenanceOptions}
+            onChange={v => {
+              handleInputChange('buildingMaintained', v);
+              handleBlur('buildingMaintained', v);
+            }}
+            onBlur={() => handleBlur('buildingMaintained')}
+            error={touched.buildingMaintained && !!errors.buildingMaintained}
+            searchable
+          />
+        </View>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Last Refurbished</Text>
+          <CustomDropdown
+            placeholder="Select Year"
+            value={formData.lastRefurbished}
+            options={yearOptions}
+            onChange={v => {
+              handleInputChange('lastRefurbished', v);
+              handleBlur('lastRefurbished', v);
+            }}
+            onBlur={() => handleBlur('lastRefurbished')}
+            error={touched.lastRefurbished && !!errors.lastRefurbished}
           />
         </View>
       </View>
@@ -269,6 +500,11 @@ const styles = StyleSheet.create({
     color: '#444',
     marginBottom: 6,
   },
+  errorText: {
+    color: '#EE2529',
+    fontSize: 11,
+    marginTop: 4,
+  },
   inputWrapper: {
     position: 'relative',
     justifyContent: 'center',
@@ -280,6 +516,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: 14,
     color: '#333',
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  inputError: {
+    borderColor: '#EE2529',
   },
   inputIcon: {
     position: 'absolute',

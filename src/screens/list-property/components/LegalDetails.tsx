@@ -8,7 +8,8 @@ import {
   ScrollView,
   useWindowDimensions,
 } from 'react-native';
-import { ChevronDown, Plus, X } from 'lucide-react-native';
+import { Plus, X } from 'lucide-react-native';
+import CustomDropdown from './CustomDropdown';
 
 interface LegalDetailsProps {
   onNext: (data: any) => void;
@@ -16,9 +17,30 @@ interface LegalDetailsProps {
   initialData?: any;
 }
 
-const LegalDetails: React.FC<LegalDetailsProps> = ({ onNext, onFormValid, initialData }) => {
+const LegalDetails: React.FC<LegalDetailsProps> = ({
+  onNext,
+  onFormValid,
+  initialData,
+}) => {
   const { width } = useWindowDimensions();
   const isSmallScreen = width < 768;
+
+  const titleStatusOptions = [
+    { label: 'No Litigation', value: 'no_litigation' },
+    { label: 'Pending Litigation', value: 'pending_litigation' },
+  ];
+
+  const occupancyCertificateOptions = [
+    { label: 'Yes, available', value: 'yes' },
+    { label: 'In Process', value: 'in_process' },
+    { label: 'Not available', value: 'not_available' },
+  ];
+
+  const leaseRegistrationOptions = [
+    { label: 'Registered Lease', value: 'registered' },
+    { label: 'Notorized Lease', value: 'notorized' },
+    { label: 'No lease document', value: 'no_document' },
+  ];
 
   const [formData, setFormData] = useState({
     titleStatus: initialData?.titleStatus || '',
@@ -53,8 +75,41 @@ const LegalDetails: React.FC<LegalDetailsProps> = ({ onNext, onFormValid, initia
     );
   };
 
+  const validateField = (name: string, value: any) => {
+    switch (name) {
+      case 'titleStatus':
+        return !value ? 'Title Status is required' : '';
+      case 'occupancyCertificate':
+        return !value ? 'Occupancy Certificate is required' : '';
+      case 'leaseRegistration':
+        return !value ? 'Lease Registration is required' : '';
+      case 'pendingLitigations':
+        return !value ? 'Please select Yes or No' : '';
+      case 'litigationNote':
+        if (formData.pendingLitigations === 'yes' && !value.trim()) {
+          return 'Please provide litigation details';
+        }
+        return '';
+      default:
+        return '';
+    }
+  };
+
   const handleInputChange = (name: string, value: any) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (touched[name]) {
+      const error = validateField(name, value);
+      setErrors((prev: any) => ({ ...prev, [name]: error }));
+    }
+  };
+
+  const handleBlur = (name: string, value?: any) => {
+    setTouched((prev: any) => ({ ...prev, [name]: true }));
+    const valueToValidate =
+      value !== undefined ? value : formData[name as keyof typeof formData];
+    const error = validateField(name, valueToValidate);
+    setErrors((prev: any) => ({ ...prev, [name]: error }));
   };
 
   const toggleCertification = (cert: keyof typeof formData.certifications) => {
@@ -87,7 +142,9 @@ const LegalDetails: React.FC<LegalDetailsProps> = ({ onNext, onFormValid, initia
   };
 
   const removeOtherCert = (index: number) => {
-    const newCerts = formData.otherCertifications.filter((_:any, i:number) => i !== index);
+    const newCerts = formData.otherCertifications.filter(
+      (_: any, i: number) => i !== index,
+    );
     setFormData(prev => ({
       ...prev,
       otherCertifications: newCerts.length ? newCerts : [''],
@@ -96,58 +153,84 @@ const LegalDetails: React.FC<LegalDetailsProps> = ({ onNext, onFormValid, initia
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={[styles.sectionTitle, isSmallScreen && styles.sectionTitleMobile]}>Legal & Title Details</Text>
+      <Text
+        style={[
+          styles.sectionTitle,
+          isSmallScreen && styles.sectionTitleMobile,
+        ]}
+      >
+        Legal & Title Details
+      </Text>
 
       <Text style={styles.subHeader}>Title & Ownership Status</Text>
 
       <View style={styles.fieldContainer}>
         <Text style={styles.label}>Title Status *</Text>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="Select Status"
-            value={formData.titleStatus}
-            onChangeText={v => handleInputChange('titleStatus', v)}
-          />
-          <ChevronDown size={20} color="#999" style={styles.inputIcon} />
-        </View>
+        <CustomDropdown
+          placeholder="Select Status"
+          value={formData.titleStatus}
+          options={titleStatusOptions}
+          onChange={v => {
+            handleInputChange('titleStatus', v);
+            handleBlur('titleStatus', v);
+          }}
+          onBlur={() => handleBlur('titleStatus')}
+          error={touched.titleStatus && !!errors.titleStatus}
+        />
+        {touched.titleStatus && errors.titleStatus && (
+          <Text style={styles.errorText}>{errors.titleStatus}</Text>
+        )}
       </View>
 
       <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Occupancy Certificate *</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={styles.input}
-              placeholder="Select Status"
-              value={formData.occupancyCertificate}
-              onChangeText={v => handleInputChange('occupancyCertificate', v)}
-            />
-            <ChevronDown size={20} color="#999" style={styles.inputIcon} />
-          </View>
+          <Text style={styles.label}>Occupancy Certificate (OC) *</Text>
+          <CustomDropdown
+            placeholder="Select Status"
+            value={formData.occupancyCertificate}
+            options={occupancyCertificateOptions}
+            onChange={v => {
+              handleInputChange('occupancyCertificate', v);
+              handleBlur('occupancyCertificate', v);
+            }}
+            onBlur={() => handleBlur('occupancyCertificate')}
+            error={
+              touched.occupancyCertificate && !!errors.occupancyCertificate
+            }
+          />
+          {touched.occupancyCertificate && errors.occupancyCertificate && (
+            <Text style={styles.errorText}>{errors.occupancyCertificate}</Text>
+          )}
         </View>
 
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Lease Registration *</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput
-              style={styles.input}
-              placeholder="Select Status"
-              value={formData.leaseRegistration}
-              onChangeText={v => handleInputChange('leaseRegistration', v)}
-            />
-            <ChevronDown size={20} color="#999" style={styles.inputIcon} />
-          </View>
+          <CustomDropdown
+            placeholder="Select Status"
+            value={formData.leaseRegistration}
+            options={leaseRegistrationOptions}
+            onChange={v => {
+              handleInputChange('leaseRegistration', v);
+              handleBlur('leaseRegistration', v);
+            }}
+            onBlur={() => handleBlur('leaseRegistration')}
+            error={touched.leaseRegistration && !!errors.leaseRegistration}
+          />
+          {touched.leaseRegistration && errors.leaseRegistration && (
+            <Text style={styles.errorText}>{errors.leaseRegistration}</Text>
+          )}
         </View>
       </View>
 
-      <Text style={styles.subHeader}>Litigation Status</Text>
       <View style={styles.fieldContainer}>
         <Text style={styles.label}>Any Pending Litigations *</Text>
         <View style={styles.radioGroup}>
           <TouchableOpacity
             style={styles.radioButton}
-            onPress={() => handleInputChange('pendingLitigations', 'yes')}
+            onPress={() => {
+              handleInputChange('pendingLitigations', 'yes');
+              handleBlur('pendingLitigations');
+            }}
           >
             <View
               style={[
@@ -164,7 +247,10 @@ const LegalDetails: React.FC<LegalDetailsProps> = ({ onNext, onFormValid, initia
 
           <TouchableOpacity
             style={styles.radioButton}
-            onPress={() => handleInputChange('pendingLitigations', 'no')}
+            onPress={() => {
+              handleInputChange('pendingLitigations', 'no');
+              handleBlur('pendingLitigations');
+            }}
           >
             <View
               style={[
@@ -179,19 +265,34 @@ const LegalDetails: React.FC<LegalDetailsProps> = ({ onNext, onFormValid, initia
             <Text style={styles.radioLabel}>No</Text>
           </TouchableOpacity>
         </View>
+        {touched.pendingLitigations && errors.pendingLitigations && (
+          <Text style={styles.errorText}>{errors.pendingLitigations}</Text>
+        )}
       </View>
 
       {formData.pendingLitigations === 'yes' && (
         <View style={styles.fieldContainer}>
           <TextInput
-            style={[styles.input, styles.textArea]}
+            style={[
+              styles.input,
+              styles.textArea,
+              touched.litigationNote &&
+                errors.litigationNote &&
+                styles.inputError,
+            ]}
             placeholder="Enter Brief note on Litigation"
             multiline
             numberOfLines={3}
             textAlignVertical="top"
             value={formData.litigationNote}
             onChangeText={v => handleInputChange('litigationNote', v)}
+            onBlur={(e: any) =>
+              handleBlur('litigationNote', e.nativeEvent.text)
+            }
           />
+          {touched.litigationNote && errors.litigationNote && (
+            <Text style={styles.errorText}>{errors.litigationNote}</Text>
+          )}
         </View>
       )}
 
@@ -220,7 +321,7 @@ const LegalDetails: React.FC<LegalDetailsProps> = ({ onNext, onFormValid, initia
 
       <View style={styles.otherCertContainer}>
         <Text style={styles.labelSmall}>Add Others (if Any)</Text>
-        {formData.otherCertifications.map((cert:any, index:number) => (
+        {formData.otherCertifications.map((cert: any, index: number) => (
           <View key={index} style={styles.certInputRow}>
             <TextInput
               style={[styles.input, { flex: 1 }]}
@@ -294,6 +395,11 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 8,
   },
+  errorText: {
+    color: '#EE2529',
+    fontSize: 11,
+    marginTop: 4,
+  },
   inputWrapper: {
     position: 'relative',
     justifyContent: 'center',
@@ -305,6 +411,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: 14,
     color: '#333',
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  inputError: {
+    borderColor: '#EE2529',
   },
   inputIcon: {
     position: 'absolute',

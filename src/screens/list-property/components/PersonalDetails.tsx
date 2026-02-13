@@ -140,6 +140,14 @@ const PersonalDetails = forwardRef(
       handleChange('mobile', value);
     };
 
+    const handleBlur = (name: string, value?: string) => {
+      setTouched((prev: any) => ({ ...prev, [name]: true }));
+      const valueToValidate =
+        value !== undefined ? value : formData[name as keyof typeof formData];
+      const error = validateField(name, valueToValidate);
+      setErrors((prev: any) => ({ ...prev, [name]: error }));
+    };
+
     const handleSendOtp = () => {
       const mobileNumber = formData.mobile.replace(/\D/g, '');
       const mobileError = validateField('mobile', formData.mobile);
@@ -176,7 +184,11 @@ const PersonalDetails = forwardRef(
 
     return (
       <View style={styles.container}>
-        <Text style={[styles.sectionTitle, isMobile && styles.sectionTitleMobile]}>Personal Details</Text>
+        <Text
+          style={[styles.sectionTitle, isMobile && styles.sectionTitleMobile]}
+        >
+          Personal Details
+        </Text>
 
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
@@ -190,6 +202,7 @@ const PersonalDetails = forwardRef(
               onChangeText={text => handleChange('firstName', text)}
               placeholder="Enter Your First Name"
               placeholderTextColor="#999"
+              onBlur={(e: any) => handleBlur('firstName', e.nativeEvent.text)}
             />
             {touched.firstName && errors.firstName && (
               <Text style={styles.errorText}>{errors.firstName}</Text>
@@ -207,6 +220,7 @@ const PersonalDetails = forwardRef(
               onChangeText={text => handleChange('lastName', text)}
               placeholder="Enter Your Last Name"
               placeholderTextColor="#999"
+              onBlur={(e: any) => handleBlur('lastName', e.nativeEvent.text)}
             />
             {touched.lastName && errors.lastName && (
               <Text style={styles.errorText}>{errors.lastName}</Text>
@@ -226,6 +240,7 @@ const PersonalDetails = forwardRef(
             placeholder="Enter Email Address"
             placeholderTextColor="#999"
             keyboardType="email-address"
+            onBlur={(e: any) => handleBlur('email', e.nativeEvent.text)}
           />
           {touched.email && errors.email && (
             <Text style={styles.errorText}>{errors.email}</Text>
@@ -276,7 +291,12 @@ const PersonalDetails = forwardRef(
 
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Mobile Number *</Text>
-          <View style={[styles.mobileInputContainer, isMobile && styles.mobileInputContainerMobile]}>
+          <View
+            style={[
+              styles.mobileInputContainer,
+              isMobile && styles.mobileInputContainerMobile,
+            ]}
+          >
             <TextInput
               style={[
                 styles.input,
@@ -289,6 +309,7 @@ const PersonalDetails = forwardRef(
               placeholderTextColor="#999"
               keyboardType="phone-pad"
               maxLength={11}
+              onBlur={(e: any) => handleBlur('mobile', e.nativeEvent.text)}
             />
             <TouchableOpacity
               style={[
@@ -300,7 +321,9 @@ const PersonalDetails = forwardRef(
               onPress={handleSendOtp}
               disabled={mobileNumberRaw.length !== 10 || otpSent}
             >
-              <Text style={[styles.otpBtnText, isMobile && styles.otpBtnTextMobile]}>
+              <Text
+                style={[styles.otpBtnText, isMobile && styles.otpBtnTextMobile]}
+              >
                 {otpSent ? 'Resend OTP' : 'Send OTP'}
               </Text>
             </TouchableOpacity>
@@ -313,7 +336,12 @@ const PersonalDetails = forwardRef(
         {otpSent && (
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>OTP *</Text>
-            <View style={[styles.otpInputGroup, isMobile && styles.otpInputGroupMobile]}>
+            <View
+              style={[
+                styles.otpInputGroup,
+                isMobile && styles.otpInputGroupMobile,
+              ]}
+            >
               {[0, 1, 2, 3].map(index => (
                 <TextInput
                   key={index}

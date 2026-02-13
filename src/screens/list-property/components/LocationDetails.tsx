@@ -34,6 +34,9 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
     faqs: initialData?.faqs || ([] as { id: number; question: string; answer: string }[]),
   });
 
+  const [errors, setErrors] = useState<any>({});
+  const [touched, setTouched] = useState<any>({});
+
   useEffect(() => {
     const isValid = validateFormSilently();
     onFormValid(isValid);
@@ -47,8 +50,32 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
     );
   };
 
+  const validateField = (name: string, value: string) => {
+    switch (name) {
+      case 'microMarket':
+        return !value.trim() ? 'Micro Market is required' : '';
+      case 'city':
+        return !value.trim() ? 'City is required' : '';
+      case 'state':
+        return !value.trim() ? 'State is required' : '';
+      default:
+        return '';
+    }
+  };
+
   const handleInputChange = (name: string, value: any) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+
+    if (touched[name]) {
+      const error = validateField(name, value);
+      setErrors((prev: any) => ({ ...prev, [name]: error }));
+    }
+  };
+
+  const handleBlur = (name: string) => {
+    setTouched((prev: any) => ({ ...prev, [name]: true }));
+    const error = validateField(name, formData[name as keyof typeof formData] as string);
+    setErrors((prev: any) => ({ ...prev, [name]: error }));
   };
 
   const handleConnectivityChange = (
@@ -112,11 +139,18 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
       <View style={styles.fieldContainer}>
         <Text style={styles.label}>Micro Market *</Text>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            touched.microMarket && errors.microMarket && styles.inputError,
+          ]}
           placeholder="Enter Micro Market"
           value={formData.microMarket}
           onChangeText={v => handleInputChange('microMarket', v)}
+          onBlur={() => handleBlur('microMarket')}
         />
+        {touched.microMarket && errors.microMarket && (
+          <Text style={styles.errorText}>{errors.microMarket}</Text>
+        )}
       </View>
 
       <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
@@ -124,26 +158,40 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
           <Text style={styles.label}>State *</Text>
           <View style={styles.inputWrapper}>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                touched.state && errors.state && styles.inputError,
+              ]}
               placeholder="Select State"
               value={formData.state}
               onChangeText={v => handleInputChange('state', v)}
+              onBlur={() => handleBlur('state')}
             />
             <ChevronDown size={20} color="#999" style={styles.inputIcon} />
           </View>
+          {touched.state && errors.state && (
+            <Text style={styles.errorText}>{errors.state}</Text>
+          )}
         </View>
 
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>City *</Text>
           <View style={styles.inputWrapper}>
             <TextInput
-              style={styles.input}
+              style={[
+                styles.input,
+                touched.city && errors.city && styles.inputError,
+              ]}
               placeholder="Select City"
               value={formData.city}
               onChangeText={v => handleInputChange('city', v)}
+              onBlur={() => handleBlur('city')}
             />
             <ChevronDown size={20} color="#999" style={styles.inputIcon} />
           </View>
+          {touched.city && errors.city && (
+            <Text style={styles.errorText}>{errors.city}</Text>
+          )}
         </View>
       </View>
 
@@ -316,6 +364,11 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 4,
   },
+  errorText: {
+    color: '#EE2529',
+    fontSize: 11,
+    marginTop: 4,
+  },
   inputWrapper: {
     position: 'relative',
     justifyContent: 'center',
@@ -327,6 +380,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     fontSize: 14,
     color: '#333',
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  inputError: {
+    borderColor: '#EE2529',
   },
   inputSmall: {
     backgroundColor: '#FFF',
