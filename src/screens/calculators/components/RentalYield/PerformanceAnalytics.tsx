@@ -37,7 +37,7 @@ const PerformanceAnalytics: React.FC = () => {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
 
-  const chartWidth = isDesktop ? width / 2.5 : width - 40;
+  const chartWidth = isDesktop ? width / 2.5 : width - 64;
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -48,48 +48,52 @@ const PerformanceAnalytics: React.FC = () => {
         <View style={[styles.card, isDesktop && styles.desktopCard]}>
           <Text style={styles.cardTitle}>Annual Expense Breakdown</Text>
 
-          <PieChart
-            data={expenseData.map(item => ({
-              name: item.name,
-              population: item.value,
-              color: item.color,
-              legendFontColor: '#333',
-              legendFontSize: 12,
-            }))}
-            width={chartWidth}
-            height={260}
-            chartConfig={chartConfig}
-            accessor="population"
-            backgroundColor="transparent"
-            paddingLeft="10"
-            absolute
-          />
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <PieChart
+              data={expenseData.map(item => ({
+                name: item.name,
+                population: item.value,
+                color: item.color,
+                legendFontColor: '#333',
+                legendFontSize: 12,
+              }))}
+              width={isDesktop ? chartWidth : Math.max(chartWidth, 300)} // Ensure minimum width for readability
+              height={260}
+              chartConfig={chartConfig}
+              accessor="population"
+              backgroundColor="transparent"
+              paddingLeft="10"
+              absolute
+            />
+          </ScrollView>
         </View>
 
         {/* Bar Chart */}
         <View style={[styles.card, isDesktop && styles.desktopCard]}>
           <Text style={styles.cardTitle}>Rental Yield Comparison</Text>
 
-          <BarChart
-            data={{
-              labels: yieldData.map(item => item.name),
-              datasets: [
-                {
-                  data: yieldData.map(item => item.value),
-                },
-              ],
-            }}
-            width={chartWidth}
-            height={260}
-            yAxisLabel=""
-            yAxisSuffix="%"
-            fromZero
-            chartConfig={{
-              ...chartConfig,
-              color: () => '#C73834',
-            }}
-            style={{ borderRadius: 12 }}
-          />
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <BarChart
+              data={{
+                labels: yieldData.map(item => item.name),
+                datasets: [
+                  {
+                    data: yieldData.map(item => item.value),
+                  },
+                ],
+              }}
+              width={isDesktop ? chartWidth : Math.max(chartWidth, 300)}
+              height={260}
+              yAxisLabel=""
+              yAxisSuffix="%"
+              fromZero
+              chartConfig={{
+                ...chartConfig,
+                color: () => '#C73834',
+              }}
+              style={{ borderRadius: 12 }}
+            />
+          </ScrollView>
         </View>
       </View>
     </ScrollView>

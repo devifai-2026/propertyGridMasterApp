@@ -1,11 +1,6 @@
-import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  useWindowDimensions,
-} from "react-native";
-import { Calendar, TrendingUp } from "lucide-react-native";
+import React from 'react';
+import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
+import { Calendar, TrendingUp } from 'lucide-react-native';
 
 const RentalCards = () => {
   const { width } = useWindowDimensions();
@@ -14,24 +9,23 @@ const RentalCards = () => {
   const isTablet = width >= 768 && width < 1024;
 
   const cardWidth = isDesktop
-    ? "23%"
+    ? '23%' // 4 columns
     : isTablet
-    ? "48%"
-    : "48%"; // 2 columns on mobile
+    ? '48%' // 2 columns
+    : '100%'; // 1 column on mobile
 
-  const squareSize = (width - 60) / 2; // mobile square calculation
+  const squareSize = (width - 60) / 2; // mobile square calculation (unused for 1 column now)
 
   return (
     <View style={styles.container}>
       <View style={styles.grid}>
-
         {/* 1 - Gross Rental Yield */}
         <View
           style={[
             styles.card,
             styles.redCard,
             { width: cardWidth },
-            !isDesktop && { height: squareSize },
+            // !isDesktop && { height: squareSize }, // Removed fixed height for full width cards
           ]}
         >
           <View style={styles.flexGrow}>
@@ -42,9 +36,7 @@ const RentalCards = () => {
 
           <View style={styles.bottomText}>
             <Text style={styles.subText}>Return before expenses.</Text>
-            <Text style={styles.subText}>
-              Higher %=stronger rental income.
-            </Text>
+            <Text style={styles.subText}>Higher %=stronger rental income.</Text>
           </View>
         </View>
 
@@ -54,7 +46,7 @@ const RentalCards = () => {
             styles.card,
             styles.blueCard,
             { width: cardWidth },
-            !isDesktop && { height: squareSize },
+            // !isDesktop && { height: squareSize },
           ]}
         >
           <View style={styles.flexGrow}>
@@ -64,9 +56,7 @@ const RentalCards = () => {
           </View>
 
           <View style={styles.bottomText}>
-            <Text style={styles.subText}>
-              Return after all expenses.
-            </Text>
+            <Text style={styles.subText}>Return after all expenses.</Text>
             <Text style={styles.subText}>Shows your real profit.</Text>
           </View>
         </View>
@@ -77,15 +67,13 @@ const RentalCards = () => {
             styles.card,
             styles.blueCard,
             { width: cardWidth },
-            !isDesktop && { height: squareSize },
+            // !isDesktop && { height: squareSize },
           ]}
         >
           <View style={styles.flexGrow}>
             <View style={styles.rowBetween}>
               <Text style={styles.title}>Annual Cash Flow</Text>
-              {isDesktop && (
-                <TrendingUp size={20} color="#429482" />
-              )}
+              {isDesktop && <TrendingUp size={20} color="#429482" />}
             </View>
             <Text style={styles.greenValue}>₹5.35 Lakhs</Text>
             <Text style={styles.subText}>Net annual income</Text>
@@ -93,9 +81,7 @@ const RentalCards = () => {
 
           <View style={styles.bottomText}>
             <Text style={styles.subText}>Net yearly income.</Text>
-            <Text style={styles.subText}>
-              Money you can use or reinvest.
-            </Text>
+            <Text style={styles.subText}>Money you can use or reinvest.</Text>
           </View>
         </View>
 
@@ -105,15 +91,13 @@ const RentalCards = () => {
             styles.card,
             styles.yellowCard,
             { width: cardWidth },
-            !isDesktop && { height: squareSize },
+            // !isDesktop && { height: squareSize },
           ]}
         >
           <View style={styles.flexGrow}>
             <View style={styles.rowBetween}>
               <Text style={styles.title}>Payback Period</Text>
-              {isDesktop && (
-                <Calendar size={20} color="#F7C952" />
-              )}
+              {isDesktop && <Calendar size={20} color="#F7C952" />}
             </View>
             <Text style={styles.yellowValue}>9.1 years</Text>
             <Text style={styles.subText}>Time to break even</Text>
@@ -121,12 +105,9 @@ const RentalCards = () => {
 
           <View style={styles.bottomText}>
             <Text style={styles.subText}>Years to recover cost.</Text>
-            <Text style={styles.subText}>
-              Shorter = quicker returns.
-            </Text>
+            <Text style={styles.subText}>Shorter = quicker returns.</Text>
           </View>
         </View>
-
       </View>
     </View>
   );
@@ -141,9 +122,9 @@ const styles = StyleSheet.create({
   },
 
   grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
     gap: 16,
   },
 
@@ -151,7 +132,7 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 16,
     borderWidth: 2,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
 
   flexGrow: {
@@ -163,62 +144,62 @@ const styles = StyleSheet.create({
   },
 
   rowBetween: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 
   title: {
     fontSize: 15,
-    fontWeight: "600",
+    fontWeight: '600',
   },
 
   subText: {
     fontSize: 13,
-    color: "#6B7280",
+    color: '#6B7280',
     marginTop: 4,
   },
 
   redCard: {
-    backgroundColor: "#FDEDEE",
-    borderColor: "#C73834",
+    backgroundColor: '#FDEDEE',
+    borderColor: '#C73834',
   },
 
   blueCard: {
-    backgroundColor: "#D7EFF7",
-    borderColor: "#26BFCC",
+    backgroundColor: '#D7EFF7',
+    borderColor: '#26BFCC',
   },
 
   yellowCard: {
-    backgroundColor: "#FFFCF4",
-    borderColor: "#F7C952",
+    backgroundColor: '#FFFCF4',
+    borderColor: '#F7C952',
   },
 
   redValue: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#C73834",
+    fontWeight: '700',
+    color: '#C73834',
     marginTop: 4,
   },
 
   blueValue: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#26BFCC",
+    fontWeight: '700',
+    color: '#26BFCC',
     marginTop: 4,
   },
 
   greenValue: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#429482",
+    fontWeight: '700',
+    color: '#429482',
     marginTop: 4,
   },
 
   yellowValue: {
     fontSize: 18,
-    fontWeight: "700",
-    color: "#F7C952",
+    fontWeight: '700',
+    color: '#F7C952',
     marginTop: 4,
   },
 });

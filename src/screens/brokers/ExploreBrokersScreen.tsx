@@ -5,12 +5,10 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import Layout from '../../layout/Layout';
 import { MapPin, ArrowDown } from 'lucide-react-native';
-
-const { width } = Dimensions.get('window');
 
 const brokers = Array.from({ length: 8 }, (_, index) => ({
   id: index + 1,
@@ -25,6 +23,10 @@ const brokers = Array.from({ length: 8 }, (_, index) => ({
 }));
 
 const ExploreBrokersScreen = () => {
+  const { width } = useWindowDimensions();
+  const isMobile = width <= 600;
+  const isDesktop = width > 1024;
+
   return (
     <Layout>
       <View style={styles.container}>
@@ -59,7 +61,7 @@ const ExploreBrokersScreen = () => {
           style={[
             styles.gridContainer,
             {
-              flexDirection: width > 1024 ? 'row' : 'column',
+              flexDirection: isDesktop ? 'row' : 'column',
               flexWrap: 'wrap',
               justifyContent: 'space-between',
             },
@@ -68,7 +70,7 @@ const ExploreBrokersScreen = () => {
           {brokers.map(item => (
             <View
               key={item.id}
-              style={[styles.card, { width: width > 1024 ? '48%' : '100%' }]}
+              style={[styles.card, { width: isDesktop ? '48%' : '100%' }]}
             >
               <Image
                 source={require('../../assets/ExploreBrokers/top.png')}
@@ -84,17 +86,25 @@ const ExploreBrokersScreen = () => {
               <View
                 style={[
                   styles.cardContent,
-                  { flexDirection: width > 600 ? 'row' : 'column' },
+                  { flexDirection: !isMobile ? 'row' : 'column' },
                 ]}
               >
                 {/* Left Section */}
                 <View
                   style={[
                     styles.leftSection,
-                    { alignItems: width > 600 ? 'flex-start' : 'center' },
+                    !isMobile
+                      ? { flex: 1, alignItems: 'flex-start' }
+                      : {
+                          width: '100%',
+                          alignItems: 'center',
+                          marginBottom: 20,
+                        },
                   ]}
                 >
-                  <View>
+                  <View
+                    style={{ alignItems: isMobile ? 'center' : 'flex-start' }}
+                  >
                     <Text style={styles.brokerCompany}>{item.name}</Text>
                     <Image
                       source={item.image}
@@ -108,11 +118,16 @@ const ExploreBrokersScreen = () => {
                 </View>
 
                 {/* Right Section */}
-                <View style={styles.rightSection}>
+                <View
+                  style={[
+                    styles.rightSection,
+                    !isMobile ? { flex: 1.5 } : { width: '100%' },
+                  ]}
+                >
                   <Text
                     style={[
                       styles.agentName,
-                      { textAlign: width > 600 ? 'left' : 'center' },
+                      { textAlign: !isMobile ? 'left' : 'center' },
                     ]}
                   >
                     {item.agentName}
@@ -120,7 +135,7 @@ const ExploreBrokersScreen = () => {
                   <View
                     style={[
                       styles.locationRow,
-                      { justifyContent: width > 600 ? 'flex-start' : 'center' },
+                      { justifyContent: !isMobile ? 'flex-start' : 'center' },
                     ]}
                   >
                     <MapPin size={14} color="#EE2529" />
@@ -131,7 +146,7 @@ const ExploreBrokersScreen = () => {
                   <View
                     style={[
                       styles.divider,
-                      { alignSelf: width > 600 ? 'flex-start' : 'center' },
+                      { alignSelf: !isMobile ? 'flex-start' : 'center' },
                     ]}
                   />
 
@@ -139,7 +154,7 @@ const ExploreBrokersScreen = () => {
                     <Text
                       style={[
                         styles.specLabel,
-                        { textAlign: width > 600 ? 'left' : 'center' },
+                        { textAlign: !isMobile ? 'left' : 'center' },
                       ]}
                     >
                       Specializes In:
@@ -148,7 +163,7 @@ const ExploreBrokersScreen = () => {
                       style={[
                         styles.tagsRow,
                         {
-                          justifyContent: width > 600 ? 'flex-start' : 'center',
+                          justifyContent: !isMobile ? 'flex-start' : 'center',
                         },
                       ]}
                     >
@@ -163,7 +178,7 @@ const ExploreBrokersScreen = () => {
                   <View
                     style={[
                       styles.statsRow,
-                      { alignItems: width > 600 ? 'flex-start' : 'center' },
+                      { alignItems: !isMobile ? 'flex-start' : 'center' },
                     ]}
                   >
                     <Text style={styles.statText}>
