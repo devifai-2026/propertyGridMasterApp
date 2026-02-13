@@ -7,6 +7,7 @@ import {
   ScrollView,
   SafeAreaView,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import {
   User,
@@ -42,6 +43,10 @@ const STEPS = [
 ];
 
 const ListPropertyScreen = () => {
+  const { width } = useWindowDimensions();
+  const isSmallScreen = width < 768;
+  const isMobile = width < 480;
+
   const [currentStep, setCurrentStep] = useState(1);
   const [isFormValid, setIsFormValid] = useState(false);
   const [formData, setFormData] = useState({});
@@ -122,16 +127,16 @@ const ListPropertyScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* Hero Section */}
-        <View style={styles.heroSection}>
-          <Text style={styles.heroTitle}>List Your Property</Text>
-          <Text style={styles.heroSubtext}>
+        <View style={[styles.heroSection, isMobile && styles.heroSectionMobile]}>
+          <Text style={[styles.heroTitle, isMobile && styles.heroTitleMobile]}>List Your Property</Text>
+          <Text style={[styles.heroSubtext, isMobile && styles.heroSubtextMobile]}>
             Connect with serious investors looking for pre-leased commercial
             properties across India
           </Text>
-          <TouchableOpacity style={styles.bulkUploadBtn}>
-            <Text style={styles.bulkUploadText}>Bulk Upload</Text>
+          <TouchableOpacity style={[styles.bulkUploadBtn, isMobile && styles.bulkUploadBtnMobile]}>
+            <Text style={[styles.bulkUploadText, isMobile && styles.bulkUploadTextMobile]}>Bulk Upload</Text>
             <View style={styles.arrowBg}>
-              <ChevronRight size={16} color="#EE2529" strokeWidth={3} />
+              <ChevronRight size={isMobile ? 14 : 16} color="#EE2529" strokeWidth={3} />
             </View>
           </TouchableOpacity>
         </View>
@@ -141,7 +146,7 @@ const ListPropertyScreen = () => {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.stepperContent}
+            contentContainerStyle={[styles.stepperContent, isMobile && styles.stepperContentMobile]}
           >
             {STEPS.map((step, index) => {
               const Icon = step.icon;
@@ -150,11 +155,12 @@ const ListPropertyScreen = () => {
               const accentColor = isActive ? '#EE2529' : '#767676';
 
               return (
-                <View key={step.id} style={styles.stepCardContainer}>
+                <View key={step.id} style={[styles.stepCardContainer, isMobile && styles.stepCardContainerMobile]}>
                   <TouchableOpacity
                     activeOpacity={0.8}
                     style={[
                       styles.stepCard,
+                      isMobile && styles.stepCardMobile,
                       { borderTopColor: accentColor },
                       isCurrent && styles.stepCardCurrent,
                     ]}
@@ -162,9 +168,9 @@ const ListPropertyScreen = () => {
                       step.id < currentStep && setCurrentStep(step.id)
                     }
                   >
-                    <Icon size={24} color={accentColor} />
+                    <Icon size={isMobile ? 20 : 24} color={accentColor} />
                     <Text
-                      style={[styles.stepCardLabel, { color: accentColor }]}
+                      style={[styles.stepCardLabel, isMobile && styles.stepCardLabelMobile, { color: accentColor }]}
                     >
                       {step.title}
                     </Text>
@@ -179,36 +185,38 @@ const ListPropertyScreen = () => {
         </View>
 
         {/* Form Area */}
-        <View style={styles.formCard}>{renderStep()}</View>
+        <View style={[styles.formCard, isMobile && styles.formCardMobile]}>{renderStep()}</View>
 
         {/* Navigation Actions */}
-        <View style={styles.footer}>
+        <View style={[styles.footer, isMobile && styles.footerMobile]}>
           <TouchableOpacity
             style={[
               styles.navBtn,
               styles.backBtn,
+              isMobile && styles.navBtnMobile,
               currentStep === 1 && styles.btnHidden,
             ]}
             onPress={handleBack}
             disabled={currentStep === 1}
           >
-            <ChevronLeft size={20} color="#666" />
-            <Text style={styles.backBtnText}>Previous</Text>
+            <ChevronLeft size={isMobile ? 18 : 20} color="#666" />
+            <Text style={[styles.backBtnText, isMobile && styles.backBtnTextMobile]}>Previous</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[
               styles.navBtn,
               styles.nextBtn,
+              isMobile && styles.navBtnMobile,
               !isFormValid && styles.nextBtnDisabled,
             ]}
             onPress={handleFooterAction}
             disabled={!isFormValid}
           >
-            <Text style={styles.nextBtnText}>
+            <Text style={[styles.nextBtnText, isMobile && styles.nextBtnTextMobile]}>
               {currentStep === 6 ? 'List Property' : 'Next Step'}
             </Text>
-            {currentStep < 6 && <ChevronRight size={20} color="#FFF" />}
+            {currentStep < 6 && <ChevronRight size={isMobile ? 18 : 20} color="#FFF" />}
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -226,12 +234,19 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
     backgroundColor: '#FFF',
   },
+  heroSectionMobile: {
+    paddingVertical: 24,
+  },
   heroTitle: {
     fontSize: 28,
     fontWeight: '800',
     color: '#000',
     marginBottom: 10,
     textAlign: 'center',
+  },
+  heroTitleMobile: {
+    fontSize: 22,
+    marginBottom: 8,
   },
   heroSubtext: {
     fontSize: 14,
@@ -240,6 +255,12 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     paddingHorizontal: 20,
     marginBottom: 20,
+  },
+  heroSubtextMobile: {
+    fontSize: 13,
+    lineHeight: 18,
+    paddingHorizontal: 16,
+    marginBottom: 16,
   },
   bulkUploadBtn: {
     flexDirection: 'row',
@@ -255,11 +276,20 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 5,
   },
+  bulkUploadBtnMobile: {
+    paddingLeft: 16,
+    paddingRight: 4,
+    paddingVertical: 4,
+  },
   bulkUploadText: {
     color: '#FFF',
     fontSize: 14,
     fontWeight: '700',
     marginRight: 10,
+  },
+  bulkUploadTextMobile: {
+    fontSize: 12,
+    marginRight: 8,
   },
   arrowBg: {
     backgroundColor: '#FFF',
@@ -272,14 +302,24 @@ const styles = StyleSheet.create({
   stepperWrapper: {
     marginTop: 10,
     paddingBottom: 10,
+    alignItems: 'center',
   },
   stepperContent: {
     paddingHorizontal: 16,
     gap: 12,
+    justifyContent: 'center',
+  },
+  stepperContentMobile: {
+    paddingHorizontal: 12,
+    gap: 8,
+    justifyContent: 'flex-start',
   },
   stepCardContainer: {
     width: 130,
     alignItems: 'center',
+  },
+  stepCardContainerMobile: {
+    width: 110,
   },
   stepCard: {
     backgroundColor: '#FFF',
@@ -296,6 +336,11 @@ const styles = StyleSheet.create({
     elevation: 3,
     padding: 10,
   },
+  stepCardMobile: {
+    height: 85,
+    borderRadius: 10,
+    padding: 8,
+  },
   stepCardCurrent: {
     shadowOpacity: 0.15,
     elevation: 6,
@@ -306,6 +351,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textAlign: 'center',
     marginTop: 8,
+  },
+  stepCardLabelMobile: {
+    fontSize: 10,
+    marginTop: 6,
   },
   underline: {
     width: '100%',
@@ -324,12 +373,21 @@ const styles = StyleSheet.create({
     elevation: 2,
     minHeight: 400,
   },
+  formCardMobile: {
+    margin: 12,
+    borderRadius: 10,
+  },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     marginTop: 10,
     paddingBottom: 40,
+  },
+  footerMobile: {
+    paddingHorizontal: 12,
+    paddingBottom: 24,
+    marginTop: 8,
   },
   navBtn: {
     flexDirection: 'row',
@@ -340,6 +398,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     height: 52,
   },
+  navBtnMobile: {
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    height: 44,
+    borderRadius: 10,
+  },
   backBtn: {
     backgroundColor: '#F5F5F5',
   },
@@ -348,6 +412,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 15,
     marginLeft: 4,
+  },
+  backBtnTextMobile: {
+    fontSize: 13,
   },
   nextBtn: {
     backgroundColor: '#EE2529',
@@ -362,6 +429,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 15,
     marginRight: 4,
+  },
+  nextBtnTextMobile: {
+    fontSize: 13,
   },
   btnHidden: {
     opacity: 0,

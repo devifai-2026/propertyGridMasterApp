@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  useWindowDimensions,
 } from 'react-native';
 import { ChevronDown, Info } from 'lucide-react-native';
 
@@ -15,6 +16,9 @@ interface LeaseDetailsProps {
 }
 
 const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid }) => {
+  const { width } = useWindowDimensions();
+  const isSmallScreen = width < 768;
+
   const [formData, setFormData] = useState({
     tenantType: '',
     leaseStartDate: '',
@@ -64,7 +68,7 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid }) => {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={styles.sectionTitle}>Lease & Tenant</Text>
+      <Text style={[styles.sectionTitle, isSmallScreen && styles.sectionTitleMobile]}>Lease & Tenant</Text>
 
       <Text style={styles.subHeader}>Tenant Information</Text>
       <View style={styles.fieldContainer}>
@@ -81,7 +85,7 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid }) => {
       </View>
 
       <Text style={styles.subHeader}>Lease Duration & Terms</Text>
-      <View style={styles.row}>
+      <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Lease Start Date *</Text>
           <TextInput
@@ -102,7 +106,7 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid }) => {
         </View>
       </View>
 
-      <View style={styles.row}>
+      <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Lock In Period</Text>
           <View style={styles.flexRow}>
@@ -135,7 +139,7 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid }) => {
       </View>
 
       <Text style={styles.subHeader}>Rental & Deposit Details</Text>
-      <View style={styles.toggleRow}>
+      <View style={[styles.toggleRow, isSmallScreen && styles.rowColumn]}>
         <View style={styles.toggleGroup}>
           <Text style={styles.label}>Rent Type</Text>
           <View style={styles.radioGroup}>
@@ -217,7 +221,7 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid }) => {
         </View>
       </View>
 
-      <View style={styles.row}>
+      <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
         {formData.rentType === 'perSqFt' ? (
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>Rent Per Sq Ft *</Text>
@@ -268,7 +272,7 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid }) => {
       </View>
 
       <Text style={styles.subHeader}>Escalation Terms & Maintenance</Text>
-      <View style={styles.row}>
+      <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Frequency (Years) *</Text>
           <TextInput
@@ -305,7 +309,7 @@ const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid }) => {
       </View>
 
       {formData.maintenanceScope !== '' && (
-        <View style={[styles.row, { marginTop: 4 }]}>
+        <View style={[styles.row, isSmallScreen && styles.rowColumn, { marginTop: 4 }]}>
           <View style={[styles.fieldContainer, { flex: 0.4 }]}>
             <Text style={styles.label}>Type</Text>
             <View style={[styles.inputWrapper]}>
@@ -347,6 +351,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
   },
+  sectionTitleMobile: {
+    fontSize: 18,
+    marginBottom: 16,
+  },
   subHeader: {
     fontSize: 14,
     fontWeight: '700',
@@ -357,6 +365,10 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     gap: 12,
+  },
+  rowColumn: {
+    flexDirection: 'column',
+    gap: 0,
   },
   flexRow: {
     flexDirection: 'row',

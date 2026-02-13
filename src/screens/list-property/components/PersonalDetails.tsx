@@ -12,6 +12,7 @@ import {
   StyleSheet,
   Switch,
   ScrollView,
+  useWindowDimensions,
 } from 'react-native';
 
 interface PersonalDetailsProps {
@@ -21,6 +22,10 @@ interface PersonalDetailsProps {
 
 const PersonalDetails = forwardRef(
   ({ onNext, onFormValid }: PersonalDetailsProps, ref) => {
+    const { width } = useWindowDimensions();
+    const isSmallScreen = width < 768;
+    const isMobile = width < 480;
+
     const [formData, setFormData] = useState({
       firstName: '',
       lastName: '',
@@ -170,9 +175,9 @@ const PersonalDetails = forwardRef(
 
     return (
       <View style={styles.container}>
-        <Text style={styles.sectionTitle}>Personal Details</Text>
+        <Text style={[styles.sectionTitle, isMobile && styles.sectionTitleMobile]}>Personal Details</Text>
 
-        <View style={styles.row}>
+        <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>First Name *</Text>
             <TextInput
@@ -270,7 +275,7 @@ const PersonalDetails = forwardRef(
 
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Mobile Number *</Text>
-          <View style={styles.mobileInputContainer}>
+          <View style={[styles.mobileInputContainer, isMobile && styles.mobileInputContainerMobile]}>
             <TextInput
               style={[
                 styles.input,
@@ -287,13 +292,14 @@ const PersonalDetails = forwardRef(
             <TouchableOpacity
               style={[
                 styles.otpBtn,
+                isMobile && styles.otpBtnMobile,
                 (mobileNumberRaw.length !== 10 || otpSent) &&
                   styles.otpBtnDisabled,
               ]}
               onPress={handleSendOtp}
               disabled={mobileNumberRaw.length !== 10 || otpSent}
             >
-              <Text style={styles.otpBtnText}>
+              <Text style={[styles.otpBtnText, isMobile && styles.otpBtnTextMobile]}>
                 {otpSent ? 'Resend OTP' : 'Send OTP'}
               </Text>
             </TouchableOpacity>
@@ -306,12 +312,13 @@ const PersonalDetails = forwardRef(
         {otpSent && (
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>OTP *</Text>
-            <View style={styles.otpInputGroup}>
+            <View style={[styles.otpInputGroup, isMobile && styles.otpInputGroupMobile]}>
               {[0, 1, 2, 3].map(index => (
                 <TextInput
                   key={index}
                   style={[
                     styles.otpInput,
+                    isMobile && styles.otpInputMobile,
                     touched.otp && errors.otp && styles.inputError,
                   ]}
                   maxLength={1}
@@ -391,10 +398,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
   },
+  sectionTitleMobile: {
+    fontSize: 18,
+    marginBottom: 16,
+  },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 16,
+  },
+  rowColumn: {
+    flexDirection: 'column',
+    gap: 0,
   },
   fieldContainer: {
     flex: 1,
@@ -461,6 +476,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
   },
+  mobileInputContainerMobile: {
+    flexDirection: 'column',
+    gap: 10,
+  },
   mobileInput: {
     flex: 1,
   },
@@ -471,6 +490,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     height: 48,
   },
+  otpBtnMobile: {
+    paddingHorizontal: 12,
+    height: 44,
+  },
   otpBtnDisabled: {
     backgroundColor: '#CCC',
   },
@@ -479,9 +502,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
+  otpBtnTextMobile: {
+    fontSize: 13,
+  },
   otpInputGroup: {
     flexDirection: 'row',
     gap: 12,
+  },
+  otpInputGroupMobile: {
+    gap: 8,
+    justifyContent: 'center',
   },
   otpInput: {
     width: 44,
@@ -493,6 +523,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     borderWidth: 1,
     borderColor: '#CCC',
+  },
+  otpInputMobile: {
+    width: 50,
+    height: 50,
+    fontSize: 20,
   },
   checkboxSection: {
     gap: 12,

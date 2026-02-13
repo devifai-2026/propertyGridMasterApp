@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ScrollView,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { ChevronDown, Info, Upload, FileText, X } from 'lucide-react-native';
 
@@ -16,6 +17,9 @@ interface BasicDetailsProps {
 }
 
 const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext, onFormValid }) => {
+  const { width } = useWindowDimensions();
+  const isSmallScreen = width < 768;
+
   const currentYear = new Date().getFullYear();
   const years = Array.from({ length: 31 }, (_, i) =>
     (currentYear - i).toString(),
@@ -76,7 +80,7 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext, onFormValid }) => {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={styles.sectionTitle}>
+      <Text style={[styles.sectionTitle, isSmallScreen && styles.sectionTitleMobile]}>
         Property Overview and Basic Details
       </Text>
 
@@ -95,7 +99,7 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext, onFormValid }) => {
         </View>
       </View>
 
-      <View style={styles.row}>
+      <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Carpet Area *</Text>
           <View style={styles.areaInputGroup}>
@@ -124,7 +128,7 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext, onFormValid }) => {
         </View>
       </View>
 
-      <View style={styles.row}>
+      <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Building Grade *</Text>
           <View style={styles.inputWrapper}>
@@ -153,7 +157,7 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext, onFormValid }) => {
       </View>
 
       <Text style={styles.subHeader}>Parking Details</Text>
-      <View style={styles.row}>
+      <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>4 Wheeler Parkings *</Text>
           <TextInput
@@ -177,7 +181,7 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext, onFormValid }) => {
       </View>
 
       <Text style={styles.subHeader}>Infrastructure</Text>
-      <View style={styles.row}>
+      <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Furnishing Status *</Text>
           <View style={styles.inputWrapper}>
@@ -235,6 +239,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
   },
+  sectionTitleMobile: {
+    fontSize: 18,
+    marginBottom: 16,
+  },
   subHeader: {
     fontSize: 14,
     fontWeight: '700',
@@ -245,6 +253,10 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     gap: 12,
+  },
+  rowColumn: {
+    flexDirection: 'column',
+    gap: 0,
   },
   fieldContainer: {
     flex: 1,

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  useWindowDimensions,
 } from 'react-native';
 import { ChevronDown, Plus, X } from 'lucide-react-native';
 
@@ -15,6 +16,9 @@ interface LegalDetailsProps {
 }
 
 const LegalDetails: React.FC<LegalDetailsProps> = ({ onNext, onFormValid }) => {
+  const { width } = useWindowDimensions();
+  const isSmallScreen = width < 768;
+
   const [formData, setFormData] = useState({
     titleStatus: '',
     occupancyCertificate: '',
@@ -91,7 +95,7 @@ const LegalDetails: React.FC<LegalDetailsProps> = ({ onNext, onFormValid }) => {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={styles.sectionTitle}>Legal & Title Details</Text>
+      <Text style={[styles.sectionTitle, isSmallScreen && styles.sectionTitleMobile]}>Legal & Title Details</Text>
 
       <Text style={styles.subHeader}>Title & Ownership Status</Text>
 
@@ -108,7 +112,7 @@ const LegalDetails: React.FC<LegalDetailsProps> = ({ onNext, onFormValid }) => {
         </View>
       </View>
 
-      <View style={styles.row}>
+      <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Occupancy Certificate *</Text>
           <View style={styles.inputWrapper}>
@@ -254,6 +258,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
   },
+  sectionTitleMobile: {
+    fontSize: 18,
+    marginBottom: 16,
+  },
   subHeader: {
     fontSize: 14,
     fontWeight: '700',
@@ -264,6 +272,10 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     gap: 12,
+  },
+  rowColumn: {
+    flexDirection: 'column',
+    gap: 0,
   },
   fieldContainer: {
     flex: 1,

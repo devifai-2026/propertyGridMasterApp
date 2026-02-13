@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  useWindowDimensions,
 } from 'react-native';
 import { Info } from 'lucide-react-native';
 
@@ -18,6 +19,9 @@ const FinancialDetails: React.FC<FinancialDetailsProps> = ({
   onNext,
   onFormValid,
 }) => {
+  const { width } = useWindowDimensions();
+  const isSmallScreen = width < 768;
+
   const [formData, setFormData] = useState({
     sellingPrice: '',
     propertyTax: '',
@@ -74,7 +78,7 @@ const FinancialDetails: React.FC<FinancialDetailsProps> = ({
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={styles.sectionTitle}>Financial Analytics</Text>
+      <Text style={[styles.sectionTitle, isSmallScreen && styles.sectionTitleMobile]}>Financial Analytics</Text>
 
       <Text style={styles.subHeader}>Property Details</Text>
       <View style={styles.fieldContainer}>
@@ -92,7 +96,7 @@ const FinancialDetails: React.FC<FinancialDetailsProps> = ({
       </View>
 
       <Text style={styles.subHeader}>Annual Operating Costs</Text>
-      <View style={styles.row}>
+      <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>Property Tax (Annual) *</Text>
           <TextInput
@@ -192,6 +196,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
   },
+  sectionTitleMobile: {
+    fontSize: 18,
+    marginBottom: 16,
+  },
   subHeader: {
     fontSize: 14,
     fontWeight: '700',
@@ -202,6 +210,10 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     gap: 12,
+  },
+  rowColumn: {
+    flexDirection: 'column',
+    gap: 0,
   },
   fieldContainer: {
     flex: 1,

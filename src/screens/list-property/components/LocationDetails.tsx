@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
+  useWindowDimensions,
 } from 'react-native';
 import { ChevronDown, Plus, X, Trash2 } from 'lucide-react-native';
 
@@ -18,6 +19,9 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
   onNext,
   onFormValid,
 }) => {
+  const { width } = useWindowDimensions();
+  const isSmallScreen = width < 768;
+
   const [formData, setFormData] = useState({
     microMarket: '',
     city: '',
@@ -100,7 +104,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={styles.sectionTitle}>Location & Market Details</Text>
+      <Text style={[styles.sectionTitle, isSmallScreen && styles.sectionTitleMobile]}>Location & Market Details</Text>
 
       <Text style={styles.subHeader}>Location Details</Text>
       <View style={styles.fieldContainer}>
@@ -113,7 +117,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
         />
       </View>
 
-      <View style={styles.row}>
+      <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>State *</Text>
           <View style={styles.inputWrapper}>
@@ -164,7 +168,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
               <ChevronDown size={16} color="#999" style={styles.inputIcon} />
             </View>
           </View>
-          <View style={styles.row}>
+          <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
             <View style={[styles.fieldContainer, { flex: 2 }]}>
               <Text style={styles.labelSmall}>Name</Text>
               <TextInput
@@ -276,6 +280,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
   },
+  sectionTitleMobile: {
+    fontSize: 18,
+    marginBottom: 16,
+  },
   subHeader: {
     fontSize: 14,
     fontWeight: '700',
@@ -286,6 +294,10 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     gap: 12,
+  },
+  rowColumn: {
+    flexDirection: 'column',
+    gap: 0,
   },
   fieldContainer: {
     flex: 1,
