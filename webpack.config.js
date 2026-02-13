@@ -17,6 +17,8 @@ const babelLoaderConfiguration = {
     path.resolve(appDirectory, 'node_modules/react-native-uncompiled'),
     path.resolve(appDirectory, 'node_modules/lucide-react-native'),
     path.resolve(appDirectory, 'node_modules/@react-native-async-storage'),
+    path.resolve(appDirectory, 'node_modules/react-native-chart-kit'),
+    path.resolve(appDirectory, 'node_modules/react-native-svg'),
   ],
   use: {
     loader: 'babel-loader',

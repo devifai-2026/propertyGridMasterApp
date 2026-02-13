@@ -8,23 +8,23 @@ import {
   Image,
   TextInput,
   Switch,
-  Dimensions,
 } from 'react-native';
 import Layout from '../../layout/Layout';
-import { TrendingUp, Calculator } from 'lucide-react-native';
-import Svg, {
-  Circle,
-  Rect,
-  G,
-  Text as SvgText,
-  Path,
-  Line as SvgLine,
-  Defs,
-  LinearGradient,
-  Stop,
-} from 'react-native-svg';
+import { TrendingUp, Calculator, ChevronDown } from 'lucide-react-native';
 
-const { width } = Dimensions.get('window');
+// RentalYield Components
+import RentalCards from './components/RentalYield/RentalCards';
+import SummaryCards from './components/RentalYield/SummaryCards';
+import FinancialDetails from './components/RentalYield/FinancialDetails';
+import PerformanceAnalytics from './components/RentalYield/PerformanceAnalytics';
+import CashflowProjections from './components/RentalYield/CashflowProjections';
+import RentalDetailsCashflow from './components/RentalYield/RentalDetailsCashflow';
+
+// EMI Components
+import EMISummaryCards from './components/EMI/EMISummaryCards';
+import EMIAnalytics from './components/EMI/EMIAnalytics';
+import PrincipleChart from './components/EMI/PrincipleChart';
+import CoverageAnalysis from './components/EMI/CoverageAnalysis';
 
 const CalculatorsScreen = () => {
   const [activeTab, setActiveTab] = useState<'roi' | 'emi'>('roi');
@@ -122,7 +122,7 @@ const CalculatorsScreen = () => {
         {/* Content Area */}
         <View style={styles.contentArea}>
           {activeTab === 'roi' ? (
-            <RentalYieldCalculator />
+            <RentalYieldCalculator activeTab={activeTab} />
           ) : (
             <EMICalculatorView />
           )}
@@ -132,251 +132,69 @@ const CalculatorsScreen = () => {
   );
 };
 
-const ExpensePieChart = () => {
-  const data = [
-    { name: 'Annual Loan EMI', value: 84, color: '#4A4A4A' },
-    { name: 'Maintenance', value: 7, color: '#FFA500' },
-    { name: 'Property Tax', value: 3, color: '#20B2AA' },
-    { name: 'Insurance', value: 2, color: '#FF6B6B' },
-    { name: 'Other', value: 4, color: '#87CEEB' },
-  ];
-
-  const total = 100;
-  const radius = 60;
-  const circumference = 2 * Math.PI * radius;
-  let accumulatedOffset = 0;
+// Custom Dropdown Component
+const Dropdown = ({
+  options,
+  selected,
+  onSelect,
+  label,
+}: {
+  options: string[];
+  selected: string;
+  onSelect: (val: string) => void;
+  label: string;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <View style={styles.chartWrapper}>
-      <Text style={styles.chartTitle}>Annual Expense Breakdown</Text>
-      <View style={styles.chartRow}>
-        <Svg height="150" width="150" viewBox="0 0 150 150">
-          <G rotation="-90" origin="75, 75">
-            {data.map((item, index) => {
-              const strokeDasharray = `${
-                (item.value / total) * circumference
-              } ${circumference}`;
-              const strokeDashoffset = -accumulatedOffset;
-              accumulatedOffset += (item.value / total) * circumference;
+    <View style={styles.dropdownContainer}>
+      <Text style={styles.label}>{label}</Text>
+      <TouchableOpacity
+        style={styles.dropdownHeader}
+        onPress={() => setIsOpen(!isOpen)}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.dropdownHeaderText}>{selected || 'Select'}</Text>
+        <ChevronDown
+          size={18}
+          color="#EE2529"
+          style={{ transform: [{ rotate: isOpen ? '180deg' : '0deg' }] }}
+        />
+      </TouchableOpacity>
 
-              return (
-                <Circle
-                  key={index}
-                  cx="75"
-                  cy="75"
-                  r={radius}
-                  stroke={item.color}
-                  strokeWidth="20"
-                  fill="transparent"
-                  strokeDasharray={strokeDasharray}
-                  strokeDashoffset={strokeDashoffset}
-                />
-              );
-            })}
-            {/* Inner White Circle to clean up edges if needed, or text in middle */}
-            <SvgText
-              x="75"
-              y="80"
-              textAnchor="middle"
-              fontSize="18"
-              fontWeight="bold"
-              fill="#333"
+      {isOpen && (
+        <View style={styles.dropdownList}>
+          {options.map((option, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.dropdownItem,
+                selected === option && styles.dropdownItemSelected,
+                index === options.length - 1 && { borderBottomWidth: 0 },
+              ]}
+              onPress={() => {
+                onSelect(option);
+                setIsOpen(false);
+              }}
             >
-              Exp
-            </SvgText>
-          </G>
-        </Svg>
-        <View style={styles.legendContainer}>
-          {data.map((item, index) => (
-            <View key={index} style={styles.legendItem}>
-              <View
-                style={[styles.legendColor, { backgroundColor: item.color }]}
-              />
-              <Text style={styles.legendText}>
-                {item.name} ({item.value}%)
+              <Text
+                style={[
+                  styles.dropdownItemText,
+                  selected === option && styles.activeDropdownItemText,
+                ]}
+              >
+                {option}
               </Text>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
-      </View>
+      )}
     </View>
   );
 };
 
-const YieldBarChart = () => {
-  const data = [
-    { name: 'Gross', value: 13.33, color: '#C73834' },
-    { name: 'Net', value: 12.11, color: '#26BFCC' },
-  ];
-  const chartHeight = 150;
-  const chartWidth = 200;
-  const maxVal = 16;
-
-  return (
-    <View style={styles.chartWrapper}>
-      <Text style={styles.chartTitle}>Rental Yield Comparison</Text>
-      <View style={{ alignItems: 'center' }}>
-        <Svg height={chartHeight + 30} width={chartWidth}>
-          {/* Axis Line */}
-          <SvgLine
-            x1="10"
-            y1={chartHeight}
-            x2={chartWidth - 10}
-            y2={chartHeight}
-            stroke="#ddd"
-            strokeWidth="2"
-          />
-
-          {data.map((item, index) => {
-            const barHeight = (item.value / maxVal) * chartHeight;
-            const x = 50 + index * 80;
-            const y = chartHeight - barHeight;
-            return (
-              <G key={index}>
-                <Rect
-                  x={x}
-                  y={y}
-                  width="40"
-                  height={barHeight}
-                  fill={item.color}
-                  rx="4"
-                />
-                <SvgText
-                  x={x + 20}
-                  y={y - 10}
-                  fill={item.color}
-                  fontSize="12"
-                  fontWeight="bold"
-                  textAnchor="middle"
-                >
-                  {item.value}%
-                </SvgText>
-                <SvgText
-                  x={x + 20}
-                  y={chartHeight + 20}
-                  fill="#555"
-                  fontSize="12"
-                  textAnchor="middle"
-                >
-                  {item.name}
-                </SvgText>
-              </G>
-            );
-          })}
-        </Svg>
-      </View>
-    </View>
-  );
-};
-
-const CashflowLineChart = () => {
-  // Mock Data for Cashflow: Year 1 to 10
-  const data = [
-    { year: 1, flow: -44 },
-    { year: 2, flow: -38 },
-    { year: 3, flow: -33 },
-    { year: 4, flow: -28 },
-    { year: 5, flow: -22 },
-    { year: 6, flow: -16 },
-    { year: 7, flow: -10 },
-    { year: 8, flow: -4 },
-    { year: 9, flow: 2 },
-    { year: 10, flow: 8 },
-  ];
-
-  const chartHeight = 200;
-  const chartWidth = width - 60;
-  const minVal = -50;
-  const maxVal = 10;
-  const range = maxVal - minVal;
-
-  // Helper to map Value to Y coordinate
-  const getY = (val: number) => {
-    return chartHeight - ((val - minVal) / range) * chartHeight;
-  };
-
-  // Helper to map Year to X coordinate
-  const getX = (index: number) => {
-    return (index / (data.length - 1)) * chartWidth;
-  };
-
-  // Generate Path
-  let pathD = `M ${getX(0)} ${getY(data[0].flow)}`;
-  data.forEach((item, index) => {
-    if (index === 0) return;
-    pathD += ` L ${getX(index)} ${getY(item.flow)}`;
-  });
-
-  return (
-    <View style={styles.chartWrapper}>
-      <Text style={styles.chartTitle}>Cash Flow Projections (Cumulative)</Text>
-      <Svg height={chartHeight + 40} width={chartWidth + 20}>
-        {/* Zero Line */}
-        <SvgLine
-          x1="0"
-          y1={getY(0)}
-          x2={chartWidth}
-          y2={getY(0)}
-          stroke="#ccc"
-          strokeWidth="1"
-          strokeDasharray="5, 5"
-        />
-
-        {/* Y Axis Line */}
-        <SvgLine
-          x1="0"
-          y1="0"
-          x2="0"
-          y2={chartHeight}
-          stroke="#ddd"
-          strokeWidth="1"
-        />
-
-        {/* Data Line */}
-        <Path d={pathD} fill="none" stroke="#F7C952" strokeWidth="3" />
-
-        {/* Dots */}
-        {data.map((item, index) => (
-          <Circle
-            key={index}
-            cx={getX(index)}
-            cy={getY(item.flow)}
-            r="3"
-            fill="#F7C952"
-          />
-        ))}
-
-        {/* X Axis Labels */}
-        {data.map((item, index) => (
-          <SvgText
-            key={index}
-            x={getX(index)}
-            y={chartHeight + 20}
-            fontSize="10"
-            fill="#767676"
-            textAnchor="middle"
-          >
-            Y{item.year}
-          </SvgText>
-        ))}
-      </Svg>
-      <Text style={[styles.legendText, { marginTop: 10 }]}>
-        Cumulative Cash Flow (₹ Lakhs)
-      </Text>
-    </View>
-  );
-};
-
-const PerformanceAnalytics = () => (
-  <View style={styles.sectionCard}>
-    <Text style={styles.sectionTitle}>Performance Analytics</Text>
-    <ExpensePieChart />
-    <YieldBarChart />
-    <CashflowLineChart />
-  </View>
-);
-
-const RentalYieldCalculator = () => {
+// ============= RENTAL YIELD CALCULATOR =============
+const RentalYieldCalculator = ({ activeTab }: any) => {
   const [formData, setFormData] = useState({
     propertyType: 'Residential Space',
     carpetArea: '',
@@ -402,9 +220,15 @@ const RentalYieldCalculator = () => {
   });
 
   const [includeLoan, setIncludeLoan] = useState(false);
+  const [calculated, setCalculated] = useState(true);
 
   const handleInputChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCalculate = () => {
+    // TODO: Add validation
+    setCalculated(true);
   };
 
   return (
@@ -419,34 +243,13 @@ const RentalYieldCalculator = () => {
       <View style={styles.sectionCard}>
         <Text style={styles.sectionTitle}>Property Details</Text>
 
-        {/* Type Selector */}
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Property Type</Text>
-          <View style={styles.typeSelector}>
-            {['Residential Space', 'Commercial Space', 'Mixed Use'].map(
-              type => (
-                <TouchableOpacity
-                  key={type}
-                  onPress={() => handleInputChange('propertyType', type)}
-                  style={[
-                    styles.typeBtn,
-                    formData.propertyType === type && styles.activeTypeBtn,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.typeBtnText,
-                      formData.propertyType === type &&
-                        styles.activeTypeBtnText,
-                    ]}
-                  >
-                    {type}
-                  </Text>
-                </TouchableOpacity>
-              ),
-            )}
-          </View>
-        </View>
+        {/* Property Type Dropdown */}
+        <Dropdown
+          label="Property Type"
+          options={['Residential Space', 'Commercial Space', 'Mixed Use']}
+          selected={formData.propertyType}
+          onSelect={val => handleInputChange('propertyType', val)}
+        />
 
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
@@ -718,72 +521,353 @@ const RentalYieldCalculator = () => {
       </View>
 
       {/* Calculate Button */}
-      <TouchableOpacity style={styles.calculateBtn}>
+      <TouchableOpacity style={styles.calculateBtn} onPress={handleCalculate}>
         <Text style={styles.calculateBtnText}>
           Calculate ROI & Rental Yield
         </Text>
       </TouchableOpacity>
 
-      {/* Result Section (Placeholder for detailed cards) */}
-      <View style={styles.resultBox}>
-        <Text style={styles.resultLabel}>Projected Annual Yield</Text>
-        <Text style={styles.resultValue}>0.0%</Text>
-        <Text style={[styles.resultLabel, { marginTop: 10 }]}>
-          Please fill in details to see comprehensive analysis
-        </Text>
-      </View>
-
-      <PerformanceAnalytics />
+      {/* Result Components */}
+      {calculated && (
+        <>
+          {activeTab === 'roi' ? <RentalCards /> : <SummaryCards />}
+          <FinancialDetails />
+          <PerformanceAnalytics />
+          <CashflowProjections />
+          <RentalDetailsCashflow />
+        </>
+      )}
     </ScrollView>
   );
 };
 
-const EMICalculatorView = () => (
-  <ScrollView style={styles.calcContainer} showsVerticalScrollIndicator={false}>
-    <Text style={styles.calcTitle}>EMI Calculator</Text>
-    <View style={styles.sectionCard}>
-      <Text style={styles.sectionTitle}>Loan Details</Text>
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Loan Amount (₹)</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="30,00,000"
-          keyboardType="numeric"
-          placeholderTextColor="#999"
+// ============= EMI CALCULATOR =============
+const EMICalculatorView = () => {
+  const [formData, setFormData] = useState({
+    propertyType: 'Residential Space',
+    carpetArea: '',
+    purchasePrice: '',
+    loanAmount: '',
+    downPayment: '',
+    interestRate: '',
+    loanTenure: '',
+    monthlyRent: '',
+    securityDeposit: '',
+    rentEscalation: '',
+    leaseStartDate: '',
+    leaseTerm: '',
+    propertyTax: '',
+    maintenance: '',
+    insurance: '',
+    maintenanceLumpsum: '',
+    stampDuty: '',
+    legalFees: '',
+    brokerage: '',
+    otherCosts: '',
+  });
+
+  const [includeLoan, setIncludeLoan] = useState(true);
+  const [calculated, setCalculated] = useState(true);
+
+  const handleInputChange = (name: string, value: string) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleCalculate = () => {
+    setCalculated(true);
+  };
+
+  return (
+    <ScrollView
+      style={styles.calcContainer}
+      showsVerticalScrollIndicator={false}
+    >
+      <Text style={styles.calcTitle}>Property EMI Calculator</Text>
+
+      {/* Property Details */}
+      <View style={styles.sectionCard}>
+        <Text style={styles.sectionTitle}>Property Details</Text>
+        {/* Property Type Dropdown */}
+        <Dropdown
+          label="Property Type"
+          options={['Residential Space', 'Commercial Space']}
+          selected={formData.propertyType}
+          onSelect={val => handleInputChange('propertyType', val)}
         />
-      </View>
-      <View style={styles.gridRow}>
-        <View style={styles.inputCol}>
-          <Text style={styles.label}>Interest Rate (%)</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="8.5"
-            keyboardType="numeric"
-            placeholderTextColor="#999"
-          />
+        <View style={styles.gridRow}>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Carpet Area (sq ft)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="5600"
+              keyboardType="numeric"
+              value={formData.carpetArea}
+              onChangeText={v => handleInputChange('carpetArea', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Purchase Price (₹)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="400000"
+              keyboardType="numeric"
+              value={formData.purchasePrice}
+              onChangeText={v => handleInputChange('purchasePrice', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
         </View>
-        <View style={styles.inputCol}>
-          <Text style={styles.label}>Tenure (Years)</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="20"
-            keyboardType="numeric"
-            placeholderTextColor="#999"
-          />
+      </View>
+
+      {/* EMI Options */}
+      <View style={styles.sectionCard}>
+        <View style={styles.sectionHeaderRow}>
+          <Text style={styles.sectionTitle}>EMI Options</Text>
+          <View style={styles.toggleRow}>
+            <Text style={[styles.label, { marginBottom: 0, fontSize: 12 }]}>
+              Include Downpayment
+            </Text>
+            <Switch
+              value={includeLoan}
+              onValueChange={setIncludeLoan}
+              trackColor={{ false: '#767577', true: '#EE2529' }}
+              thumbColor={'#fff'}
+            />
+          </View>
+        </View>
+        <View style={styles.gridRow}>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Loan Amount (₹)</Text>
+            <TextInput
+              style={[styles.input, !includeLoan && styles.inputDisabled]}
+              placeholder="310000"
+              keyboardType="numeric"
+              value={formData.loanAmount}
+              onChangeText={v => handleInputChange('loanAmount', v)}
+              editable={includeLoan}
+              placeholderTextColor="#999"
+            />
+          </View>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Down Payment (₹)</Text>
+            <TextInput
+              style={[styles.input, !includeLoan && styles.inputDisabled]}
+              placeholder="130000"
+              keyboardType="numeric"
+              value={formData.downPayment}
+              onChangeText={v => handleInputChange('downPayment', v)}
+              editable={includeLoan}
+              placeholderTextColor="#999"
+            />
+          </View>
+        </View>
+        <View style={styles.gridRow}>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Interest (% per annum)</Text>
+            <TextInput
+              style={[styles.input, !includeLoan && styles.inputDisabled]}
+              placeholder="9.5"
+              keyboardType="numeric"
+              value={formData.interestRate}
+              onChangeText={v => handleInputChange('interestRate', v)}
+              editable={includeLoan}
+              placeholderTextColor="#999"
+            />
+          </View>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Loan Tenure (Years)</Text>
+            <TextInput
+              style={[styles.input, !includeLoan && styles.inputDisabled]}
+              placeholder="20"
+              keyboardType="numeric"
+              value={formData.loanTenure}
+              onChangeText={v => handleInputChange('loanTenure', v)}
+              editable={includeLoan}
+              placeholderTextColor="#999"
+            />
+          </View>
         </View>
       </View>
-    </View>
 
-    <TouchableOpacity style={styles.calculateBtn}>
-      <Text style={styles.calculateBtnText}>Calculate EMI</Text>
-    </TouchableOpacity>
+      {/* Rental Details */}
+      <View style={styles.sectionCard}>
+        <Text style={styles.sectionTitle}>Rental Details</Text>
+        <View style={styles.gridRow}>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Monthly Rent (₹)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="30000"
+              keyboardType="numeric"
+              value={formData.monthlyRent}
+              onChangeText={v => handleInputChange('monthlyRent', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Security Deposit (₹)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="300000"
+              keyboardType="numeric"
+              value={formData.securityDeposit}
+              onChangeText={v => handleInputChange('securityDeposit', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
+        </View>
+        <View style={styles.gridRow}>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Rent Escalation (% per year)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="8"
+              keyboardType="numeric"
+              value={formData.rentEscalation}
+              onChangeText={v => handleInputChange('rentEscalation', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Lease Term (Yrs)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="10"
+              keyboardType="numeric"
+              value={formData.leaseTerm}
+              onChangeText={v => handleInputChange('leaseTerm', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
+        </View>
+      </View>
 
-    <View style={styles.resultBox}>
-      <Text style={styles.resultLabel}>Monthly EMI</Text>
-      <Text style={styles.resultValue}>₹ 26,035</Text>
-    </View>
-  </ScrollView>
-);
+      {/* Recurring Expenses */}
+      <View style={styles.sectionCard}>
+        <Text style={styles.sectionTitle}>Recurring Expenses (Annual)</Text>
+        <View style={styles.gridRow}>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Property Tax (₹)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="12000"
+              keyboardType="numeric"
+              value={formData.propertyTax}
+              onChangeText={v => handleInputChange('propertyTax', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Maintenance per sq ft (₹)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="30000"
+              keyboardType="numeric"
+              value={formData.maintenance}
+              onChangeText={v => handleInputChange('maintenance', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
+        </View>
+        <View style={styles.gridRow}>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Insurance (₹)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="8000"
+              keyboardType="numeric"
+              value={formData.insurance}
+              onChangeText={v => handleInputChange('insurance', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Maintenance Lump sum (₹)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="58000"
+              keyboardType="numeric"
+              value={formData.maintenanceLumpsum}
+              onChangeText={v => handleInputChange('maintenanceLumpsum', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
+        </View>
+      </View>
+
+      {/* One-time Costs */}
+      <View style={styles.sectionCard}>
+        <Text style={styles.sectionTitle}>One-time Costs</Text>
+        <View style={styles.gridRow}>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Stamp Duty (%)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="12"
+              keyboardType="numeric"
+              value={formData.stampDuty}
+              onChangeText={v => handleInputChange('stampDuty', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Legal Fees (₹)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="38000"
+              keyboardType="numeric"
+              value={formData.legalFees}
+              onChangeText={v => handleInputChange('legalFees', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
+        </View>
+        <View style={styles.gridRow}>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Brokerage (₹)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="67500"
+              keyboardType="numeric"
+              value={formData.brokerage}
+              onChangeText={v => handleInputChange('brokerage', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Other One-time Costs (₹)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="25000"
+              keyboardType="numeric"
+              value={formData.otherCosts}
+              onChangeText={v => handleInputChange('otherCosts', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
+        </View>
+      </View>
+
+      {/* Calculate Button */}
+      <TouchableOpacity style={styles.calculateBtn} onPress={handleCalculate}>
+        <Text style={styles.calculateBtnText}>
+          Calculate ROI & Rental Yield
+        </Text>
+      </TouchableOpacity>
+
+      {/* Result Components */}
+      {calculated && (
+        <>
+          <EMISummaryCards />
+          <EMIAnalytics />
+          <PrincipleChart />
+          <CoverageAnalysis />
+        </>
+      )}
+    </ScrollView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -987,6 +1071,9 @@ const styles = StyleSheet.create({
     color: '#333',
     fontWeight: 'bold',
   },
+  inputDisabled: {
+    opacity: 0.5,
+  },
   typeSelector: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -1010,7 +1097,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   activeTypeBtnText: {
-    color: '#d62d2d', // Darker red for text
+    color: '#d62d2d',
   },
   calculateBtn: {
     backgroundColor: '#EE2529',
@@ -1029,68 +1116,56 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  resultBox: {
-    marginTop: 0,
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
+  dropdownContainer: {
+    marginBottom: 20,
+    zIndex: 1000,
+  },
+  dropdownHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: '#F9F9F9',
     borderWidth: 1,
-    borderColor: '#EE2529',
-    marginBottom: 40,
+    borderColor: '#E0E0E0',
+    borderRadius: 8,
+    padding: 12,
   },
-  resultLabel: {
+  dropdownHeaderText: {
     fontSize: 14,
-    color: '#767676',
-    textAlign: 'center',
+    color: '#333',
+    fontWeight: 'bold',
   },
-  resultValue: {
-    fontSize: 24,
+  dropdownList: {
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 8,
+    marginTop: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
+    zIndex: 2000,
+  },
+  dropdownItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  dropdownItemSelected: {
+    backgroundColor: '#FFF3CA',
+  },
+  dropdownItemText: {
+    fontSize: 14,
+    color: '#555',
+  },
+  activeDropdownItemText: {
     color: '#EE2529',
     fontWeight: 'bold',
-    marginTop: 5,
-    textAlign: 'center',
-  },
-  chartWrapper: {
-    marginTop: 20,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#eee',
-    alignItems: 'center',
-  },
-  chartTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  chartRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-    gap: 20,
-  },
-  legendContainer: {
-    marginLeft: 10,
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 5,
-  },
-  legendColor: {
-    width: 12,
-    height: 12,
-    borderRadius: 2,
-    marginRight: 8,
-  },
-  legendText: {
-    fontSize: 12,
-    color: '#333',
   },
 });
 
