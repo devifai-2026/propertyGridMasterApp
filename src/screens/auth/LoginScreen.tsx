@@ -8,6 +8,11 @@ import {
   Alert,
   Platform,
   useWindowDimensions,
+  Image,
+  ImageBackground,
+  ScrollView,
+  Animated,
+  Easing,
 } from 'react-native';
 import Layout from '../../layout/Layout';
 import { useAuth } from '../../context/AuthContext';
@@ -21,9 +26,31 @@ const LoginScreen = () => {
   const { navigate } = useNavigation();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
+  const isDesktop = width >= 1024;
 
   // Refs for OTP inputs
   const otpInputRefs = useRef<Array<TextInput | null>>([]);
+
+  // Animation value
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+
+  React.useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }),
+    ]).start();
+  }, []);
 
   const handleSendOtp = () => {
     if (phone.length === 10) {
@@ -32,7 +59,10 @@ const LoginScreen = () => {
       setTimeout(() => {
         otpInputRefs.current[0]?.focus();
       }, 100);
-      Alert.alert('OTP Sent', 'A 4-digit OTP has been sent to your mobile number');
+      Alert.alert(
+        'OTP Sent',
+        'A 4-digit OTP has been sent to your mobile number',
+      );
     } else {
       Alert.alert('Error', 'Please enter a valid 10-digit number');
     }
@@ -74,101 +104,138 @@ const LoginScreen = () => {
 
   return (
     <Layout>
-      <View style={styles.container}>
-        <View style={styles.card}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Welcome</Text>
-            <Text style={styles.subtitle}>
-              Sign in to your account to continue
-            </Text>
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Mobile Number *</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Enter your contact number"
-              placeholderTextColor="#999"
-              keyboardType="numeric"
-              maxLength={10}
-              value={phone}
-              onChangeText={setPhone}
-              editable={!otpSent}
-            />
-          </View>
-
-          {otpSent && (
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Enter OTP *</Text>
-              <View style={styles.otpInputGroup}>
-                {[0, 1, 2, 3].map(index => (
-                  <TextInput
-                    key={index}
-                    ref={ref => {
-                      otpInputRefs.current[index] = ref;
-                    }}
-                    style={styles.otpInput}
-                    maxLength={1}
-                    keyboardType="number-pad"
-                    value={otp[index] || ''}
-                    onChangeText={text => handleOtpChange(text, index)}
-                    onKeyPress={e => handleOtpKeyPress(e, index)}
-                    selectTextOnFocus
-                    autoComplete="one-time-code"
-                  />
-                ))}
-              </View>
-              <TouchableOpacity
-                style={styles.resendBtn}
-                onPress={() => {
-                  setOtp('');
-                  Alert.alert('OTP Resent', 'A new OTP has been sent to your mobile number');
-                }}
-              >
-                <Text style={styles.resendText}>Resend OTP</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {!otpSent && (
-            <View style={styles.dummyInfo}>
-              <Text style={styles.dummyTitle}>Dummy Login Credentials:</Text>
-              <Text style={styles.dummyText}>• Investor: 9999999991</Text>
-              <Text style={styles.dummyText}>• Broker: 9999999992</Text>
-              <Text style={styles.dummyText}>• Owner: 9999999993</Text>
-            </View>
-          )}
-
-          <View style={styles.actions}>
-            <TouchableOpacity
-              style={styles.btnOutline}
-              onPress={() => navigate('/dashboard')}
-            >
-              <Text style={styles.btnOutlineText}>Cancel</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+      <View style={styles.scrollContainer}>
+        <View style={[styles.container, isDesktop && styles.desktopContainer]}>
+          <Animated.View
+            style={[
+              styles.contentWrapper,
+              isDesktop && styles.desktopContentWrapper,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }],
+              },
+            ]}
+          >
+            <View
               style={[
-                styles.btnFilled,
-                (otpSent ? otp.length !== 4 : phone.length !== 10) &&
-                  styles.btnDisabled,
+                styles.formSection,
+                isDesktop && styles.desktopFormSection,
               ]}
-              onPress={otpSent ? handleVerifyOtp : handleSendOtp}
-              disabled={otpSent ? otp.length !== 4 : phone.length !== 10}
             >
-              <Text style={styles.btnFilledText}>
-                {otpSent ? 'Verify & Login' : 'Send OTP'}
-              </Text>
-            </TouchableOpacity>
-          </View>
+              <View style={styles.card}>
+                <View style={styles.header}>
+                  <Text style={styles.title}>Welcome</Text>
+                  <Text style={styles.subtitle}>
+                    Sign in to your account to continue
+                  </Text>
+                </View>
 
-          {!otpSent && (
-            <View style={styles.signupSection}>
-              <Text style={styles.signupText}>Don't have an account?</Text>
-              <TouchableOpacity onPress={() => navigate('/signup')}>
-                <Text style={styles.signupLink}>Sign up</Text>
-              </TouchableOpacity>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Mobile Number *</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="Enter your contact number"
+                    placeholderTextColor="#999"
+                    keyboardType="numeric"
+                    maxLength={10}
+                    value={phone}
+                    onChangeText={setPhone}
+                    editable={!otpSent}
+                  />
+                </View>
+
+                {otpSent && (
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.inputLabel}>Enter OTP *</Text>
+                    <View style={styles.otpInputGroup}>
+                      {[0, 1, 2, 3].map(index => (
+                        <TextInput
+                          key={index}
+                          ref={ref => {
+                            otpInputRefs.current[index] = ref;
+                          }}
+                          style={styles.otpInput}
+                          maxLength={1}
+                          keyboardType="number-pad"
+                          value={otp[index] || ''}
+                          onChangeText={text => handleOtpChange(text, index)}
+                          onKeyPress={e => handleOtpKeyPress(e, index)}
+                          selectTextOnFocus
+                          autoComplete="one-time-code"
+                        />
+                      ))}
+                    </View>
+                    <TouchableOpacity
+                      style={styles.resendBtn}
+                      onPress={() => {
+                        setOtp('');
+                        Alert.alert(
+                          'OTP Resent',
+                          'A new OTP has been sent to your mobile number',
+                        );
+                      }}
+                    >
+                      <Text style={styles.resendText}>Resend OTP</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+
+                {!otpSent && (
+                  <View style={styles.dummyInfo}>
+                    <Text style={styles.dummyTitle}>
+                      Dummy Login Credentials:
+                    </Text>
+                    <Text style={styles.dummyText}>• Investor: 9999999991</Text>
+                    <Text style={styles.dummyText}>• Broker: 9999999992</Text>
+                    <Text style={styles.dummyText}>• Owner: 9999999993</Text>
+                  </View>
+                )}
+
+                <View style={styles.actions}>
+                  <TouchableOpacity
+                    style={styles.btnOutline}
+                    onPress={() => navigate('/dashboard')}
+                  >
+                    <Text style={styles.btnOutlineText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.btnFilled,
+                      (otpSent ? otp.length !== 4 : phone.length !== 10) &&
+                        styles.btnDisabled,
+                    ]}
+                    onPress={otpSent ? handleVerifyOtp : handleSendOtp}
+                    disabled={otpSent ? otp.length !== 4 : phone.length !== 10}
+                  >
+                    <Text style={styles.btnFilledText}>
+                      {otpSent ? 'Verify & Login' : 'Send OTP'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {!otpSent && (
+                  <View style={styles.signupSection}>
+                    <Text style={styles.signupText}>
+                      Don't have an account?
+                    </Text>
+                    <TouchableOpacity onPress={() => navigate('/signup')}>
+                      <Text style={styles.signupLink}>Sign up</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </View>
             </View>
-          )}
+
+            {isDesktop && (
+              <View style={styles.imageSection}>
+                <Image
+                  source={require('../../assets/Banner/property.png')}
+                  style={styles.sideImage}
+                  resizeMode="cover"
+                />
+              </View>
+            )}
+          </Animated.View>
         </View>
       </View>
     </Layout>
@@ -176,23 +243,79 @@ const LoginScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  scrollContainer: {
+    flexGrow: 1,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 16,
+    minHeight: '100%',
+  },
+  desktopContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 40,
+  },
+  contentWrapper: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  desktopContentWrapper: {
+    flexDirection: 'row',
+    maxWidth: 900,
+    width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 24,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.15,
+    shadowRadius: 30,
+    elevation: 20,
+  },
+  formSection: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  desktopFormSection: {
+    flex: 1,
+    padding: 10,
+    justifyContent: 'center',
+  },
+  imageSection: {
+    flex: 1,
+    height: '100%',
+    minHeight: 450,
+    backgroundColor: 'transparent',
     padding: 10,
   },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 30,
+  sideImage: {
     width: '100%',
-    maxWidth: 400,
+    height: '100%',
+    flex: 1,
+    borderRadius: 20,
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 20,
+    width: '100%',
+    maxWidth: 420,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.06,
+    shadowRadius: 16,
+    elevation: 8,
+    marginVertical: 16,
+    // On desktop, the card shadow/border is mostly handled by wrapper, but we keep basic styling
   },
   header: {
     marginBottom: 30,

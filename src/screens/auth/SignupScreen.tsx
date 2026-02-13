@@ -8,6 +8,10 @@ import {
   Alert,
   ScrollView,
   useWindowDimensions,
+  ImageBackground,
+  Image,
+  Animated,
+  Easing,
 } from 'react-native';
 import { Briefcase, Building2, Home, Smartphone } from 'lucide-react-native';
 import Layout from '../../layout/Layout';
@@ -30,10 +34,32 @@ const SignupScreen = () => {
   const { navigate } = useNavigation();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
+  const isDesktop = width >= 1024;
   const isSmallMobile = width < 400;
 
   // Refs for OTP inputs
   const otpInputRefs = useRef<Array<TextInput | null>>([]);
+
+  // Animation value
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+
+  React.useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }),
+    ]).start();
+  }, []);
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -104,261 +130,302 @@ const SignupScreen = () => {
 
   return (
     <Layout>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.container}>
-          <View style={styles.card}>
-            <View style={styles.header}>
-              <Text style={styles.title}>Create Account</Text>
-              <Text style={styles.subtitle}>
-                Sign up to get started with your property journey
-              </Text>
+      <View style={styles.scrollContainer}>
+        <View style={[styles.container, isDesktop && styles.desktopContainer]}>
+          <Animated.View
+            style={[
+              styles.contentWrapper,
+              isDesktop && styles.desktopContentWrapper,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }],
+              },
+            ]}
+          >
+            <View
+              style={[
+                styles.formSection,
+                isDesktop && styles.desktopFormSection,
+              ]}
+            >
+              <View style={styles.card}>
+                <View style={styles.header}>
+                  <Text style={styles.title}>Create Account</Text>
+                  <Text style={styles.subtitle}>
+                    Sign up to get started with your property journey
+                  </Text>
+                </View>
+
+                {!otpSent ? (
+                  <>
+                    {/* Name Fields */}
+                    <View
+                      style={[styles.row, isSmallMobile && styles.rowStack]}
+                    >
+                      <View
+                        style={[
+                          styles.inputGroup,
+                          !isSmallMobile && styles.halfWidth,
+                        ]}
+                      >
+                        <Text style={styles.inputLabel}>First Name *</Text>
+                        <TextInput
+                          style={[
+                            styles.textInput,
+                            focusedField === 'firstName' &&
+                              styles.textInputFocused,
+                          ]}
+                          placeholder="John"
+                          placeholderTextColor="#9CA3AF"
+                          value={formData.firstName}
+                          onChangeText={text => handleChange('firstName', text)}
+                          onFocus={() => setFocusedField('firstName')}
+                          onBlur={() => setFocusedField(null)}
+                        />
+                      </View>
+
+                      <View
+                        style={[
+                          styles.inputGroup,
+                          !isSmallMobile && styles.halfWidth,
+                        ]}
+                      >
+                        <Text style={styles.inputLabel}>Last Name *</Text>
+                        <TextInput
+                          style={[
+                            styles.textInput,
+                            focusedField === 'lastName' &&
+                              styles.textInputFocused,
+                          ]}
+                          placeholder="Doe"
+                          placeholderTextColor="#9CA3AF"
+                          value={formData.lastName}
+                          onChangeText={text => handleChange('lastName', text)}
+                          onFocus={() => setFocusedField('lastName')}
+                          onBlur={() => setFocusedField(null)}
+                        />
+                      </View>
+                    </View>
+
+                    {/* Email */}
+                    <View style={styles.inputGroup}>
+                      <Text style={styles.inputLabel}>Email Address *</Text>
+                      <TextInput
+                        style={[
+                          styles.textInput,
+                          focusedField === 'email' && styles.textInputFocused,
+                        ]}
+                        placeholder="john.doe@example.com"
+                        placeholderTextColor="#9CA3AF"
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        value={formData.email}
+                        onChangeText={text => handleChange('email', text)}
+                        onFocus={() => setFocusedField('email')}
+                        onBlur={() => setFocusedField(null)}
+                      />
+                    </View>
+
+                    {/* Phone */}
+                    <View style={styles.inputGroup}>
+                      <Text style={styles.inputLabel}>Mobile Number *</Text>
+                      <TextInput
+                        style={[
+                          styles.textInput,
+                          focusedField === 'phone' && styles.textInputFocused,
+                        ]}
+                        placeholder="9876543210"
+                        placeholderTextColor="#9CA3AF"
+                        keyboardType="numeric"
+                        maxLength={10}
+                        value={formData.phone}
+                        onChangeText={text => handleChange('phone', text)}
+                        onFocus={() => setFocusedField('phone')}
+                        onBlur={() => setFocusedField(null)}
+                      />
+                    </View>
+
+                    {/* User Type Selection */}
+                    <View style={styles.inputGroup}>
+                      <Text style={styles.inputLabel}>I am a *</Text>
+                      <View
+                        style={[
+                          styles.userTypeContainer,
+                          isSmallMobile && styles.userTypeContainerStack,
+                        ]}
+                      >
+                        {[
+                          {
+                            id: 'investor',
+                            label: 'Investor',
+                            Icon: Briefcase,
+                          },
+                          { id: 'broker', label: 'Broker', Icon: Building2 },
+                          { id: 'owner', label: 'Owner', Icon: Home },
+                        ].map(type => (
+                          <TouchableOpacity
+                            key={type.id}
+                            style={[
+                              styles.userTypeCard,
+                              isSmallMobile && styles.userTypeCardSmall,
+                              formData.userType === type.id &&
+                                styles.userTypeCardActive,
+                            ]}
+                            onPress={() => handleChange('userType', type.id)}
+                          >
+                            <type.Icon
+                              size={isSmallMobile ? 20 : 24}
+                              color={
+                                formData.userType === type.id
+                                  ? '#D32F2F'
+                                  : '#6B7280'
+                              }
+                              strokeWidth={2.5}
+                            />
+                            <Text
+                              style={[
+                                styles.userTypeLabel,
+                                formData.userType === type.id &&
+                                  styles.userTypeLabelActive,
+                              ]}
+                            >
+                              {type.label}
+                            </Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+                  </>
+                ) : (
+                  /* OTP Section */
+                  <View style={styles.otpSection}>
+                    <View style={styles.otpIconContainer}>
+                      <Smartphone size={32} color="#D32F2F" strokeWidth={2} />
+                    </View>
+                    <Text style={styles.otpTitle}>Verify Your Number</Text>
+                    <Text style={styles.otpHint}>
+                      We've sent a 4-digit code to{'\n'}
+                      <Text style={styles.phoneHighlight}>
+                        +91 {formData.phone}
+                      </Text>
+                    </Text>
+
+                    <View
+                      style={[
+                        styles.otpInputGroup,
+                        isSmallMobile && styles.otpInputGroupSmall,
+                      ]}
+                    >
+                      {[0, 1, 2, 3].map(index => (
+                        <TextInput
+                          key={index}
+                          ref={ref => {
+                            otpInputRefs.current[index] = ref;
+                          }}
+                          style={[
+                            styles.otpInput,
+                            isSmallMobile && styles.otpInputSmall,
+                            focusedOtpIndex === index && styles.otpInputFocused,
+                            otp[index] && styles.otpInputFilled,
+                          ]}
+                          maxLength={1}
+                          keyboardType="number-pad"
+                          value={otp[index] || ''}
+                          onChangeText={text => handleOtpChange(text, index)}
+                          onKeyPress={e => handleOtpKeyPress(e, index)}
+                          onFocus={() => setFocusedOtpIndex(index)}
+                          onBlur={() => setFocusedOtpIndex(null)}
+                          selectTextOnFocus
+                          autoComplete="one-time-code"
+                        />
+                      ))}
+                    </View>
+
+                    <TouchableOpacity
+                      style={styles.resendBtn}
+                      onPress={() => {
+                        setOtp('');
+                        Alert.alert(
+                          'OTP Resent',
+                          'A new OTP has been sent to your mobile number',
+                        );
+                      }}
+                    >
+                      <Text style={styles.resendText}>
+                        Didn't receive code? Resend
+                      </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={styles.changeNumberBtn}
+                      onPress={() => {
+                        setOtpSent(false);
+                        setOtp('');
+                      }}
+                    >
+                      <Text style={styles.changeNumberText}>Change Number</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+
+                {/* Action Buttons */}
+                <View style={styles.actions}>
+                  <TouchableOpacity
+                    style={styles.btnOutline}
+                    onPress={() => navigate('/login')}
+                  >
+                    <Text style={styles.btnOutlineText}>
+                      {otpSent ? 'Back' : 'Sign In'}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[
+                      styles.btnFilled,
+                      (otpSent ? otp.length !== 4 : !isFormValid()) &&
+                        styles.btnDisabled,
+                    ]}
+                    onPress={otpSent ? handleSignup : handleSendOtp}
+                    disabled={otpSent ? otp.length !== 4 : !isFormValid()}
+                  >
+                    <Text style={styles.btnFilledText}>
+                      {otpSent ? 'Create Account' : 'Continue'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Terms */}
+                {!otpSent && (
+                  <Text style={styles.termsText}>
+                    By signing up, you agree to our{' '}
+                    <Text style={styles.termsLink}>Terms of Service</Text> and{' '}
+                    <Text style={styles.termsLink}>Privacy Policy</Text>
+                  </Text>
+                )}
+              </View>
             </View>
 
-            {!otpSent ? (
-              <>
-                {/* Name Fields */}
-                <View style={[styles.row, isSmallMobile && styles.rowStack]}>
-                  <View
-                    style={[
-                      styles.inputGroup,
-                      !isSmallMobile && styles.halfWidth,
-                    ]}
-                  >
-                    <Text style={styles.inputLabel}>First Name *</Text>
-                    <TextInput
-                      style={[
-                        styles.textInput,
-                        focusedField === 'firstName' && styles.textInputFocused,
-                      ]}
-                      placeholder="John"
-                      placeholderTextColor="#9CA3AF"
-                      value={formData.firstName}
-                      onChangeText={text => handleChange('firstName', text)}
-                      onFocus={() => setFocusedField('firstName')}
-                      onBlur={() => setFocusedField(null)}
-                    />
-                  </View>
-
-                  <View
-                    style={[
-                      styles.inputGroup,
-                      !isSmallMobile && styles.halfWidth,
-                    ]}
-                  >
-                    <Text style={styles.inputLabel}>Last Name *</Text>
-                    <TextInput
-                      style={[
-                        styles.textInput,
-                        focusedField === 'lastName' && styles.textInputFocused,
-                      ]}
-                      placeholder="Doe"
-                      placeholderTextColor="#9CA3AF"
-                      value={formData.lastName}
-                      onChangeText={text => handleChange('lastName', text)}
-                      onFocus={() => setFocusedField('lastName')}
-                      onBlur={() => setFocusedField(null)}
-                    />
-                  </View>
-                </View>
-
-                {/* Email */}
-                <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Email Address *</Text>
-                  <TextInput
-                    style={[
-                      styles.textInput,
-                      focusedField === 'email' && styles.textInputFocused,
-                    ]}
-                    placeholder="john.doe@example.com"
-                    placeholderTextColor="#9CA3AF"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    value={formData.email}
-                    onChangeText={text => handleChange('email', text)}
-                    onFocus={() => setFocusedField('email')}
-                    onBlur={() => setFocusedField(null)}
-                  />
-                </View>
-
-                {/* Phone */}
-                <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Mobile Number *</Text>
-                  <TextInput
-                    style={[
-                      styles.textInput,
-                      focusedField === 'phone' && styles.textInputFocused,
-                    ]}
-                    placeholder="9876543210"
-                    placeholderTextColor="#9CA3AF"
-                    keyboardType="numeric"
-                    maxLength={10}
-                    value={formData.phone}
-                    onChangeText={text => handleChange('phone', text)}
-                    onFocus={() => setFocusedField('phone')}
-                    onBlur={() => setFocusedField(null)}
-                  />
-                </View>
-
-                {/* User Type Selection */}
-                <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>I am a *</Text>
-                  <View
-                    style={[
-                      styles.userTypeContainer,
-                      isSmallMobile && styles.userTypeContainerStack,
-                    ]}
-                  >
-                    {[
-                      { id: 'investor', label: 'Investor', Icon: Briefcase },
-                      { id: 'broker', label: 'Broker', Icon: Building2 },
-                      { id: 'owner', label: 'Owner', Icon: Home },
-                    ].map(type => (
-                      <TouchableOpacity
-                        key={type.id}
-                        style={[
-                          styles.userTypeCard,
-                          isSmallMobile && styles.userTypeCardSmall,
-                          formData.userType === type.id &&
-                            styles.userTypeCardActive,
-                        ]}
-                        onPress={() => handleChange('userType', type.id)}
-                      >
-                        <type.Icon
-                          size={isSmallMobile ? 20 : 24}
-                          color={
-                            formData.userType === type.id
-                              ? '#D32F2F'
-                              : '#6B7280'
-                          }
-                          strokeWidth={2.5}
-                        />
-                        <Text
-                          style={[
-                            styles.userTypeLabel,
-                            formData.userType === type.id &&
-                              styles.userTypeLabelActive,
-                          ]}
-                        >
-                          {type.label}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
-              </>
-            ) : (
-              /* OTP Section */
-              <View style={styles.otpSection}>
-                <View style={styles.otpIconContainer}>
-                  <Smartphone size={32} color="#D32F2F" strokeWidth={2} />
-                </View>
-                <Text style={styles.otpTitle}>Verify Your Number</Text>
-                <Text style={styles.otpHint}>
-                  We've sent a 4-digit code to{'\n'}
-                  <Text style={styles.phoneHighlight}>
-                    +91 {formData.phone}
-                  </Text>
-                </Text>
-
-                <View
-                  style={[
-                    styles.otpInputGroup,
-                    isSmallMobile && styles.otpInputGroupSmall,
-                  ]}
-                >
-                  {[0, 1, 2, 3].map(index => (
-                    <TextInput
-                      key={index}
-                      ref={ref => {
-                        otpInputRefs.current[index] = ref;
-                      }}
-                      style={[
-                        styles.otpInput,
-                        isSmallMobile && styles.otpInputSmall,
-                        focusedOtpIndex === index && styles.otpInputFocused,
-                        otp[index] && styles.otpInputFilled,
-                      ]}
-                      maxLength={1}
-                      keyboardType="number-pad"
-                      value={otp[index] || ''}
-                      onChangeText={text => handleOtpChange(text, index)}
-                      onKeyPress={e => handleOtpKeyPress(e, index)}
-                      onFocus={() => setFocusedOtpIndex(index)}
-                      onBlur={() => setFocusedOtpIndex(null)}
-                      selectTextOnFocus
-                      autoComplete="one-time-code"
-                    />
-                  ))}
-                </View>
-
-                <TouchableOpacity
-                  style={styles.resendBtn}
-                  onPress={() => {
-                    setOtp('');
-                    Alert.alert(
-                      'OTP Resent',
-                      'A new OTP has been sent to your mobile number',
-                    );
-                  }}
-                >
-                  <Text style={styles.resendText}>
-                    Didn't receive code? Resend
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.changeNumberBtn}
-                  onPress={() => {
-                    setOtpSent(false);
-                    setOtp('');
-                  }}
-                >
-                  <Text style={styles.changeNumberText}>Change Number</Text>
-                </TouchableOpacity>
+            {isDesktop && (
+              <View style={styles.imageSection}>
+                <Image
+                  source={require('../../assets/Banner/property.png')}
+                  style={styles.sideImage}
+                  resizeMode="cover"
+                />
               </View>
             )}
-
-            {/* Action Buttons */}
-            <View style={styles.actions}>
-              <TouchableOpacity
-                style={styles.btnOutline}
-                onPress={() => navigate('/login')}
-              >
-                <Text style={styles.btnOutlineText}>
-                  {otpSent ? 'Back' : 'Sign In'}
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.btnFilled,
-                  (otpSent ? otp.length !== 4 : !isFormValid()) &&
-                    styles.btnDisabled,
-                ]}
-                onPress={otpSent ? handleSignup : handleSendOtp}
-                disabled={otpSent ? otp.length !== 4 : !isFormValid()}
-              >
-                <Text style={styles.btnFilledText}>
-                  {otpSent ? 'Create Account' : 'Continue'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* Terms */}
-            {!otpSent && (
-              <Text style={styles.termsText}>
-                By signing up, you agree to our{' '}
-                <Text style={styles.termsLink}>Terms of Service</Text> and{' '}
-                <Text style={styles.termsLink}>Privacy Policy</Text>
-              </Text>
-            )}
-          </View>
+          </Animated.View>
         </View>
-      </ScrollView>
+      </View>
     </Layout>
   );
 };
 
 const styles = StyleSheet.create({
+  backgroundImage: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
   scrollContainer: {
     flexGrow: 1,
   },
@@ -366,22 +433,65 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#F5F7FA',
     minHeight: '100%',
+  },
+  desktopContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 40,
+  },
+  contentWrapper: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  desktopContentWrapper: {
+    flexDirection: 'row',
+    maxWidth: 900,
+    width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    borderRadius: 24,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.15,
+    shadowRadius: 30,
+    elevation: 20,
+  },
+  formSection: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  desktopFormSection: {
+    flex: 1,
+    padding: 10,
+  },
+  imageSection: {
+    flex: 1,
+    height: '100%',
+    minHeight: 450,
+    padding: 10,
+    backgroundColor: 'transparent',
+  },
+  sideImage: {
+    width: '100%',
+    height: '100%',
+    flex: 1,
+    borderRadius: 20,
   },
   card: {
     backgroundColor: '#FFFFFF',
     borderRadius: 20,
-    padding: 24,
+    padding: 20,
     width: '100%',
-    maxWidth: 540,
+    maxWidth: 420,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.06,
     shadowRadius: 16,
     elevation: 8,
     marginVertical: 16,
+    // On desktop, the card shadow/border is handled by the wrapper
   },
   header: {
     marginBottom: 24,
