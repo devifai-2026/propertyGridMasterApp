@@ -64,7 +64,7 @@ module.exports = {
       template: path.resolve(appDirectory, 'web/index.html'),
     }),
     new webpack.DefinePlugin({
-      __DEV__: JSON.stringify(true),
+      __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production'),
     }),
   ],
 
