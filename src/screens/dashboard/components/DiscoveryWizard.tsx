@@ -41,19 +41,30 @@ const StepCard = ({
   active: boolean;
   onPress: () => void;
 }) => {
+  const { width } = useWindowDimensions();
   const IconComponent = item.Icon;
   return (
     <TouchableOpacity
-      style={[styles.stepCard, active && styles.stepCardActive]}
+      style={[
+        styles.stepCard,
+        active && styles.stepCardActive,
+        { width: width < 768 ? 90 : 120, height: width < 768 ? 90 : 120 },
+      ]}
       onPress={onPress}
     >
       <IconComponent
-        size={32}
+        size={width < 768 ? 24 : 32}
         color={active ? '#D32F2F' : '#666'}
         strokeWidth={1.5}
         style={styles.stepIcon}
       />
-      <Text style={[styles.stepLabel, active && styles.stepLabelActive]}>
+      <Text
+        style={[
+          styles.stepLabel,
+          active && styles.stepLabelActive,
+          { fontSize: width < 768 ? 12 : 14 },
+        ]}
+      >
         {item.label}
       </Text>
     </TouchableOpacity>
@@ -118,13 +129,13 @@ const DiscoveryWizard = () => {
           Select your {STEPS.find(s => s.id === activeStep)?.label} Preference.
         </Text>
 
-        <View style={styles.wizardOptions}>
+        <View style={[styles.wizardOptions, isMobile && { gap: 10 }]}>
           {['Pune', 'Mumbai', 'Gurgaon', 'New Delhi'].map(city => (
             <TouchableOpacity
               key={city}
               style={[
                 styles.cityOption,
-                isMobile && { width: 100, height: 80 },
+                isMobile && { width: (width - (isMobile ? 40 : 120) - 10) / 2 },
                 selectedCity === city && styles.cityOptionSelected,
               ]}
               onPress={() => setSelectedCity(city)}
@@ -133,6 +144,7 @@ const DiscoveryWizard = () => {
                 style={[
                   styles.cityOptionText,
                   selectedCity === city && styles.cityOptionTextSelected,
+                  isMobile && { fontSize: 16 },
                 ]}
               >
                 {city}
@@ -142,10 +154,12 @@ const DiscoveryWizard = () => {
         </View>
 
         <View style={styles.wizardActions}>
-          <TouchableOpacity style={styles.skipBtn}>
+          <TouchableOpacity style={[styles.skipBtn, isMobile && { flex: 1 }]}>
             <Text style={styles.skipBtnText}>Skip</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.showPropertiesBtn}>
+          <TouchableOpacity
+            style={[styles.showPropertiesBtn, isMobile && { flex: 2 }]}
+          >
             <Text style={styles.showPropertiesText}>Show Properties</Text>
           </TouchableOpacity>
         </View>

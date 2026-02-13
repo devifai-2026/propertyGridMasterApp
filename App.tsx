@@ -6,6 +6,7 @@ import ExplorePropertiesScreen from './src/screens/properties/ExplorePropertiesS
 import CalculatorsScreen from './src/screens/calculators/CalculatorsScreen';
 import ExploreBrokersScreen from './src/screens/brokers/ExploreBrokersScreen';
 import InvestorsScreen from './src/screens/investors/InvestorsScreen';
+import ListPropertyScreen from './src/screens/list-property/ListPropertyScreen';
 import {
   NavigationProvider,
   useNavigation,
@@ -34,6 +35,8 @@ const AppContent = () => {
         return <ExploreBrokersScreen />;
       case currentPath === '/investors':
         return <InvestorsScreen />;
+      case currentPath === '/list-property':
+        return <ListPropertyScreen />;
       default:
         // Default redirection to /dashboard
         return <Dashboard />;

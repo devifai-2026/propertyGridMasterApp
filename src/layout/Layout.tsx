@@ -70,8 +70,8 @@ const SideMenu: React.FC<SideMenuProps> = ({
           <SafeAreaView style={{ flex: 1 }}>
             <View style={styles.menuHeader}>
               <Image
-                source={require('../assets/Footer/logo.png')}
-                style={{ width: 120, height: 40 }}
+                source={require('../assets/Navbar/Preleasegrid logo 1.png')}
+                style={{ width: 150, height: 45 }}
                 resizeMode="contain"
               />
               <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
@@ -195,11 +195,6 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
   const { width } = useWindowDimensions();
   const { navigate } = useNavigation();
   const isMobile = width < 768;
-
-  const handleSignIn = () => {
-    navigate('/login');
-  };
-
   return (
     <View style={styles.headerContainer}>
       <View
@@ -213,7 +208,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
           onPress={() => navigate('/dashboard')}
         >
           <Image
-            source={require('../assets/Footer/logo.png')}
+            source={require('../assets/Navbar/Preleasegrid logo 1.png')}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -247,6 +242,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
                 paddingVertical: 0,
               },
             ]}
+            onPress={() => navigate('/list-property')}
           >
             <View style={[styles.plusIconBg, isMobile && { marginRight: 0 }]}>
               <Text style={styles.plusIcon}>+</Text>
@@ -256,7 +252,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
             )}
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuBtn} onPress={onMenuPress}>
-            <Text style={styles.menuIcon}>☰</Text>
+            <Menu size={24} color="#D32F2F" />
           </TouchableOpacity>
         </View>
       </View>
@@ -291,7 +287,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         onLogoutClick={logout}
       />
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, { paddingTop: 100 }]}
+      >
         {children}
         <Footer />
       </ScrollView>
@@ -309,12 +307,28 @@ const styles = StyleSheet.create({
   },
   // Header Styles
   headerContainer: {
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    height: 80,
+    backgroundColor: 'rgba(255, 255, 255, 0.75)',
+    borderWidth: 1,
+    borderColor: 'rgba(230, 230, 230, 0.4)',
+    height: 70,
     justifyContent: 'center',
-    zIndex: 100,
+    zIndex: 1000,
+    position: 'absolute',
+    top: 15,
+    left: '4%',
+    right: '4%',
+    borderRadius: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
+    ...Platform.select({
+      web: {
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+      },
+    }),
   },
   headerContent: {
     flexDirection: 'row',
@@ -323,6 +337,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 1440,
     alignSelf: 'center',
+    paddingHorizontal: 20,
   },
   logoContainer: {
     flexDirection: 'row',
@@ -383,19 +398,23 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   menuBtn: {
-    padding: 8,
-    backgroundColor: '#FFF0F0',
-    borderRadius: 50,
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(238, 37, 41, 0.1)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
   },
   menuIcon: {
-    fontSize: 20,
     color: '#D32F2F',
-    textAlign: 'center',
   },
   // Modal Styles
   modalOverlay: {
@@ -498,9 +517,15 @@ const styles = StyleSheet.create({
   // Side Menu Styles
   menuOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.2)',
     flexDirection: 'row',
     justifyContent: 'flex-end',
+    ...Platform.select({
+      web: {
+        backdropFilter: 'blur(4px)',
+        WebkitBackdropFilter: 'blur(4px)',
+      },
+    }),
   },
   menuBackdrop: {
     position: 'absolute',
