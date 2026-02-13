@@ -160,6 +160,15 @@ const LoginScreen = () => {
               </Text>
             </TouchableOpacity>
           </View>
+
+          {!otpSent && (
+            <View style={styles.signupSection}>
+              <Text style={styles.signupText}>Don't have an account?</Text>
+              <TouchableOpacity onPress={() => navigate('/signup')}>
+                <Text style={styles.signupLink}>Sign up</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </View>
     </Layout>
@@ -293,6 +302,23 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#D32F2F',
     fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  signupSection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 24,
+    gap: 6,
+  },
+  signupText: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  signupLink: {
+    fontSize: 14,
+    color: '#D32F2F',
+    fontWeight: '700',
     textDecorationLine: 'underline',
   },
 });

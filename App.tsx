@@ -15,6 +15,7 @@ import {
   useNavigation,
 } from './src/context/NavigationContext';
 import { AuthProvider } from './src/context/AuthContext';
+import SignupScreen from './src/screens/auth/SignupScreen';
 
 const AppContent = () => {
   const { currentPath } = useNavigation();
@@ -46,6 +47,8 @@ const AppContent = () => {
         return <SupportScreen />;
       case currentPath === '/how-it-works':
         return <HowItWorksScreen />;
+      case currentPath === '/signup':
+        return <SignupScreen />;
       default:
         // Default redirection to /dashboard
         return <Dashboard />;
