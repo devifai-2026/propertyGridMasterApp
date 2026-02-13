@@ -2,6 +2,7 @@ import React from 'react';
 import {
   View,
   Text,
+  ImageBackground,
   TouchableOpacity,
   useWindowDimensions,
   Platform,
@@ -13,15 +14,29 @@ const Hero = () => {
   const isMobile = width < 768;
 
   return (
-    <View
+    <ImageBackground
+      source={require('../../../assets/Banner/bannerBg.png')}
       style={[
         styles.heroContainer,
         {
           paddingHorizontal: isMobile ? 20 : 60,
           paddingVertical: isMobile ? 40 : 80,
+          width: '100%', // Ensure it takes full width
+          overflow: 'hidden', // Ensure borderRadius works
         },
       ]}
+      imageStyle={{
+        borderRadius: 10,
+        resizeMode: 'cover', // Ensure image covers the area
+      }}
     >
+      <View
+        style={{
+          ...StyleSheet.absoluteFillObject,
+          backgroundColor: 'rgba(255,255,255,0.0)', // Transparent overlay to verify image visibility first
+          borderRadius: 10,
+        }}
+      />
       <Text style={[styles.heroTitle, { fontSize: isMobile ? 32 : 56 }]}>
         Earn effortlessly with
       </Text>
@@ -44,7 +59,7 @@ const Hero = () => {
       <TouchableOpacity style={styles.getStartedBtn}>
         <Text style={styles.getStartedText}>Get Started ➔</Text>
       </TouchableOpacity>
-    </View>
+    </ImageBackground>
   );
 };
 
@@ -52,7 +67,7 @@ const styles = StyleSheet.create({
   heroContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff', // Removed solid background
   },
   heroTitle: {
     fontWeight: '400',
