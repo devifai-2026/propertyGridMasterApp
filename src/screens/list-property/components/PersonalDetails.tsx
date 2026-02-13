@@ -18,23 +18,24 @@ import {
 interface PersonalDetailsProps {
   onNext: (data: any) => void;
   onFormValid: (isValid: boolean) => void;
+  initialData?: any;
 }
 
 const PersonalDetails = forwardRef(
-  ({ onNext, onFormValid }: PersonalDetailsProps, ref) => {
+  ({ onNext, onFormValid, initialData }: PersonalDetailsProps, ref) => {
     const { width } = useWindowDimensions();
     const isSmallScreen = width < 768;
     const isMobile = width < 480;
 
     const [formData, setFormData] = useState({
-      firstName: '',
-      lastName: '',
-      email: '',
-      mobile: '',
-      listUnder: '',
-      otp: '',
-      agreeTerms: false,
-      agreePrivacy: false,
+      firstName: initialData?.firstName || '',
+      lastName: initialData?.lastName || '',
+      email: initialData?.email || '',
+      mobile: initialData?.mobile || '',
+      listUnder: initialData?.listUnder || '',
+      otp: initialData?.otp || '',
+      agreeTerms: initialData?.agreeTerms || false,
+      agreePrivacy: initialData?.agreePrivacy || false,
     });
 
     const [otpSent, setOtpSent] = useState(false);

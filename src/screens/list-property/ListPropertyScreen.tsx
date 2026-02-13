@@ -84,27 +84,48 @@ const ListPropertyScreen = () => {
             ref={personalDetailsRef}
             onNext={handleNext}
             onFormValid={setIsFormValid}
+            initialData={formData}
           />
         );
       case 2:
         return (
-          <BasicDetails onNext={handleNext} onFormValid={setIsFormValid} />
+          <BasicDetails
+            onNext={handleNext}
+            onFormValid={setIsFormValid}
+            initialData={formData}
+          />
         );
       case 3:
         return (
-          <LegalDetails onNext={handleNext} onFormValid={setIsFormValid} />
+          <LegalDetails
+            onNext={handleNext}
+            onFormValid={setIsFormValid}
+            initialData={formData}
+          />
         );
       case 4:
         return (
-          <LeaseDetails onNext={handleNext} onFormValid={setIsFormValid} />
+          <LeaseDetails
+            onNext={handleNext}
+            onFormValid={setIsFormValid}
+            initialData={formData}
+          />
         );
       case 5:
         return (
-          <FinancialDetails onNext={handleNext} onFormValid={setIsFormValid} />
+          <FinancialDetails
+            onNext={handleNext}
+            onFormValid={setIsFormValid}
+            initialData={formData}
+          />
         );
       case 6:
         return (
-          <LocationDetails onNext={handleNext} onFormValid={setIsFormValid} />
+          <LocationDetails
+            onNext={handleNext}
+            onFormValid={setIsFormValid}
+            initialData={formData}
+          />
         );
       default:
         return null;
@@ -436,7 +457,9 @@ const styles = StyleSheet.create({
   },
   nextBtn: {
     backgroundColor: '#EE2529',
-    flex: 1,
+    flex: 0,
+    flexGrow: 1,
+    maxWidth: 300,
     marginLeft: 16,
   },
   nextBtnDisabled: {

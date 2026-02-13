@@ -13,23 +13,25 @@ import { ChevronDown, Plus, X, Trash2 } from 'lucide-react-native';
 interface LocationDetailsProps {
   onNext: (data: any) => void;
   onFormValid: (isValid: boolean) => void;
+  initialData?: any;
 }
 
 const LocationDetails: React.FC<LocationDetailsProps> = ({
   onNext,
   onFormValid,
+  initialData,
 }) => {
   const { width } = useWindowDimensions();
   const isSmallScreen = width < 768;
 
   const [formData, setFormData] = useState({
-    microMarket: '',
-    city: '',
-    state: '',
-    connectivity: [{ id: 1, type: '', name: '', distance: '' }],
-    demandDrivers: '',
-    futureInfrastructure: '',
-    faqs: [] as { id: number; question: string; answer: string }[],
+    microMarket: initialData?.microMarket || '',
+    city: initialData?.city || '',
+    state: initialData?.state || '',
+    connectivity: initialData?.connectivity || [{ id: 1, type: '', name: '', distance: '' }],
+    demandDrivers: initialData?.demandDrivers || '',
+    futureInfrastructure: initialData?.futureInfrastructure || '',
+    faqs: initialData?.faqs || ([] as { id: number; question: string; answer: string }[]),
   });
 
   useEffect(() => {
@@ -56,7 +58,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
   ) => {
     setFormData(prev => ({
       ...prev,
-      connectivity: prev.connectivity.map(item =>
+      connectivity: prev.connectivity.map((item:any) =>
         item.id === id ? { ...item, [field]: value } : item,
       ),
     }));
@@ -75,7 +77,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
   const removeConnectivity = (id: number) => {
     setFormData(prev => ({
       ...prev,
-      connectivity: prev.connectivity.filter(item => item.id !== id),
+      connectivity: prev.connectivity.filter((item:any) => item.id !== id),
     }));
   };
 
@@ -89,7 +91,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
   const handleFaqChange = (id: number, field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
-      faqs: prev.faqs.map(faq =>
+      faqs: prev.faqs.map((faq:any) =>
         faq.id === id ? { ...faq, [field]: value } : faq,
       ),
     }));
@@ -98,7 +100,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
   const removeFaq = (id: number) => {
     setFormData(prev => ({
       ...prev,
-      faqs: prev.faqs.filter(faq => faq.id !== id),
+      faqs: prev.faqs.filter((faq:any) => faq.id !== id),
     }));
   };
 
@@ -146,7 +148,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
       </View>
 
       <Text style={styles.subHeader}>Connectivity Details</Text>
-      {formData.connectivity.map((item, index) => (
+      {formData.connectivity.map((item:any, index:number) => (
         <View key={item.id} style={styles.connectivityCard}>
           <View style={styles.connectivityHeader}>
             <Text style={styles.itemNumber}>#{index + 1}</Text>
@@ -228,7 +230,7 @@ const LocationDetails: React.FC<LocationDetailsProps> = ({
       </View>
 
       <Text style={styles.subHeader}>Frequently Asked Questions</Text>
-      {formData.faqs.map((faq, index) => (
+      {formData.faqs.map((faq:any, index:number) => (
         <View key={faq.id} style={styles.faqCard}>
           <View style={styles.faqHeader}>
             <Text style={styles.itemNumber}>FAQ #{index + 1}</Text>

@@ -13,24 +13,25 @@ import { ChevronDown, Plus, X } from 'lucide-react-native';
 interface LegalDetailsProps {
   onNext: (data: any) => void;
   onFormValid: (isValid: boolean) => void;
+  initialData?: any;
 }
 
-const LegalDetails: React.FC<LegalDetailsProps> = ({ onNext, onFormValid }) => {
+const LegalDetails: React.FC<LegalDetailsProps> = ({ onNext, onFormValid, initialData }) => {
   const { width } = useWindowDimensions();
   const isSmallScreen = width < 768;
 
   const [formData, setFormData] = useState({
-    titleStatus: '',
-    occupancyCertificate: '',
-    leaseRegistration: '',
-    pendingLitigations: 'no',
-    litigationNote: '',
-    certifications: {
+    titleStatus: initialData?.titleStatus || '',
+    occupancyCertificate: initialData?.occupancyCertificate || '',
+    leaseRegistration: initialData?.leaseRegistration || '',
+    pendingLitigations: initialData?.pendingLitigations || 'no',
+    litigationNote: initialData?.litigationNote || '',
+    certifications: initialData?.certifications || {
       rera: false,
       leed: false,
       igbc: false,
     },
-    otherCertifications: [''],
+    otherCertifications: initialData?.otherCertifications || [''],
   });
 
   const [errors, setErrors] = useState<any>({});
@@ -86,7 +87,7 @@ const LegalDetails: React.FC<LegalDetailsProps> = ({ onNext, onFormValid }) => {
   };
 
   const removeOtherCert = (index: number) => {
-    const newCerts = formData.otherCertifications.filter((_, i) => i !== index);
+    const newCerts = formData.otherCertifications.filter((_:any, i:number) => i !== index);
     setFormData(prev => ({
       ...prev,
       otherCertifications: newCerts.length ? newCerts : [''],
@@ -219,7 +220,7 @@ const LegalDetails: React.FC<LegalDetailsProps> = ({ onNext, onFormValid }) => {
 
       <View style={styles.otherCertContainer}>
         <Text style={styles.labelSmall}>Add Others (if Any)</Text>
-        {formData.otherCertifications.map((cert, index) => (
+        {formData.otherCertifications.map((cert:any, index:number) => (
           <View key={index} style={styles.certInputRow}>
             <TextInput
               style={[styles.input, { flex: 1 }]}

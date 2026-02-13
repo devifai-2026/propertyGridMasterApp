@@ -13,30 +13,31 @@ import { ChevronDown, Info } from 'lucide-react-native';
 interface LeaseDetailsProps {
   onNext: (data: any) => void;
   onFormValid: (isValid: boolean) => void;
+  initialData?: any;
 }
 
-const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid }) => {
+const LeaseDetails: React.FC<LeaseDetailsProps> = ({ onNext, onFormValid, initialData }) => {
   const { width } = useWindowDimensions();
   const isSmallScreen = width < 768;
 
   const [formData, setFormData] = useState({
-    tenantType: '',
-    leaseStartDate: '',
-    leaseExpiryDate: '',
-    lockInYears: '',
-    lockInMonths: '',
-    leaseDuration: '',
-    rentType: 'perSqFt',
-    rentPerSqFt: '',
-    totalMonthlyRent: '',
-    securityDepositType: 'months',
-    securityDepositMonths: '',
-    securityDepositAmount: '',
-    escalationPercentage: '',
-    escalationFrequency: '',
-    maintenanceScope: '',
-    maintenanceType: 'perSqFt',
-    maintenanceAmount: '',
+    tenantType: initialData?.tenantType || '',
+    leaseStartDate: initialData?.leaseStartDate || '',
+    leaseExpiryDate: initialData?.leaseExpiryDate || '',
+    lockInYears: initialData?.lockInYears || '',
+    lockInMonths: initialData?.lockInMonths || '',
+    leaseDuration: initialData?.leaseDuration || '',
+    rentType: initialData?.rentType || 'perSqFt',
+    rentPerSqFt: initialData?.rentPerSqFt || '',
+    totalMonthlyRent: initialData?.totalMonthlyRent || '',
+    securityDepositType: initialData?.securityDepositType || 'months',
+    securityDepositMonths: initialData?.securityDepositMonths || '',
+    securityDepositAmount: initialData?.securityDepositAmount || '',
+    escalationPercentage: initialData?.escalationPercentage || '',
+    escalationFrequency: initialData?.escalationFrequency || '',
+    maintenanceScope: initialData?.maintenanceScope || '',
+    maintenanceType: initialData?.maintenanceType || 'perSqFt',
+    maintenanceAmount: initialData?.maintenanceAmount || '',
   });
 
   useEffect(() => {

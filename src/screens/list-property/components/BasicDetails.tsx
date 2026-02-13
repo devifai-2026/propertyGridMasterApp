@@ -14,9 +14,10 @@ import { ChevronDown, Info, Upload, FileText, X } from 'lucide-react-native';
 interface BasicDetailsProps {
   onNext: (data: any) => void;
   onFormValid: (isValid: boolean) => void;
+  initialData?: any;
 }
 
-const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext, onFormValid }) => {
+const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext, onFormValid, initialData }) => {
   const { width } = useWindowDimensions();
   const isSmallScreen = width < 768;
 
@@ -35,22 +36,22 @@ const BasicDetails: React.FC<BasicDetailsProps> = ({ onNext, onFormValid }) => {
   ];
 
   const [formData, setFormData] = useState({
-    propertyType: '',
-    builtYear: '',
-    buildingGrade: '',
-    carpetArea: '',
-    carpetAreaUnit: 'sqft',
-    lastRefurbished: '',
-    ownership: '',
-    fourWheelerParkings: '',
-    twoWheelerParkings: '',
-    powerBackup: '',
-    numLifts: '',
-    hvacType: '',
-    furnishingStatus: '',
-    buildingMaintained: '',
-    keyAmenities: [] as string[],
-    propertyDescription: '',
+    propertyType: initialData?.propertyType || '',
+    builtYear: initialData?.builtYear || '',
+    buildingGrade: initialData?.buildingGrade || '',
+    carpetArea: initialData?.carpetArea || '',
+    carpetAreaUnit: initialData?.carpetAreaUnit || 'sqft',
+    lastRefurbished: initialData?.lastRefurbished || '',
+    ownership: initialData?.ownership || '',
+    fourWheelerParkings: initialData?.fourWheelerParkings || '',
+    twoWheelerParkings: initialData?.twoWheelerParkings || '',
+    powerBackup: initialData?.powerBackup || '',
+    numLifts: initialData?.numLifts || '',
+    hvacType: initialData?.hvacType || '',
+    furnishingStatus: initialData?.furnishingStatus || '',
+    buildingMaintained: initialData?.buildingMaintained || '',
+    keyAmenities: initialData?.keyAmenities || ([] as string[]),
+    propertyDescription: initialData?.propertyDescription || '',
   });
 
   const [errors, setErrors] = useState<any>({});

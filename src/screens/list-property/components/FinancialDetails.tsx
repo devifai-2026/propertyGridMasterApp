@@ -13,21 +13,23 @@ import { Info } from 'lucide-react-native';
 interface FinancialDetailsProps {
   onNext: (data: any) => void;
   onFormValid: (isValid: boolean) => void;
+  initialData?: any;
 }
 
 const FinancialDetails: React.FC<FinancialDetailsProps> = ({
   onNext,
   onFormValid,
+  initialData,
 }) => {
   const { width } = useWindowDimensions();
   const isSmallScreen = width < 768;
 
   const [formData, setFormData] = useState({
-    sellingPrice: '',
-    propertyTax: '',
-    insurance: '',
-    otherCosts: '',
-    additionalIncome: '',
+    sellingPrice: initialData?.sellingPrice || '',
+    propertyTax: initialData?.propertyTax || '',
+    insurance: initialData?.insurance || '',
+    otherCosts: initialData?.otherCosts || '',
+    additionalIncome: initialData?.additionalIncome || '',
   });
 
   const [metrics, setMetrics] = useState({
