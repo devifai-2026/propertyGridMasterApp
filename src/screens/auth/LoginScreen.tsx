@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   StyleSheet,
   Text,
@@ -15,19 +15,60 @@ import { useNavigation } from '../../context/NavigationContext';
 
 const LoginScreen = () => {
   const [phone, setPhone] = useState('');
+  const [otp, setOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
   const { login } = useAuth();
   const { navigate } = useNavigation();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
-  const handleContinue = async () => {
+  // Refs for OTP inputs
+  const otpInputRefs = useRef<Array<TextInput | null>>([]);
+
+  const handleSendOtp = () => {
     if (phone.length === 10) {
+      setOtpSent(true);
+      // Auto-focus first OTP input after a short delay
+      setTimeout(() => {
+        otpInputRefs.current[0]?.focus();
+      }, 100);
+      Alert.alert('OTP Sent', 'A 4-digit OTP has been sent to your mobile number');
+    } else {
+      Alert.alert('Error', 'Please enter a valid 10-digit number');
+    }
+  };
+
+  const handleOtpChange = (text: string, index: number) => {
+    // Only allow digits
+    const digit = text.replace(/[^0-9]/g, '');
+
+    const newOtp = otp.split('');
+    newOtp[index] = digit;
+    setOtp(newOtp.join(''));
+
+    // Auto-focus next input if digit entered
+    if (digit && index < 3) {
+      otpInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyPress = (e: any, index: number) => {
+    // Handle backspace on empty field - move to previous input
+    if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (otp.length === 4) {
+      // Here you would verify OTP with backend
+      // For now, we'll just proceed with login
       const success = await login(phone);
       if (success) {
         navigate('/dashboard');
       }
     } else {
-      Alert.alert('Error', 'Please enter a valid 10-digit number');
+      Alert.alert('Error', 'Please enter the complete 4-digit OTP');
     }
   };
 
@@ -52,15 +93,51 @@ const LoginScreen = () => {
               maxLength={10}
               value={phone}
               onChangeText={setPhone}
+              editable={!otpSent}
             />
           </View>
 
-          <View style={styles.dummyInfo}>
-            <Text style={styles.dummyTitle}>Dummy Login Credentials:</Text>
-            <Text style={styles.dummyText}>• Investor: 9999999991</Text>
-            <Text style={styles.dummyText}>• Broker: 9999999992</Text>
-            <Text style={styles.dummyText}>• Owner: 9999999993</Text>
-          </View>
+          {otpSent && (
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Enter OTP *</Text>
+              <View style={styles.otpInputGroup}>
+                {[0, 1, 2, 3].map(index => (
+                  <TextInput
+                    key={index}
+                    ref={ref => {
+                      otpInputRefs.current[index] = ref;
+                    }}
+                    style={styles.otpInput}
+                    maxLength={1}
+                    keyboardType="number-pad"
+                    value={otp[index] || ''}
+                    onChangeText={text => handleOtpChange(text, index)}
+                    onKeyPress={e => handleOtpKeyPress(e, index)}
+                    selectTextOnFocus
+                    autoComplete="one-time-code"
+                  />
+                ))}
+              </View>
+              <TouchableOpacity
+                style={styles.resendBtn}
+                onPress={() => {
+                  setOtp('');
+                  Alert.alert('OTP Resent', 'A new OTP has been sent to your mobile number');
+                }}
+              >
+                <Text style={styles.resendText}>Resend OTP</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {!otpSent && (
+            <View style={styles.dummyInfo}>
+              <Text style={styles.dummyTitle}>Dummy Login Credentials:</Text>
+              <Text style={styles.dummyText}>• Investor: 9999999991</Text>
+              <Text style={styles.dummyText}>• Broker: 9999999992</Text>
+              <Text style={styles.dummyText}>• Owner: 9999999993</Text>
+            </View>
+          )}
 
           <View style={styles.actions}>
             <TouchableOpacity
@@ -69,8 +146,18 @@ const LoginScreen = () => {
             >
               <Text style={styles.btnOutlineText}>Cancel</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.btnFilled} onPress={handleContinue}>
-              <Text style={styles.btnFilledText}>Continue</Text>
+            <TouchableOpacity
+              style={[
+                styles.btnFilled,
+                (otpSent ? otp.length !== 4 : phone.length !== 10) &&
+                  styles.btnDisabled,
+              ]}
+              onPress={otpSent ? handleVerifyOtp : handleSendOtp}
+              disabled={otpSent ? otp.length !== 4 : phone.length !== 10}
+            >
+              <Text style={styles.btnFilledText}>
+                {otpSent ? 'Verify & Login' : 'Send OTP'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -175,6 +262,38 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#fff',
+  },
+  btnDisabled: {
+    backgroundColor: '#CCC',
+    opacity: 0.6,
+  },
+  otpInputGroup: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 12,
+    marginBottom: 15,
+  },
+  otpInput: {
+    width: 50,
+    height: 50,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 8,
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: '700',
+    borderWidth: 2,
+    borderColor: '#E0E0E0',
+    color: '#333',
+  },
+  resendBtn: {
+    alignSelf: 'center',
+    paddingVertical: 8,
+  },
+  resendText: {
+    fontSize: 14,
+    color: '#D32F2F',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 });
 

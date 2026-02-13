@@ -3,6 +3,7 @@ import React, {
   useEffect,
   forwardRef,
   useImperativeHandle,
+  useRef,
 } from 'react';
 import {
   View,
@@ -42,6 +43,9 @@ const PersonalDetails = forwardRef(
     const [errors, setErrors] = useState<any>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [touched, setTouched] = useState<any>({});
+
+    // Refs for OTP inputs
+    const otpInputRefs = useRef<Array<TextInput | null>>([]);
 
     useEffect(() => {
       const isValid = !!validateFormSilently();
@@ -154,12 +158,37 @@ const PersonalDetails = forwardRef(
 
       if (!mobileError && mobileNumber.length === 10) {
         setOtpSent(true);
+        // Auto-focus first OTP input after a short delay
+        setTimeout(() => {
+          otpInputRefs.current[0]?.focus();
+        }, 100);
       } else {
         setErrors((prev: any) => ({
           ...prev,
           mobile:
             mobileError || 'Please enter a valid mobile number to send OTP',
         }));
+      }
+    };
+
+    const handleOtpChange = (text: string, index: number) => {
+      // Only allow digits
+      const digit = text.replace(/[^0-9]/g, '');
+
+      const newOtp = formData.otp.split('');
+      newOtp[index] = digit;
+      handleChange('otp', newOtp.join(''));
+
+      // Auto-focus next input if digit entered
+      if (digit && index < 3) {
+        otpInputRefs.current[index + 1]?.focus();
+      }
+    };
+
+    const handleOtpKeyPress = (e: any, index: number) => {
+      // Handle backspace on empty field - move to previous input
+      if (e.nativeEvent.key === 'Backspace' && !formData.otp[index] && index > 0) {
+        otpInputRefs.current[index - 1]?.focus();
       }
     };
 
@@ -345,6 +374,9 @@ const PersonalDetails = forwardRef(
               {[0, 1, 2, 3].map(index => (
                 <TextInput
                   key={index}
+                  ref={ref => {
+                    otpInputRefs.current[index] = ref;
+                  }}
                   style={[
                     styles.otpInput,
                     isMobile && styles.otpInputMobile,
@@ -353,11 +385,10 @@ const PersonalDetails = forwardRef(
                   maxLength={1}
                   keyboardType="number-pad"
                   value={formData.otp[index] || ''}
-                  onChangeText={text => {
-                    const newOtp = formData.otp.split('');
-                    newOtp[index] = text;
-                    handleChange('otp', newOtp.join(''));
-                  }}
+                  onChangeText={text => handleOtpChange(text, index)}
+                  onKeyPress={e => handleOtpKeyPress(e, index)}
+                  selectTextOnFocus
+                  autoComplete="one-time-code"
                 />
               ))}
             </View>
