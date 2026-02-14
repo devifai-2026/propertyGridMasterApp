@@ -12,6 +12,7 @@ import {
   Image,
   Animated,
   Easing,
+  Platform,
 } from 'react-native';
 import { Briefcase, Building2, Home, Smartphone } from 'lucide-react-native';
 import Layout from '../../layout/Layout';
@@ -131,11 +132,15 @@ const SignupScreen = () => {
         },
         async (response: any) => {
           if (response.success) {
-            Alert.alert(
-              'Success',
-              'Account created successfully! Please login to continue.',
-              [{ text: 'OK', onPress: () => navigate('/login') }],
-            );
+            if (Platform.OS === 'web') {
+              navigate('/login');
+            } else {
+              Alert.alert(
+                'Success',
+                'Account created successfully! Please login to continue.',
+                [{ text: 'OK', onPress: () => navigate('/login') }],
+              );
+            }
           } else {
             Alert.alert('Error', response.message || 'Signup failed');
           }
