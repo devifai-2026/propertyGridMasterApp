@@ -9,18 +9,18 @@ import { Alert, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface User {
+  userId: string;
   name: string;
   role: string;
   email: string;
-  mobile: string;
-  joined: string;
-  lastLogin: string;
+  accessToken: string;
+  refreshToken: string;
 }
 
 interface AuthContextType {
   isLoggedIn: boolean;
   user: User | null;
-  login: (phone: string) => Promise<boolean>;
+  login: (userData: any) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -35,21 +35,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const checkLogin = async () => {
       try {
-        const phone = await AsyncStorage.getItem('userPhone');
-        if (phone !== null) {
+        const userStr = await AsyncStorage.getItem('user');
+        console.log(userStr)
+        if (userStr !== null) {
+          const userData = JSON.parse(userStr);
           setIsLoggedIn(true);
-          // Restore mock user
-          setUser({
-            name: 'Rohit Sharma',
-            role: 'Investor',
-            email: 'rohit.sharma@example.com',
-            mobile: phone,
-            joined: '26 Aug 2025',
-            lastLogin: '13 Aug 2025',
-          });
+          setUser(userData);
         }
       } catch (e) {
-        // error reading value
+        console.error('Error reading auth state:', e);
       } finally {
         setIsLoading(false);
       }
@@ -57,40 +51,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     checkLogin();
   }, []);
 
-  const login = async (phone: string): Promise<boolean> => {
-    if (['9999999991', '9999999992', '9999999993'].includes(phone)) {
-      try {
-        await AsyncStorage.setItem('userPhone', phone);
-        setIsLoggedIn(true);
-        setUser({
-          name: 'Rohit Sharma',
-          role: 'Investor',
-          email: 'rohit.sharma@example.com',
-          mobile: phone,
-          joined: '26 Aug 2025',
-          lastLogin: new Date().toDateString(),
-        });
-        return true;
-      } catch (e) {
-        // saving error
-        return false;
-      }
-    } else {
-      Alert.alert(
-        'Error',
-        'Invalid dummy credential. Use 9999999991, 9999999992, or 9999999993',
-      );
+  const login = async (userData: any): Promise<boolean> => {
+    try {
+      // Map token to 'token' for headers.ts compatibility if needed,
+      // but we'll also update headers.ts or just rely on storing the whole object
+      const userToStore = {
+        ...userData,
+        token: userData.accessToken, // for backward compatibility with headers.ts
+      };
+      await AsyncStorage.setItem('user', JSON.stringify(userToStore));
+      setIsLoggedIn(true);
+      setUser(userToStore);
+      return true;
+    } catch (e) {
+      console.error('Error saving auth state:', e);
       return false;
     }
   };
 
   const logout = async () => {
     try {
-      await AsyncStorage.removeItem('userPhone');
+      await AsyncStorage.removeItem('user');
       setIsLoggedIn(false);
       setUser(null);
     } catch (e) {
-      // remove error
+      console.error('Error clearing auth state:', e);
     }
   };
 

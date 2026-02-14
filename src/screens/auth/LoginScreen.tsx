@@ -17,12 +17,14 @@ import {
 import Layout from '../../layout/Layout';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
+import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
 
 const LoginScreen = () => {
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const { login } = useAuth();
+  const { login: authenticate, loading: apiLoading } = useAuthAPIs();
   const { navigate } = useNavigation();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
@@ -61,7 +63,7 @@ const LoginScreen = () => {
       }, 100);
       Alert.alert(
         'OTP Sent',
-        'A 4-digit OTP has been sent to your mobile number',
+        'A 4-digit OTP has been sent to your mobile number (Use 1111 for demo)',
       );
     } else {
       Alert.alert('Error', 'Please enter a valid 10-digit number');
@@ -91,12 +93,25 @@ const LoginScreen = () => {
 
   const handleVerifyOtp = async () => {
     if (otp.length === 4) {
-      // Here you would verify OTP with backend
-      // For now, we'll just proceed with login
-      const success = await login(phone);
-      if (success) {
-        navigate('/dashboard');
-      }
+      authenticate(
+        { mobileNumber: phone, otp },
+        async (response: any) => {
+          if (response.success) {
+            const success = await login(response.data);
+            if (success) {
+              navigate('/dashboard');
+            }
+          } else {
+            Alert.alert('Error', response.message || 'Login failed');
+          }
+        },
+        (error: any) => {
+          Alert.alert(
+            'Error',
+            error?.response?.data?.message || 'Something went wrong',
+          );
+        },
+      );
     } else {
       Alert.alert('Error', 'Please enter the complete 4-digit OTP');
     }
@@ -205,10 +220,17 @@ const LoginScreen = () => {
                         styles.btnDisabled,
                     ]}
                     onPress={otpSent ? handleVerifyOtp : handleSendOtp}
-                    disabled={otpSent ? otp.length !== 4 : phone.length !== 10}
+                    disabled={
+                      apiLoading ||
+                      (otpSent ? otp.length !== 4 : phone.length !== 10)
+                    }
                   >
                     <Text style={styles.btnFilledText}>
-                      {otpSent ? 'Verify & Login' : 'Send OTP'}
+                      {apiLoading
+                        ? 'Processing...'
+                        : otpSent
+                        ? 'Verify & Login'
+                        : 'Send OTP'}
                     </Text>
                   </TouchableOpacity>
                 </View>

@@ -1,8 +1,8 @@
-import axios, { AxiosError, AxiosRequestConfig } from "axios";
-import { BASE_URL } from "../environments";
-import { getHeaders } from "./headers";
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { BASE_URL } from '../environments';
+import { getHeaders } from './headers';
 
-type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export interface RequestConfig<T = any> {
   route: string;
@@ -24,16 +24,16 @@ export const request = async <T = any, R = any>(
     onSuccess = null,
     onError = null,
     afterCall = null,
-  }: RequestConfig<T>
+  }: RequestConfig<T>,
 ): Promise<R | undefined> => {
   if (setLoading) setLoading(true);
 
   try {
     const headers = await getHeaders();
     const isExternal =
-      route.startsWith("http://") || route.startsWith("https://");
+      route.startsWith('http://') || route.startsWith('https://');
 
-    const normalizedRoute = route.startsWith("/") ? route : `/${route}`;
+    const normalizedRoute = route.startsWith('/') ? route : `/${route}`;
     const url = isExternal ? route : `${BASE_URL}${normalizedRoute}`;
 
     const options: AxiosRequestConfig = {
@@ -44,33 +44,39 @@ export const request = async <T = any, R = any>(
       paramsSerializer: {
         serialize: (params: Record<string, any>) => {
           const parts: string[] = [];
-          Object.keys(params).forEach((key) => {
+          Object.keys(params).forEach(key => {
             const value = params[key];
             if (Array.isArray(value)) {
-              const quotedValues = value.map((v) => `'${v}'`).join(",");
+              const quotedValues = value.map(v => `'${v}'`).join(',');
               parts.push(`${key}=[${quotedValues}]`);
             } else if (value !== null && value !== undefined) {
               parts.push(`${key}=${encodeURIComponent(value)}`);
             }
           });
-          return parts.join("&");
+          return parts.join('&');
         },
       },
       ...(payload ? { data: payload } : {}),
     };
 
     if (payload instanceof FormData) {
-      delete (options.headers as Record<string, string>)["Content-Type"];
+      delete (options.headers as Record<string, string>)['Content-Type'];
     }
 
     const response = await axios(options);
 
+    // Automatically decode data if it's encoded/compressed
+    if (response.data && response.data.data) {
+      const { decodeResponseData } = require('./decoder');
+      response.data.data = decodeResponseData(response.data.data);
+    }
+
     if (onSuccess) onSuccess(response.data);
     return response.data;
   } catch (error) {
-      console.error(`Unexpected Error (${method} ${route}):`, error);
-      if (onError) onError(error);
-      else throw error;
+    console.error(`Unexpected Error (${method} ${route}):`, error);
+    if (onError) onError(error);
+    else throw error;
   } finally {
     if (setLoading) setLoading(false);
     if (afterCall) afterCall();

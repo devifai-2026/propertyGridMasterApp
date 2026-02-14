@@ -17,6 +17,7 @@ import { Briefcase, Building2, Home, Smartphone } from 'lucide-react-native';
 import Layout from '../../layout/Layout';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
+import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
 
 const SignupScreen = () => {
   const [formData, setFormData] = useState({
@@ -31,6 +32,7 @@ const SignupScreen = () => {
   const [focusedOtpIndex, setFocusedOtpIndex] = useState<number | null>(null);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const { login } = useAuth();
+  const { signup: register, loading: apiLoading } = useAuthAPIs();
   const { navigate } = useNavigation();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
@@ -85,7 +87,7 @@ const SignupScreen = () => {
       }, 100);
       Alert.alert(
         'OTP Sent',
-        'A 4-digit OTP has been sent to your mobile number',
+        'A 4-digit OTP has been sent to your mobile number (Use 1111 for demo)',
       );
     } else {
       Alert.alert('Error', 'Please fill in all required fields correctly');
@@ -115,14 +117,35 @@ const SignupScreen = () => {
 
   const handleSignup = async () => {
     if (otp.length === 4) {
-      // Here you would verify OTP and create account with backend
-      // For now, we'll just proceed with login
-      const success = await login(formData.phone);
-      if (success) {
-        Alert.alert('Success', 'Account created successfully!', [
-          { text: 'OK', onPress: () => navigate('/dashboard') },
-        ]);
-      }
+      register(
+        {
+          mobileNumber: formData.phone,
+          email: formData.email,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          roleName:
+            formData.userType.charAt(0).toUpperCase() +
+            formData.userType.slice(1), // investor -> Investor
+          otp,
+        },
+        async (response: any) => {
+          if (response.success) {
+            Alert.alert(
+              'Success',
+              'Account created successfully! Please login to continue.',
+              [{ text: 'OK', onPress: () => navigate('/login') }],
+            );
+          } else {
+            Alert.alert('Error', response.message || 'Signup failed');
+          }
+        },
+        (error: any) => {
+          Alert.alert(
+            'Error',
+            error?.response?.data?.message || 'Something went wrong',
+          );
+        },
+      );
     } else {
       Alert.alert('Error', 'Please enter the complete 4-digit OTP');
     }
@@ -385,10 +408,17 @@ const SignupScreen = () => {
                         styles.btnDisabled,
                     ]}
                     onPress={otpSent ? handleSignup : handleSendOtp}
-                    disabled={otpSent ? otp.length !== 4 : !isFormValid()}
+                    disabled={
+                      apiLoading ||
+                      (otpSent ? otp.length !== 4 : !isFormValid())
+                    }
                   >
                     <Text style={styles.btnFilledText}>
-                      {otpSent ? 'Create Account' : 'Continue'}
+                      {apiLoading
+                        ? 'Processing...'
+                        : otpSent
+                        ? 'Create Account'
+                        : 'Continue'}
                     </Text>
                   </TouchableOpacity>
                 </View>

@@ -14,6 +14,7 @@ const babelLoaderConfiguration = {
     path.resolve(appDirectory, 'index.js'),
     path.resolve(appDirectory, 'App.tsx'),
     path.resolve(appDirectory, 'src'),
+    path.resolve(appDirectory, 'helpers'),
     path.resolve(appDirectory, 'node_modules/react-native-chart-kit'),
     path.resolve(appDirectory, 'node_modules/react-native-svg'),
   ],
