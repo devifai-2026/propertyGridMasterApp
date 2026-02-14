@@ -7,6 +7,7 @@ import {
   useWindowDimensions,
   StyleSheet,
 } from 'react-native';
+import { COLORS } from '../../../constants/theme';
 
 export interface Property {
   id: string;
@@ -154,14 +155,14 @@ const FeaturedSection = () => {
 
 const styles = StyleSheet.create({
   featuredSection: {
-    backgroundColor: '#F9F9F9',
+    backgroundColor: COLORS.background,
     paddingVertical: 60,
     alignItems: 'center',
     marginTop: 60,
   },
   sectionTitle: {
     fontWeight: '400',
-    color: '#1A1A1A',
+    color: COLORS.textDark,
     marginBottom: 40,
     textAlign: 'center',
   },
@@ -173,7 +174,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   propertyCard: {
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -183,7 +184,7 @@ const styles = StyleSheet.create({
     elevation: 4,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: COLORS.divider,
   },
   propImageContainer: {
     height: 250,
@@ -198,14 +199,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 15,
     right: 0,
-    backgroundColor: '#D32F2F',
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderTopLeftRadius: 4,
     borderBottomLeftRadius: 4,
   },
   verifiedText: {
-    color: '#fff',
+    color: COLORS.white,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -221,7 +222,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   mncBadgeText: {
-    color: '#666',
+    color: COLORS.textSecondary,
     fontSize: 12,
     fontWeight: '600',
   },
@@ -229,7 +230,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 15,
     right: 15,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -237,7 +238,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
   },
   compareText: {
-    color: '#D32F2F',
+    color: COLORS.primary,
     fontWeight: '700',
     fontSize: 13,
   },
@@ -247,12 +248,12 @@ const styles = StyleSheet.create({
   propCategory: {
     fontSize: 22,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: COLORS.textDark,
     marginBottom: 4,
   },
   propLocation: {
     fontSize: 14,
-    color: '#666',
+    color: COLORS.textSecondary,
     marginBottom: 16,
   },
   propDetailsRow: {
@@ -266,14 +267,14 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 13,
-    color: '#666',
+    color: COLORS.textSecondary,
   },
   detailValue: {
-    color: '#1A1A1A',
+    color: COLORS.textDark,
     fontWeight: '700',
   },
   roiBadge: {
-    backgroundColor: '#F5F5F7',
+    backgroundColor: COLORS.background,
     padding: 10,
     borderRadius: 8,
     alignItems: 'center',
@@ -282,13 +283,13 @@ const styles = StyleSheet.create({
   },
   roiLabel: {
     fontSize: 12,
-    color: '#666',
+    color: COLORS.textSecondary,
     fontWeight: '600',
     marginBottom: 2,
   },
   roiValue: {
     fontSize: 16,
-    color: '#D32F2F',
+    color: COLORS.primary,
     fontWeight: '800',
   },
   propActions: {
@@ -299,23 +300,23 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: COLORS.divider,
     borderRadius: 8,
     alignItems: 'center',
   },
   viewBtnText: {
-    color: '#666',
+    color: COLORS.textSecondary,
     fontWeight: '600',
   },
   enquireBtn: {
     flex: 1,
     paddingVertical: 12,
-    backgroundColor: '#D32F2F',
+    backgroundColor: COLORS.primary,
     borderRadius: 8,
     alignItems: 'center',
   },
   enquireBtnText: {
-    color: '#fff',
+    color: COLORS.white,
     fontWeight: '600',
   },
 });

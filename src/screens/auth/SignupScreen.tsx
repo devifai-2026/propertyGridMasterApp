@@ -18,6 +18,7 @@ import Layout from '../../layout/Layout';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
+import { COLORS } from '../../constants/theme';
 
 const SignupScreen = () => {
   const [formData, setFormData] = useState({
@@ -300,7 +301,7 @@ const SignupScreen = () => {
                               size={isSmallMobile ? 20 : 24}
                               color={
                                 formData.userType === type.id
-                                  ? '#D32F2F'
+                                  ? COLORS.primary
                                   : '#6B7280'
                               }
                               strokeWidth={2.5}
@@ -323,7 +324,11 @@ const SignupScreen = () => {
                   /* OTP Section */
                   <View style={styles.otpSection}>
                     <View style={styles.otpIconContainer}>
-                      <Smartphone size={32} color="#D32F2F" strokeWidth={2} />
+                      <Smartphone
+                        size={32}
+                        color={COLORS.primary}
+                        strokeWidth={2}
+                      />
                     </View>
                     <Text style={styles.otpTitle}>Verify Your Number</Text>
                     <Text style={styles.otpHint}>
@@ -510,7 +515,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.white,
     borderRadius: 20,
     padding: 20,
     width: '100%',
@@ -573,8 +578,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   textInputFocused: {
-    borderColor: '#D32F2F',
-    backgroundColor: '#FFFFFF',
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.white,
   },
   userTypeContainer: {
     flexDirection: 'row',
@@ -604,7 +609,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   userTypeCardActive: {
-    borderColor: '#D32F2F',
+    borderColor: COLORS.primary,
     backgroundColor: '#FEF2F2',
   },
   userTypeLabel: {
@@ -614,7 +619,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   userTypeLabelActive: {
-    color: '#D32F2F',
+    color: COLORS.primary,
     fontWeight: '700',
   },
   otpSection: {
@@ -680,8 +685,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   otpInputFocused: {
-    borderColor: '#D32F2F',
-    backgroundColor: '#FFFFFF',
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.white,
     shadowOpacity: 0.12,
     shadowRadius: 6,
     elevation: 3,
@@ -698,7 +703,7 @@ const styles = StyleSheet.create({
   },
   resendText: {
     fontSize: 12,
-    color: '#D32F2F',
+    color: COLORS.primary,
     fontWeight: '600',
   },
   changeNumberBtn: {
@@ -724,7 +729,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: '#E5E7EB',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.white,
   },
   btnOutlineText: {
     fontSize: 15,
@@ -735,9 +740,9 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 14,
     borderRadius: 10,
-    backgroundColor: '#D32F2F',
+    backgroundColor: COLORS.primary,
     alignItems: 'center',
-    shadowColor: '#D32F2F',
+    shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.25,
     shadowRadius: 6,
@@ -746,7 +751,7 @@ const styles = StyleSheet.create({
   btnFilledText: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: COLORS.white,
     letterSpacing: 0.2,
   },
   btnDisabled: {
@@ -763,7 +768,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   termsLink: {
-    color: '#D32F2F',
+    color: COLORS.primary,
     fontWeight: '600',
     textDecorationLine: 'underline',
   },

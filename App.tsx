@@ -16,6 +16,8 @@ import {
 } from './src/context/NavigationContext';
 import { AuthProvider } from './src/context/AuthContext';
 import SignupScreen from './src/screens/auth/SignupScreen';
+import ProfileScreen from './src/screens/profile/ProfileScreen';
+import NotificationsScreen from './src/screens/notifications/NotificationsScreen';
 
 const AppContent = () => {
   const { currentPath } = useNavigation();
@@ -49,6 +51,10 @@ const AppContent = () => {
         return <HowItWorksScreen />;
       case currentPath === '/signup':
         return <SignupScreen />;
+      case currentPath === '/my-profile':
+        return <ProfileScreen />;
+      case currentPath === '/notifications':
+        return <NotificationsScreen />;
       default:
         // Default redirection to /dashboard
         return <Dashboard />;

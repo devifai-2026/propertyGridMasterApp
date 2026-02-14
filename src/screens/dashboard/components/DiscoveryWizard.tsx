@@ -7,6 +7,7 @@ import {
   useWindowDimensions,
   StyleSheet,
 } from 'react-native';
+import { COLORS } from '../../../constants/theme';
 import {
   Building2,
   Percent,
@@ -54,7 +55,7 @@ const StepCard = ({
     >
       <IconComponent
         size={width < 768 ? 24 : 32}
-        color={active ? '#D32F2F' : '#666'}
+        color={active ? COLORS.primary : COLORS.textSecondary}
         strokeWidth={1.5}
         style={styles.stepIcon}
       />
@@ -176,7 +177,7 @@ const styles = StyleSheet.create({
   },
   wizardTitle: {
     fontWeight: '500',
-    color: '#1A1A1A',
+    color: COLORS.textDark,
     marginBottom: 40,
     textAlign: 'center',
   },
@@ -188,17 +189,17 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: COLORS.divider,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     marginRight: 10,
   },
   stepCardActive: {
-    borderColor: '#D32F2F',
+    borderColor: COLORS.primary,
     borderWidth: 2,
-    shadowColor: '#D32F2F',
+    shadowColor: COLORS.primary,
     shadowOpacity: 0.1,
     shadowRadius: 5,
   },
@@ -207,17 +208,17 @@ const styles = StyleSheet.create({
   },
   stepLabel: {
     fontSize: 14,
-    color: '#666',
+    color: COLORS.textSecondary,
     fontWeight: '600',
     textAlign: 'center',
   },
   stepLabelActive: {
-    color: '#D32F2F',
+    color: COLORS.primary,
   },
   wizardContentCard: {
     width: '100%',
     maxWidth: 800,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     borderRadius: 24,
     paddingHorizontal: 20,
     paddingVertical: 40,
@@ -231,7 +232,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignSelf: 'center',
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: COLORS.divider,
   },
   wizardStepBadge: {
     position: 'absolute',
@@ -254,18 +255,18 @@ const styles = StyleSheet.create({
   wizardStepText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#666',
+    color: COLORS.textSecondary,
   },
   wizardQuestion: {
     fontWeight: '900',
-    color: '#1A1A1A',
+    color: COLORS.textDark,
     marginBottom: 10,
     textAlign: 'center',
     marginTop: 20,
   },
   wizardSubtext: {
     fontSize: 16,
-    color: '#666',
+    color: COLORS.textSecondary,
     marginBottom: 40,
     textAlign: 'center',
   },
@@ -279,7 +280,7 @@ const styles = StyleSheet.create({
   cityOption: {
     width: 150,
     height: 100,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
@@ -290,17 +291,17 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
   cityOptionSelected: {
-    borderColor: '#D32F2F',
+    borderColor: COLORS.primary,
     borderWidth: 2,
-    backgroundColor: '#FFF8F8',
+    backgroundColor: COLORS.lightRed,
   },
   cityOptionText: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#333',
+    color: COLORS.textDark,
   },
   cityOptionTextSelected: {
-    color: '#D32F2F',
+    color: COLORS.primary,
   },
   wizardActions: {
     flexDirection: 'row',
@@ -311,21 +312,21 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: COLORS.divider,
     borderRadius: 8,
   },
   skipBtnText: {
-    color: '#666',
+    color: COLORS.textSecondary,
     fontWeight: '600',
   },
   showPropertiesBtn: {
-    backgroundColor: '#D32F2F',
+    backgroundColor: COLORS.primary,
     paddingVertical: 12,
     paddingHorizontal: 32,
     borderRadius: 8,
   },
   showPropertiesText: {
-    color: '#fff',
+    color: COLORS.white,
     fontWeight: '600',
   },
 });

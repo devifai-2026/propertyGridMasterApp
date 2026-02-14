@@ -7,6 +7,7 @@ import {
   useWindowDimensions,
   StyleSheet,
 } from 'react-native';
+import { COLORS } from '../../../constants/theme';
 
 const FEATURES = [
   {
@@ -79,20 +80,23 @@ const WhyChooseSection = () => {
         ]}
       >
         {/* Left Side Illustration */}
-        {!isMobile &&
-        <View
-          style={[
-            styles.illustrationContainer,
-            isMobile && styles.illustrationContainerMobile,
-          ]}
-        >
-          <Image
-            source={require('../../../assets/WhyChoose/img.png')}
-            style={[styles.illustration, isMobile && styles.illustrationMobile]}
-            resizeMode="contain"
-          />
-        </View>
-        }
+        {!isMobile && (
+          <View
+            style={[
+              styles.illustrationContainer,
+              isMobile && styles.illustrationContainerMobile,
+            ]}
+          >
+            <Image
+              source={require('../../../assets/WhyChoose/img.png')}
+              style={[
+                styles.illustration,
+                isMobile && styles.illustrationMobile,
+              ]}
+              resizeMode="contain"
+            />
+          </View>
+        )}
 
         {/* Right Side Features */}
         <View
@@ -118,7 +122,7 @@ const WhyChooseSection = () => {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 80,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     alignItems: 'center',
     paddingHorizontal: 20,
     width: '100%',
@@ -138,7 +142,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 36,
     fontWeight: '400',
-    color: '#1A1A1A',
+    color: COLORS.textDark,
     marginBottom: 10,
     textAlign: 'center',
   },
@@ -148,7 +152,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: COLORS.textSecondary,
     textAlign: 'center',
     maxWidth: 600,
   },
@@ -208,7 +212,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 20,
-    backgroundColor: '#FFF5F5',
+    backgroundColor: COLORS.lightRed,
     borderRadius: 30,
   },
   featureIcon: {
@@ -221,16 +225,16 @@ const styles = StyleSheet.create({
   featureTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1A1A1A',
+    color: COLORS.textDark,
     marginBottom: 8,
   },
   featureDescription: {
     fontSize: 14,
-    color: '#666',
+    color: COLORS.textSecondary,
     lineHeight: 22,
   },
   exploreBtn: {
-    backgroundColor: '#D32F2F',
+    backgroundColor: COLORS.primary,
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 8,
@@ -244,7 +248,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   exploreBtnText: {
-    color: '#fff',
+    color: COLORS.white,
     fontWeight: '600',
     fontSize: 16,
   },

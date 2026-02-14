@@ -8,6 +8,7 @@ import {
   Platform,
   StyleSheet,
 } from 'react-native';
+import { COLORS } from '../../../constants/theme';
 
 const Hero = () => {
   const { width } = useWindowDimensions();
@@ -71,13 +72,13 @@ const styles = StyleSheet.create({
   },
   heroTitle: {
     fontWeight: '400',
-    color: '#1A1A1A',
+    color: COLORS.textDark,
     textAlign: 'center',
     fontFamily: Platform.OS === 'web' ? 'system-ui' : undefined,
   },
   heroTitleRed: {
     fontWeight: '700',
-    color: '#D32F2F',
+    color: COLORS.primary,
     textAlign: 'center',
     marginBottom: 20,
   },
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   getStartedBtn: {
-    backgroundColor: '#D32F2F',
+    backgroundColor: COLORS.primary,
     paddingVertical: 16,
     paddingHorizontal: 40,
     borderRadius: 30,

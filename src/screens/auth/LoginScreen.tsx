@@ -18,6 +18,7 @@ import Layout from '../../layout/Layout';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
+import { COLORS } from '../../constants/theme';
 
 const LoginScreen = () => {
   const [phone, setPhone] = useState('');
@@ -150,7 +151,7 @@ const LoginScreen = () => {
                   <TextInput
                     style={styles.textInput}
                     placeholder="Enter your contact number"
-                    placeholderTextColor="#999"
+                    placeholderTextColor={COLORS.textSecondary}
                     keyboardType="numeric"
                     maxLength={10}
                     value={phone}
@@ -326,7 +327,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   card: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: COLORS.white,
     borderRadius: 20,
     padding: 20,
     width: '100%',
@@ -346,12 +347,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#1A1A1A',
+    color: COLORS.textDark,
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: COLORS.textSecondary,
     textAlign: 'center',
   },
   inputGroup: {
@@ -360,7 +361,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: COLORS.textDark,
     marginBottom: 8,
   },
   textInput: {
@@ -369,23 +370,23 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    color: '#333',
+    color: COLORS.textDark,
   },
   dummyInfo: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: COLORS.background,
     padding: 15,
     borderRadius: 8,
     marginBottom: 30,
   },
   dummyTitle: {
     fontWeight: '700',
-    color: '#333',
+    color: COLORS.textDark,
     marginBottom: 8,
     fontSize: 14,
   },
   dummyText: {
     fontSize: 13,
-    color: '#666',
+    color: COLORS.textSecondary,
     marginBottom: 4,
   },
   actions: {
@@ -403,19 +404,19 @@ const styles = StyleSheet.create({
   btnOutlineText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#666',
+    color: COLORS.textSecondary,
   },
   btnFilled: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#D32F2F',
+    backgroundColor: COLORS.primary,
     alignItems: 'center',
   },
   btnFilledText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
+    color: COLORS.white,
   },
   btnDisabled: {
     backgroundColor: '#CCC',
@@ -430,14 +431,14 @@ const styles = StyleSheet.create({
   otpInput: {
     width: 50,
     height: 50,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: COLORS.background,
     borderRadius: 8,
     textAlign: 'center',
     fontSize: 20,
     fontWeight: '700',
     borderWidth: 2,
     borderColor: '#E0E0E0',
-    color: '#333',
+    color: COLORS.textDark,
   },
   resendBtn: {
     alignSelf: 'center',
@@ -445,7 +446,7 @@ const styles = StyleSheet.create({
   },
   resendText: {
     fontSize: 14,
-    color: '#D32F2F',
+    color: COLORS.primary,
     fontWeight: '600',
     textDecorationLine: 'underline',
   },
@@ -462,7 +463,7 @@ const styles = StyleSheet.create({
   },
   signupLink: {
     fontSize: 14,
-    color: '#D32F2F',
+    color: COLORS.primary,
     fontWeight: '700',
     textDecorationLine: 'underline',
   },
