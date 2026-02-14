@@ -13,7 +13,8 @@ const CATEGORIES = [
     id: '1',
     title: 'Residential',
     count: '26 Property Listed',
-    image: 'https://images.unsplash.com/photo-1553456558-aff63285bdd1?auto=format&fit=crop&q=80&w=1000',
+    image:
+      'https://images.unsplash.com/photo-1553456558-aff63285bdd1?auto=format&fit=crop&q=80&w=1000',
   },
   {
     id: '2',

@@ -59,13 +59,15 @@ const FeatureItem = ({ item }: { item: (typeof FEATURES)[0] }) => {
 
 const WhyChooseSection = () => {
   const { width } = useWindowDimensions();
-  const isMobile = width < 900; // Switch to stacked layout below 900px
+  const isMobile = width < 900;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Why choose PreLeaseGrid</Text>
-        <Text style={styles.subtitle}>
+    <View style={[styles.container, isMobile && styles.containerMobile]}>
+      <View style={[styles.header, isMobile && styles.headerMobile]}>
+        <Text style={[styles.title, isMobile && styles.titleMobile]}>
+          Why choose PreLeaseGrid
+        </Text>
+        <Text style={[styles.subtitle, isMobile && styles.subtitleMobile]}>
           The most trusted platform for premium real estate Property
         </Text>
       </View>
@@ -77,30 +79,34 @@ const WhyChooseSection = () => {
         ]}
       >
         {/* Left Side Illustration */}
+        {!isMobile &&
         <View
           style={[
             styles.illustrationContainer,
-            isMobile && { marginBottom: 40, flex: 0, height: 'auto' },
+            isMobile && styles.illustrationContainerMobile,
           ]}
         >
           <Image
             source={require('../../../assets/WhyChoose/img.png')}
-            style={[styles.illustration, isMobile && { height: 300 }]}
+            style={[styles.illustration, isMobile && styles.illustrationMobile]}
             resizeMode="contain"
           />
         </View>
+        }
 
         {/* Right Side Features */}
         <View
           style={[
             styles.featuresContainer,
-            isMobile && { paddingLeft: 0, width: '100%', flex: 0 },
+            isMobile && styles.featuresContainerMobile,
           ]}
         >
           {FEATURES.map(feature => (
             <FeatureItem key={feature.id} item={feature} />
           ))}
-          <TouchableOpacity style={styles.exploreBtn}>
+          <TouchableOpacity
+            style={[styles.exploreBtn, isMobile && styles.exploreBtnMobile]}
+          >
             <Text style={styles.exploreBtnText}>Explore More</Text>
           </TouchableOpacity>
         </View>
@@ -115,10 +121,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     paddingHorizontal: 20,
+    width: '100%',
+  },
+  containerMobile: {
+    paddingVertical: 40,
+    paddingHorizontal: 16,
   },
   header: {
     marginBottom: 60,
     alignItems: 'center',
+    width: '100%',
+  },
+  headerMobile: {
+    marginBottom: 40,
   },
   title: {
     fontSize: 36,
@@ -127,10 +142,20 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
   },
+  titleMobile: {
+    fontSize: 28,
+    lineHeight: 36,
+  },
   subtitle: {
     fontSize: 16,
     color: '#666',
     textAlign: 'center',
+    maxWidth: 600,
+  },
+  subtitleMobile: {
+    fontSize: 15,
+    lineHeight: 22,
+    maxWidth: '100%',
   },
   contentContainer: {
     width: '100%',
@@ -145,14 +170,32 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  illustrationContainerMobile: {
+    flex: 0,
+    height: 'auto', // Allow container to size to content
+    marginBottom: 40,
+    width: '100%',
+    alignItems: 'center', // Center the image
+  },
   illustration: {
     width: '100%',
     height: '100%',
+  },
+  illustrationMobile: {
+    height: 300, // Explicit height on the image itself
+    width: '100%',
+    maxWidth: 400, // Prevent it from being too huge on tablets
   },
   featuresContainer: {
     flex: 1,
     paddingLeft: 40,
     maxWidth: 600,
+  },
+  featuresContainerMobile: {
+    paddingLeft: 0,
+    width: '100%',
+    flex: 0, // Ensure it doesn't try to fill undefined height
+    marginTop: 20,
   },
   featureItem: {
     flexDirection: 'row',
@@ -165,10 +208,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 20,
+    backgroundColor: '#FFF5F5',
+    borderRadius: 30,
   },
   featureIcon: {
-    width: 50,
-    height: 50,
+    width: 30,
+    height: 30,
   },
   featureContent: {
     flex: 1,
@@ -191,6 +236,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignSelf: 'flex-start',
     marginTop: 20,
+  },
+  exploreBtnMobile: {
+    alignSelf: 'center',
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 10,
   },
   exploreBtnText: {
     color: '#fff',
