@@ -679,7 +679,7 @@ const ExplorePropertiesScreen = () => {
                       showsHorizontalScrollIndicator={false}
                       onMomentumScrollEnd={e => handleScroll(e, property.id)}
                     >
-                      {property.images.map((img, idx) => (
+                      {property.images?.map((img: string, idx: number) => (
                         <Image
                           key={idx}
                           source={{ uri: img }}
@@ -690,7 +690,7 @@ const ExplorePropertiesScreen = () => {
 
                     {/* Dots Indicator */}
                     <View style={styles.dotsContainer}>
-                      {property.images.map((_, idx) => (
+                      {property.images?.map((_: any, idx: number) => (
                         <View
                           key={idx}
                           style={[

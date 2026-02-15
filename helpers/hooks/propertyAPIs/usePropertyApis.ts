@@ -71,8 +71,26 @@ export const usePropertyAPIs = () => {
     });
   };
 
+  const getPropertyById = (
+    id: string,
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: `/v1/properties/${id}`,
+      onSuccess: data => {
+        if (onSuccess) onSuccess(decodeResponseData(data.data));
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   return {
     getProperties,
+    getPropertyById,
     createProperty,
     getAmenities,
     getCaretakers,

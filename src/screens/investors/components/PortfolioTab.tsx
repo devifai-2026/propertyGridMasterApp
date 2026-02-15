@@ -12,6 +12,194 @@ import {
 import { PieChart, LineChart, BarChart } from 'react-native-chart-kit';
 import { MapPin } from 'lucide-react-native';
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+export const DiversificationCard = ({ data }: { data: any[] }) => {
+  const pieChartData = data.map(item => ({
+    name: item.type,
+    population: item.percentage,
+    color: item.color,
+    legendFontColor: '#666',
+    legendFontSize: 13,
+  }));
+
+  const isWide = SCREEN_WIDTH > 768;
+  const chartWidthToUse = isWide ? 350 : SCREEN_WIDTH - 80;
+
+  return (
+    <View style={styles.chartCard}>
+      <Text style={styles.chartTitle}>Portfolio Diversification</Text>
+      <PieChart
+        data={pieChartData}
+        width={chartWidthToUse}
+        height={200}
+        chartConfig={{
+          color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+        }}
+        accessor="population"
+        backgroundColor="transparent"
+        paddingLeft="15"
+        absolute={false}
+        hasLegend={false}
+      />
+      <View style={styles.legend}>
+        {data.map((item, index) => (
+          <View key={index} style={styles.legendItem}>
+            <View style={[styles.legendDot, { backgroundColor: item.color }]} />
+            <Text style={styles.legendText}>
+              {item.type} {item.percentage}%
+            </Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+};
+
+export const IncomeTrackerCard = ({ data }: { data: any }) => {
+  const [containerWidth, setContainerWidth] = useState(0);
+  const isWide = SCREEN_WIDTH > 768;
+
+  const onLayout = (event: any) => {
+    const { width } = event.nativeEvent.layout;
+    setContainerWidth(width - 40);
+  };
+
+  const chartWidthToUse =
+    containerWidth > 0
+      ? containerWidth
+      : isWide
+      ? (SCREEN_WIDTH - 340) / 2
+      : SCREEN_WIDTH - 60;
+
+  return (
+    <View style={styles.chartCard} onLayout={onLayout}>
+      <Text style={styles.chartTitle}>Income Tracker</Text>
+      <View style={{ alignItems: 'center' }}>
+        <LineChart
+          data={{
+            labels: data.labels,
+            datasets: [
+              {
+                data: data.expected,
+                color: () => '#5DADE2',
+                strokeWidth: 2,
+              },
+              {
+                data: data.received,
+                color: () => '#EE2529',
+                strokeWidth: 2,
+              },
+            ],
+          }}
+          width={chartWidthToUse}
+          height={220}
+          fromZero
+          bezier={false}
+          withShadow={false}
+          withInnerLines
+          withOuterLines={false}
+          withVerticalLines={false}
+          yAxisSuffix="L"
+          chartConfig={{
+            backgroundGradientFrom: '#ffffff',
+            backgroundGradientTo: '#ffffff',
+            backgroundGradientFromOpacity: 0,
+            backgroundGradientToOpacity: 0,
+            decimalPlaces: 0,
+            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            labelColor: () => '#666666',
+            propsForBackgroundLines: {
+              stroke: '#E5E5E5',
+              strokeWidth: 1,
+            },
+          }}
+          style={{
+            borderRadius: 8,
+          }}
+        />
+      </View>
+
+      <View style={styles.legend}>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendLine, { backgroundColor: '#5DADE2' }]} />
+          <Text style={styles.legendText}>Expected</Text>
+        </View>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendLine, { backgroundColor: '#EE2529' }]} />
+          <Text style={styles.legendText}>Received</Text>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+export const LeaseRenewalsCard = ({ renewals }: { renewals: any[] }) => {
+  const isWide = SCREEN_WIDTH > 768;
+  return (
+    <View style={styles.tableCard}>
+      <View style={styles.tableHeader}>
+        <Text style={styles.tableTitle}>Upcoming Lease Renewals</Text>
+        <Text style={styles.expiringBadge}>
+          {renewals.length} Expiring Soon
+        </Text>
+      </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={{ width: '100%' }}
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
+        <View
+          style={[
+            styles.table,
+            { width: isWide ? '100%' : 700, minWidth: '100%' },
+          ]}
+        >
+          <View style={styles.tableRow}>
+            <Text style={[styles.tableHeaderText, { flex: 1.5 }]}>
+              Property
+            </Text>
+            <Text style={[styles.tableHeaderText, { flex: 1 }]}>Location</Text>
+            <Text style={[styles.tableHeaderText, { flex: 1.2 }]}>Tenant</Text>
+            <Text style={[styles.tableHeaderText, { flex: 1 }]}>
+              Expiry Date
+            </Text>
+            <Text style={[styles.tableHeaderText, { flex: 1.2 }]}>
+              Annual Rent
+            </Text>
+            <Text style={[styles.tableHeaderText, { flex: 0.8 }]}>Action</Text>
+          </View>
+
+          {renewals.map(item => (
+            <View key={item.id} style={[styles.tableRow, styles.tableDataRow]}>
+              <Text style={[styles.tableDataText, { flex: 1.5 }]}>
+                {item.property}
+              </Text>
+              <Text style={[styles.tableDataText, { flex: 1 }]}>
+                {item.location}
+              </Text>
+              <Text style={[styles.tableDataText, { flex: 1.2 }]}>
+                {item.tenant}
+              </Text>
+              <Text style={[styles.tableDataText, { flex: 1 }]}>
+                {item.expiryDate}
+              </Text>
+              <Text style={[styles.tableDataText, { flex: 1.2 }]}>
+                {item.annualRent}
+              </Text>
+              <TouchableOpacity style={styles.viewButton}>
+                <Text style={styles.viewButtonText}>view</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    </View>
+  );
+};
+
 const PortfolioTab = () => {
   const leaseRenewals = [
     {
@@ -142,173 +330,14 @@ const PortfolioTab = () => {
       </View>
 
       <View style={styles.chartsRow}>
-        {/* Portfolio Diversification */}
-        <View style={styles.chartCard}>
-          <Text style={styles.chartTitle}>Portfolio Diversification</Text>
-          <PieChart
-            data={pieChartData}
-            width={chartWidth}
-            height={200}
-            chartConfig={{
-              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            }}
-            accessor="population"
-            backgroundColor="transparent"
-            paddingLeft="15"
-            absolute={false}
-            hasLegend={false}
-          />
-          <View style={styles.legend}>
-            {diversificationData.map((item, index) => (
-              <View key={index} style={styles.legendItem}>
-                <View
-                  style={[styles.legendDot, { backgroundColor: item.color }]}
-                />
-                <Text style={styles.legendText}>
-                  {item.type} {item.percentage}%
-                </Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Income Tracker */}
-        <View style={styles.chartCard} onLayout={onLayout}>
-          <Text style={styles.chartTitle}>Income Tracker</Text>
-          <View style={{ alignItems: 'center' }}>
-            <LineChart
-              data={{
-                labels: incomeData.labels,
-                datasets: [
-                  {
-                    data: incomeData.expected,
-                    color: () => '#5DADE2',
-                    strokeWidth: 2,
-                  },
-                  {
-                    data: incomeData.received,
-                    color: () => '#EE2529',
-                    strokeWidth: 2,
-                  },
-                ],
-              }}
-              width={chartWidthToUse}
-              height={220}
-              fromZero
-              bezier={false}
-              withShadow={false}
-              withInnerLines
-              withOuterLines={false}
-              withVerticalLines={false}
-              yAxisSuffix="L"
-              chartConfig={{
-                backgroundGradientFrom: '#ffffff',
-                backgroundGradientTo: '#ffffff',
-                backgroundGradientFromOpacity: 0,
-                backgroundGradientToOpacity: 0,
-                decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                labelColor: () => '#666666',
-                propsForBackgroundLines: {
-                  stroke: '#E5E5E5',
-                  strokeWidth: 1,
-                },
-              }}
-              style={{
-                borderRadius: 8,
-              }}
-            />
-          </View>
-
-          <View style={styles.legend}>
-            <View style={styles.legendItem}>
-              <View
-                style={[styles.legendLine, { backgroundColor: '#5DADE2' }]}
-              />
-              <Text style={styles.legendText}>Expected</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View
-                style={[styles.legendLine, { backgroundColor: '#EE2529' }]}
-              />
-              <Text style={styles.legendText}>Received</Text>
-            </View>
-          </View>
-        </View>
+        <DiversificationCard data={diversificationData} />
+        <IncomeTrackerCard data={incomeData} />
       </View>
 
-      {/* Upcoming Lease Renewals */}
-      <View style={styles.tableCard}>
-        <View style={styles.tableHeader}>
-          <Text style={styles.tableTitle}>Upcoming Lease Renewals</Text>
-          <Text style={styles.expiringBadge}>2 Expiring Soon</Text>
-        </View>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ width: '100%' }}
-          contentContainerStyle={{ flexGrow: 1 }}
-        >
-          <View
-            style={[
-              styles.table,
-              { width: isDesktop ? '100%' : 700, minWidth: '100%' },
-            ]}
-          >
-            {/* Table Header */}
-            <View style={styles.tableRow}>
-              <Text style={[styles.tableHeaderText, { flex: 1.5 }]}>
-                Property
-              </Text>
-              <Text style={[styles.tableHeaderText, { flex: 1 }]}>
-                Location
-              </Text>
-              <Text style={[styles.tableHeaderText, { flex: 1.2 }]}>
-                Tenant
-              </Text>
-              <Text style={[styles.tableHeaderText, { flex: 1 }]}>
-                Expiry Date
-              </Text>
-              <Text style={[styles.tableHeaderText, { flex: 1.2 }]}>
-                Annual Rent
-              </Text>
-              <Text style={[styles.tableHeaderText, { flex: 0.8 }]}>
-                Action
-              </Text>
-            </View>
-
-            {/* Table Rows */}
-            {leaseRenewals.map(item => (
-              <View
-                key={item.id}
-                style={[styles.tableRow, styles.tableDataRow]}
-              >
-                <Text style={[styles.tableDataText, { flex: 1.5 }]}>
-                  {item.property}
-                </Text>
-                <Text style={[styles.tableDataText, { flex: 1 }]}>
-                  {item.location}
-                </Text>
-                <Text style={[styles.tableDataText, { flex: 1.2 }]}>
-                  {item.tenant}
-                </Text>
-                <Text style={[styles.tableDataText, { flex: 1 }]}>
-                  {item.expiryDate}
-                </Text>
-                <Text style={[styles.tableDataText, { flex: 1.2 }]}>
-                  {item.annualRent}
-                </Text>
-                <TouchableOpacity style={styles.viewButton}>
-                  <Text style={styles.viewButtonText}>view</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-        </ScrollView>
-      </View>
+      <LeaseRenewalsCard renewals={leaseRenewals} />
 
       {/* Properties Owned */}
+
       <View style={styles.propertiesSection}>
         <Text style={styles.sectionTitle}>Properties Owned</Text>
         <View style={styles.propertiesGrid}>

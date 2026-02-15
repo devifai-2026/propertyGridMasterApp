@@ -289,7 +289,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
         >
           <Image
             source={require('../assets/Navbar/Preleasegrid logo 1.png')}
-            style={styles.logo}
+            style={styles.logoImage}
             resizeMode="contain"
           />
         </TouchableOpacity>
@@ -461,9 +461,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  logo: {
+  logoImage: {
     height: 48,
-    width: 140,
+    width: 200,
   },
   navLinks: {
     flexDirection: 'row',

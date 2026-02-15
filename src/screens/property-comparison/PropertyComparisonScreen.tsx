@@ -1,0 +1,689 @@
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  ActivityIndicator,
+  Share,
+  Dimensions,
+} from 'react-native';
+import { useNavigation } from '../../context/NavigationContext';
+import Layout from '../../layout/Layout';
+import { COLORS } from '../../constants/theme';
+import {
+  Download,
+  Share2,
+  MapPin,
+  ChevronLeft,
+  X,
+  Heart,
+  XCircle,
+} from 'lucide-react-native';
+import { request } from '../../../helpers/api/request';
+import PropertyCard from '../../components/PropertyCard';
+
+const { width } = Dimensions.get('window');
+
+interface ComparisonProperty {
+  propertyId: string;
+  title: string;
+  location: string;
+  cost: string;
+  rent: string;
+  tenure: string;
+  roi: string;
+  image: string;
+  clientType: string;
+  carpetArea: string;
+  floorPlate: string;
+  furnishing: string;
+  powerBackup: string;
+  parking: string;
+  buildingGrade?: string;
+  leaseStartDate?: string;
+  lockInPeriod?: string;
+  securityDeposit?: string;
+  escalation?: string;
+  maintenance?: string;
+  propertyTax?: string;
+  insurance?: string;
+  additionalIncome?: string;
+  occupancyCertificate?: boolean;
+}
+
+const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
+  const { goBack } = useNavigation();
+  const [properties, setProperties] = useState<ComparisonProperty[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const ids = propertyIds.split(',');
+        const propertyData = await Promise.all(
+          ids.map(async id => {
+            const response = await request('GET', {
+              route: `/v1/properties/${id}`,
+            });
+            const data = response?.data;
+            return {
+              propertyId: data?.propertyId,
+              title: data?.propertyType || 'Property',
+              location: `${data?.city}, ${data?.state}`,
+              cost: data?.sellingPrice ? `₹${data.sellingPrice} Cr` : 'N/A',
+              rent: data?.totalMonthlyRent
+                ? `₹${data.totalMonthlyRent}`
+                : 'N/A',
+              tenure: data?.leaseDurationYears
+                ? `${data.leaseDurationYears} Yrs`
+                : 'N/A',
+              roi: data?.grossRentalYield ? `${data.grossRentalYield}%` : 'N/A',
+              image:
+                data?.media?.[0]?.fileUrl || 'https://via.placeholder.com/300',
+              clientType: data?.tenantType || 'MNC Client',
+              carpetArea: data?.carpetArea ? `${data.carpetArea} sq ft` : 'N/A',
+              floorPlate: data?.floorPlate ? `${data.floorPlate} sq ft` : 'N/A',
+              furnishing: data?.furnishingStatus || 'N/A',
+              powerBackup: data?.powerBackup || 'N/A',
+              parking: `${data?.parkingFourWheeler || 0} Car`,
+              buildingGrade: data?.buildingGrade || 'Grade A',
+              lockInPeriod: data?.lockInPeriodYears
+                ? `${data.lockInPeriodYears} Yrs`
+                : 'N/A',
+              securityDeposit: data?.securityDepositAmount
+                ? `₹${data.securityDepositAmount}`
+                : 'N/A',
+              escalation: data?.annualEscalationPercent
+                ? `${data.annualEscalationPercent}%`
+                : 'N/A',
+              maintenance: data?.maintenanceAmount
+                ? `₹${data.maintenanceAmount}`
+                : 'N/A',
+              additionalIncome: data?.additionalIncomeAnnual
+                ? `₹${data.additionalIncomeAnnual}`
+                : 'Nil',
+              occupancyCertificate: !!data?.occupancyCertificate,
+            };
+          }),
+        );
+        setProperties(propertyData);
+      } catch (error) {
+        console.error('Error fetching properties:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (propertyIds) {
+      fetchProperties();
+    }
+  }, [propertyIds]);
+
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: `Check out this property comparison: ${properties
+          .map(p => p.title)
+          .join(', ')}`,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleRemoveProperty = (id: string) => {
+    setProperties(prev => prev.filter(p => p.propertyId !== id));
+  };
+
+  const ComparisonRow = ({
+    label,
+    keys,
+    highlightIndex = -1,
+    isAlternate = false,
+  }: {
+    label: string;
+    keys: (keyof ComparisonProperty)[];
+    highlightIndex?: number;
+    isAlternate?: boolean;
+  }) => (
+    <View
+      style={[
+        styles.rowContainer,
+        isAlternate && { backgroundColor: '#F2F2F2' },
+      ]}
+    >
+      <View style={styles.rowLabelContainer}>
+        <Text style={styles.rowLabelText}>{label}</Text>
+      </View>
+      {properties.map((prop, index) => (
+        <View
+          key={prop.propertyId}
+          style={[
+            styles.rowValueContainer,
+            index === highlightIndex && styles.highlightCell,
+          ]}
+        >
+          {keys.map(key => (
+            <Text
+              key={key as string}
+              style={[
+                styles.rowValueText,
+                index === highlightIndex && styles.highlightText,
+              ]}
+            >
+              {typeof prop[key] === 'boolean'
+                ? prop[key]
+                  ? '✓ Available'
+                  : '✗ Unavailable'
+                : prop[key]}
+            </Text>
+          ))}
+        </View>
+      ))}
+      {[...Array(3 - properties.length)].map((_, i) => (
+        <View key={`empty-${i}`} style={styles.rowValueContainer} />
+      ))}
+    </View>
+  );
+
+  const SectionTitle = ({
+    title,
+    subtitle,
+  }: {
+    title: string;
+    subtitle: string;
+  }) => (
+    <View style={styles.sectionHeaderContainer}>
+      <Text style={styles.sectionHeaderTitle}>{title}</Text>
+      <Text style={styles.sectionHeaderSubtitle}>{subtitle}</Text>
+    </View>
+  );
+
+  if (loading) {
+    return (
+      <Layout>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+        </View>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout>
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Header Title */}
+        <View style={styles.pageHeader}>
+          <TouchableOpacity onPress={goBack} style={styles.backButton}>
+            <ChevronLeft size={24} color={COLORS.textDark} />
+          </TouchableOpacity>
+          <Text style={styles.pageTitle}>
+            Property Comparison Dashboard
+            <Text style={styles.pageSubtitle}>
+              {' '}
+              ({properties.length} properties selected)
+            </Text>
+          </Text>
+        </View>
+
+        {/* Property Cards Row */}
+        <View style={styles.cardsRow}>
+          <View style={styles.propertyHeaderLabel}>
+            <Text style={styles.propertyHeaderTitle}>Property</Text>
+          </View>
+          {properties.map(prop => (
+            <PropertyCard
+              key={prop.propertyId}
+              item={{
+                id: prop.propertyId,
+                title: prop.title,
+                location: prop.location,
+                price: prop.cost,
+                rent: prop.rent,
+                tenure: prop.tenure,
+                roi: prop.roi,
+                type: prop.title,
+                image: prop.image,
+                badges: [prop.clientType],
+                verified: true,
+              }}
+              width="25%"
+              onRemove={handleRemoveProperty}
+              onView={() => {}}
+              onEnquire={() => {}}
+              style={{ marginHorizontal: 5 }}
+            />
+          ))}
+          {/* Fill empty slots */}
+          {[...Array(3 - properties.length)].map((_, i) => (
+            <View key={`empty-card-${i}`} style={styles.emptyCard} />
+          ))}
+        </View>
+
+        {/* Overview Section */}
+        {/* ... rest of the code */}
+
+        {/* Overview Section */}
+        <SectionTitle title="Overview" subtitle="Property details & location" />
+        <View style={styles.tableContainer}>
+          <View style={styles.headerRow}>
+            <View style={styles.rowLabelContainer}>
+              <Text style={styles.headerRowText}>Property Type</Text>
+            </View>
+            {properties.map(p => (
+              <View key={p.propertyId} style={styles.rowValueContainer}>
+                <Text style={styles.headerRowValue}>{p.title}</Text>
+              </View>
+            ))}
+            {[...Array(3 - properties.length)].map((_, i) => (
+              <View
+                key={`empty-header-${i}`}
+                style={styles.rowValueContainer}
+              />
+            ))}
+          </View>
+          <ComparisonRow label="Carpet Area" keys={['carpetArea']} />
+          <ComparisonRow
+            label="Location"
+            keys={['location']}
+            isAlternate={true}
+          />
+          <ComparisonRow label="Building Details" keys={['buildingGrade']} />
+          <ComparisonRow
+            label="Tenant Type"
+            keys={['clientType']}
+            isAlternate={true}
+          />
+        </View>
+
+        {/* Productivity Section */}
+        <SectionTitle
+          title="Productivity (Financials)"
+          subtitle="Rent, yield, ROI analysis"
+        />
+        <View style={styles.tableContainer}>
+          <View style={styles.headerRow}>
+            <View style={styles.rowLabelContainer}>
+              <Text style={styles.headerRowText}>Property Value</Text>
+            </View>
+            {properties.map(p => (
+              <View key={p.propertyId} style={styles.rowValueContainer}>
+                <Text style={styles.headerRowValue}>{p.cost}</Text>
+              </View>
+            ))}
+            {[...Array(3 - properties.length)].map((_, i) => (
+              <View
+                key={`empty-header-prod-${i}`}
+                style={styles.rowValueContainer}
+              />
+            ))}
+          </View>
+          <ComparisonRow label="Rent per sq ft" keys={['rent']} />
+          <ComparisonRow
+            label="Monthly Rent"
+            keys={['rent']}
+            isAlternate={true}
+            highlightIndex={1} // Example highlight
+          />
+          <ComparisonRow label="Maintenance Costs" keys={['maintenance']} />
+          <ComparisonRow
+            label="Gross Rental Yield"
+            keys={['roi']}
+            isAlternate={true}
+            highlightIndex={2} // Example highlight
+          />
+        </View>
+
+        {/* Lease Terms Section */}
+        <SectionTitle title="Lease Terms" subtitle="Lease agreement details" />
+        <View style={styles.tableContainer}>
+          <ComparisonRow
+            label="Balance Lease Tenure"
+            keys={['tenure']}
+            isAlternate={true}
+          />
+          <ComparisonRow label="Security Deposit" keys={['securityDeposit']} />
+          <ComparisonRow
+            label="Lock-in Period"
+            keys={['lockInPeriod']}
+            isAlternate={true}
+            highlightIndex={1}
+          />
+          <ComparisonRow label="Annual Escalation" keys={['escalation']} />
+        </View>
+
+        {/* Facilities Section */}
+        <SectionTitle
+          title="Facilities & Features"
+          subtitle="Amenities & specifications"
+        />
+        <View style={styles.tableContainer}>
+          <ComparisonRow
+            label="Parking Spaces"
+            keys={['parking']}
+            isAlternate={true}
+          />
+          <ComparisonRow
+            label="Additional Income"
+            keys={['additionalIncome']}
+            isAlternate={true}
+          />
+          <ComparisonRow
+            label="Furnishing Status"
+            keys={['furnishing']}
+            highlightIndex={2}
+          />
+        </View>
+
+        {/* Documents Section */}
+        <SectionTitle
+          title="Documents & Compliance"
+          subtitle="Legal documents & certificates"
+        />
+        <View style={styles.tableContainer}>
+          <ComparisonRow
+            label="Occupancy Certificate"
+            keys={['occupancyCertificate']}
+            isAlternate={true}
+          />
+        </View>
+
+        {/* Footer Actions */}
+        <View style={styles.actionButtons}>
+          <TouchableOpacity
+            style={styles.actionBtn}
+            onPress={() => {
+              /* Download */
+            }}
+          >
+            <Download size={16} color={COLORS.textSecondary} />
+            <Text style={styles.actionBtnText}>Download Report</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.actionBtn} onPress={handleShare}>
+            <Share2 size={16} color={COLORS.textSecondary} />
+            <Text style={styles.actionBtnText}>Share Report</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </Layout>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 20,
+    backgroundColor: COLORS.white,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 400,
+  },
+  pageHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.divider,
+  },
+  backButton: {
+    marginRight: 10,
+  },
+  pageTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#EE2529',
+  },
+  pageSubtitle: {
+    fontSize: 14,
+    fontWeight: '400',
+    color: COLORS.textSecondary,
+  },
+  cardsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 40,
+    alignItems: 'flex-start',
+  },
+  propertyHeaderLabel: {
+    width: '20%',
+    paddingTop: 20,
+  },
+  propertyHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
+  },
+  propertyCard: {
+    width: '25%', // Adjust based on 3 columns + label
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    marginHorizontal: 5,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
+  },
+  emptyCard: {
+    width: '25%',
+    marginHorizontal: 5,
+  },
+  cardImageContainer: {
+    height: 150,
+    position: 'relative',
+  },
+  cardImage: {
+    width: '100%',
+    height: '100%',
+  },
+  clientBadge: {
+    position: 'absolute',
+    bottom: 10,
+    left: 10,
+    backgroundColor: '#FFF3CA',
+    paddingHorizontal: 10,
+    paddingVertical: 2,
+    borderRadius: 12,
+  },
+  clientBadgeText: {
+    fontSize: 10,
+    color: COLORS.textSecondary,
+    fontWeight: '600',
+  },
+  removeBtn: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 2,
+  },
+  cardInfo: {
+    padding: 12,
+  },
+  cardTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 4,
+    color: COLORS.textDark,
+  },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 4,
+  },
+  locationText: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+  },
+  cardStatsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  statLabel: {
+    fontSize: 10,
+    color: COLORS.textSecondary,
+    marginBottom: 2,
+  },
+  statValue: {
+    fontWeight: '700',
+    color: COLORS.textDark,
+  },
+  roiBox: {
+    width: 50,
+    height: 50,
+    backgroundColor: 'white', // Gradient simulated or actual simplified
+    borderWidth: 1,
+    borderColor: '#EEEEEE',
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+  },
+  roiLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  roiValue: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#EE2529',
+  },
+  cardActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  viewBtn: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: COLORS.textSecondary,
+    borderRadius: 6,
+    paddingVertical: 6,
+    alignItems: 'center',
+  },
+  viewBtnText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
+  },
+  enquireBtn: {
+    flex: 1,
+    backgroundColor: '#EE2529',
+    borderRadius: 6,
+    paddingVertical: 6,
+    alignItems: 'center',
+  },
+  enquireBtnText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: 'white',
+  },
+  sectionHeaderContainer: {
+    marginTop: 30,
+    marginBottom: 10,
+  },
+  sectionHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#EE2529',
+    marginBottom: 2,
+  },
+  sectionHeaderSubtitle: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
+  },
+  tableContainer: {
+    borderWidth: 0,
+  },
+  rowContainer: {
+    flexDirection: 'row',
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  headerRow: {
+    flexDirection: 'row',
+    backgroundColor: '#F2F2F2',
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  rowLabelContainer: {
+    width: '25%', // First column
+    paddingLeft: 10,
+  },
+  rowLabelText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.textDark,
+  },
+  headerRowText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.textDark,
+  },
+  rowValueContainer: {
+    width: '25%', // Data columns
+    alignItems: 'center',
+    paddingHorizontal: 5,
+    justifyContent: 'center',
+  },
+  rowValueText: {
+    fontSize: 14,
+    color: COLORS.textDark,
+    textAlign: 'center',
+  },
+  headerRowValue: {
+    fontSize: 14,
+    fontWeight: '500', // Normal weight for headers per web
+    color: COLORS.textDark,
+    textAlign: 'center',
+  },
+  highlightCell: {
+    backgroundColor: '#FFFCF4',
+    borderLeftWidth: 4,
+    borderLeftColor: '#EE2529',
+    paddingVertical: 8,
+  },
+  highlightText: {
+    color: '#EE2529',
+    fontWeight: '700',
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 16,
+    marginTop: 40,
+    marginBottom: 60,
+  },
+  actionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    borderWidth: 1,
+    borderColor: COLORS.textSecondary,
+    borderRadius: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    backgroundColor: 'white',
+  },
+  actionBtnText: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    fontWeight: '600',
+  },
+});
+
+export default PropertyComparisonScreen;

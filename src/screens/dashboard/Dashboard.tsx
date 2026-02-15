@@ -49,10 +49,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-// {
-//     "success": false,
-//     "message": "Access token expired",
-//     "expired": true,
-//     "stack": "Error: Access token expired\n    at /Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/src/middlewares/auth.js:29:23\n    at /Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/src/middlewares/auth.js:82:5\n    at /Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/src/utils/asyncHandler.js:4:7\n    at Layer.handleRequest (/Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/node_modules/router/lib/layer.js:152:17)\n    at next (/Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/node_modules/router/lib/route.js:157:13)\n    at Route.dispatch (/Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/node_modules/router/lib/route.js:117:3)\n    at handle (/Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/node_modules/router/index.js:435:11)\n    at Layer.handleRequest (/Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/node_modules/router/lib/layer.js:152:17)\n    at /Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/node_modules/router/index.js:295:15\n    at processParams (/Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/node_modules/router/index.js:582:12)"
-// }

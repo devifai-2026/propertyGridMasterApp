@@ -18,6 +18,9 @@ import { AuthProvider } from './src/context/AuthContext';
 import SignupScreen from './src/screens/auth/SignupScreen';
 import ProfileScreen from './src/screens/profile/ProfileScreen';
 import NotificationsScreen from './src/screens/notifications/NotificationsScreen';
+import PropertyComparisonScreen from './src/screens/property-comparison/PropertyComparisonScreen';
+import PropertyDetailsScreen from './src/screens/properties/PropertyDetailsScreen';
+import EnquiriesScreen from './src/screens/enquiries/EnquiriesScreen';
 
 const AppContent = () => {
   const { currentPath } = useNavigation();
@@ -30,14 +33,18 @@ const AppContent = () => {
         return <Dashboard />;
       case currentPath === '/login':
         return <LoginScreen />;
+      case currentPath.startsWith('/compare/'):
+        const ids = currentPath.split('/compare/')[1];
+        return <PropertyComparisonScreen propertyIds={ids} />;
       case currentPath === '/explore-properties':
       case currentPath.startsWith('/explore-properties'):
-      case currentPath.startsWith('/propertyDetails'): // Placeholder
         return <ExplorePropertiesScreen />;
+      case currentPath.startsWith('/propertyDetails'):
+        return <PropertyDetailsScreen />;
       case currentPath === '/calculators':
         return <CalculatorsScreen />;
       case currentPath === '/explore-brokers':
-      case currentPath.startsWith('/contact-brokers'): // Placeholder
+      case currentPath.startsWith('/contact-brokers'):
         return <ExploreBrokersScreen />;
       case currentPath === '/investors':
         return <InvestorsScreen />;
@@ -55,6 +62,9 @@ const AppContent = () => {
         return <ProfileScreen />;
       case currentPath === '/notifications':
         return <NotificationsScreen />;
+      case currentPath === '/enquiry':
+      case currentPath.startsWith('/enquiry/'):
+        return <EnquiriesScreen />;
       default:
         // Default redirection to /dashboard
         return <Dashboard />;
