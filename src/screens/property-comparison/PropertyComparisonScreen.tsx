@@ -58,7 +58,6 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
   const { goBack } = useNavigation();
   const [properties, setProperties] = useState<ComparisonProperty[]>([]);
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchProperties = async () => {
       try {
@@ -84,28 +83,40 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
               image:
                 data?.media?.[0]?.fileUrl || 'https://via.placeholder.com/300',
               clientType: data?.tenantType || 'MNC Client',
-              carpetArea: data?.carpetArea ? `${data.carpetArea} sq ft` : 'N/A',
+              carpetArea: data?.carpetArea
+                ? `${data.carpetArea} ${
+                    data.carpetAreaUnit === 'Sq. Feet'
+                      ? 'sq ft'
+                      : data.carpetAreaUnit || 'sq ft'
+                  }`
+                : 'N/A',
               floorPlate: data?.floorPlate ? `${data.floorPlate} sq ft` : 'N/A',
               furnishing: data?.furnishingStatus || 'N/A',
               powerBackup: data?.powerBackup || 'N/A',
               parking: `${data?.parkingFourWheeler || 0} Car`,
               buildingGrade: data?.buildingGrade || 'Grade A',
-              lockInPeriod: data?.lockInPeriodYears
-                ? `${data.lockInPeriodYears} Yrs`
-                : 'N/A',
+              lockInPeriod:
+                data?.lockInPeriodYears && data.lockInPeriodYears > 0
+                  ? `${data.lockInPeriodYears} Yrs`
+                  : 'N/A',
               securityDeposit: data?.securityDepositAmount
                 ? `₹${data.securityDepositAmount}`
-                : 'N/A',
-              escalation: data?.annualEscalationPercent
-                ? `${data.annualEscalationPercent}%`
-                : 'N/A',
+                : '₹0.00',
+              escalation:
+                data?.annualEscalationPercent &&
+                data.annualEscalationPercent !== 'N/A'
+                  ? `${data.annualEscalationPercent}%`
+                  : 'N/A',
               maintenance: data?.maintenanceAmount
                 ? `₹${data.maintenanceAmount}`
-                : 'N/A',
-              additionalIncome: data?.additionalIncomeAnnual
-                ? `₹${data.additionalIncomeAnnual}`
-                : 'Nil',
-              occupancyCertificate: !!data?.occupancyCertificate,
+                : '₹0.00',
+              additionalIncome:
+                data?.additionalIncomeAnnual === '0.00'
+                  ? '₹0.00'
+                  : data?.additionalIncomeAnnual || 'Nil',
+              occupancyCertificate:
+                data?.occupancyCertificate?.toLowerCase().includes('yes') ||
+                !!data?.occupancyCertificate,
             };
           }),
         );

@@ -30,55 +30,50 @@ import {
 } from 'lucide-react-native';
 
 import Layout from '../../layout/Layout';
+import PropertyCard, { Property } from '../../components/PropertyCard';
+import CompareBanner from '../dashboard/components/CompareBanner';
+import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
+import { COLORS } from '../../constants/theme';
 
-// Mock Data
-const propertyCards = Array.from({ length: 12 }, (_, index) => ({
-  id: index + 1,
-  title:
-    index % 3 === 0
-      ? 'Residential Space'
-      : index % 3 === 1
-      ? 'Commercial Space'
-      : 'Industrial Space',
-  location: [
-    'Pune, Mundhva',
-    'Mumbai, Bandra',
-    'Delhi, Noida',
-    'Bangalore, Koramangala',
-    'Hyderabad, Hitech City',
-    'Chennai, OMR',
-    'Kolkata, Salt Lake',
-    'Ahmedabad, SG Highway',
-    'Jaipur, Malviya Nagar',
-    'Lucknow, Gomti Nagar',
-    'Chandigarh, Sector 17',
-    'Bhopal, MP Nagar',
-  ][index],
-  clientType: 'MNC Client',
-  cost: `₹${(25 + index * 1.5).toFixed(1)} Crore`,
-  annualRent: `₹${(15 + index * 0.8).toFixed(2)} Lakhs`,
-  tenureLeft: `${7 + (index % 5)} Yrs`,
-  roi: `${85 + (index % 15)}.${index % 10}${index % 10}%`,
-  isVerified: index % 2 === 0,
-  images: [
-    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=500&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=500&h=400&fit=crop',
-    'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=500&h=400&fit=crop',
-  ],
-}));
+// Property Interface is now imported from PropertyCard
 
 const ExplorePropertiesScreen = () => {
   const { width } = useWindowDimensions();
-  const CARD_WIDTH = width > 768 ? (width - 60) / 3 : width - 40;
-  const navigation = useNavigation();
-  const [selectedProperties, setSelectedProperties] = useState<any[]>([]);
+  const { navigate } = useNavigation();
+  const { getProperties, loading: apiLoading } = usePropertyAPIs();
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [selectedProperties, setSelectedProperties] = useState<Property[]>([]);
   const [currentImageIndices, setCurrentImageIndices] = useState<{
-    [key: number]: number;
+    [key: string]: number;
   }>({});
 
-  // Handle Compare Click
-  const handleCompareClick = (property: any) => {
+  useEffect(() => {
+    fetchProperties();
+  }, []);
+
+  const fetchProperties = () => {
+    getProperties((data: any[]) => {
+      const mapped: Property[] = data.map((item: any) => ({
+        id: item.propertyId.toString(),
+        title: `${item.propertyType} Space`,
+        location: `${item.city}, ${item.state}`,
+        price: `₹${item.sellingPrice} Cr`,
+        rent: item.annualGrossRent ? `₹${item.annualGrossRent} L` : 'N/A',
+        tenure: `${item.tenureLeftYears || 0} Yrs`,
+        roi: item.netRentalYield ? `${item.netRentalYield}%` : 'N/A',
+        type: item.propertyType,
+        image:
+          item.media?.[0]?.fileUrl ||
+          'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&h=400&fit=crop',
+        badges: [item.tenantType, item.buildingGrade].filter(Boolean),
+        verified: item.isActive,
+        raw: item,
+      }));
+      setProperties(mapped);
+    });
+  };
+
+  const handleCompareToggle = (property: Property) => {
     setSelectedProperties(prev => {
       const isSelected = prev.some(p => p.id === property.id);
       if (isSelected) {
@@ -94,20 +89,16 @@ const ExplorePropertiesScreen = () => {
     });
   };
 
-  const handleRemoveCompare = (id: number) => {
+  const handleRemoveCompare = (id: string) => {
     setSelectedProperties(prev => prev.filter(p => p.id !== id));
   };
 
-  const navigateToComparison = () => {
-    if (selectedProperties.length < 2) {
-      Alert.alert(
-        'Selection Required',
-        'Please select at least 2 properties to compare.',
-      );
-      return;
-    }
-    // navigation.navigate('CompareProperties', { ids: selectedProperties.map(p => p.id) });
-    Alert.alert('Navigation', 'Navigate to Compare Screen');
+  const handleClearCompare = () => setSelectedProperties([]);
+
+  const handleCompareAction = () => {
+    if (selectedProperties.length < 2) return;
+    const ids = selectedProperties.map(p => p.id).join(',');
+    navigate(`/compare/${ids}`);
   };
 
   const [showFilters, setShowFilters] = useState(false);
@@ -297,72 +288,6 @@ const ExplorePropertiesScreen = () => {
   return (
     <Layout>
       <View style={styles.container}>
-        {/* Sticky Compare Banner */}
-        {selectedProperties.length > 0 && (
-          <View style={styles.stickyBanner}>
-            <View style={styles.bannerHeader}>
-              <View style={styles.bannerTitleRow}>
-                <Text style={styles.bannerTitle}>Compare Properties</Text>
-                <Text style={styles.bannerSubtitle}>
-                  {' '}
-                  | {selectedProperties.length} of 3 properties added
-                </Text>
-              </View>
-              <TouchableOpacity onPress={() => setSelectedProperties([])}>
-                <X size={20} color="#666" />
-              </TouchableOpacity>
-            </View>
-
-            {/* Selected Items Row */}
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.selectedItemsRow}
-            >
-              {selectedProperties.map(p => (
-                <View key={p.id} style={styles.selectedItemCard}>
-                  <Image
-                    source={{ uri: p.images[0] }}
-                    style={styles.selectedItemImage}
-                  />
-                  <View style={styles.selectedItemInfo}>
-                    <Text style={styles.selectedItemTitle} numberOfLines={1}>
-                      {p.title}
-                    </Text>
-                    <Text style={styles.selectedItemLocation} numberOfLines={1}>
-                      {p.location}
-                    </Text>
-                  </View>
-                  <TouchableOpacity
-                    style={styles.removeBtn}
-                    onPress={() => handleRemoveCompare(p.id)}
-                  >
-                    <X size={12} color="#fff" />
-                  </TouchableOpacity>
-                </View>
-              ))}
-
-              {/* Empty Slot */}
-              {selectedProperties.length < 3 && (
-                <View style={styles.emptySlot} />
-              )}
-
-              <TouchableOpacity
-                style={[
-                  styles.compareBtn,
-                  { opacity: selectedProperties.length < 2 ? 0.5 : 1 },
-                ]}
-                onPress={navigateToComparison}
-                disabled={selectedProperties.length < 2}
-              >
-                <Text style={styles.compareBtnText}>
-                  Compare ({selectedProperties.length})
-                </Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </View>
-        )}
-
         {/* Main Content */}
         <View style={styles.contentContainer}>
           {/* Header & Filter Controls */}
@@ -614,17 +539,24 @@ const ExplorePropertiesScreen = () => {
             </View>
           </Modal>
 
+          {selectedProperties.length > 0 && (
+            <View style={styles.compareBannerContainer}>
+              <CompareBanner
+                selectedProperties={selectedProperties}
+                onClear={handleClearCompare}
+                onRemove={handleRemoveCompare}
+                onCompare={handleCompareAction}
+              />
+            </View>
+          )}
+
           <View
             style={[
               styles.gridContainer,
               { justifyContent: width > 768 ? 'flex-start' : 'center' },
             ]}
           >
-            {propertyCards.map((property, index) => {
-              const isSelected = selectedProperties.some(
-                p => p.id === property.id,
-              );
-
+            {properties.map((property, index) => {
               // Special Card Logic (Index 7)
               if (index === 7) {
                 return (
@@ -650,9 +582,7 @@ const ExplorePropertiesScreen = () => {
                     </Text>
                     <TouchableOpacity
                       style={styles.contactExpertBtn}
-                      onPress={() =>
-                        navigation.navigate('ExploreBrokers' as never)
-                      }
+                      onPress={() => navigate('/explore-brokers')}
                     >
                       <Text style={styles.contactExpertText}>
                         Contact our Expert
@@ -663,144 +593,16 @@ const ExplorePropertiesScreen = () => {
               }
 
               return (
-                <View
+                <PropertyCard
                   key={property.id}
-                  style={[
-                    styles.card,
-                    { width: width > 768 ? '31%' : '100%' },
-                    isSelected && styles.selectedCardBorder,
-                  ]}
-                >
-                  {/* Comparison Add Button Overlay */}
-                  <View style={styles.imageContainer}>
-                    <ScrollView
-                      horizontal
-                      pagingEnabled
-                      showsHorizontalScrollIndicator={false}
-                      onMomentumScrollEnd={e => handleScroll(e, property.id)}
-                    >
-                      {property.images?.map((img: string, idx: number) => (
-                        <Image
-                          key={idx}
-                          source={{ uri: img }}
-                          style={[styles.cardImage, { width: CARD_WIDTH }]}
-                        />
-                      ))}
-                    </ScrollView>
-
-                    {/* Dots Indicator */}
-                    <View style={styles.dotsContainer}>
-                      {property.images?.map((_: any, idx: number) => (
-                        <View
-                          key={idx}
-                          style={[
-                            styles.dot,
-                            (currentImageIndices[property.id] || 0) === idx &&
-                              styles.activeDot,
-                          ]}
-                        />
-                      ))}
-                    </View>
-
-                    {/* Verified Badge */}
-                    {property.isVerified && (
-                      <View style={styles.verifiedBadgeContainer}>
-                        <Image
-                          source={require('../../assets/FeaturedProperties/tag.png')}
-                          style={styles.verifiedTag}
-                          resizeMode="contain"
-                        />
-                        <Text style={styles.verifiedText}>Verified</Text>
-                      </View>
-                    )}
-
-                    {/* Action Overlay */}
-                    <View style={styles.imageOverlayTop}>
-                      <TouchableOpacity style={styles.iconBtn}>
-                        <Share2 size={16} color="#fff" />
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.iconBtn}>
-                        <Heart size={16} color="#fff" />
-                      </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.imageOverlayBottom}>
-                      <View style={styles.clientTypeBadge}>
-                        <Text style={styles.clientTypeText}>
-                          {property.clientType}
-                        </Text>
-                      </View>
-                      <TouchableOpacity
-                        style={[
-                          styles.compareActionBtn,
-                          isSelected
-                            ? styles.compareActive
-                            : styles.compareInactive,
-                        ]}
-                        onPress={() => handleCompareClick(property)}
-                      >
-                        <Plus
-                          size={14}
-                          color={isSelected ? '#fff' : '#EE2529'}
-                        />
-                        <Text
-                          style={[
-                            styles.compareActionText,
-                            isSelected && { color: '#fff' },
-                          ]}
-                        >
-                          {isSelected ? 'Remove' : 'Compare'}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-
-                  {/* Content */}
-                  <View style={styles.cardContent}>
-                    <Text style={styles.cardTitle}>{property.title}</Text>
-                    <View style={styles.locationRow}>
-                      <MapPin size={14} color="#EE2529" />
-                      <Text style={styles.locationText}>
-                        {property.location}
-                      </Text>
-                    </View>
-
-                    <View style={styles.statsRow}>
-                      <View>
-                        <Text style={styles.statLabel}>
-                          Cost:{' '}
-                          <Text style={styles.statValue}>{property.cost}</Text>
-                        </Text>
-                        <Text style={styles.statLabel}>
-                          Rent:{' '}
-                          <Text style={styles.statValue}>
-                            {property.annualRent}
-                          </Text>
-                        </Text>
-                        <Text style={styles.statLabel}>
-                          Tenure:{' '}
-                          <Text style={styles.statValue}>
-                            {property.tenureLeft}
-                          </Text>
-                        </Text>
-                      </View>
-                      <View style={styles.roiBadge}>
-                        <Text style={styles.roiLabel}>ROI</Text>
-                        <Text style={styles.roiValue}>{property.roi}</Text>
-                      </View>
-                    </View>
-
-                    {/* Buttons */}
-                    <View style={styles.cardActions}>
-                      <TouchableOpacity style={styles.viewBtn}>
-                        <Text style={styles.viewBtnText}>View</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.enquireBtn}>
-                        <Text style={styles.enquireBtnText}>Enquire</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                </View>
+                  item={property}
+                  width={width > 768 ? '31%' : '100%'}
+                  isSelected={selectedProperties.some(
+                    p => p.id === property.id,
+                  )}
+                  onToggleCompare={handleCompareToggle}
+                  isCompare={true}
+                />
               );
             })}
           </View>
@@ -1430,6 +1232,12 @@ const styles = StyleSheet.create({
     borderTopColor: '#eee',
     flexDirection: 'row',
     gap: 10,
+  },
+  compareBannerContainer: {
+    marginVertical: 20,
+    zIndex: 100,
+    alignItems: 'center',
+    width: '100%',
   },
 });
 

@@ -32,7 +32,6 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
     const { width } = useWindowDimensions();
     const isSmallScreen = width < 768;
     const isMobile = width < 480;
-    console.log(user);
     const nameParts = user?.name ? user.name.split(' ') : [];
     const userFirstName = nameParts.length > 0 ? nameParts[0] : '';
     const userLastName =
