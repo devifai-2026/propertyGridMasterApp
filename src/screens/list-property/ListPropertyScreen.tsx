@@ -218,6 +218,23 @@ const ListPropertyScreen = () => {
         JSON.stringify(mappedConnectivity),
       );
 
+      // Media
+      if (finalData.mediaFiles && Array.isArray(finalData.mediaFiles)) {
+        finalData.mediaFiles.forEach((file: any) => {
+          if (Platform.OS === 'web') {
+            if (file.fileObject) {
+              apiFormData.append('files', file.fileObject);
+            }
+          } else {
+            apiFormData.append('files', {
+              uri: file.uri,
+              name: file.fileName || 'image.jpg',
+              type: file.type || 'image/jpeg',
+            } as any);
+          }
+        });
+      }
+
       // Call API
       createProperty(
         apiFormData,

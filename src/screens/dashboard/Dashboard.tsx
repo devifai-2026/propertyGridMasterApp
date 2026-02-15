@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing } from 'react-native';
 import Layout from '../../layout/Layout';
 import Hero from './components/Hero';
@@ -12,7 +12,7 @@ const Dashboard = () => {
   const { getProperties } = usePropertyAPIs();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(20)).current;
-
+  const [properties, setProperties] = useState<any[]>([]);
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
@@ -28,9 +28,8 @@ const Dashboard = () => {
         easing: Easing.out(Easing.ease),
       }),
     ]).start();
-    getProperties(r => console.log(r));
+    getProperties(r => setProperties(r));
   }, []);
-
   return (
     <Layout>
       <Animated.View
@@ -41,7 +40,7 @@ const Dashboard = () => {
       >
         <Hero />
         <DiscoveryWizard />
-        <FeaturedSection />
+        <FeaturedSection properties={properties} />
         <CategoriesSection />
         <WhyChooseSection />
       </Animated.View>
@@ -50,3 +49,10 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+// {
+//     "success": false,
+//     "message": "Access token expired",
+//     "expired": true,
+//     "stack": "Error: Access token expired\n    at /Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/src/middlewares/auth.js:29:23\n    at /Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/src/middlewares/auth.js:82:5\n    at /Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/src/utils/asyncHandler.js:4:7\n    at Layer.handleRequest (/Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/node_modules/router/lib/layer.js:152:17)\n    at next (/Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/node_modules/router/lib/route.js:157:13)\n    at Route.dispatch (/Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/node_modules/router/lib/route.js:117:3)\n    at handle (/Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/node_modules/router/index.js:435:11)\n    at Layer.handleRequest (/Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/node_modules/router/lib/layer.js:152:17)\n    at /Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/node_modules/router/index.js:295:15\n    at processParams (/Users/mac/Desktop/This PC/Git/property-grid/pre-lease-server/node_modules/router/index.js:582:12)"
+// }

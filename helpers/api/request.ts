@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { BASE_URL } from '../environments';
 import { getHeaders } from './headers';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
@@ -16,7 +17,9 @@ export interface RequestConfig<T = any> {
 
 export const request = async <T = any, R = any>(
   method: HttpMethod,
-  {
+  config: RequestConfig<T>,
+): Promise<R | undefined> => {
+  const {
     route,
     payload = null,
     params = null,
@@ -24,8 +27,8 @@ export const request = async <T = any, R = any>(
     onSuccess = null,
     onError = null,
     afterCall = null,
-  }: RequestConfig<T>,
-): Promise<R | undefined> => {
+  } = config;
+
   if (setLoading) setLoading(true);
 
   try {
@@ -73,7 +76,67 @@ export const request = async <T = any, R = any>(
 
     if (onSuccess) onSuccess(response.data);
     return response.data;
-  } catch (error) {
+  } catch (error: any) {
+    // Handle 401 Unauthorized (Resulting from expired access token)
+    const isTokenExpired =
+      error.response?.status === 401 || error.response?.data?.expired === true;
+
+    if (isTokenExpired && !route.includes('refresh-token')) {
+      try {
+        const userStr = await AsyncStorage.getItem('user');
+        if (userStr) {
+          const user = JSON.parse(userStr);
+          const refreshToken = user.refreshToken;
+
+          if (refreshToken) {
+            console.log('Access token expired. Attempting refresh...');
+
+            // Call refresh token API directly with axios to avoid recursion loops
+            const refreshResponse = await axios.get(
+              `${BASE_URL}/api/v1/auth/refresh-token`,
+              {
+                headers: {
+                  Authorization: `Bearer ${refreshToken}`,
+                },
+              },
+            );
+
+            if (
+              refreshResponse.data &&
+              refreshResponse.data.success &&
+              refreshResponse.data.data
+            ) {
+              const { decodeResponseData } = require('./decoder');
+              let refreshedData = refreshResponse.data.data;
+
+              // Decode if it's an encoded string (which it is pending backend implementation)
+              if (typeof refreshedData === 'string') {
+                refreshedData = decodeResponseData(refreshedData);
+              }
+
+              const { accessToken } = refreshedData;
+              console.log('Token refreshed successfully.');
+
+              // Update stored user with new access token
+              const updatedUser = { ...user, token: accessToken };
+              // Also update 'token' field if it exists, or whatever field stores the JWT
+              // Based on headers.ts, it uses `user.token`.
+              // The user.js controller returns `accessToken` in data.
+
+              await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+
+              // Retry the original request
+              return await request<T, R>(method, config);
+            }
+          }
+        }
+      } catch (refreshError: any) {
+        console.error('Token refresh failed:', refreshError);
+        // If refresh fails, we might want to log out the user or just let the original error propagate
+        // For now, fall through to default error handling
+      }
+    }
+
     console.error(`Unexpected Error (${method} ${route}):`, error);
     if (onError) onError(error);
     else throw error;

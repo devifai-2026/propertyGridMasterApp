@@ -123,7 +123,7 @@ const PropertyCard = ({ item, width }: { item: Property; width: number }) => (
   </View>
 );
 
-const FeaturedSection = () => {
+const FeaturedSection = ({ properties }: { properties: any[] }) => {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
@@ -137,6 +137,33 @@ const FeaturedSection = () => {
 
   const cardWidth = (availableWidth - gap * (cols - 1)) / cols;
 
+  const displayProperties =
+    properties && properties.length > 0
+      ? properties.slice(0, 3).map((p: any) => ({
+          id: p.propertyId,
+          title: p.propertyType || 'Property',
+          location: `${p.city || ''}, ${p.state || ''}`,
+          price: p.sellingPrice ? `₹${p.sellingPrice} Cr` : 'N/A',
+          rent:
+            parseFloat(p.totalMonthlyRent) > 0
+              ? `₹${p.totalMonthlyRent}`
+              : parseFloat(p.rentPerSqftMonthly) > 0
+              ? `₹${p.rentPerSqftMonthly} / sq ft`
+              : 'N/A',
+          tenure: p.leaseDurationYears
+            ? `${parseFloat(p.leaseDurationYears).toFixed(1)} Yrs`
+            : 'N/A',
+          roi: p.grossRentalYield ? `${p.grossRentalYield}%` : 'N/A',
+          type: p.propertyType,
+          image:
+            p.media && p.media.length > 0
+              ? p.media[0].fileUrl
+              : 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1000',
+          badges: p.tenantType ? [p.tenantType] : [],
+          verified: true,
+        }))
+      : FEATURED_PROPERTIES;
+
   return (
     <View
       style={[styles.featuredSection, { paddingHorizontal: containerPadding }]}
@@ -145,7 +172,7 @@ const FeaturedSection = () => {
         Featured Properties
       </Text>
       <View style={[styles.gridContainer, { gap }]}>
-        {FEATURED_PROPERTIES.map(prop => (
+        {displayProperties.map(prop => (
           <PropertyCard key={prop.id} item={prop} width={cardWidth} />
         ))}
       </View>
