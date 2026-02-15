@@ -1,4 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, {
+  useState,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import {
   View,
   Text,
@@ -17,337 +22,345 @@ interface LegalDetailsProps {
   initialData?: any;
 }
 
-const LegalDetails: React.FC<LegalDetailsProps> = ({
-  onNext,
-  onFormValid,
-  initialData,
-}) => {
-  const { width } = useWindowDimensions();
-  const isSmallScreen = width < 768;
+const LegalDetails = forwardRef<any, LegalDetailsProps>(
+  ({ onNext, onFormValid, initialData }, ref) => {
+    const { width } = useWindowDimensions();
+    const isSmallScreen = width < 768;
 
-  const titleStatusOptions = [
-    { label: 'No Litigation', value: 'no_litigation' },
-    { label: 'Pending Litigation', value: 'pending_litigation' },
-  ];
-
-  const occupancyCertificateOptions = [
-    { label: 'Yes, available', value: 'yes' },
-    { label: 'In Process', value: 'in_process' },
-    { label: 'Not available', value: 'not_available' },
-  ];
-
-  const leaseRegistrationOptions = [
-    { label: 'Registered Lease', value: 'registered' },
-    { label: 'Notorized Lease', value: 'notorized' },
-    { label: 'No lease document', value: 'no_document' },
-  ];
-
-  const [formData, setFormData] = useState({
-    titleStatus: initialData?.titleStatus || '',
-    occupancyCertificate: initialData?.occupancyCertificate || '',
-    leaseRegistration: initialData?.leaseRegistration || '',
-    pendingLitigations: initialData?.pendingLitigations || 'no',
-    litigationNote: initialData?.litigationNote || '',
-    certifications: initialData?.certifications || {
-      rera: false,
-      leed: false,
-      igbc: false,
-    },
-    otherCertifications: initialData?.otherCertifications || [''],
-  });
-
-  const [errors, setErrors] = useState<any>({});
-  const [touched, setTouched] = useState<any>({});
-
-  useEffect(() => {
-    const isValid = validateFormSilently();
-    onFormValid(isValid);
-  }, [formData]);
-
-  const validateFormSilently = () => {
-    return (
-      formData.titleStatus !== '' &&
-      formData.occupancyCertificate !== '' &&
-      formData.leaseRegistration !== '' &&
-      formData.pendingLitigations !== '' &&
-      (formData.pendingLitigations !== 'yes' ||
-        formData.litigationNote.trim() !== '')
-    );
-  };
-
-  const validateField = (name: string, value: any) => {
-    switch (name) {
-      case 'titleStatus':
-        return !value ? 'Title Status is required' : '';
-      case 'occupancyCertificate':
-        return !value ? 'Occupancy Certificate is required' : '';
-      case 'leaseRegistration':
-        return !value ? 'Lease Registration is required' : '';
-      case 'pendingLitigations':
-        return !value ? 'Please select Yes or No' : '';
-      case 'litigationNote':
-        if (formData.pendingLitigations === 'yes' && !value.trim()) {
-          return 'Please provide litigation details';
-        }
-        return '';
-      default:
-        return '';
-    }
-  };
-
-  const handleInputChange = (name: string, value: any) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
-
-    if (touched[name]) {
-      const error = validateField(name, value);
-      setErrors((prev: any) => ({ ...prev, [name]: error }));
-    }
-  };
-
-  const handleBlur = (name: string, value?: any) => {
-    setTouched((prev: any) => ({ ...prev, [name]: true }));
-    const valueToValidate =
-      value !== undefined ? value : formData[name as keyof typeof formData];
-    const error = validateField(name, valueToValidate);
-    setErrors((prev: any) => ({ ...prev, [name]: error }));
-  };
-
-  const toggleCertification = (cert: keyof typeof formData.certifications) => {
-    setFormData(prev => ({
-      ...prev,
-      certifications: {
-        ...prev.certifications,
-        [cert]: !prev.certifications[cert],
+    useImperativeHandle(ref, () => ({
+      submit: () => {
+        onNext(formData);
       },
     }));
-  };
 
-  const handleOtherCertChange = (index: number, value: string) => {
-    const newCerts = [...formData.otherCertifications];
-    newCerts[index] = value;
-    setFormData(prev => ({ ...prev, otherCertifications: newCerts }));
-  };
+    const titleStatusOptions = [
+      { label: 'No Litigation', value: 'No Litigation' },
+      { label: 'Pending Litigation', value: 'Pending Litigation' },
+    ];
 
-  const addOtherCert = () => {
-    if (
-      formData.otherCertifications[
-        formData.otherCertifications.length - 1
-      ].trim()
-    ) {
+    const occupancyCertificateOptions = [
+      { label: 'Yes, available', value: 'Yes, available' },
+      { label: 'In Process', value: 'In Process' },
+      { label: 'Not available', value: 'Not available' },
+    ];
+
+    const leaseRegistrationOptions = [
+      { label: 'Registered Lease', value: 'Registered Lease' },
+      { label: 'Notorized Lease', value: 'Notorized Lease' },
+      { label: 'No lease document', value: 'No lease document' },
+    ];
+
+    const [formData, setFormData] = useState({
+      titleStatus: initialData?.titleStatus || '',
+      occupancyCertificate: initialData?.occupancyCertificate || '',
+      leaseRegistration: initialData?.leaseRegistration || '',
+      pendingLitigations: initialData?.pendingLitigations || 'no',
+      litigationNote: initialData?.litigationNote || '',
+      certifications: initialData?.certifications || {
+        rera: false,
+        leed: false,
+        igbc: false,
+      },
+      otherCertifications: initialData?.otherCertifications || [''],
+    });
+
+    const [errors, setErrors] = useState<any>({});
+    const [touched, setTouched] = useState<any>({});
+
+    useEffect(() => {
+      const isValid = validateFormSilently();
+      onFormValid(isValid);
+    }, [formData]);
+
+    const validateFormSilently = () => {
+      return (
+        formData.titleStatus !== '' &&
+        formData.occupancyCertificate !== '' &&
+        formData.leaseRegistration !== '' &&
+        formData.pendingLitigations !== '' &&
+        (formData.pendingLitigations !== 'yes' ||
+          formData.litigationNote.trim() !== '')
+      );
+    };
+
+    const validateField = (name: string, value: any) => {
+      switch (name) {
+        case 'titleStatus':
+          return !value ? 'Title Status is required' : '';
+        case 'occupancyCertificate':
+          return !value ? 'Occupancy Certificate is required' : '';
+        case 'leaseRegistration':
+          return !value ? 'Lease Registration is required' : '';
+        case 'pendingLitigations':
+          return !value ? 'Please select Yes or No' : '';
+        case 'litigationNote':
+          if (formData.pendingLitigations === 'yes' && !value.trim()) {
+            return 'Please provide litigation details';
+          }
+          return '';
+        default:
+          return '';
+      }
+    };
+
+    const handleInputChange = (name: string, value: any) => {
+      setFormData(prev => ({ ...prev, [name]: value }));
+
+      if (touched[name]) {
+        const error = validateField(name, value);
+        setErrors((prev: any) => ({ ...prev, [name]: error }));
+      }
+    };
+
+    const handleBlur = (name: string, value?: any) => {
+      setTouched((prev: any) => ({ ...prev, [name]: true }));
+      const valueToValidate =
+        value !== undefined ? value : formData[name as keyof typeof formData];
+      const error = validateField(name, valueToValidate);
+      setErrors((prev: any) => ({ ...prev, [name]: error }));
+    };
+
+    const toggleCertification = (
+      cert: keyof typeof formData.certifications,
+    ) => {
       setFormData(prev => ({
         ...prev,
-        otherCertifications: [...prev.otherCertifications, ''],
+        certifications: {
+          ...prev.certifications,
+          [cert]: !prev.certifications[cert],
+        },
       }));
-    }
-  };
+    };
 
-  const removeOtherCert = (index: number) => {
-    const newCerts = formData.otherCertifications.filter(
-      (_: any, i: number) => i !== index,
-    );
-    setFormData(prev => ({
-      ...prev,
-      otherCertifications: newCerts.length ? newCerts : [''],
-    }));
-  };
+    const handleOtherCertChange = (index: number, value: string) => {
+      const newCerts = [...formData.otherCertifications];
+      newCerts[index] = value;
+      setFormData(prev => ({ ...prev, otherCertifications: newCerts }));
+    };
 
-  return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          isSmallScreen && styles.sectionTitleMobile,
-        ]}
-      >
-        Legal & Title Details
-      </Text>
+    const addOtherCert = () => {
+      if (
+        formData.otherCertifications[
+          formData.otherCertifications.length - 1
+        ].trim()
+      ) {
+        setFormData(prev => ({
+          ...prev,
+          otherCertifications: [...prev.otherCertifications, ''],
+        }));
+      }
+    };
 
-      <Text style={styles.subHeader}>Title & Ownership Status</Text>
+    const removeOtherCert = (index: number) => {
+      const newCerts = formData.otherCertifications.filter(
+        (_: any, i: number) => i !== index,
+      );
+      setFormData(prev => ({
+        ...prev,
+        otherCertifications: newCerts.length ? newCerts : [''],
+      }));
+    };
 
-      <View style={styles.fieldContainer}>
-        <Text style={styles.label}>Title Status *</Text>
-        <CustomDropdown
-          placeholder="Select Status"
-          value={formData.titleStatus}
-          options={titleStatusOptions}
-          onChange={v => {
-            handleInputChange('titleStatus', v);
-            handleBlur('titleStatus', v);
-          }}
-          onBlur={() => handleBlur('titleStatus')}
-          error={touched.titleStatus && !!errors.titleStatus}
-        />
-        {touched.titleStatus && errors.titleStatus && (
-          <Text style={styles.errorText}>{errors.titleStatus}</Text>
-        )}
-      </View>
+    return (
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <Text
+          style={[
+            styles.sectionTitle,
+            isSmallScreen && styles.sectionTitleMobile,
+          ]}
+        >
+          Legal & Title Details
+        </Text>
 
-      <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
+        <Text style={styles.subHeader}>Title & Ownership Status</Text>
+
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Occupancy Certificate (OC) *</Text>
+          <Text style={styles.label}>Title Status *</Text>
           <CustomDropdown
             placeholder="Select Status"
-            value={formData.occupancyCertificate}
-            options={occupancyCertificateOptions}
+            value={formData.titleStatus}
+            options={titleStatusOptions}
             onChange={v => {
-              handleInputChange('occupancyCertificate', v);
-              handleBlur('occupancyCertificate', v);
+              handleInputChange('titleStatus', v);
+              handleBlur('titleStatus', v);
             }}
-            onBlur={() => handleBlur('occupancyCertificate')}
-            error={
-              touched.occupancyCertificate && !!errors.occupancyCertificate
-            }
+            onBlur={() => handleBlur('titleStatus')}
+            error={touched.titleStatus && !!errors.titleStatus}
           />
-          {touched.occupancyCertificate && errors.occupancyCertificate && (
-            <Text style={styles.errorText}>{errors.occupancyCertificate}</Text>
+          {touched.titleStatus && errors.titleStatus && (
+            <Text style={styles.errorText}>{errors.titleStatus}</Text>
           )}
         </View>
 
-        <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Lease Registration *</Text>
-          <CustomDropdown
-            placeholder="Select Status"
-            value={formData.leaseRegistration}
-            options={leaseRegistrationOptions}
-            onChange={v => {
-              handleInputChange('leaseRegistration', v);
-              handleBlur('leaseRegistration', v);
-            }}
-            onBlur={() => handleBlur('leaseRegistration')}
-            error={touched.leaseRegistration && !!errors.leaseRegistration}
-          />
-          {touched.leaseRegistration && errors.leaseRegistration && (
-            <Text style={styles.errorText}>{errors.leaseRegistration}</Text>
-          )}
-        </View>
-      </View>
-
-      <View style={styles.fieldContainer}>
-        <Text style={styles.label}>Any Pending Litigations *</Text>
-        <View style={styles.radioGroup}>
-          <TouchableOpacity
-            style={styles.radioButton}
-            onPress={() => {
-              handleInputChange('pendingLitigations', 'yes');
-              handleBlur('pendingLitigations');
-            }}
-          >
-            <View
-              style={[
-                styles.radioCircle,
-                formData.pendingLitigations === 'yes' && styles.radioActive,
-              ]}
-            >
-              {formData.pendingLitigations === 'yes' && (
-                <View style={styles.radioInner} />
-              )}
-            </View>
-            <Text style={styles.radioLabel}>Yes</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.radioButton}
-            onPress={() => {
-              handleInputChange('pendingLitigations', 'no');
-              handleBlur('pendingLitigations');
-            }}
-          >
-            <View
-              style={[
-                styles.radioCircle,
-                formData.pendingLitigations === 'no' && styles.radioActive,
-              ]}
-            >
-              {formData.pendingLitigations === 'no' && (
-                <View style={styles.radioInner} />
-              )}
-            </View>
-            <Text style={styles.radioLabel}>No</Text>
-          </TouchableOpacity>
-        </View>
-        {touched.pendingLitigations && errors.pendingLitigations && (
-          <Text style={styles.errorText}>{errors.pendingLitigations}</Text>
-        )}
-      </View>
-
-      {formData.pendingLitigations === 'yes' && (
-        <View style={styles.fieldContainer}>
-          <TextInput
-            style={[
-              styles.input,
-              styles.textArea,
-              touched.litigationNote &&
-                errors.litigationNote &&
-                styles.inputError,
-            ]}
-            placeholder="Enter Brief note on Litigation"
-            multiline
-            numberOfLines={3}
-            textAlignVertical="top"
-            value={formData.litigationNote}
-            onChangeText={v => handleInputChange('litigationNote', v)}
-            onBlur={(e: any) =>
-              handleBlur('litigationNote', e.nativeEvent.text)
-            }
-          />
-          {touched.litigationNote && errors.litigationNote && (
-            <Text style={styles.errorText}>{errors.litigationNote}</Text>
-          )}
-        </View>
-      )}
-
-      <Text style={styles.subHeader}>Licenses & Certifications</Text>
-      <View style={styles.certGrid}>
-        {(['rera', 'leed', 'igbc'] as const).map(cert => (
-          <TouchableOpacity
-            key={cert}
-            style={styles.checkboxRow}
-            onPress={() => toggleCertification(cert)}
-          >
-            <View
-              style={[
-                styles.checkbox,
-                formData.certifications[cert] && styles.checkboxActive,
-              ]}
-            >
-              {formData.certifications[cert] && (
-                <Text style={styles.checkmark}>✓</Text>
-              )}
-            </View>
-            <Text style={styles.checkboxLabel}>{cert.toUpperCase()}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <View style={styles.otherCertContainer}>
-        <Text style={styles.labelSmall}>Add Others (if Any)</Text>
-        {formData.otherCertifications.map((cert: any, index: number) => (
-          <View key={index} style={styles.certInputRow}>
-            <TextInput
-              style={[styles.input, { flex: 1 }]}
-              placeholder="Enter certification"
-              value={cert}
-              onChangeText={v => handleOtherCertChange(index, v)}
+        <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>Occupancy Certificate (OC) *</Text>
+            <CustomDropdown
+              placeholder="Select Status"
+              value={formData.occupancyCertificate}
+              options={occupancyCertificateOptions}
+              onChange={v => {
+                handleInputChange('occupancyCertificate', v);
+                handleBlur('occupancyCertificate', v);
+              }}
+              onBlur={() => handleBlur('occupancyCertificate')}
+              error={
+                touched.occupancyCertificate && !!errors.occupancyCertificate
+              }
             />
-            {index === formData.otherCertifications.length - 1 ? (
-              <TouchableOpacity style={styles.addBtn} onPress={addOtherCert}>
-                <Plus size={20} color="#FFF" />
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                style={styles.removeBtn}
-                onPress={() => removeOtherCert(index)}
-              >
-                <X size={20} color="#666" />
-              </TouchableOpacity>
+            {touched.occupancyCertificate && errors.occupancyCertificate && (
+              <Text style={styles.errorText}>
+                {errors.occupancyCertificate}
+              </Text>
             )}
           </View>
-        ))}
-      </View>
-      <View style={{ height: 40 }} />
-    </ScrollView>
-  );
-};
+
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>Lease Registration *</Text>
+            <CustomDropdown
+              placeholder="Select Status"
+              value={formData.leaseRegistration}
+              options={leaseRegistrationOptions}
+              onChange={v => {
+                handleInputChange('leaseRegistration', v);
+                handleBlur('leaseRegistration', v);
+              }}
+              onBlur={() => handleBlur('leaseRegistration')}
+              error={touched.leaseRegistration && !!errors.leaseRegistration}
+            />
+            {touched.leaseRegistration && errors.leaseRegistration && (
+              <Text style={styles.errorText}>{errors.leaseRegistration}</Text>
+            )}
+          </View>
+        </View>
+
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Any Pending Litigations *</Text>
+          <View style={styles.radioGroup}>
+            <TouchableOpacity
+              style={styles.radioButton}
+              onPress={() => {
+                handleInputChange('pendingLitigations', 'yes');
+                handleBlur('pendingLitigations');
+              }}
+            >
+              <View
+                style={[
+                  styles.radioCircle,
+                  formData.pendingLitigations === 'yes' && styles.radioActive,
+                ]}
+              >
+                {formData.pendingLitigations === 'yes' && (
+                  <View style={styles.radioInner} />
+                )}
+              </View>
+              <Text style={styles.radioLabel}>Yes</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.radioButton}
+              onPress={() => {
+                handleInputChange('pendingLitigations', 'no');
+                handleBlur('pendingLitigations');
+              }}
+            >
+              <View
+                style={[
+                  styles.radioCircle,
+                  formData.pendingLitigations === 'no' && styles.radioActive,
+                ]}
+              >
+                {formData.pendingLitigations === 'no' && (
+                  <View style={styles.radioInner} />
+                )}
+              </View>
+              <Text style={styles.radioLabel}>No</Text>
+            </TouchableOpacity>
+          </View>
+          {touched.pendingLitigations && errors.pendingLitigations && (
+            <Text style={styles.errorText}>{errors.pendingLitigations}</Text>
+          )}
+        </View>
+
+        {formData.pendingLitigations === 'yes' && (
+          <View style={styles.fieldContainer}>
+            <TextInput
+              style={[
+                styles.input,
+                styles.textArea,
+                touched.litigationNote &&
+                  errors.litigationNote &&
+                  styles.inputError,
+              ]}
+              placeholder="Enter Brief note on Litigation"
+              multiline
+              numberOfLines={3}
+              textAlignVertical="top"
+              value={formData.litigationNote}
+              onChangeText={v => handleInputChange('litigationNote', v)}
+              onBlur={(e: any) =>
+                handleBlur('litigationNote', e.nativeEvent.text)
+              }
+            />
+            {touched.litigationNote && errors.litigationNote && (
+              <Text style={styles.errorText}>{errors.litigationNote}</Text>
+            )}
+          </View>
+        )}
+
+        <Text style={styles.subHeader}>Licenses & Certifications</Text>
+        <View style={styles.certGrid}>
+          {(['rera', 'leed', 'igbc'] as const).map(cert => (
+            <TouchableOpacity
+              key={cert}
+              style={styles.checkboxRow}
+              onPress={() => toggleCertification(cert)}
+            >
+              <View
+                style={[
+                  styles.checkbox,
+                  formData.certifications[cert] && styles.checkboxActive,
+                ]}
+              >
+                {formData.certifications[cert] && (
+                  <Text style={styles.checkmark}>✓</Text>
+                )}
+              </View>
+              <Text style={styles.checkboxLabel}>{cert.toUpperCase()}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <View style={styles.otherCertContainer}>
+          <Text style={styles.labelSmall}>Add Others (if Any)</Text>
+          {formData.otherCertifications.map((cert: any, index: number) => (
+            <View key={index} style={styles.certInputRow}>
+              <TextInput
+                style={[styles.input, { flex: 1 }]}
+                placeholder="Enter certification"
+                value={cert}
+                onChangeText={v => handleOtherCertChange(index, v)}
+              />
+              {index === formData.otherCertifications.length - 1 ? (
+                <TouchableOpacity style={styles.addBtn} onPress={addOtherCert}>
+                  <Plus size={20} color="#FFF" />
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.removeBtn}
+                  onPress={() => removeOtherCert(index)}
+                >
+                  <X size={20} color="#666" />
+                </TouchableOpacity>
+              )}
+            </View>
+          ))}
+        </View>
+        <View style={{ height: 40 }} />
+      </ScrollView>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   container: {

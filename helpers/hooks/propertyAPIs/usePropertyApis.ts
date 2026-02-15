@@ -21,8 +21,27 @@ export const usePropertyAPIs = () => {
     });
   };
 
+  const createProperty = (
+    payload: FormData,
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.post({
+      route: '/v1/properties',
+      payload,
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   return {
     getProperties,
+    createProperty,
     loading,
   };
 };

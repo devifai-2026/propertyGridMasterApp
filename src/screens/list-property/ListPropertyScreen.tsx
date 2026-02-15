@@ -23,9 +23,12 @@ import {
   Home,
   Users,
 } from 'lucide-react-native';
-import { Alert } from 'react-native';
+import { Alert, ActivityIndicator } from 'react-native';
 
 import Layout from '../../layout/Layout';
+import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
+import { useNavigation } from '../../context/NavigationContext';
+import { useAuth } from '../../context/AuthContext';
 import PersonalDetails from './components/PersonalDetails';
 import BasicDetails from './components/BasicDetails';
 import LegalDetails from './components/LegalDetails';
@@ -47,15 +50,205 @@ const ListPropertyScreen = () => {
   const isSmallScreen = width < 768;
   const isMobile = width < 480;
 
+  const { createProperty, loading: apiLoading } = usePropertyAPIs();
+  const { navigate } = useNavigation();
+  const { user } = useAuth();
+
   const [currentStep, setCurrentStep] = useState(1);
   const [isFormValid, setIsFormValid] = useState(false);
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState<any>({});
+
   const personalDetailsRef = useRef<any>(null);
+  const basicDetailsRef = useRef<any>(null);
+  const legalDetailsRef = useRef<any>(null);
+  const leaseDetailsRef = useRef<any>(null);
+  const financialDetailsRef = useRef<any>(null);
+  const locationDetailsRef = useRef<any>(null);
+
   const scrollRef = useRef<ScrollView>(null);
 
+  const submitProperty = async (finalData: any) => {
+    try {
+      console.log('Submitting Property Data:', finalData);
+
+      const apiFormData = new FormData();
+
+      // --- Basic Details ---
+      apiFormData.append('propertyType', finalData.propertyType || '');
+      apiFormData.append('carpetAreaSqft', finalData.carpetArea || '');
+      apiFormData.append('completionYear', finalData.builtYear || '');
+      apiFormData.append('lastRefurbished', finalData.lastRefurbished || '');
+      apiFormData.append('ownershipType', finalData.ownership || '');
+      apiFormData.append('buildingGrade', finalData.buildingGrade || '');
+
+      // Parking
+      apiFormData.append('parkingSlots', finalData.fourWheelerParkings || '0');
+      apiFormData.append('parkingRatio', finalData.twoWheelerParkings || '0');
+
+      // Infrastructure
+      apiFormData.append('powerBackupKva', finalData.powerBackup || '');
+      apiFormData.append('numberOfLifts', finalData.numLifts || '0');
+      apiFormData.append('hvacType', finalData.hvacType || '');
+      apiFormData.append('furnishingStatus', finalData.furnishingStatus || '');
+      apiFormData.append(
+        'buildingMaintainedBy',
+        finalData.buildingMaintained || '',
+      );
+
+      // Description
+      apiFormData.append('description', finalData.propertyDescription || '');
+
+      // --- Legal Details ---
+      apiFormData.append('titleStatus', finalData.titleStatus || '');
+      apiFormData.append(
+        'occupancyCertificate',
+        finalData.occupancyCertificate || '',
+      );
+      apiFormData.append(
+        'leaseRegistration',
+        finalData.leaseRegistration || '',
+      );
+      apiFormData.append(
+        'hasPendingLitigation',
+        finalData.pendingLitigations === 'yes' ? 'true' : 'false',
+      );
+      apiFormData.append('litigationDetails', finalData.litigationNote || '');
+      apiFormData.append('reraNumber', finalData.reraNumber || '');
+
+      // Certifications
+      const certs = {
+        ...(finalData.certifications || {}),
+        others: finalData.otherCertifications || [],
+      };
+      apiFormData.append('certifications', JSON.stringify(certs));
+
+      // --- Lease Details ---
+      apiFormData.append('tenantType', finalData.tenantType || '');
+      apiFormData.append('leaseStartDate', finalData.leaseStartDate || '');
+      apiFormData.append('leaseEndDate', finalData.leaseExpiryDate || '');
+      apiFormData.append('lockInPeriodYears', finalData.lockInYears || '0');
+      apiFormData.append('lockInPeriodMonths', finalData.lockInMonths || '0');
+      apiFormData.append('leaseDurationYears', finalData.leaseDuration || '0');
+
+      const rentTypeMap = { perSqFt: 'Per Sq Ft', lumpSum: 'Lump Sum' };
+      apiFormData.append(
+        'rentType',
+        rentTypeMap[finalData.rentType as keyof typeof rentTypeMap] ||
+          'Per Sq Ft',
+      );
+      apiFormData.append('rentPerSqftMonthly', finalData.rentPerSqFt || '0');
+      apiFormData.append('totalMonthlyRent', finalData.totalMonthlyRent || '0');
+
+      const depositTypeMap = { months: 'Months of Rent', lumpSum: 'Lump Sum' };
+      apiFormData.append(
+        'securityDepositType',
+        depositTypeMap[
+          finalData.securityDepositType as keyof typeof depositTypeMap
+        ] || 'Months of Rent',
+      );
+      apiFormData.append(
+        'securityDepositMonths',
+        finalData.securityDepositMonths || '0',
+      );
+      apiFormData.append(
+        'securityDepositAmount',
+        finalData.securityDepositAmount || '0',
+      );
+
+      apiFormData.append(
+        'escalationFrequencyYears',
+        finalData.escalationFrequency || '0',
+      );
+      apiFormData.append(
+        'annualEscalationPercent',
+        finalData.escalationPercentage || '0',
+      );
+
+      const maintScopeMap = {
+        included: 'Yes, included in rent',
+        excluded: 'No, excluded from rent',
+      };
+      apiFormData.append(
+        'maintenanceCostsIncluded',
+        maintScopeMap[
+          finalData.maintenanceScope as keyof typeof maintScopeMap
+        ] || 'No, excluded from rent',
+      );
+
+      const maintTypeMap = { perSqFt: 'Per Sq Ft', lumpSum: 'Lump Sum' };
+      apiFormData.append(
+        'maintenanceType',
+        maintTypeMap[finalData.maintenanceType as keyof typeof maintTypeMap] ||
+          'Per Sq Ft',
+      );
+      apiFormData.append(
+        'maintenanceAmount',
+        finalData.maintenanceAmount || '0',
+      );
+
+      // --- Financial Details ---
+      apiFormData.append('sellingPrice', finalData.sellingPrice || '0');
+      apiFormData.append('propertyTaxAnnual', finalData.propertyTax || '0');
+      apiFormData.append('insuranceAnnual', finalData.insurance || '0');
+      apiFormData.append('otherCostsAnnual', finalData.otherCosts || '0');
+      apiFormData.append(
+        'additionalIncomeAnnual',
+        finalData.additionalIncome || '0',
+      );
+
+      // -- Location Details --
+      apiFormData.append('microMarket', finalData.microMarket || '');
+      apiFormData.append('city', finalData.city || '');
+      apiFormData.append('state', finalData.state || '');
+      apiFormData.append('demandDrivers', finalData.demandDrivers || '');
+      apiFormData.append(
+        'upcomingDevelopments',
+        finalData.futureInfrastructure || '',
+      );
+
+      const mappedConnectivity = (finalData.connectivity || [])
+        .filter((conn: any) => conn.type && conn.type.trim() !== '')
+        .map((conn: any) => ({
+          connectivityType: conn.type,
+          name: conn.name,
+          distanceKm: conn.distance,
+        }));
+      apiFormData.append(
+        'connectivityDetails',
+        JSON.stringify(mappedConnectivity),
+      );
+
+      // Call API
+      createProperty(
+        apiFormData,
+        (response: any) => {
+          if (Platform.OS === 'web') {
+            navigate('/dashboard');
+          } else {
+            Alert.alert('Success', 'Property Listed Successfully!', [
+              { text: 'OK', onPress: () => navigate('/dashboard') },
+            ]);
+          }
+        },
+        (error: any) => {
+          const message =
+            error?.response?.data?.message ||
+            'Failed to list property. Please try again.';
+          Alert.alert('Error', message);
+          console.error('Property creation error:', error);
+        },
+      );
+    } catch (error) {
+      console.error('Error preparing submission:', error);
+      Alert.alert('Error', 'Something went wrong while submitting.');
+    }
+  };
+
   const handleNext = (stepData?: any) => {
+    let currentFormData = formData;
     if (stepData) {
-      setFormData(prev => ({ ...prev, ...stepData }));
+      currentFormData = { ...formData, ...stepData };
+      setFormData(currentFormData);
     }
 
     if (currentStep < 6) {
@@ -63,16 +256,14 @@ const ListPropertyScreen = () => {
       setIsFormValid(false);
       scrollRef.current?.scrollTo({ x: 0, y: 0, animated: true });
     } else {
-      // Final Submit
-      console.log('Final Form Data:', formData);
-      Alert.alert('Success', 'Property Listed Successfully!');
+      submitProperty(currentFormData);
     }
   };
 
   const handleBack = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
-      setIsFormValid(true); // Assuming previous step was valid
+      setIsFormValid(true);
     }
   };
 
@@ -90,6 +281,7 @@ const ListPropertyScreen = () => {
       case 2:
         return (
           <BasicDetails
+            ref={basicDetailsRef}
             onNext={handleNext}
             onFormValid={setIsFormValid}
             initialData={formData}
@@ -98,6 +290,7 @@ const ListPropertyScreen = () => {
       case 3:
         return (
           <LegalDetails
+            ref={legalDetailsRef}
             onNext={handleNext}
             onFormValid={setIsFormValid}
             initialData={formData}
@@ -106,6 +299,7 @@ const ListPropertyScreen = () => {
       case 4:
         return (
           <LeaseDetails
+            ref={leaseDetailsRef}
             onNext={handleNext}
             onFormValid={setIsFormValid}
             initialData={formData}
@@ -114,6 +308,7 @@ const ListPropertyScreen = () => {
       case 5:
         return (
           <FinancialDetails
+            ref={financialDetailsRef}
             onNext={handleNext}
             onFormValid={setIsFormValid}
             initialData={formData}
@@ -122,6 +317,7 @@ const ListPropertyScreen = () => {
       case 6:
         return (
           <LocationDetails
+            ref={locationDetailsRef}
             onNext={handleNext}
             onFormValid={setIsFormValid}
             initialData={formData}
@@ -133,10 +329,27 @@ const ListPropertyScreen = () => {
   };
 
   const handleFooterAction = () => {
-    if (currentStep === 1) {
-      personalDetailsRef.current?.submit();
-    } else {
-      handleNext();
+    switch (currentStep) {
+      case 1:
+        personalDetailsRef.current?.submit();
+        break;
+      case 2:
+        basicDetailsRef.current?.submit();
+        break;
+      case 3:
+        legalDetailsRef.current?.submit();
+        break;
+      case 4:
+        leaseDetailsRef.current?.submit();
+        break;
+      case 5:
+        financialDetailsRef.current?.submit();
+        break;
+      case 6:
+        locationDetailsRef.current?.submit();
+        break;
+      default:
+        handleNext();
     }
   };
 
@@ -148,16 +361,38 @@ const ListPropertyScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* Hero Section */}
-        <View style={[styles.heroSection, isMobile && styles.heroSectionMobile]}>
-          <Text style={[styles.heroTitle, isMobile && styles.heroTitleMobile]}>List Your Property</Text>
-          <Text style={[styles.heroSubtext, isMobile && styles.heroSubtextMobile]}>
+        <View
+          style={[styles.heroSection, isMobile && styles.heroSectionMobile]}
+        >
+          <Text style={[styles.heroTitle, isMobile && styles.heroTitleMobile]}>
+            List Your Property
+          </Text>
+          <Text
+            style={[styles.heroSubtext, isMobile && styles.heroSubtextMobile]}
+          >
             Connect with serious investors looking for pre-leased commercial
             properties across India
           </Text>
-          <TouchableOpacity style={[styles.bulkUploadBtn, isMobile && styles.bulkUploadBtnMobile]}>
-            <Text style={[styles.bulkUploadText, isMobile && styles.bulkUploadTextMobile]}>Bulk Upload</Text>
+          <TouchableOpacity
+            style={[
+              styles.bulkUploadBtn,
+              isMobile && styles.bulkUploadBtnMobile,
+            ]}
+          >
+            <Text
+              style={[
+                styles.bulkUploadText,
+                isMobile && styles.bulkUploadTextMobile,
+              ]}
+            >
+              Bulk Upload
+            </Text>
             <View style={styles.arrowBg}>
-              <ChevronRight size={isMobile ? 14 : 16} color="#EE2529" strokeWidth={3} />
+              <ChevronRight
+                size={isMobile ? 14 : 16}
+                color="#EE2529"
+                strokeWidth={3}
+              />
             </View>
           </TouchableOpacity>
         </View>
@@ -167,7 +402,10 @@ const ListPropertyScreen = () => {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={[styles.stepperContent, isMobile && styles.stepperContentMobile]}
+            contentContainerStyle={[
+              styles.stepperContent,
+              isMobile && styles.stepperContentMobile,
+            ]}
           >
             {STEPS.map((step, index) => {
               const Icon = step.icon;
@@ -176,7 +414,13 @@ const ListPropertyScreen = () => {
               const accentColor = isActive ? '#EE2529' : '#767676';
 
               return (
-                <View key={step.id} style={[styles.stepCardContainer, isMobile && styles.stepCardContainerMobile]}>
+                <View
+                  key={step.id}
+                  style={[
+                    styles.stepCardContainer,
+                    isMobile && styles.stepCardContainerMobile,
+                  ]}
+                >
                   <TouchableOpacity
                     activeOpacity={0.8}
                     style={[
@@ -191,7 +435,11 @@ const ListPropertyScreen = () => {
                   >
                     <Icon size={isMobile ? 20 : 24} color={accentColor} />
                     <Text
-                      style={[styles.stepCardLabel, isMobile && styles.stepCardLabelMobile, { color: accentColor }]}
+                      style={[
+                        styles.stepCardLabel,
+                        isMobile && styles.stepCardLabelMobile,
+                        { color: accentColor },
+                      ]}
                     >
                       {step.title}
                     </Text>
@@ -207,7 +455,9 @@ const ListPropertyScreen = () => {
 
         {/* Form Area */}
         <View style={styles.formCardWrapper}>
-          <View style={[styles.formCard, isMobile && styles.formCardMobile]}>{renderStep()}</View>
+          <View style={[styles.formCard, isMobile && styles.formCardMobile]}>
+            {renderStep()}
+          </View>
         </View>
 
         {/* Navigation Actions */}
@@ -224,7 +474,14 @@ const ListPropertyScreen = () => {
               disabled={currentStep === 1}
             >
               <ChevronLeft size={isMobile ? 18 : 20} color="#666" />
-              <Text style={[styles.backBtnText, isMobile && styles.backBtnTextMobile]}>Previous</Text>
+              <Text
+                style={[
+                  styles.backBtnText,
+                  isMobile && styles.backBtnTextMobile,
+                ]}
+              >
+                Previous
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -232,15 +489,28 @@ const ListPropertyScreen = () => {
                 styles.navBtn,
                 styles.nextBtn,
                 isMobile && styles.navBtnMobile,
-                !isFormValid && styles.nextBtnDisabled,
+                (!isFormValid || apiLoading) && styles.nextBtnDisabled,
               ]}
               onPress={handleFooterAction}
-              disabled={!isFormValid}
+              disabled={!isFormValid || apiLoading}
             >
-              <Text style={[styles.nextBtnText, isMobile && styles.nextBtnTextMobile]}>
-                {currentStep === 6 ? 'List Property' : 'Next Step'}
-              </Text>
-              {currentStep < 6 && <ChevronRight size={isMobile ? 18 : 20} color="#FFF" />}
+              {apiLoading ? (
+                <ActivityIndicator color="#FFF" />
+              ) : (
+                <>
+                  <Text
+                    style={[
+                      styles.nextBtnText,
+                      isMobile && styles.nextBtnTextMobile,
+                    ]}
+                  >
+                    {currentStep === 6 ? 'List Property' : 'Next Step'}
+                  </Text>
+                  {currentStep < 6 && (
+                    <ChevronRight size={isMobile ? 18 : 20} color="#FFF" />
+                  )}
+                </>
+              )}
             </TouchableOpacity>
           </View>
         </View>

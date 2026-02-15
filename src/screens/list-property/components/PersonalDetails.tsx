@@ -16,24 +16,40 @@ import {
   useWindowDimensions,
 } from 'react-native';
 
+import { useAuth } from '../../../context/AuthContext';
+
 interface PersonalDetailsProps {
   onNext: (data: any) => void;
   onFormValid: (isValid: boolean) => void;
   initialData?: any;
 }
 
-const PersonalDetails = forwardRef(
-  ({ onNext, onFormValid, initialData }: PersonalDetailsProps, ref) => {
+// ...
+
+const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
+  ({ onNext, onFormValid, initialData }, ref) => {
+    const { user } = useAuth();
     const { width } = useWindowDimensions();
     const isSmallScreen = width < 768;
     const isMobile = width < 480;
+    console.log(user);
+    const nameParts = user?.name ? user.name.split(' ') : [];
+    const userFirstName = nameParts.length > 0 ? nameParts[0] : '';
+    const userLastName =
+      nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+    const userRoleLower = user?.role?.toLowerCase();
 
     const [formData, setFormData] = useState({
-      firstName: initialData?.firstName || '',
-      lastName: initialData?.lastName || '',
-      email: initialData?.email || '',
-      mobile: initialData?.mobile || '',
-      listUnder: initialData?.listUnder || '',
+      firstName: userFirstName || initialData?.firstName || '',
+      lastName: userLastName || initialData?.lastName || '',
+      email: user?.email || initialData?.email || '',
+      mobile: user?.mobileNumber || initialData?.mobile || '',
+      listUnder:
+        (userRoleLower === 'broker' || userRoleLower === 'owner'
+          ? userRoleLower
+          : '') ||
+        initialData?.listUnder ||
+        '',
       otp: initialData?.otp || '',
       agreeTerms: initialData?.agreeTerms || false,
       agreePrivacy: initialData?.agreePrivacy || false,
@@ -187,7 +203,11 @@ const PersonalDetails = forwardRef(
 
     const handleOtpKeyPress = (e: any, index: number) => {
       // Handle backspace on empty field - move to previous input
-      if (e.nativeEvent.key === 'Backspace' && !formData.otp[index] && index > 0) {
+      if (
+        e.nativeEvent.key === 'Backspace' &&
+        !formData.otp[index] &&
+        index > 0
+      ) {
         otpInputRefs.current[index - 1]?.focus();
       }
     };

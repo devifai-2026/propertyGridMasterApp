@@ -6,10 +6,10 @@ import DiscoveryWizard from './components/DiscoveryWizard';
 import CategoriesSection from './components/CategoriesSection';
 import FeaturedSection from './components/FeaturedSection';
 import WhyChooseSection from './components/WhyChooseSection';
-import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyAPIs';
+import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
 
 const Dashboard = () => {
-  const {getProperties} = usePropertyAPIs();
+  const { getProperties } = usePropertyAPIs();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(20)).current;
 
@@ -28,7 +28,7 @@ const Dashboard = () => {
         easing: Easing.out(Easing.ease),
       }),
     ]).start();
-    getProperties((r)=> console.log(r));
+    getProperties(r => console.log(r));
   }, []);
 
   return (
