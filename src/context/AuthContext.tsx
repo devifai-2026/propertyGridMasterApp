@@ -36,7 +36,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const checkLogin = async () => {
       try {
         const userStr = await AsyncStorage.getItem('user');
-        console.log(userStr)
         if (userStr !== null) {
           const userData = JSON.parse(userStr);
           setIsLoggedIn(true);
