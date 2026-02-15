@@ -61,65 +61,71 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const ids = propertyIds.split(',');
-        const propertyData = await Promise.all(
-          ids.map(async id => {
-            const response = await request('GET', {
-              route: `/v1/properties/${id}`,
-            });
-            const data = response?.data;
-            return {
-              propertyId: data?.propertyId,
-              title: data?.propertyType || 'Property',
-              location: `${data?.city}, ${data?.state}`,
-              cost: data?.sellingPrice ? `₹${data.sellingPrice} Cr` : 'N/A',
-              rent: data?.totalMonthlyRent
-                ? `₹${data.totalMonthlyRent}`
+        const response = await request('GET', {
+          route: `/v1/properties/compare?propertyIds=${propertyIds}`,
+        });
+
+        const data = response?.data;
+        const comparisonList = data?.properties || [];
+
+        const propertyData = comparisonList.map((data: any) => {
+          return {
+            propertyId: data.propertyId,
+            title: data.basicInfo?.propertyType || 'Property',
+            location: `${data.location?.city}, ${data.location?.state}`,
+            cost: data.financial?.sellingPrice
+              ? `₹${data.financial.sellingPrice} Cr`
+              : 'N/A',
+            rent: data.rental?.totalMonthlyRent
+              ? `₹${data.rental.totalMonthlyRent}`
+              : 'N/A',
+            tenure: data.leaseDetails?.leaseDurationYears
+              ? `${data.leaseDetails.leaseDurationYears} Yrs`
+              : 'N/A',
+            roi: data.financial?.grossRentalYield
+              ? `${data.financial.grossRentalYield}%`
+              : 'N/A',
+            image:
+              data.media?.[0]?.fileUrl || 'https://via.placeholder.com/300',
+            clientType: data.leaseDetails?.tenantType || 'MNC Client',
+            carpetArea: data.basicInfo?.carpetArea
+              ? `${data.basicInfo.carpetArea} ${
+                  data.basicInfo.carpetAreaUnit === 'Sq. Feet'
+                    ? 'sq ft'
+                    : data.basicInfo.carpetAreaUnit || 'sq ft'
+                }`
+              : 'N/A',
+            floorPlate: 'N/A',
+            furnishing: data.infrastructure?.furnishingStatus || 'N/A',
+            powerBackup: data.infrastructure?.powerBackup || 'N/A',
+            parking: `${data.parking?.fourWheeler || 0} Car`,
+            buildingGrade: data.basicInfo?.buildingGrade || 'Grade A',
+            lockInPeriod:
+              data.leaseDetails?.lockInPeriod?.years &&
+              data.leaseDetails.lockInPeriod.years > 0
+                ? `${data.leaseDetails.lockInPeriod.years} Yrs`
                 : 'N/A',
-              tenure: data?.leaseDurationYears
-                ? `${data.leaseDurationYears} Yrs`
+            securityDeposit: data.rental?.securityDeposit?.amount
+              ? `₹${data.rental.securityDeposit.amount}`
+              : '₹0.00',
+            escalation:
+              data.escalationAndMaintenance?.annualEscalationPercent &&
+              data.escalationAndMaintenance.annualEscalationPercent !== 'N/A'
+                ? `${data.escalationAndMaintenance.annualEscalationPercent}%`
                 : 'N/A',
-              roi: data?.grossRentalYield ? `${data.grossRentalYield}%` : 'N/A',
-              image:
-                data?.media?.[0]?.fileUrl || 'https://via.placeholder.com/300',
-              clientType: data?.tenantType || 'MNC Client',
-              carpetArea: data?.carpetArea
-                ? `${data.carpetArea} ${
-                    data.carpetAreaUnit === 'Sq. Feet'
-                      ? 'sq ft'
-                      : data.carpetAreaUnit || 'sq ft'
-                  }`
-                : 'N/A',
-              floorPlate: data?.floorPlate ? `${data.floorPlate} sq ft` : 'N/A',
-              furnishing: data?.furnishingStatus || 'N/A',
-              powerBackup: data?.powerBackup || 'N/A',
-              parking: `${data?.parkingFourWheeler || 0} Car`,
-              buildingGrade: data?.buildingGrade || 'Grade A',
-              lockInPeriod:
-                data?.lockInPeriodYears && data.lockInPeriodYears > 0
-                  ? `${data.lockInPeriodYears} Yrs`
-                  : 'N/A',
-              securityDeposit: data?.securityDepositAmount
-                ? `₹${data.securityDepositAmount}`
-                : '₹0.00',
-              escalation:
-                data?.annualEscalationPercent &&
-                data.annualEscalationPercent !== 'N/A'
-                  ? `${data.annualEscalationPercent}%`
-                  : 'N/A',
-              maintenance: data?.maintenanceAmount
-                ? `₹${data.maintenanceAmount}`
-                : '₹0.00',
-              additionalIncome:
-                data?.additionalIncomeAnnual === '0.00'
-                  ? '₹0.00'
-                  : data?.additionalIncomeAnnual || 'Nil',
-              occupancyCertificate:
-                data?.occupancyCertificate?.toLowerCase().includes('yes') ||
-                !!data?.occupancyCertificate,
-            };
-          }),
-        );
+            maintenance: data.escalationAndMaintenance?.maintenanceAmount
+              ? `₹${data.escalationAndMaintenance.maintenanceAmount}`
+              : '₹0.00',
+            additionalIncome:
+              data.financial?.additionalIncomeAnnual === '0.00'
+                ? '₹0.00'
+                : data.financial?.additionalIncomeAnnual || 'Nil',
+            occupancyCertificate:
+              typeof data.legal?.occupancyCertificate === 'string'
+                ? data.legal.occupancyCertificate.toLowerCase().includes('yes')
+                : !!data.legal?.occupancyCertificate,
+          };
+        });
         setProperties(propertyData);
       } catch (error) {
         console.error('Error fetching properties:', error);
