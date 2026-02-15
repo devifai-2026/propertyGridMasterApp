@@ -90,9 +90,11 @@ const ListPropertyScreen = () => {
       apiFormData.append('numberOfLifts', finalData.numLifts || '0');
       apiFormData.append('hvacType', finalData.hvacType || '');
       apiFormData.append('furnishingStatus', finalData.furnishingStatus || '');
+      apiFormData.append('caretakerId', finalData.buildingMaintained || '');
+
       apiFormData.append(
-        'buildingMaintainedBy',
-        finalData.buildingMaintained || '',
+        'amenityIds',
+        JSON.stringify(finalData.amenityIds || []),
       );
 
       // Description

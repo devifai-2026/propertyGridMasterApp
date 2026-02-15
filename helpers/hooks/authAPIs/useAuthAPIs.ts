@@ -48,9 +48,31 @@ export const useAuthAPIs = () => {
     });
   };
 
+  const logout = (
+    refreshToken: string,
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.post({
+      route: '/v1/logout',
+      payload: {},
+      headers: {
+        Authorization: `Bearer ${refreshToken}`,
+      },
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   return {
     loading,
     login,
     signup,
+    logout,
   };
 };

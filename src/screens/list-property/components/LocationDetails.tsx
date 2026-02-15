@@ -90,15 +90,15 @@ const CITY_BY_STATE: any = {
 };
 
 const CONNECTIVITY_TYPES = [
-  { label: 'Airport', value: 'airport' },
-  { label: 'Railway Station', value: 'railway' },
-  { label: 'Metro Station', value: 'metro' },
-  { label: 'Highway', value: 'highway' },
-  { label: 'Bus Station', value: 'bus-station' },
-  { label: 'Hospital', value: 'hospital' },
-  { label: 'School', value: 'school' },
-  { label: 'Shopping Mall', value: 'shopping' },
-  { label: 'Office Park', value: 'office-park' },
+  { label: 'Airport', value: 'Airport' },
+  { label: 'Railway Station', value: 'Railway Station' },
+  { label: 'Metro Station', value: 'Metro Station' },
+  { label: 'Highway', value: 'Highway' },
+  { label: 'Bus Station', value: 'Bus Station' },
+  { label: 'Hospital', value: 'Hospital' },
+  { label: 'School', value: 'School' },
+  { label: 'Shopping Mall', value: 'Shopping Mall' },
+  { label: 'Office Park', value: 'Office Park' },
 ];
 
 interface LocationDetailsProps {

@@ -39,9 +39,43 @@ export const usePropertyAPIs = () => {
     });
   };
 
+  const getAmenities = (
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: '/v1/amenities',
+      onSuccess: data => {
+        if (onSuccess) onSuccess(decodeResponseData(data.data));
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
+  const getCaretakers = (
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: '/v1/caretakers',
+      onSuccess: data => {
+        if (onSuccess) onSuccess(decodeResponseData(data.data));
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   return {
     getProperties,
     createProperty,
+    getAmenities,
+    getCaretakers,
     loading,
   };
 };

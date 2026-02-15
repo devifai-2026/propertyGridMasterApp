@@ -28,12 +28,15 @@ interface AuthContextType {
   isLoading: boolean;
 }
 
+import { useAuthAPIs } from '../../helpers/hooks/authAPIs/useAuthAPIs';
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const { logout: logoutApi } = useAuthAPIs();
 
   useEffect(() => {
     const checkLogin = async () => {
@@ -73,11 +76,38 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
+      let refreshToken = user?.refreshToken;
+
+      if (!refreshToken) {
+        const userStr = await AsyncStorage.getItem('user');
+        if (userStr) {
+          const userData = JSON.parse(userStr);
+          refreshToken = userData.refreshToken;
+        }
+      }
+
+      if (refreshToken) {
+        await new Promise<void>(resolve => {
+          logoutApi(
+            refreshToken!,
+            () => resolve(),
+            err => {
+              console.error('Logout API failed', err);
+              resolve();
+            },
+          );
+        });
+      }
+
       await AsyncStorage.removeItem('user');
       setIsLoggedIn(false);
       setUser(null);
     } catch (e) {
       console.error('Error clearing auth state:', e);
+      // Ensure cleanup happens even if error
+      await AsyncStorage.removeItem('user');
+      setIsLoggedIn(false);
+      setUser(null);
     }
   };
 

@@ -13,6 +13,7 @@ export interface RequestConfig<T = any> {
   onSuccess?: ((data: any) => void) | null;
   onError?: ((error: any) => void) | null;
   afterCall?: (() => void) | null;
+  headers?: Record<string, string> | null;
 }
 
 export const request = async <T = any, R = any>(
@@ -27,17 +28,20 @@ export const request = async <T = any, R = any>(
     onSuccess = null,
     onError = null,
     afterCall = null,
+    headers: configHeaders = null,
   } = config;
 
   if (setLoading) setLoading(true);
 
   try {
-    const headers = await getHeaders();
+    const defaultHeaders = await getHeaders();
     const isExternal =
       route.startsWith('http://') || route.startsWith('https://');
 
     const normalizedRoute = route.startsWith('/') ? route : `/${route}`;
     const url = isExternal ? route : `${BASE_URL}${normalizedRoute}`;
+
+    const headers = { ...defaultHeaders, ...(configHeaders || {}) };
 
     const options: AxiosRequestConfig = {
       method,

@@ -17,6 +17,8 @@ import {
 import { Upload } from 'lucide-react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import CustomDropdown from './CustomDropdown';
+import CustomMultiSelect from './CustomMultiSelect';
+import { usePropertyAPIs } from '../../../../helpers/hooks/propertyAPIs/usePropertyApis';
 
 interface BasicDetailsProps {
   onNext: (data: any) => void;
@@ -28,6 +30,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
   ({ onNext, onFormValid, initialData }, ref) => {
     const { width } = useWindowDimensions();
     const isSmallScreen = width < 768;
+    const { getAmenities, getCaretakers } = usePropertyAPIs();
 
     useImperativeHandle(ref, () => ({
       submit: () => {
@@ -88,37 +91,33 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
       { label: 'Central AC', value: 'Central AC' },
       { label: 'Split AC', value: 'Split AC' },
       { label: 'VRF System', value: 'VRF System' },
-      { label: 'Chilled Water System', value: 'Chilled Water System' }, // Note: Not in model restrict list, might fail if model has validation. Model has: Central AC, Split AC, VRF System. It will fail for Chilled Water System.
-      { label: 'None', value: 'None' }, // Not in model list.
+      { label: 'Chilled Water System', value: 'Chilled Water System' },
+      { label: 'None', value: 'None' },
     ];
 
-    // Model only allows: ["Central AC", "Split AC", "VRF System"]
-    // I should probably restrict this list or update the model.
-    // Given the user instructions, I should fix the errors. "Invalid HVAC type" was NOT in the error list, likely because it was empty or valid?
-    // User sent request: ...
-    // Error list: propertyType, buildingGrade, ownershipType, powerBackup, furnishingStatus, titleStatus, occupancyCertificate, leaseRegistration, tenantType.
-    // HVAC was NOT in the error list.
-    // But if I change it to "Central AC" (matching model), it will be safe.
+    const [amenityOptions, setAmenityOptions] = useState<any[]>([]);
+    const [caretakerOptions, setCaretakerOptions] = useState<any[]>([]);
 
-    // As for buildingMaintenanceOptions, I'll leave them for now as they weren't in the error list.
-
-    const buildingMaintenanceOptions = [
-      { label: 'CBRE', value: '1' }, // Assuming IDs for now if strictly integer, but better to check if I can get the list.
-      // Actually, let's leave buildingMaintenanceOptions alone for now to avoid breaking if they are handled differently or just not validated yet.
-      { label: 'CBRE', value: 'cbre' },
-      { label: 'JLL (Jones Lang LaSalle)', value: 'jll' },
-      { label: 'Colliers International', value: 'colliers' },
-      { label: 'Cushman & Wakefield', value: 'cushman' },
-      { label: 'Knight Frank', value: 'knight_frank' },
-      { label: 'Savills', value: 'savills' },
-      { label: 'Godrej Properties', value: 'godrej' },
-      { label: 'Prestige Group', value: 'prestige' },
-      { label: 'DLF Limited', value: 'dlf' },
-      { label: 'Sobha Limited', value: 'sobha' },
-      { label: 'Brigade Group', value: 'brigade' },
-      { label: 'In-house Maintenance Team', value: 'inhouse' },
-      { label: 'Self-maintained by Owner', value: 'self_maintained' },
-    ];
+    useEffect(() => {
+      getAmenities(data => {
+        if (Array.isArray(data)) {
+          const options = data.map((a: any) => ({
+            label: a.amenityName,
+            value: a.amenityId,
+          }));
+          setAmenityOptions(options);
+        }
+      });
+      getCaretakers(data => {
+        if (Array.isArray(data)) {
+          const options = data.map((c: any) => ({
+            label: c.caretakerName,
+            value: String(c.caretakerId),
+          })); // Convert to string for Dropdown
+          setCaretakerOptions(options);
+        }
+      });
+    }, []);
 
     const [formData, setFormData] = useState({
       propertyType: initialData?.propertyType || '',
@@ -135,7 +134,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
       hvacType: initialData?.hvacType || '',
       furnishingStatus: initialData?.furnishingStatus || '',
       buildingMaintained: initialData?.buildingMaintained || '',
-      keyAmenities: initialData?.keyAmenities || ([] as string[]),
+      amenityIds: initialData?.amenityIds || ([] as (string | number)[]),
       propertyDescription: initialData?.propertyDescription || '',
     });
 
@@ -199,11 +198,12 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
       }
     };
 
-    const handleInputChange = (name: string, value: string) => {
+    const handleInputChange = (name: string, value: any) => {
       setFormData(prev => ({ ...prev, [name]: value }));
 
       if (touched[name]) {
-        const error = validateField(name, value);
+        // cast value to string for validation if needed, though most fields needing validation are strings
+        const error = validateField(name, String(value));
         setErrors((prev: any) => ({ ...prev, [name]: error }));
       }
     };
@@ -213,7 +213,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
       const valueToValidate =
         value !== undefined
           ? value
-          : (formData[name as keyof typeof formData] as string);
+          : String(formData[name as keyof typeof formData]);
       const error = validateField(name, valueToValidate);
       setErrors((prev: any) => ({ ...prev, [name]: error }));
     };
@@ -413,6 +413,17 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
         <Text style={styles.subHeader}>
           Building Amenities & Infrastructure
         </Text>
+        {/* Amenities Multi-Select */}
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Amenities</Text>
+          <CustomMultiSelect
+            placeholder="Select Amenities"
+            value={formData.amenityIds}
+            options={amenityOptions}
+            onChange={v => handleInputChange('amenityIds', v)}
+          />
+        </View>
+
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
             <Text style={styles.label}>Power Backup</Text>
@@ -450,7 +461,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
             <CustomDropdown
               placeholder="Select Building Maintenance"
               value={formData.buildingMaintained}
-              options={buildingMaintenanceOptions}
+              options={caretakerOptions}
               onChange={v => {
                 handleInputChange('buildingMaintained', v);
                 handleBlur('buildingMaintained', v);
