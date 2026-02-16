@@ -18,6 +18,7 @@ import {
   Bell,
   Fingerprint,
   Calendar,
+  Phone,
 } from 'lucide-react-native';
 import Layout from '../../layout/Layout';
 import { useAuth } from '../../context/AuthContext';
@@ -116,6 +117,12 @@ const ProfileScreen = () => {
                 Icon={Mail}
                 label="Email Address"
                 value={user?.email || 'N/A'}
+              />
+              <View style={styles.divider} />
+              <ProfileItem
+                Icon={Phone}
+                label="Phone Number"
+                value={user?.mobileNumber || 'N/A'}
               />
             </View>
           </View>
