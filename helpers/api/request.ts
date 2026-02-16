@@ -96,14 +96,19 @@ export const request = async <T = any, R = any>(
             console.log('Access token expired. Attempting refresh...');
 
             // Call refresh token API directly with axios to avoid recursion loops
-            const refreshResponse = await axios.get(
-              `${BASE_URL}/api/v1/auth/refresh-token`,
-              {
-                headers: {
-                  Authorization: `Bearer ${refreshToken}`,
-                },
+            // The backend endpoint is GET /api/v1/refresh-token
+            // BASE_URL already includes /api, but backend expects /api/v1/refresh-token
+            // We'll construct the path carefully.
+            const refreshUrl = `${BASE_URL.replace(
+              /\/api$/,
+              '',
+            )}/api/v1/refresh-token`;
+
+            const refreshResponse = await axios.get(refreshUrl, {
+              headers: {
+                Authorization: `Bearer ${refreshToken}`,
               },
-            );
+            });
 
             if (
               refreshResponse.data &&
@@ -113,7 +118,7 @@ export const request = async <T = any, R = any>(
               const { decodeResponseData } = require('./decoder');
               let refreshedData = refreshResponse.data.data;
 
-              // Decode if it's an encoded string (which it is pending backend implementation)
+              // Decode if it's an encoded string
               if (typeof refreshedData === 'string') {
                 refreshedData = decodeResponseData(refreshedData);
               }
@@ -122,10 +127,8 @@ export const request = async <T = any, R = any>(
               console.log('Token refreshed successfully.');
 
               // Update stored user with new access token
+              // The app expects 'token' field for the access token as seen in headers.ts
               const updatedUser = { ...user, token: accessToken };
-              // Also update 'token' field if it exists, or whatever field stores the JWT
-              // Based on headers.ts, it uses `user.token`.
-              // The user.js controller returns `accessToken` in data.
 
               await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
 
@@ -135,9 +138,12 @@ export const request = async <T = any, R = any>(
           }
         }
       } catch (refreshError: any) {
-        console.error('Token refresh failed:', refreshError);
-        // If refresh fails, we might want to log out the user or just let the original error propagate
-        // For now, fall through to default error handling
+        console.error(
+          'Token refresh failed:',
+          refreshError?.response?.data || refreshError.message,
+        );
+        // If refresh fails, we might want to log out the user
+        // await AsyncStorage.removeItem('user');
       }
     }
 

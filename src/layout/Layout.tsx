@@ -349,28 +349,41 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
             </TouchableOpacity>
           )}
 
-          <TouchableOpacity
-            style={[
-              styles.listPropertyBtn,
-              isMobile && {
-                borderWidth: 0,
-                paddingRight: 0,
-                paddingLeft: 0,
-                paddingVertical: 0,
-              },
-            ]}
-            onPress={() => navigate('/list-property')}
-          >
-            <View style={[styles.plusIconBg, isMobile && { marginRight: 0 }]}>
-              <Text style={styles.plusIcon}>+</Text>
-            </View>
-            {!isMobile && (
-              <Text style={styles.listPropertyText}>List Property</Text>
-            )}
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.menuBtn} onPress={onMenuPress}>
-            <Menu size={24} color={COLORS.primary} />
-          </TouchableOpacity>
+          {isLoggedIn ? (
+            <>
+              <TouchableOpacity
+                style={[
+                  styles.listPropertyBtn,
+                  isMobile && {
+                    borderWidth: 0,
+                    paddingRight: 0,
+                    paddingLeft: 0,
+                    paddingVertical: 0,
+                  },
+                ]}
+                onPress={() => navigate('/list-property')}
+              >
+                <View
+                  style={[styles.plusIconBg, isMobile && { marginRight: 0 }]}
+                >
+                  <Text style={styles.plusIcon}>+</Text>
+                </View>
+                {!isMobile && (
+                  <Text style={styles.listPropertyText}>List Property</Text>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.menuBtn} onPress={onMenuPress}>
+                <Menu size={24} color={COLORS.primary} />
+              </TouchableOpacity>
+            </>
+          ) : (
+            <TouchableOpacity
+              style={styles.signInBtn}
+              onPress={() => navigate('/login')}
+            >
+              <Text style={styles.signInText}>Sign In</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </View>

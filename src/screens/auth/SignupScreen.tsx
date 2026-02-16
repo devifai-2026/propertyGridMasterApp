@@ -31,10 +31,11 @@ const SignupScreen = () => {
   });
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
+  const [verificationId, setVerificationId] = useState('');
   const [focusedOtpIndex, setFocusedOtpIndex] = useState<number | null>(null);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const { login } = useAuth();
-  const { signup: register, loading: apiLoading } = useAuthAPIs();
+  const { signup: register, sendOtp, loading: apiLoading } = useAuthAPIs();
   const { navigate } = useNavigation();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
@@ -82,14 +83,30 @@ const SignupScreen = () => {
 
   const handleSendOtp = () => {
     if (isFormValid()) {
-      setOtpSent(true);
-      // Auto-focus first OTP input after a short delay
-      setTimeout(() => {
-        otpInputRefs.current[0]?.focus();
-      }, 100);
-      Alert.alert(
-        'OTP Sent',
-        'A 4-digit OTP has been sent to your mobile number (Use 1111 for demo)',
+      sendOtp(
+        { mobileNumber: formData.phone },
+        (response: any) => {
+          if (response.success) {
+            setVerificationId(response.data.verificationId);
+            setOtpSent(true);
+            // Auto-focus first OTP input after a short delay
+            setTimeout(() => {
+              otpInputRefs.current[0]?.focus();
+            }, 100);
+            Alert.alert(
+              'OTP Sent',
+              'A 6-digit OTP has been sent to your mobile number',
+            );
+          } else {
+            Alert.alert('Error', response.message || 'Failed to send OTP');
+          }
+        },
+        (error: any) => {
+          Alert.alert(
+            'Error',
+            error?.response?.data?.message || 'Failed to send OTP',
+          );
+        },
       );
     } else {
       Alert.alert('Error', 'Please fill in all required fields correctly');
@@ -105,7 +122,7 @@ const SignupScreen = () => {
     setOtp(newOtp.join(''));
 
     // Auto-focus next input if digit entered
-    if (digit && index < 3) {
+    if (digit && index < 5) {
       otpInputRefs.current[index + 1]?.focus();
     }
   };
@@ -118,7 +135,7 @@ const SignupScreen = () => {
   };
 
   const handleSignup = async () => {
-    if (otp.length === 4) {
+    if (otp.length === 6) {
       register(
         {
           mobileNumber: formData.phone,
@@ -129,6 +146,7 @@ const SignupScreen = () => {
             formData.userType.charAt(0).toUpperCase() +
             formData.userType.slice(1), // investor -> Investor
           otp,
+          verificationId,
         },
         async (response: any) => {
           if (response.success) {
@@ -153,7 +171,7 @@ const SignupScreen = () => {
         },
       );
     } else {
-      Alert.alert('Error', 'Please enter the complete 4-digit OTP');
+      Alert.alert('Error', 'Please enter the complete 6-digit OTP');
     }
   };
 
@@ -337,7 +355,7 @@ const SignupScreen = () => {
                     </View>
                     <Text style={styles.otpTitle}>Verify Your Number</Text>
                     <Text style={styles.otpHint}>
-                      We've sent a 4-digit code to{'\n'}
+                      We've sent a 6-digit code to{'\n'}
                       <Text style={styles.phoneHighlight}>
                         +91 {formData.phone}
                       </Text>
@@ -349,7 +367,7 @@ const SignupScreen = () => {
                         isSmallMobile && styles.otpInputGroupSmall,
                       ]}
                     >
-                      {[0, 1, 2, 3].map(index => (
+                      {[0, 1, 2, 3, 4, 5].map(index => (
                         <TextInput
                           key={index}
                           ref={ref => {
@@ -414,13 +432,13 @@ const SignupScreen = () => {
                   <TouchableOpacity
                     style={[
                       styles.btnFilled,
-                      (otpSent ? otp.length !== 4 : !isFormValid()) &&
+                      (otpSent ? otp.length !== 6 : !isFormValid()) &&
                         styles.btnDisabled,
                     ]}
                     onPress={otpSent ? handleSignup : handleSendOtp}
                     disabled={
                       apiLoading ||
-                      (otpSent ? otp.length !== 4 : !isFormValid())
+                      (otpSent ? otp.length !== 6 : !isFormValid())
                     }
                   >
                     <Text style={styles.btnFilledText}>
@@ -668,12 +686,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   otpInput: {
-    width: 48,
-    height: 48,
+    width: 42,
+    height: 42,
     backgroundColor: COLORS.background,
     borderRadius: 10,
     textAlign: 'center',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     borderWidth: 2,
     borderColor: COLORS.divider,
@@ -685,9 +703,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   otpInputSmall: {
-    width: 42,
-    height: 42,
-    fontSize: 18,
+    width: 36,
+    height: 36,
+    fontSize: 16,
   },
   otpInputFocused: {
     borderColor: COLORS.primary,

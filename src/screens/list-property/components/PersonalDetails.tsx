@@ -14,9 +14,11 @@ import {
   Switch,
   ScrollView,
   useWindowDimensions,
+  Alert,
 } from 'react-native';
 
 import { useAuth } from '../../../context/AuthContext';
+import { useAuthAPIs } from '../../../../helpers/hooks/authAPIs/useAuthAPIs';
 
 interface PersonalDetailsProps {
   onNext: (data: any) => void;
@@ -55,9 +57,13 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
     });
 
     const [otpSent, setOtpSent] = useState(false);
+    const [isOtpVerified, setIsOtpVerified] = useState(false);
+    const [verificationId, setVerificationId] = useState('');
     const [errors, setErrors] = useState<any>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [touched, setTouched] = useState<any>({});
+
+    const { sendOtp, verifyOtp, loading: apiLoading } = useAuthAPIs();
 
     // Refs for OTP inputs
     const otpInputRefs = useRef<Array<TextInput | null>>([]);
@@ -65,7 +71,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
     useEffect(() => {
       const isValid = !!validateFormSilently();
       onFormValid(isValid);
-    }, [formData, otpSent]);
+    }, [formData, otpSent, isOtpVerified]);
 
     const validateFormSilently = () => {
       const mobileNumber = formData.mobile.replace(/\D/g, '');
@@ -80,7 +86,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
         mobileNumber.length === 10 &&
         /^[6-9]\d{9}$/.test(mobileNumber) &&
         formData.listUnder !== '' &&
-        (!otpSent || (formData.otp && /^\d{4}$/.test(formData.otp))) &&
+        isOtpVerified &&
         formData.agreeTerms &&
         formData.agreePrivacy
       );
@@ -119,9 +125,9 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
           return '';
 
         case 'otp':
-          if (otpSent) {
+          if (otpSent && !isOtpVerified) {
             if (!value) return 'OTP is required';
-            if (!/^\d{4}$/.test(value)) return 'OTP must be 4 digits';
+            if (!/^\d{6}$/.test(value)) return 'OTP must be 6 digits';
           }
           return '';
 
@@ -172,17 +178,61 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
       const mobileError = validateField('mobile', formData.mobile);
 
       if (!mobileError && mobileNumber.length === 10) {
-        setOtpSent(true);
-        // Auto-focus first OTP input after a short delay
-        setTimeout(() => {
-          otpInputRefs.current[0]?.focus();
-        }, 100);
+        sendOtp(
+          { mobileNumber },
+          (response: any) => {
+            if (response.success) {
+              setVerificationId(response.data.verificationId);
+              setOtpSent(true);
+              // Auto-focus first OTP input after a short delay
+              setTimeout(() => {
+                otpInputRefs.current[0]?.focus();
+              }, 100);
+              Alert.alert(
+                'OTP Sent',
+                'A 6-digit OTP has been sent to your mobile number',
+              );
+            } else {
+              Alert.alert('Error', response.message || 'Failed to send OTP');
+            }
+          },
+          (error: any) => {
+            Alert.alert(
+              'Error',
+              error?.response?.data?.message || 'Failed to send OTP',
+            );
+          },
+        );
       } else {
         setErrors((prev: any) => ({
           ...prev,
           mobile:
             mobileError || 'Please enter a valid mobile number to send OTP',
         }));
+      }
+    };
+
+    const handleVerifyOtp = () => {
+      if (formData.otp.length === 6) {
+        verifyOtp(
+          { otp: formData.otp, verificationId },
+          (response: any) => {
+            if (response.success) {
+              setIsOtpVerified(true);
+              Alert.alert('Success', 'Mobile number verified successfully');
+            } else {
+              Alert.alert('Error', response.message || 'Verification failed');
+            }
+          },
+          (error: any) => {
+            Alert.alert(
+              'Error',
+              error?.response?.data?.message || 'Verification failed',
+            );
+          },
+        );
+      } else {
+        Alert.alert('Error', 'Please enter the complete 6-digit OTP');
       }
     };
 
@@ -195,8 +245,16 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
       handleChange('otp', newOtp.join(''));
 
       // Auto-focus next input if digit entered
-      if (digit && index < 3) {
+      if (digit && index < 5) {
         otpInputRefs.current[index + 1]?.focus();
+      }
+
+      // Auto-verify when 6th digit is entered
+      if (digit && index === 5) {
+        // We delay slightly to let the UI update
+        setTimeout(() => {
+          handleVerifyOtp();
+        }, 100);
       }
     };
 
@@ -220,7 +278,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
       setTouched(allTouched);
 
       if (validateFormSilently()) {
-        onNext(formData);
+        onNext({ ...formData, verificationId });
       }
     };
 
@@ -358,22 +416,32 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
               keyboardType="phone-pad"
               maxLength={11}
               onBlur={(e: any) => handleBlur('mobile', e.nativeEvent.text)}
+              editable={!isOtpVerified}
             />
             <TouchableOpacity
               style={[
                 styles.otpBtn,
                 isMobile && styles.otpBtnMobile,
-                (mobileNumberRaw.length !== 10 || otpSent) &&
+                (mobileNumberRaw.length !== 10 || (otpSent && isOtpVerified)) &&
                   styles.otpBtnDisabled,
               ]}
               onPress={handleSendOtp}
-              disabled={mobileNumberRaw.length !== 10 || otpSent}
+              disabled={
+                mobileNumberRaw.length !== 10 || (otpSent && isOtpVerified)
+              }
             >
               <Text
                 style={[styles.otpBtnText, isMobile && styles.otpBtnTextMobile]}
               >
-                {otpSent ? 'Resend OTP' : 'Send OTP'}
+                {isOtpVerified
+                  ? 'Verified'
+                  : otpSent
+                  ? 'Resend OTP'
+                  : 'Send OTP'}
               </Text>
+              {apiLoading && otpSent && !isOtpVerified && (
+                <View style={styles.loadingIndicator} />
+              )}
             </TouchableOpacity>
           </View>
           {touched.mobile && errors.mobile && (
@@ -390,7 +458,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
                 isMobile && styles.otpInputGroupMobile,
               ]}
             >
-              {[0, 1, 2, 3].map(index => (
+              {[0, 1, 2, 3, 4, 5].map(index => (
                 <TextInput
                   key={index}
                   ref={ref => {
@@ -408,10 +476,25 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
                   onKeyPress={e => handleOtpKeyPress(e, index)}
                   selectTextOnFocus
                   autoComplete="one-time-code"
+                  editable={!isOtpVerified}
                 />
               ))}
+              {!isOtpVerified && formData.otp.length === 6 && (
+                <TouchableOpacity
+                  style={styles.verifyBtn}
+                  onPress={handleVerifyOtp}
+                  disabled={apiLoading}
+                >
+                  <Text style={styles.verifyBtnText}>
+                    {apiLoading ? '...' : 'Verify'}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
-            {touched.otp && errors.otp && (
+            {isOtpVerified && (
+              <Text style={styles.verifiedText}>✓ Verified</Text>
+            )}
+            {touched.otp && errors.otp && !isOtpVerified && (
               <Text style={styles.errorText}>{errors.otp}</Text>
             )}
           </View>
@@ -593,8 +676,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   otpInput: {
-    width: 44,
-    height: 44,
+    width: 38,
+    height: 48,
     backgroundColor: '#F2F2F2',
     borderRadius: 8,
     textAlign: 'center',
@@ -604,9 +687,34 @@ const styles = StyleSheet.create({
     borderColor: '#CCC',
   },
   otpInputMobile: {
-    width: 50,
-    height: 50,
-    fontSize: 20,
+    width: 42,
+    height: 44,
+    fontSize: 18,
+  },
+  loadingIndicator: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#FFF',
+    marginLeft: 8,
+  },
+  verifiedText: {
+    color: '#4CAF50',
+    fontSize: 12,
+    fontWeight: '700',
+    marginTop: 4,
+  },
+  verifyBtn: {
+    backgroundColor: '#EE2529',
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    justifyContent: 'center',
+    height: 48,
+  },
+  verifyBtnText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: '700',
   },
   checkboxSection: {
     gap: 12,

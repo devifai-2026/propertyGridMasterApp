@@ -25,8 +25,9 @@ const LoginScreen = () => {
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
+  const [verificationId, setVerificationId] = useState('');
   const { login } = useAuth();
-  const { login: authenticate, loading: apiLoading } = useAuthAPIs();
+  const { login: authenticate, sendOtp, loading: apiLoading } = useAuthAPIs();
   const { navigate } = useNavigation();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
@@ -58,14 +59,30 @@ const LoginScreen = () => {
 
   const handleSendOtp = () => {
     if (phone.length === 10) {
-      setOtpSent(true);
-      // Auto-focus first OTP input after a short delay
-      setTimeout(() => {
-        otpInputRefs.current[0]?.focus();
-      }, 100);
-      Alert.alert(
-        'OTP Sent',
-        'A 4-digit OTP has been sent to your mobile number (Use 1111 for demo)',
+      sendOtp(
+        { mobileNumber: phone },
+        (response: any) => {
+          if (response.success) {
+            setVerificationId(response.data.verificationId);
+            setOtpSent(true);
+            // Auto-focus first OTP input after a short delay
+            setTimeout(() => {
+              otpInputRefs.current[0]?.focus();
+            }, 100);
+            Alert.alert(
+              'OTP Sent',
+              'A 6-digit OTP has been sent to your mobile number',
+            );
+          } else {
+            Alert.alert('Error', response.message || 'Failed to send OTP');
+          }
+        },
+        (error: any) => {
+          Alert.alert(
+            'Error',
+            error?.response?.data?.message || 'Failed to send OTP',
+          );
+        },
       );
     } else {
       Alert.alert('Error', 'Please enter a valid 10-digit number');
@@ -81,7 +98,7 @@ const LoginScreen = () => {
     setOtp(newOtp.join(''));
 
     // Auto-focus next input if digit entered
-    if (digit && index < 3) {
+    if (digit && index < 5) {
       otpInputRefs.current[index + 1]?.focus();
     }
   };
@@ -94,9 +111,9 @@ const LoginScreen = () => {
   };
 
   const handleVerifyOtp = async () => {
-    if (otp.length === 4) {
+    if (otp.length === 6) {
       authenticate(
-        { mobileNumber: phone, otp },
+        { mobileNumber: phone, otp, verificationId },
         async (response: any) => {
           if (response.success) {
             if (!allowedRoles.includes(response.data.role)) {
@@ -122,7 +139,7 @@ const LoginScreen = () => {
         },
       );
     } else {
-      Alert.alert('Error', 'Please enter the complete 4-digit OTP');
+      Alert.alert('Error', 'Please enter the complete 6-digit OTP');
     }
   };
 
@@ -172,7 +189,7 @@ const LoginScreen = () => {
                   <View style={styles.inputGroup}>
                     <Text style={styles.inputLabel}>Enter OTP *</Text>
                     <View style={styles.otpInputGroup}>
-                      {[0, 1, 2, 3].map(index => (
+                      {[0, 1, 2, 3, 4, 5].map(index => (
                         <TextInput
                           key={index}
                           ref={ref => {
@@ -225,13 +242,13 @@ const LoginScreen = () => {
                   <TouchableOpacity
                     style={[
                       styles.btnFilled,
-                      (otpSent ? otp.length !== 4 : phone.length !== 10) &&
+                      (otpSent ? otp.length !== 6 : phone.length !== 10) &&
                         styles.btnDisabled,
                     ]}
                     onPress={otpSent ? handleVerifyOtp : handleSendOtp}
                     disabled={
                       apiLoading ||
-                      (otpSent ? otp.length !== 4 : phone.length !== 10)
+                      (otpSent ? otp.length !== 6 : phone.length !== 10)
                     }
                   >
                     <Text style={styles.btnFilledText}>
@@ -437,12 +454,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   otpInput: {
-    width: 50,
-    height: 50,
+    width: 44,
+    height: 44,
     backgroundColor: COLORS.background,
     borderRadius: 8,
     textAlign: 'center',
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '700',
     borderWidth: 2,
     borderColor: COLORS.divider,
