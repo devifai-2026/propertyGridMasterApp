@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ViewStyle,
   DimensionValue,
+  Platform,
 } from 'react-native';
 import {
   MapPin,
@@ -65,6 +66,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
   const hasImages = item.images && item.images.length > 0;
   const imageCount = hasImages ? item.images!.length : 0;
+  const hasBadges = item.badges && item.badges.length > 0;
+  const showBlurOverlay = hasBadges || (isCompare && !!onToggleCompare);
 
   // Auto-slideshow effect
   useEffect(() => {
@@ -125,7 +128,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 >
                   <ChevronRight size={16} color="white" />
                 </TouchableOpacity>
-                <View style={styles.dotsContainer}>
+                <View
+                  style={[
+                    styles.dotsContainer,
+                    showBlurOverlay && { bottom: 60 },
+                  ]}
+                >
                   {item.images!.map((_, idx) => (
                     <View
                       key={idx}
@@ -162,42 +170,55 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           </TouchableOpacity>
         )}
 
-        {/* Badges (e.g., MNC Client) */}
-        <View style={styles.badgeContainer}>
-          {item.badges?.map((badge, idx) => (
-            <View key={idx} style={styles.mncBadge}>
-              <Text style={styles.mncBadgeText}>{badge}</Text>
+        {/* Bottom Blur Overlay Container */}
+        {showBlurOverlay && (
+          <View style={styles.blurContainer}>
+            {/* Badges (e.g., MNC Client) */}
+            <View style={styles.badgeWrapper}>
+              {item.badges?.map((badge, idx) => (
+                <View key={idx} style={styles.mncBadge}>
+                  <Text style={styles.mncBadgeText}>{badge}</Text>
+                </View>
+              ))}
             </View>
-          ))}
-        </View>
 
-        {/* Compare Button - ONLY if isCompare is true */}
-        {isCompare && onToggleCompare && (
-          <TouchableOpacity
-            style={[
-              styles.compareBtn,
-              isSelected && { backgroundColor: COLORS.primary },
-            ]}
-            onPress={() => onToggleCompare(item)}
-          >
-            {isSelected ? (
-              <View
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
+            {/* Compare Button - ONLY if isCompare is true */}
+            {isCompare && onToggleCompare && (
+              <TouchableOpacity
+                style={[
+                  styles.compareBtnInternal,
+                  isSelected && { backgroundColor: COLORS.primary },
+                ]}
+                onPress={() => onToggleCompare(item)}
               >
-                <Check size={14} color={COLORS.white} />
-                <Text style={[styles.compareText, { color: COLORS.white }]}>
-                  Selected
-                </Text>
-              </View>
-            ) : (
-              <View
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}
-              >
-                <Plus size={14} color={COLORS.primary} />
-                <Text style={styles.compareText}>Compare</Text>
-              </View>
+                {isSelected ? (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 4,
+                    }}
+                  >
+                    <Check size={14} color={COLORS.white} />
+                    <Text style={[styles.compareText, { color: COLORS.white }]}>
+                      Selected
+                    </Text>
+                  </View>
+                ) : (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 4,
+                    }}
+                  >
+                    <Plus size={14} color={COLORS.primary} />
+                    <Text style={styles.compareText}>Compare</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
             )}
-          </TouchableOpacity>
+          </View>
         )}
       </View>
 
@@ -332,41 +353,55 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 2,
   },
-  badgeContainer: {
+  blurContainer: {
     position: 'absolute',
-    bottom: 50,
-    left: 15,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    ...Platform.select({
+      web: {
+        backdropFilter: 'blur(2px)',
+        backgroundColor: 'rgba(255, 255, 255, 0.4)',
+      },
+    }),
+  } as ViewStyle,
+  badgeWrapper: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 5,
+    flex: 1,
   },
   mncBadge: {
     backgroundColor: '#FFF8E1',
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: 8,
   },
   mncBadgeText: {
     color: COLORS.textSecondary,
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '600',
   },
-  compareBtn: {
-    position: 'absolute',
-    bottom: 15,
-    right: 15,
+  compareBtnInternal: {
     backgroundColor: COLORS.white,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     elevation: 2,
+    marginLeft: 8,
   },
   compareText: {
     color: COLORS.primary,
     fontWeight: '700',
-    fontSize: 13,
+    fontSize: 12,
   },
   propContent: {
     padding: 15, // Reduced padding

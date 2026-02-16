@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
-import { X, AlertCircle } from 'lucide-react-native';
+import { X, AlertCircle, Image as LucideImage } from 'lucide-react-native';
 import { COLORS } from '../../../constants/theme';
 import { Property } from '../../../components/PropertyCard';
 
@@ -53,10 +53,21 @@ const CompareBanner: React.FC<CompareBannerProps> = ({
           <View style={styles.selectedList}>
             {selectedProperties.map(prop => (
               <View key={prop.id} style={styles.selectedItem}>
-                <Image
-                  source={{ uri: prop.images?.[0] }}
-                  style={styles.selectedThumb}
-                />
+                {prop.images && prop.images.length > 0 ? (
+                  <Image
+                    source={{ uri: prop.images[0] }}
+                    style={styles.selectedThumb}
+                  />
+                ) : (
+                  <View
+                    style={[
+                      styles.selectedThumb,
+                      { alignItems: 'center', justifyContent: 'center' },
+                    ]}
+                  >
+                    <LucideImage size={20} color={COLORS.textSecondary} />
+                  </View>
+                )}
                 <View style={styles.selectedInfo}>
                   <Text numberOfLines={1} style={styles.selectedTitle}>
                     {prop.title}
