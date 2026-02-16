@@ -62,9 +62,10 @@ const ExplorePropertiesScreen = () => {
         tenure: `${item.tenureLeftYears || 0} Yrs`,
         roi: item.netRentalYield ? `${item.netRentalYield}%` : 'N/A',
         type: item.propertyType,
-        image:
-          item.media?.[0]?.fileUrl ||
-          'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&h=400&fit=crop',
+        images:
+          item.media && item.media.length > 0
+            ? item.media.map((m: any) => m.fileUrl)
+            : null,
         badges: [item.tenantType, item.buildingGrade].filter(Boolean),
         verified: item.isActive,
         raw: item,

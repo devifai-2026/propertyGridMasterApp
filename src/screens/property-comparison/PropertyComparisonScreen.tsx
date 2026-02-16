@@ -35,7 +35,7 @@ interface ComparisonProperty {
   rent: string;
   tenure: string;
   roi: string;
-  image: string;
+  images: string[] | null;
   clientType: string;
   carpetArea: string;
   floorPlate: string;
@@ -85,8 +85,10 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
             roi: data.financial?.grossRentalYield
               ? `${data.financial.grossRentalYield}%`
               : 'N/A',
-            image:
-              data.media?.[0]?.fileUrl || 'https://via.placeholder.com/300',
+            images:
+              data.media && data.media.length > 0
+                ? data.media.map((m: any) => m.fileUrl)
+                : null,
             clientType: data.leaseDetails?.tenantType || 'MNC Client',
             carpetArea: data.basicInfo?.carpetArea
               ? `${data.basicInfo.carpetArea} ${
@@ -263,7 +265,7 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
                 tenure: prop.tenure,
                 roi: prop.roi,
                 type: prop.title,
-                image: prop.image,
+                images: prop.images,
                 badges: [prop.clientType],
                 verified: true,
               }}

@@ -3,37 +3,56 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
-  Image,
   Dimensions,
+  TouchableOpacity,
 } from 'react-native';
-import { ChevronDown, Heart, Share2 } from 'lucide-react-native';
-
-interface WishlistProperty {
-  id: string;
-  title: string;
-  location: string;
-  image: any;
-}
+import { ChevronDown } from 'lucide-react-native';
+import PropertyCard, { Property } from '../../../components/PropertyCard';
 
 const WishlistTab = () => {
   const [timeFilter, setTimeFilter] = useState('Last 30 Days');
-  const [sortBy, setSortBy] = useState('Date');
 
-  const properties: WishlistProperty[] = [
+  // Dummy data matching Property interface
+  const properties: Property[] = [
     {
       id: '1',
       title: 'Commercial Space',
       location: 'Mumbai, Mundhva',
-      image: require('../../../assets/FeaturedProperties/cardImg.png'),
+      price: '₹ 2.5 Cr',
+      rent: '₹ 2.5 L',
+      tenure: '5 Years',
+      roi: '8.5%',
+      type: 'Commercial',
+      images: [
+        'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
+        'https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=800&q=80',
+      ],
+      verified: true,
+      badges: ['MNC Client'],
     },
     {
       id: '2',
-      title: 'Commercial Space',
-      location: 'Mumbai, Mundhva',
-      image: require('../../../assets/FeaturedProperties/cardImg.png'),
+      title: 'Office Complex',
+      location: 'Pune, Kharadi',
+      price: '₹ 4.2 Cr',
+      rent: '₹ 3.8 L',
+      tenure: '9 Years',
+      roi: '9.2%',
+      type: 'Commercial',
+      images: [
+        'https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=800&q=80',
+      ],
+      verified: true,
+      badges: ['IT Park'],
     },
   ];
+
+  const handleRemove = (id: string) => {
+    console.log('Remove from wishlist:', id);
+    // Add logic to remove from wishlist
+  };
 
   return (
     <View style={styles.container}>
@@ -60,33 +79,11 @@ const WishlistTab = () => {
 
       <View style={styles.propertiesGrid}>
         {properties.map(property => (
-          <View key={property.id} style={styles.propertyCard}>
-            <View style={styles.imageContainer}>
-              <Image
-                source={property.image}
-                style={styles.propertyImage}
-                resizeMode="cover"
-              />
-              <TouchableOpacity style={styles.shareButton}>
-                <Share2 size={18} color="#333" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.heartButton}>
-                <Heart size={20} color="#EE2529" fill="#EE2529" />
-              </TouchableOpacity>
-
-              {/* Carousel dots */}
-              <View style={styles.carouselDots}>
-                <View style={[styles.dot, styles.activeDot]} />
-                <View style={styles.dot} />
-                <View style={styles.dot} />
-              </View>
-            </View>
-
-            <View style={styles.propertyInfo}>
-              <Text style={styles.propertyTitle}>{property.title}</Text>
-              <Text style={styles.propertyLocation}>{property.location}</Text>
-            </View>
-          </View>
+          <PropertyCard
+            key={property.id}
+            item={property}
+            width={isDesktop ? '48%' : '100%'}
+          />
         ))}
       </View>
     </View>
@@ -143,79 +140,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 20,
-  },
-  propertyCard: {
-    width: isDesktop ? '48%' : '100%',
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  imageContainer: {
-    position: 'relative',
-    height: 250,
-  },
-  propertyImage: {
-    width: '100%',
-    height: '100%',
-  },
-  shareButton: {
-    position: 'absolute',
-    top: 15,
-    right: 55,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  heartButton: {
-    position: 'absolute',
-    top: 15,
-    right: 15,
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  carouselDots: {
-    position: 'absolute',
-    bottom: 15,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 6,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-  },
-  activeDot: {
-    backgroundColor: '#fff',
-  },
-  propertyInfo: {
-    padding: 15,
-  },
-  propertyTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 5,
-  },
-  propertyLocation: {
-    fontSize: 14,
-    color: '#666',
   },
 });
 

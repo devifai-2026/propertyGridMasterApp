@@ -73,9 +73,10 @@ const PropertyDetailsScreen = () => {
           tenure: `${data.tenureLeftYears || 0} Yrs`,
           roi: data.netRentalYield ? `${data.netRentalYield}%` : 'N/A',
           type: data.propertyType,
-          image:
-            data.media?.[0]?.fileUrl ||
-            'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&h=400&fit=crop',
+          images:
+            data.media && data.media.length > 0
+              ? data.media.map((m: any) => m.fileUrl)
+              : null,
           badges: [data.tenantType, data.buildingGrade].filter(Boolean),
           verified: data.isActive,
           raw: data,

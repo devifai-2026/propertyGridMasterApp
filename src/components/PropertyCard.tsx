@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,15 @@ import {
   ViewStyle,
   DimensionValue,
 } from 'react-native';
-import { MapPin, Check, Plus, XCircle } from 'lucide-react-native';
+import {
+  MapPin,
+  Check,
+  Plus,
+  XCircle,
+  Image as LucideImage,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react-native';
 import { COLORS } from '../constants/theme';
 import { useNavigation } from '../context/NavigationContext';
 
@@ -21,7 +29,7 @@ export interface Property {
   tenure: string; // "Tenure Left"
   roi: string;
   type: string;
-  image: string;
+  images: string[] | null; // Changed from image: string
   badges?: string[];
   verified: boolean;
   raw?: any;
@@ -53,6 +61,29 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   style,
 }) => {
   const { navigate } = useNavigation();
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const hasImages = item.images && item.images.length > 0;
+  const imageCount = hasImages ? item.images!.length : 0;
+
+  // Auto-slideshow effect
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (imageCount > 1) {
+      interval = setInterval(() => {
+        setCurrentImageIndex(prev => (prev + 1) % imageCount);
+      }, 3000); // Change image every 3 seconds
+    }
+    return () => clearInterval(interval);
+  }, [imageCount]);
+
+  const handlePrevImage = () => {
+    setCurrentImageIndex(prev => (prev - 1 + imageCount) % imageCount);
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex(prev => (prev + 1) % imageCount);
+  };
 
   const handleView = () => {
     navigate(`/propertyDetails/${item.id}`);
@@ -67,7 +98,48 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   return (
     <View style={[styles.propertyCard, { width }, style]}>
       <View style={styles.propImageContainer}>
-        <Image source={{ uri: item.image }} style={styles.propImage} />
+        {!hasImages ? (
+          <View style={[styles.propImage, styles.noImageContainer]}>
+            <LucideImage size={48} color={COLORS.textSecondary} />
+            <Text style={styles.noImageText}>No Image Available</Text>
+          </View>
+        ) : (
+          <>
+            <Image
+              source={{ uri: item.images![currentImageIndex] }}
+              style={styles.propImage}
+              resizeMode="cover"
+            />
+            {/* Slideshow Controls (only if > 1 image) */}
+            {imageCount > 1 && (
+              <>
+                <TouchableOpacity
+                  style={[styles.arrowBtn, styles.arrowLeft]}
+                  onPress={handlePrevImage}
+                >
+                  <ChevronLeft size={16} color="white" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.arrowBtn, styles.arrowRight]}
+                  onPress={handleNextImage}
+                >
+                  <ChevronRight size={16} color="white" />
+                </TouchableOpacity>
+                <View style={styles.dotsContainer}>
+                  {item.images!.map((_, idx) => (
+                    <View
+                      key={idx}
+                      style={[
+                        styles.dot,
+                        idx === currentImageIndex && styles.activeDot,
+                      ]}
+                    />
+                  ))}
+                </View>
+              </>
+            )}
+          </>
+        )}
 
         {/* Verified Badge */}
         {item.verified && (
@@ -183,13 +255,57 @@ const styles = StyleSheet.create({
     borderColor: COLORS.divider,
   },
   propImageContainer: {
-    height: 180, // Reduced slightly to fit comparison better
+    height: 250,
     width: '100%',
     position: 'relative',
+    backgroundColor: '#f0f0f0',
   },
   propImage: {
     width: '100%',
     height: '100%',
+  },
+  noImageContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#e0e0e0',
+  },
+  noImageText: {
+    marginTop: 8,
+    fontSize: 12,
+    color: COLORS.textSecondary,
+  },
+  arrowBtn: {
+    position: 'absolute',
+    top: '40%',
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    borderRadius: 15,
+    padding: 4,
+    zIndex: 10,
+  },
+  arrowLeft: {
+    left: 10,
+  },
+  arrowRight: {
+    right: 10,
+  },
+  dotsContainer: {
+    position: 'absolute',
+    bottom: 10,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 4,
+    zIndex: 10,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.5)',
+  },
+  activeDot: {
+    backgroundColor: COLORS.primary,
+    width: 16,
   },
   verifiedBadge: {
     position: 'absolute',

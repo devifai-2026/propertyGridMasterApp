@@ -21,8 +21,9 @@ const FEATURED_PROPERTIES: Property[] = [
     tenure: '10 Yrs',
     roi: '90.21%',
     type: 'Residential',
-    image:
+    images: [
       'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=1000',
+    ],
     badges: ['MNC Client'],
     verified: true,
   },
@@ -35,8 +36,9 @@ const FEATURED_PROPERTIES: Property[] = [
     tenure: '8 Yrs',
     roi: '90.21%',
     type: 'Commercial',
-    image:
+    images: [
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1000',
+    ],
     badges: ['MNC Client'],
     verified: true,
   },
@@ -49,8 +51,9 @@ const FEATURED_PROPERTIES: Property[] = [
     tenure: '12 Yrs',
     roi: '90.21%',
     type: 'Industrial',
-    image:
+    images: [
       'https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&q=80&w=1000',
+    ],
     badges: ['MNC Client'],
     verified: true,
   },
@@ -90,10 +93,10 @@ const FeaturedSection = ({ properties }: { properties: any[] }) => {
             : 'N/A',
           roi: p.grossRentalYield ? `${p.grossRentalYield}%` : 'N/A',
           type: p.propertyType,
-          image:
+          images:
             p.media && p.media.length > 0
-              ? p.media[0].fileUrl
-              : 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1000',
+              ? p.media.map((m: any) => m.fileUrl)
+              : null,
           badges: p.tenantType ? [p.tenantType] : [],
           verified: true,
         }))

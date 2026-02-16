@@ -54,7 +54,7 @@ const CompareBanner: React.FC<CompareBannerProps> = ({
             {selectedProperties.map(prop => (
               <View key={prop.id} style={styles.selectedItem}>
                 <Image
-                  source={{ uri: prop.image }}
+                  source={{ uri: prop.images?.[0] }}
                   style={styles.selectedThumb}
                 />
                 <View style={styles.selectedInfo}>
