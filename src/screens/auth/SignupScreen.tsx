@@ -205,7 +205,7 @@ const SignupScreen = () => {
                               styles.textInputFocused,
                           ]}
                           placeholder="John"
-                          placeholderTextColor="#9CA3AF"
+                          placeholderTextColor={COLORS.textSecondary}
                           value={formData.firstName}
                           onChangeText={text => handleChange('firstName', text)}
                           onFocus={() => setFocusedField('firstName')}
@@ -227,7 +227,7 @@ const SignupScreen = () => {
                               styles.textInputFocused,
                           ]}
                           placeholder="Doe"
-                          placeholderTextColor="#9CA3AF"
+                          placeholderTextColor={COLORS.textSecondary}
                           value={formData.lastName}
                           onChangeText={text => handleChange('lastName', text)}
                           onFocus={() => setFocusedField('lastName')}
@@ -245,7 +245,7 @@ const SignupScreen = () => {
                           focusedField === 'email' && styles.textInputFocused,
                         ]}
                         placeholder="john.doe@example.com"
-                        placeholderTextColor="#9CA3AF"
+                        placeholderTextColor={COLORS.textSecondary}
                         keyboardType="email-address"
                         autoCapitalize="none"
                         value={formData.email}
@@ -264,7 +264,7 @@ const SignupScreen = () => {
                           focusedField === 'phone' && styles.textInputFocused,
                         ]}
                         placeholder="9876543210"
-                        placeholderTextColor="#9CA3AF"
+                        placeholderTextColor={COLORS.textSecondary}
                         keyboardType="numeric"
                         maxLength={10}
                         value={formData.phone}
@@ -307,7 +307,7 @@ const SignupScreen = () => {
                               color={
                                 formData.userType === type.id
                                   ? COLORS.primary
-                                  : '#6B7280'
+                                  : COLORS.textSecondary
                               }
                               strokeWidth={2.5}
                             />
@@ -540,13 +540,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#1A1A2E',
+    color: COLORS.textDark,
     marginBottom: 6,
     letterSpacing: -0.3,
   },
   subtitle: {
     fontSize: 13,
-    color: '#6B7280',
+    color: COLORS.textSecondary,
     textAlign: 'center',
     lineHeight: 18,
   },
@@ -567,19 +567,19 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 13,
     fontWeight: '700',
-    color: '#374151',
+    color: COLORS.textDark,
     marginBottom: 8,
     letterSpacing: 0.1,
   },
   textInput: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: COLORS.background,
     borderWidth: 2,
-    borderColor: '#E5E7EB',
+    borderColor: COLORS.divider,
     borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 15,
-    color: '#1F2937',
+    color: COLORS.textDark,
     fontWeight: '500',
   },
   textInputFocused: {
@@ -595,9 +595,9 @@ const styles = StyleSheet.create({
   },
   userTypeCard: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: COLORS.background,
     borderWidth: 2,
-    borderColor: '#E5E7EB',
+    borderColor: COLORS.divider,
     borderRadius: 10,
     paddingVertical: 14,
     paddingHorizontal: 8,
@@ -615,12 +615,12 @@ const styles = StyleSheet.create({
   },
   userTypeCardActive: {
     borderColor: COLORS.primary,
-    backgroundColor: '#FEF2F2',
+    backgroundColor: COLORS.lightRed,
   },
   userTypeLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#6B7280',
+    color: COLORS.textSecondary,
     marginTop: 6,
   },
   userTypeLabelActive: {
@@ -635,7 +635,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#FEF2F2',
+    backgroundColor: COLORS.lightRed,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
@@ -643,12 +643,12 @@ const styles = StyleSheet.create({
   otpTitle: {
     fontSize: 20,
     fontWeight: '800',
-    color: '#1A1A2E',
+    color: COLORS.textDark,
     marginBottom: 6,
   },
   otpHint: {
     fontSize: 13,
-    color: '#6B7280',
+    color: COLORS.textSecondary,
     textAlign: 'center',
     marginBottom: 20,
     lineHeight: 18,
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
   },
   phoneHighlight: {
     fontWeight: '700',
-    color: '#1F2937',
+    color: COLORS.textDark,
   },
   otpInputGroup: {
     flexDirection: 'row',
@@ -670,14 +670,14 @@ const styles = StyleSheet.create({
   otpInput: {
     width: 48,
     height: 48,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: COLORS.background,
     borderRadius: 10,
     textAlign: 'center',
     fontSize: 20,
     fontWeight: '700',
     borderWidth: 2,
-    borderColor: '#E5E7EB',
-    color: '#1F2937',
+    borderColor: COLORS.divider,
+    color: COLORS.textDark,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -697,7 +697,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   otpInputFilled: {
-    borderColor: '#10B981',
+    borderColor: COLORS.success,
     backgroundColor: '#ECFDF5',
   },
   resendBtn: {
@@ -718,7 +718,7 @@ const styles = StyleSheet.create({
   },
   changeNumberText: {
     fontSize: 12,
-    color: '#6B7280',
+    color: COLORS.textSecondary,
     fontWeight: '600',
     textDecorationLine: 'underline',
   },
@@ -732,14 +732,14 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#E5E7EB',
+    borderColor: COLORS.divider,
     alignItems: 'center',
     backgroundColor: COLORS.white,
   },
   btnOutlineText: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#6B7280',
+    color: COLORS.textSecondary,
   },
   btnFilled: {
     flex: 1,
@@ -760,13 +760,13 @@ const styles = StyleSheet.create({
     letterSpacing: 0.2,
   },
   btnDisabled: {
-    backgroundColor: '#D1D5DB',
+    backgroundColor: COLORS.divider,
     shadowOpacity: 0,
     elevation: 0,
   },
   termsText: {
     fontSize: 11,
-    color: '#9CA3AF',
+    color: COLORS.textSecondary,
     textAlign: 'center',
     marginTop: 18,
     lineHeight: 16,

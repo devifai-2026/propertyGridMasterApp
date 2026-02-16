@@ -65,10 +65,16 @@ const Footer = () => {
           {/* Resources */}
           <View style={styles.linksColumn}>
             <Text style={styles.columnTitle}>Resources</Text>
-            <TouchableOpacity style={styles.linkItem}>
+            <TouchableOpacity
+              onPress={() => handleNavigate('/blogs')}
+              style={styles.linkItem}
+            >
               <Text style={styles.linkText}>Blogs</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.linkItem}>
+            <TouchableOpacity
+              onPress={() => handleNavigate('/how-it-works')}
+              style={styles.linkItem}
+            >
               <Text style={styles.linkText}>How it Works</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -82,10 +88,16 @@ const Footer = () => {
           {/* Legal */}
           <View style={styles.linksColumn}>
             <Text style={styles.columnTitle}>Legal</Text>
-            <TouchableOpacity style={styles.linkItem}>
+            <TouchableOpacity
+              onPress={() => handleNavigate('/privacy-policy')}
+              style={styles.linkItem}
+            >
               <Text style={styles.linkText}>Privacy Policy</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.linkItem}>
+            <TouchableOpacity
+              onPress={() => handleNavigate('/terms-of-service')}
+              style={styles.linkItem}
+            >
               <Text style={styles.linkText}>Terms of Service</Text>
             </TouchableOpacity>
           </View>

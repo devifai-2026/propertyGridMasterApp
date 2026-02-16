@@ -21,6 +21,9 @@ import NotificationsScreen from './src/screens/notifications/NotificationsScreen
 import PropertyComparisonScreen from './src/screens/property-comparison/PropertyComparisonScreen';
 import PropertyDetailsScreen from './src/screens/properties/PropertyDetailsScreen';
 import EnquiriesScreen from './src/screens/enquiries/EnquiriesScreen';
+import BlogsScreen from './src/screens/blogs/BlogsScreen';
+import PrivacyPolicyScreen from './src/screens/legal/PrivacyPolicyScreen';
+import TermsOfServiceScreen from './src/screens/legal/TermsOfServiceScreen';
 
 const AppContent = () => {
   const { currentPath } = useNavigation();
@@ -65,6 +68,12 @@ const AppContent = () => {
       case currentPath === '/enquiry':
       case currentPath.startsWith('/enquiry/'):
         return <EnquiriesScreen />;
+      case currentPath === '/blogs':
+        return <BlogsScreen />;
+      case currentPath === '/privacy-policy':
+        return <PrivacyPolicyScreen />;
+      case currentPath === '/terms-of-service':
+        return <TermsOfServiceScreen />;
       default:
         // Default redirection to /dashboard
         return <Dashboard />;

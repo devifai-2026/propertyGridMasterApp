@@ -19,6 +19,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
 import { COLORS } from '../../constants/theme';
+import { allowedRoles } from '../../../helpers/allowedRoles';
 
 const LoginScreen = () => {
   const [phone, setPhone] = useState('');
@@ -98,6 +99,13 @@ const LoginScreen = () => {
         { mobileNumber: phone, otp },
         async (response: any) => {
           if (response.success) {
+            if (!allowedRoles.includes(response.data.role)) {
+              Alert.alert(
+                'Access Denied',
+                'Only Owners, Brokers, and Investors can access this platform.',
+              );
+              return;
+            }
             const success = await login(response.data);
             if (success) {
               navigate('/dashboard');
@@ -201,9 +209,9 @@ const LoginScreen = () => {
                     <Text style={styles.dummyTitle}>
                       Dummy Login Credentials:
                     </Text>
-                    <Text style={styles.dummyText}>• Investor: 9999999991</Text>
-                    <Text style={styles.dummyText}>• Broker: 9999999992</Text>
-                    <Text style={styles.dummyText}>• Owner: 9999999993</Text>
+                    <Text style={styles.dummyText}>• Investor: 7550969935</Text>
+                    <Text style={styles.dummyText}>• Broker: 7550969932</Text>
+                    <Text style={styles.dummyText}>• Owner: 7550969934</Text>
                   </View>
                 )}
 
@@ -366,7 +374,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: COLORS.divider,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
@@ -398,7 +406,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: COLORS.divider,
     alignItems: 'center',
   },
   btnOutlineText: {
@@ -419,7 +427,7 @@ const styles = StyleSheet.create({
     color: COLORS.white,
   },
   btnDisabled: {
-    backgroundColor: '#CCC',
+    backgroundColor: COLORS.divider,
     opacity: 0.6,
   },
   otpInputGroup: {
@@ -437,7 +445,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     borderWidth: 2,
-    borderColor: '#E0E0E0',
+    borderColor: COLORS.divider,
     color: COLORS.textDark,
   },
   resendBtn: {
@@ -459,7 +467,7 @@ const styles = StyleSheet.create({
   },
   signupText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: COLORS.textSecondary,
   },
   signupLink: {
     fontSize: 14,
