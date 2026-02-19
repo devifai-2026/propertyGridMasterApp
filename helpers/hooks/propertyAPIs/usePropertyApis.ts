@@ -88,10 +88,30 @@ export const usePropertyAPIs = () => {
     });
   };
 
+  const createPropertyInquiry = (
+    propertyId: string,
+    payload: any,
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.post({
+      route: `/v1/inquiries/properties/${propertyId}`,
+      payload,
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   return {
     getProperties,
     getPropertyById,
     createProperty,
+    createPropertyInquiry,
     getAmenities,
     getCaretakers,
     loading,

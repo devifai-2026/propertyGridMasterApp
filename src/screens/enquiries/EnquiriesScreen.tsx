@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -9,33 +9,55 @@ import {
   Image,
   Dimensions,
   Alert,
+  Platform,
 } from 'react-native';
 import { Check, ChevronLeft } from 'lucide-react-native';
 import { COLORS } from '../../constants/theme';
 import { useNavigation } from '../../context/NavigationContext';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
+import { useAuth } from '../../context/AuthContext';
+import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
 import Layout from '../../layout/Layout';
 
 const { width } = Dimensions.get('window');
 const isDesktop = width > 900;
 
 const EnquiriesScreen = () => {
+  const { user } = useAuth();
   const { currentPath, navigate, goBack } = useNavigation();
   const propertyId = currentPath.split('/enquiry/')[1];
   const [property, setProperty] = useState<any>(null);
-  const { getPropertyById, loading } = usePropertyAPIs();
+  const { getPropertyById, createPropertyInquiry, loading } = usePropertyAPIs();
 
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
-    otp: ['', '', '', ''],
+    otp: '',
+    question: '',
     termsAccepted: false,
     privacyAccepted: false,
   });
 
+  const otpInputRefs = useRef<Array<TextInput | null>>([]);
+
+  const { sendOtp, verifyOtp, loading: authLoading } = useAuthAPIs();
+  const [verificationId, setVerificationId] = useState('');
+  const [isVerified, setIsVerified] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        firstName: user.firstName || user.name.split(' ')[0] || '',
+        lastName: user.lastName || user.name.split(' ')[1] || '',
+        email: user.email || '',
+        phone: user.mobileNumber || '',
+      }));
+    }
+  }, [user]);
 
   useEffect(() => {
     if (propertyId) {
@@ -47,30 +69,174 @@ const EnquiriesScreen = () => {
 
   const handleInputChange = (name: string, value: any) => {
     setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'phone') {
+      setIsVerified(false);
+      setOtpSent(false);
+    }
   };
 
   const handleOtpChange = (index: number, value: string) => {
-    if (value.length <= 1 && /^\d*$/.test(value)) {
-      const newOtp = [...formData.otp];
-      newOtp[index] = value;
-      setFormData(prev => ({ ...prev, otp: newOtp }));
+    // Only allow digits
+    const digit = value.replace(/[^0-9]/g, '');
+
+    const newOtp = formData.otp.split('');
+    newOtp[index] = digit;
+    const otpValue = newOtp.join('');
+    setFormData(prev => ({ ...prev, otp: otpValue }));
+
+    // Auto-focus next input if digit entered
+    if (digit && index < 5) {
+      otpInputRefs.current[index + 1]?.focus();
+    }
+
+    // Auto-verify when 6th digit is entered
+    if (digit && index === 5) {
+      if (otpValue.length === 6) {
+        setTimeout(() => {
+          handleVerifyOTP(otpValue);
+        }, 100);
+      }
+    }
+  };
+
+  const handleOtpKeyPress = (e: any, index: number) => {
+    // Handle backspace on empty field - move to previous input
+    if (
+      e.nativeEvent.key === 'Backspace' &&
+      !formData.otp[index] &&
+      index > 0
+    ) {
+      otpInputRefs.current[index - 1]?.focus();
     }
   };
 
   const handleSendOTP = () => {
-    if (formData.phone.length === 10) {
-      setOtpSent(true);
-      console.log('Sending OTP to:', formData.phone);
+    const mobileNumber = formData.phone.replace(/\D/g, '');
+    if (mobileNumber.length === 10) {
+      sendOtp(
+        { mobileNumber },
+        (res: any) => {
+          console.log('OTP Send Response:', res);
+          if (res.success) {
+            setOtpSent(true);
+            setIsVerified(false);
+            setVerificationId(res.data.verificationId);
+            // Auto-focus first OTP input after a short delay
+            setTimeout(() => {
+              otpInputRefs.current[0]?.focus();
+            }, 100);
+            Alert.alert(
+              'OTP Sent',
+              'A 6-digit OTP has been sent to your mobile number',
+            );
+          } else {
+            Alert.alert('Error', res.message || 'Failed to send OTP');
+          }
+        },
+        (err: any) => {
+          Alert.alert(
+            'Error',
+            err?.response?.data?.message || 'Failed to send OTP',
+          );
+        },
+      );
+    } else {
+      Alert.alert(
+        'Invalid Phone',
+        'Please enter a valid 10-digit phone number',
+      );
     }
   };
 
-  const handleSubmit = () => {
-    if (formData.termsAccepted && formData.privacyAccepted) {
-      console.log('Form submitted:', formData);
-      // Logic for submission
-      Alert.alert('Success', 'Enquiry submitted successfully!');
-      navigate('/dashboard');
+  const handleVerifyOTP = (otpValue?: string) => {
+    const code = otpValue || formData.otp;
+    if (code.length !== 6) {
+      Alert.alert('Error', 'Please enter a 6-digit OTP');
+      return;
     }
+
+    if (!verificationId) {
+      Alert.alert('Error', 'Please send OTP first');
+      return;
+    }
+
+    console.log('Verifying OTP:', { code, verificationId });
+    verifyOtp(
+      { otp: code, verificationId },
+      (res: any) => {
+        console.log('OTP Verify Response:', res);
+        if (res.success) {
+          setIsVerified(true);
+          Alert.alert('Verified', 'Mobile number verified successfully!');
+        } else {
+          Alert.alert('Error', res.message || 'Invalid OTP');
+        }
+      },
+      (err: any) => {
+        console.error('OTP Verify Error:', err);
+        Alert.alert('Error', err?.response?.data?.message || 'Invalid OTP');
+      },
+    );
+  };
+
+  const handleSubmit = () => {
+    console.log('handleSubmit called');
+    console.log('formData:', formData);
+    console.log('isVerified:', isVerified);
+    console.log('propertyId:', propertyId);
+
+    if (!user) {
+      Alert.alert(
+        'Authentication Required',
+        'Please login to submit an enquiry.',
+      );
+      navigate('/login');
+      return;
+    }
+
+    if (!formData.question.trim()) {
+      Alert.alert('Error', 'Please enter your inquiry question.');
+      return;
+    }
+
+    const isProfileMobile = user && formData.phone === user.mobileNumber;
+    if (!isVerified && !isProfileMobile) {
+      Alert.alert('Error', 'Please verify your phone number first.');
+      return;
+    }
+
+    if (!formData.termsAccepted) {
+      Alert.alert('Error', 'Please agree to the terms & conditions.');
+      return;
+    }
+
+    if (!formData.privacyAccepted) {
+      Alert.alert('Error', 'Please agree to the Privacy Policy.');
+      return;
+    }
+
+    const payload = {
+      inquiries: [{ question: formData.question }],
+      source: Platform.OS === 'web' ? 'web' : 'mobile',
+    };
+
+    console.log('Sending payload:', payload);
+
+    createPropertyInquiry(
+      propertyId,
+      payload,
+      () => {
+        Alert.alert('Success', 'Enquiry submitted successfully!');
+        navigate('/dashboard');
+      },
+      err => {
+        console.error('API Error:', err);
+        Alert.alert(
+          'Error',
+          err?.response?.data?.message || 'Failed to submit enquiry',
+        );
+      },
+    );
   };
 
   return (
@@ -181,44 +347,104 @@ const EnquiriesScreen = () => {
                 <View style={styles.phoneInputContainer}>
                   <TextInput
                     style={styles.phoneInput}
-                    placeholder="+91"
+                    placeholder="+91 00000 00000"
                     keyboardType="numeric"
                     maxLength={10}
                     value={formData.phone}
                     onChangeText={v => handleInputChange('phone', v)}
+                    editable={!isVerified}
                   />
                   <TouchableOpacity
-                    style={styles.otpButton}
+                    style={[
+                      styles.otpButton,
+                      isVerified && styles.otpButtonVerified,
+                      formData.phone.length !== 10 && styles.otpButtonDisabled,
+                    ]}
                     onPress={handleSendOTP}
+                    disabled={
+                      isVerified || formData.phone.length !== 10 || authLoading
+                    }
                   >
                     <Text style={styles.otpButtonText}>
-                      {otpSent ? 'Resend OTP' : 'Send OTP'}
+                      {isVerified
+                        ? 'Verified'
+                        : otpSent
+                        ? 'Resend OTP'
+                        : 'Send OTP'}
                     </Text>
                   </TouchableOpacity>
                 </View>
-                <Text style={styles.otpHelpText}>
-                  Didn't received OTP?{' '}
-                  <Text style={styles.link} onPress={handleSendOTP}>
-                    Click to resend OTP.
+                {!isVerified && (
+                  <Text style={styles.otpHelpText}>
+                    Didn't received OTP?{' '}
+                    <Text style={styles.link} onPress={handleSendOTP}>
+                      Click to resend OTP.
+                    </Text>
                   </Text>
-                </Text>
+                )}
               </View>
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>OTP</Text>
-                <View style={styles.otpContainer}>
-                  {formData.otp.map((digit, idx) => (
+                <View
+                  style={[styles.otpContainer, isVerified && { opacity: 0.6 }]}
+                >
+                  {[0, 1, 2, 3, 4, 5].map(idx => (
                     <TextInput
                       key={idx}
-                      style={styles.otpInput}
-                      value={digit}
+                      ref={ref => {
+                        otpInputRefs.current[idx] = ref;
+                      }}
+                      style={[
+                        styles.otpInput,
+                        isVerified && styles.otpInputVerified,
+                      ]}
+                      value={formData.otp[idx] || ''}
                       onChangeText={v => handleOtpChange(idx, v)}
+                      onKeyPress={e => handleOtpKeyPress(e, idx)}
                       keyboardType="numeric"
                       maxLength={1}
+                      editable={!isVerified}
+                      selectTextOnFocus
                     />
                   ))}
+                  {!isVerified && formData.otp.length === 6 && (
+                    <TouchableOpacity
+                      style={styles.verifyBtn}
+                      onPress={() => handleVerifyOTP()}
+                      disabled={authLoading}
+                    >
+                      <Text style={styles.verifyBtnText}>
+                        {authLoading ? '...' : 'Verify'}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                  {isVerified && (
+                    <View style={styles.verifiedBadge}>
+                      <Check size={16} color={COLORS.white} />
+                    </View>
+                  )}
                 </View>
+                {isVerified && (
+                  <Text style={styles.verifiedText}>✓ Verified</Text>
+                )}
               </View>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>
+                Your Inquiry <Text style={styles.required}>*</Text>
+              </Text>
+              <TextInput
+                style={[
+                  styles.input,
+                  { height: 100, textAlignVertical: 'top' },
+                ]}
+                placeholder="What would you like to know about this property?"
+                multiline
+                value={formData.question}
+                onChangeText={v => handleInputChange('question', v)}
+              />
             </View>
 
             {/* Checkboxes */}
@@ -271,15 +497,35 @@ const EnquiriesScreen = () => {
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[
-                  styles.submitButton,
-                  (!formData.termsAccepted || !formData.privacyAccepted) &&
-                    styles.submitButtonDisabled,
-                ]}
+                style={[styles.submitButton]}
                 onPress={handleSubmit}
-                disabled={!formData.termsAccepted || !formData.privacyAccepted}
+                disabled={loading}
               >
-                <Text style={styles.submitButtonText}>Enquire</Text>
+                {loading ? (
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 8,
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 16,
+                        height: 16,
+                        borderTopColor: COLORS.white,
+                        borderRightColor: COLORS.white,
+                        borderBottomColor: 'transparent',
+                        borderLeftColor: 'transparent',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                      }}
+                    />
+                    <Text style={styles.submitButtonText}>Processing...</Text>
+                  </View>
+                ) : (
+                  <Text style={styles.submitButtonText}>Enquire</Text>
+                )}
               </TouchableOpacity>
             </View>
           </View>
@@ -427,18 +673,27 @@ const styles = StyleSheet.create({
   },
   otpButton: {
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderRadius: 6,
+    minWidth: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  otpButtonDisabled: {
+    backgroundColor: '#D1D5DB',
+  },
+  otpButtonVerified: {
+    backgroundColor: '#10B981',
   },
   otpButtonText: {
     color: COLORS.white,
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 13,
+    fontWeight: '700',
   },
   otpHelpText: {
-    fontSize: 11,
-    color: COLORS.textDark,
+    fontSize: 12,
+    color: COLORS.textSecondary,
     marginTop: 8,
   },
   link: {
@@ -447,19 +702,53 @@ const styles = StyleSheet.create({
   },
   otpContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 8,
+    alignItems: 'center',
+    gap: 12,
   },
   otpInput: {
-    width: 44,
-    height: 44,
-    borderWidth: 1,
+    width: 38,
+    height: 48,
+    borderWidth: 1.5,
     borderColor: '#D1D5DB',
     borderRadius: 8,
     textAlign: 'center',
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '700',
     color: COLORS.textDark,
+    backgroundColor: '#F2F2F2',
+  },
+  otpInputVerified: {
+    borderColor: '#10B981',
+    backgroundColor: '#ECFDF5',
+    color: '#065F46',
+  },
+  verifiedBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#10B981',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 4,
+  },
+  verifyBtn: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    justifyContent: 'center',
+    height: 48,
+    marginLeft: 4,
+  },
+  verifyBtnText: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  verifiedText: {
+    color: '#10B981',
+    fontSize: 12,
+    fontWeight: '700',
+    marginTop: 4,
   },
   checkboxContainer: {
     flexDirection: 'row',
