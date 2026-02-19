@@ -29,6 +29,7 @@ const WishlistTab = () => {
         'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
         'https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=800&q=80',
       ],
+      isVerified: 'completed',
       verified: true,
       badges: ['MNC Client'],
     },
@@ -44,6 +45,7 @@ const WishlistTab = () => {
       images: [
         'https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=800&q=80',
       ],
+      isVerified: 'completed',
       verified: true,
       badges: ['IT Park'],
     },

@@ -32,7 +32,8 @@ export interface Property {
   type: string;
   images: string[] | null; // Changed from image: string
   badges?: string[];
-  verified: boolean;
+  verified?: boolean;
+  isVerified?: string;
   raw?: any;
 }
 
@@ -150,9 +151,11 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         )}
 
         {/* Verified Badge */}
-        {item.verified && (
+        {(item.isVerified === 'partial' || item.isVerified === 'completed') && (
           <View style={styles.verifiedBadge}>
-            <Text style={styles.verifiedText}>Verified</Text>
+            <Text style={styles.verifiedText}>
+              {item.isVerified === 'partial' ? 'Partial' : 'Verified'}
+            </Text>
           </View>
         )}
 

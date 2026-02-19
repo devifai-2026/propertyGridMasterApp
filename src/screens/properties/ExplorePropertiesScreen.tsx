@@ -46,13 +46,13 @@ const ExplorePropertiesScreen = () => {
   const [currentImageIndices, setCurrentImageIndices] = useState<{
     [key: string]: number;
   }>({});
-
   useEffect(() => {
     fetchProperties();
   }, []);
 
   const fetchProperties = () => {
     getProperties((data: any[]) => {
+      console.log(data);
       const mapped: Property[] = data.map((item: any) => ({
         id: item.propertyId.toString(),
         title: `${item.propertyType} Space`,
@@ -67,7 +67,9 @@ const ExplorePropertiesScreen = () => {
             ? item.media.map((m: any) => m.fileUrl)
             : null,
         badges: [item.tenantType, item.buildingGrade].filter(Boolean),
-        verified: item.isActive,
+        isVerified: item.isVerified,
+        verified:
+          item.isVerified === 'partial' || item.isVerified === 'completed',
         raw: item,
       }));
       setProperties(mapped);

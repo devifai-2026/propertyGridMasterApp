@@ -243,6 +243,7 @@ const PortfolioTab = () => {
       images: [
         'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
       ],
+      isVerified: 'completed',
       verified: true,
       badges: ['Owned', 'Rented'],
     },
@@ -258,6 +259,7 @@ const PortfolioTab = () => {
       images: [
         'https://images.unsplash.com/photo-1486406140926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80',
       ],
+      isVerified: 'completed',
       verified: true,
       badges: ['Owned'],
     },
@@ -273,6 +275,7 @@ const PortfolioTab = () => {
       images: [
         'https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?auto=format&fit=crop&w=800&q=80',
       ],
+      isVerified: 'completed',
       verified: true,
       badges: ['Owned'],
     },
@@ -288,6 +291,7 @@ const PortfolioTab = () => {
       images: [
         'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&q=80',
       ],
+      isVerified: 'completed',
       verified: true,
       badges: ['Owned'],
     },
@@ -303,6 +307,7 @@ const PortfolioTab = () => {
       images: [
         'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
       ],
+      isVerified: 'completed',
       verified: true,
       badges: ['Owned'],
     },

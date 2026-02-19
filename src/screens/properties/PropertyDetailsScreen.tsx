@@ -78,7 +78,9 @@ const PropertyDetailsScreen = () => {
               ? data.media.map((m: any) => m.fileUrl)
               : null,
           badges: [data.tenantType, data.buildingGrade].filter(Boolean),
-          verified: data.isActive,
+          isVerified: data.isVerified,
+          verified:
+            data.isVerified === 'partial' || data.isVerified === 'completed',
           raw: data,
         };
         setProperty(mappedProperty);

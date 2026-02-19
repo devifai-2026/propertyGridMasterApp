@@ -25,6 +25,7 @@ const FEATURED_PROPERTIES: Property[] = [
       'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=1000',
     ],
     badges: ['MNC Client'],
+    isVerified: 'completed',
     verified: true,
   },
   {
@@ -40,6 +41,7 @@ const FEATURED_PROPERTIES: Property[] = [
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1000',
     ],
     badges: ['MNC Client'],
+    isVerified: 'completed',
     verified: true,
   },
   {
@@ -55,6 +57,7 @@ const FEATURED_PROPERTIES: Property[] = [
       'https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&q=80&w=1000',
     ],
     badges: ['MNC Client'],
+    isVerified: 'completed',
     verified: true,
   },
 ];
@@ -98,7 +101,8 @@ const FeaturedSection = ({ properties }: { properties: any[] }) => {
               ? p.media.map((m: any) => m.fileUrl)
               : null,
           badges: p.tenantType ? [p.tenantType] : [],
-          verified: true,
+          isVerified: p.isVerified,
+          verified: p.isVerified === 'partial' || p.isVerified === 'completed',
         }))
       : FEATURED_PROPERTIES;
 

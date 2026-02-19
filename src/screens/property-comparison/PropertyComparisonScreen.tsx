@@ -52,6 +52,7 @@ interface ComparisonProperty {
   insurance?: string;
   additionalIncome?: string;
   occupancyCertificate?: boolean;
+  isVerified?: string;
 }
 
 const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
@@ -126,6 +127,7 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
               typeof data.legal?.occupancyCertificate === 'string'
                 ? data.legal.occupancyCertificate.toLowerCase().includes('yes')
                 : !!data.legal?.occupancyCertificate,
+            isVerified: data.isVerified,
           };
         });
         setProperties(propertyData);
@@ -267,7 +269,10 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
                 type: prop.title,
                 images: prop.images,
                 badges: [prop.clientType],
-                verified: true,
+                isVerified: prop.isVerified,
+                verified:
+                  prop.isVerified === 'partial' ||
+                  prop.isVerified === 'completed',
               }}
               width="25%"
               onRemove={handleRemoveProperty}
