@@ -19,7 +19,9 @@ import {
   Fingerprint,
   Calendar,
   Phone,
+  CheckCircle2,
 } from 'lucide-react-native';
+import { Alert } from 'react-native';
 import Layout from '../../layout/Layout';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
@@ -27,7 +29,7 @@ import { useEffect } from 'react';
 import { COLORS } from '../../constants/theme';
 
 const ProfileScreen = () => {
-  const { user, logout, isLoggedIn, isLoading } = useAuth();
+  const { user, logout, switchUserRole, isLoggedIn, isLoading } = useAuth();
   const { navigate } = useNavigation();
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
@@ -45,6 +47,15 @@ const ProfileScreen = () => {
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleSwitchRole = async (role: string) => {
+    if (role === user?.role) return;
+
+    const success = await switchUserRole(role);
+    if (success) {
+      Alert.alert('Success', `Switched to ${role} role`);
+    }
   };
 
   const ProfileItem = ({
@@ -142,6 +153,55 @@ const ProfileScreen = () => {
                 label="Privacy Policy"
                 onPress={() => navigate('/support')}
               />
+            </View>
+          </View>
+
+          {/* Role Switcher Section */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Switch Role</Text>
+            <View style={styles.card}>
+              {['Broker', 'Investor', 'Owner'].map((role, index) => (
+                <React.Fragment key={role}>
+                  <TouchableOpacity
+                    style={[
+                      styles.profileItem,
+                      user?.role === role && styles.activeRoleItem,
+                    ]}
+                    onPress={() => handleSwitchRole(role)}
+                  >
+                    <View style={styles.itemLeft}>
+                      <View
+                        style={[
+                          styles.iconContainer,
+                          user?.role === role && {
+                            backgroundColor: COLORS.lightRed,
+                          },
+                        ]}
+                      >
+                        <Shield
+                          size={20}
+                          color={user?.role === role ? COLORS.primary : '#666'}
+                        />
+                      </View>
+                      <View>
+                        <Text
+                          style={[
+                            styles.itemValue,
+                            user?.role === role && { color: COLORS.primary },
+                          ]}
+                        >
+                          {role}
+                        </Text>
+                        {user?.role === role && (
+                          <Text style={styles.activeLabel}>Active</Text>
+                        )}
+                      </View>
+                    </View>
+                    {user?.role === role && <View style={styles.activeDot} />}
+                  </TouchableOpacity>
+                  {index < 2 && <View style={styles.divider} />}
+                </React.Fragment>
+              ))}
             </View>
           </View>
 
@@ -308,6 +368,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: COLORS.primary,
+  },
+  activeRoleItem: {
+    backgroundColor: '#FDF2F2',
+  },
+  activeLabel: {
+    fontSize: 10,
+    color: COLORS.primary,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+  },
+  activeDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.primary,
   },
 });
 

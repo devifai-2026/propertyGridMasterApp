@@ -497,9 +497,12 @@ const EnquiriesScreen = () => {
                 <Text style={styles.cancelButtonText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.submitButton]}
+                style={[
+                  styles.submitButton,
+                  user?.role !== 'Broker' && { backgroundColor: '#CCC' },
+                ]}
                 onPress={handleSubmit}
-                disabled={loading}
+                disabled={loading || user?.role !== 'Broker'}
               >
                 {loading ? (
                   <View
@@ -527,6 +530,11 @@ const EnquiriesScreen = () => {
                   <Text style={styles.submitButtonText}>Enquire</Text>
                 )}
               </TouchableOpacity>
+              {user?.role !== 'Broker' && (
+                <Text style={styles.roleWarningText}>
+                  * Only Brokers can submit property enquiries.
+                </Text>
+              )}
             </View>
           </View>
         </View>
@@ -808,6 +816,14 @@ const styles = StyleSheet.create({
   loadingContainer: {
     padding: 20,
     alignItems: 'center',
+  },
+  roleWarningText: {
+    color: COLORS.primary,
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 12,
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
 

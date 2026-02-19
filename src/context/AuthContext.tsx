@@ -16,6 +16,9 @@ interface User {
   role: string;
   email: string;
   mobileNumber?: string;
+  mobile?: string;
+  joined?: string;
+  lastLogin?: string;
   accessToken: string;
   refreshToken: string;
 }
@@ -25,6 +28,7 @@ interface AuthContextType {
   user: User | null;
   login: (userData: any) => Promise<boolean>;
   logout: () => void;
+  switchUserRole: (role: string) => Promise<boolean>;
   isLoading: boolean;
 }
 
@@ -36,7 +40,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { logout: logoutApi } = useAuthAPIs();
+  const { switchRole: switchRoleApi, logout: logoutApi } = useAuthAPIs();
 
   useEffect(() => {
     const checkLogin = async () => {
@@ -110,10 +114,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(null);
     }
   };
+  const switchUserRole = async (role: string): Promise<boolean> => {
+    return new Promise(resolve => {
+      switchRoleApi(
+        { roleName: role },
+        async response => {
+          if (response.success) {
+            const updatedUser = {
+              ...user,
+              ...response.data,
+              token: response.data.accessToken, // matching headers.ts requirement
+              role: response.data.activeRole,
+            };
+            await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+            setUser(updatedUser as User);
+            resolve(true);
+          } else {
+            Alert.alert('Error', response.message || 'Failed to switch role');
+            resolve(false);
+          }
+        },
+        error => {
+          Alert.alert(
+            'Error',
+            error?.response?.data?.message || 'Something went wrong',
+          );
+          resolve(false);
+        },
+      );
+    });
+  };
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn, user, login, logout, isLoading }}
+      value={{
+        isLoggedIn,
+        user,
+        login,
+        logout,
+        switchUserRole,
+        isLoading,
+      }}
     >
       {children}
     </AuthContext.Provider>

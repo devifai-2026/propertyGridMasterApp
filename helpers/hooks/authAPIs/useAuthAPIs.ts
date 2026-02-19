@@ -90,6 +90,24 @@ export const useAuthAPIs = () => {
     });
   };
 
+  const switchRole = (
+    payload: { roleName: string },
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.post({
+      route: '/v1/switch-role',
+      payload,
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   const logout = (
     refreshToken: string,
     onSuccess?: (data: any) => void,
@@ -117,6 +135,7 @@ export const useAuthAPIs = () => {
     signup,
     sendOtp,
     verifyOtp,
+    switchRole,
     logout,
   };
 };
