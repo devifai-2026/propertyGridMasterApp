@@ -8,9 +8,10 @@ export const usePropertyAPIs = () => {
   const getProperties = (
     onSuccess?: (data: any) => void,
     onError?: (error: any) => void,
+    query?: string,
   ) => {
     apiCall.get({
-      route: '/v1/properties',
+      route: `/v1/properties${query ? `?${query}` : ''}`,
       onSuccess: data => {
         if (onSuccess) onSuccess(decodeResponseData(data.data));
       },

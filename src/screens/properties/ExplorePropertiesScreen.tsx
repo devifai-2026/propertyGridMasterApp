@@ -50,30 +50,70 @@ const ExplorePropertiesScreen = () => {
     fetchProperties();
   }, []);
 
-  const fetchProperties = () => {
-    getProperties((data: any[]) => {
-      console.log(data);
-      const mapped: Property[] = data.map((item: any) => ({
-        id: item.propertyId.toString(),
-        title: `${item.propertyType} Space`,
-        location: `${item.city}, ${item.state}`,
-        price: `₹${item.sellingPrice} Cr`,
-        rent: item.annualGrossRent ? `₹${item.annualGrossRent} L` : 'N/A',
-        tenure: `${item.tenureLeftYears || 0} Yrs`,
-        roi: item.netRentalYield ? `${item.netRentalYield}%` : 'N/A',
-        type: item.propertyType,
-        images:
-          item.media && item.media.length > 0
-            ? item.media.map((m: any) => m.fileUrl)
-            : null,
-        badges: [item.tenantType, item.buildingGrade].filter(Boolean),
-        isVerified: item.isVerified,
-        verified:
-          item.isVerified === 'partial' || item.isVerified === 'completed',
-        raw: item,
-      }));
-      setProperties(mapped);
-    });
+  const fetchProperties = (overrideFilters?: any) => {
+    let queryParams = [];
+    const activeFilters = overrideFilters || filters;
+
+    // Pricing
+    if (activeFilters.pricing?.min)
+      queryParams.push(`minPrice=${activeFilters.pricing.min}`);
+    if (activeFilters.pricing?.max)
+      queryParams.push(`maxPrice=${activeFilters.pricing.max}`);
+
+    // Units
+    if (activeFilters.unit?.length > 0) {
+      // API expects propertyTypes comma separated. First map the keys to match the Capitalised labels if needed.
+      const mappedTypes = activeFilters.unit
+        .map((id: string) => componentUnitTypes.find(c => c.id === id)?.label)
+        .filter(Boolean);
+      if (mappedTypes.length > 0) {
+        queryParams.push(`propertyTypes=${mappedTypes.join(',')}`);
+      }
+    }
+
+    // Rent
+    if (activeFilters.rent?.min)
+      queryParams.push(`minRent=${activeFilters.rent.min}`);
+    if (activeFilters.rent?.max)
+      queryParams.push(`maxRent=${activeFilters.rent.max}`);
+
+    // ROI
+    if (activeFilters.roi) queryParams.push(`minROI=${activeFilters.roi}`);
+
+    // Tenure
+    if (activeFilters.tenure)
+      queryParams.push(`minTenure=${activeFilters.tenure}`);
+
+    const queryString = queryParams.join('&');
+
+    getProperties(
+      (data: any[]) => {
+        const mapped: Property[] = data.map((item: any) => ({
+          id: item.propertyId.toString(),
+          title: `${item.propertyType} Space`,
+          location: `${item.city}, ${item.state}`,
+          price: `₹${item.sellingPrice} Cr`,
+          rent: item.annualGrossRent ? `₹${item.annualGrossRent} L` : 'N/A',
+          tenure: `${item.tenureLeftYears || 0} Yrs`,
+          roi: item.netRentalYield ? `${item.netRentalYield}%` : 'N/A',
+          type: item.propertyType,
+          images:
+            item.media && item.media.length > 0
+              ? item.media.map((m: any) => m.fileUrl)
+              : null,
+          badges: [item.tenantType, item.buildingGrade].filter(Boolean),
+          isVerified: item.isVerified,
+          verified:
+            item.isVerified === 'partial' || item.isVerified === 'completed',
+          raw: item,
+        }));
+        setProperties(mapped);
+      },
+      (error: any) => {
+        console.error('Error fetching properties automatically:', error);
+      },
+      queryString, // Passed here!
+    );
   };
 
   const handleCompareToggle = (property: Property) => {
@@ -122,17 +162,19 @@ const ExplorePropertiesScreen = () => {
 
   const handleApplyFilters = () => {
     setShowFilters(false);
-    // Logic to apply filters would go here
+    fetchProperties();
   };
 
   const handleResetFilters = () => {
-    setFilters({
+    const emptyFilters = {
       pricing: { min: '', max: '' },
       unit: [],
       rent: { min: '', max: '' },
       roi: '',
       tenure: '',
-    });
+    };
+    setFilters(emptyFilters);
+    fetchProperties(emptyFilters);
   };
 
   const componentUnitTypes = [
