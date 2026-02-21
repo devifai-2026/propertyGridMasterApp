@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Dimensions,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import {
   ChevronLeft,
@@ -68,8 +69,11 @@ const PropertyDetailsScreen = () => {
   const [property, setProperty] = useState<Property | null>(null);
   const [notesData, setNotesData] = useState<any[]>([]);
   const [isNotesLoading, setIsNotesLoading] = useState(false);
-  const { getPropertyById, getPropertyNotesForOwner, loading } =
+  const { getPropertyById, getPropertyNotesForOwner, addOwnerNote, loading } =
     usePropertyAPIs();
+
+  const [newNote, setNewNote] = useState('');
+  const [isSubmittingNote, setIsSubmittingNote] = useState(false);
 
   const isOwner = user?.role === 'Owner';
   useEffect(() => {
@@ -676,6 +680,32 @@ const PropertyDetailsScreen = () => {
     );
   };
 
+  const handleAddNote = () => {
+    if (!newNote.trim() || !propertyId) return;
+    setIsSubmittingNote(true);
+    addOwnerNote(
+      propertyId,
+      newNote.trim(),
+      () => {
+        setNewNote('');
+        setIsSubmittingNote(false);
+        // Optimistically update notesData
+        const newNoteEntry = {
+          note: newNote.trim(),
+          createdAt: new Date().toISOString(),
+          addedBy:
+            `${user?.firstName || 'Owner'} ${user?.lastName || ''}`.trim() ||
+            'You',
+        };
+        setNotesData([newNoteEntry, ...notesData]);
+      },
+      (err: any) => {
+        setIsSubmittingNote(false);
+        Alert.alert('Error', err.message || 'Failed to add note');
+      },
+    );
+  };
+
   const renderNotesContent = () => {
     if (!property) return null;
 
@@ -687,6 +717,58 @@ const PropertyDetailsScreen = () => {
             Updates and observations from our property management team
           </Text>
         </View>
+
+        {property.isVerified !== 'completed' && (
+          <View style={styles.addNoteContainer}>
+            <textarea
+              value={newNote}
+              onChange={(e: any) => setNewNote(e.target.value)}
+              placeholder="Type your note here..."
+              // Using basic web styles directly on the native-web textarea works since this is react-native-web primarily
+              style={
+                {
+                  width: '100%',
+                  backgroundColor: '#F9FAFB',
+                  borderWidth: 1,
+                  borderColor: '#E5E7EB',
+                  borderRadius: 12,
+                  padding: 16,
+                  fontSize: 14,
+                  color: '#374151',
+                  outlineStyle: 'none',
+                  resize: 'none',
+                  minHeight: 120,
+                } as any
+              }
+            />
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'flex-end',
+                marginTop: 12,
+              }}
+            >
+              <TouchableOpacity
+                onPress={handleAddNote}
+                disabled={!newNote.trim() || isSubmittingNote}
+                style={[
+                  styles.addNoteButton,
+                  (!newNote.trim() || isSubmittingNote) &&
+                    styles.addNoteButtonDisabled,
+                ]}
+              >
+                {isSubmittingNote ? (
+                  <ActivityIndicator size="small" color="#FFF" />
+                ) : (
+                  <>
+                    <MessageSquare size={16} color="#FFF" />
+                    <Text style={styles.addNoteButtonText}>Add Note</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
 
         {isNotesLoading ? (
           <View style={styles.emptyNotesContainer}>
@@ -1190,6 +1272,27 @@ const styles = StyleSheet.create({
     color: '#999',
     fontWeight: '600',
     textAlign: 'center',
+  },
+  addNoteContainer: {
+    marginBottom: 20,
+  },
+  addNoteButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: COLORS.primary,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  addNoteButtonDisabled: {
+    backgroundColor: '#CCCCCC',
+  },
+  addNoteButtonText: {
+    color: COLORS.white,
+    fontWeight: '600',
+    fontSize: 14,
   },
 });
 

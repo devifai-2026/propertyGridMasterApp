@@ -140,6 +140,25 @@ export const usePropertyAPIs = () => {
     });
   };
 
+  const addOwnerNote = (
+    propertyId: string,
+    note: string,
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.post({
+      route: `/v1/owner/properties/${propertyId}/notes`,
+      payload: { note },
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   const updateProperty = (
     propertyId: string,
     payload: FormData,
@@ -164,6 +183,7 @@ export const usePropertyAPIs = () => {
     getPropertyById,
     getOwnerNotes,
     getPropertyNotesForOwner,
+    addOwnerNote,
     createProperty,
     updateProperty,
     createPropertyInquiry,
