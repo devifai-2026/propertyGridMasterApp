@@ -24,6 +24,7 @@ import EnquiriesScreen from './src/screens/enquiries/EnquiriesScreen';
 import BlogsScreen from './src/screens/blogs/BlogsScreen';
 import PrivacyPolicyScreen from './src/screens/legal/PrivacyPolicyScreen';
 import TermsOfServiceScreen from './src/screens/legal/TermsOfServiceScreen';
+import NotesScreen from './src/screens/notes/NotesScreen';
 
 const AppContent = () => {
   const { currentPath } = useNavigation();
@@ -52,6 +53,7 @@ const AppContent = () => {
       case currentPath === '/investors':
         return <InvestorsScreen />;
       case currentPath === '/list-property':
+      case currentPath.startsWith('/list-property/'):
         return <ListPropertyScreen />;
       case currentPath === '/contact-us':
         return <ContactUsScreen />;
@@ -65,6 +67,8 @@ const AppContent = () => {
         return <ProfileScreen />;
       case currentPath === '/notifications':
         return <NotificationsScreen />;
+      case currentPath === '/my-notes':
+        return <NotesScreen />;
       case currentPath === '/enquiry':
       case currentPath.startsWith('/enquiry/'):
         return <EnquiriesScreen />;

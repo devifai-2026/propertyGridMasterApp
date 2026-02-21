@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -50,13 +50,22 @@ const ListPropertyScreen = () => {
   const isSmallScreen = width < 768;
   const isMobile = width < 480;
 
-  const { createProperty, loading: apiLoading } = usePropertyAPIs();
-  const { navigate } = useNavigation();
+  const {
+    createProperty,
+    updateProperty,
+    getPropertyById,
+    loading: apiLoading,
+  } = usePropertyAPIs();
+  const { navigate, currentPath } = useNavigation();
   const { user } = useAuth();
+
+  const propertyId = currentPath.split('/list-property/')[1];
+  const isEditMode = !!propertyId;
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isFormValid, setIsFormValid] = useState(false);
   const [formData, setFormData] = useState<any>({});
+  const [initialLoading, setInitialLoading] = useState(isEditMode);
 
   const personalDetailsRef = useRef<any>(null);
   const basicDetailsRef = useRef<any>(null);
@@ -66,6 +75,128 @@ const ListPropertyScreen = () => {
   const locationDetailsRef = useRef<any>(null);
 
   const scrollRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    if (isEditMode) {
+      setInitialLoading(true);
+      getPropertyById(
+        propertyId,
+        (data: any) => {
+          console.log('Fetched Property Data for Edit:', data);
+
+          // Map backend data to form data structure
+          const mappedData: any = {
+            // Step 1: Personal
+            firstName: data.Owner?.firstName || '',
+            lastName: data.Owner?.lastName || '',
+            email: data.Owner?.email || '',
+            mobile: data.Owner?.mobileNumber || '',
+            listUnder: data.ownerType?.toLowerCase() || 'owner',
+            agreeTerms: true,
+            agreePrivacy: true,
+
+            // Step 2: Basic
+            propertyType: data.propertyType,
+            builtYear: String(data.completionYear || ''),
+            buildingGrade: data.buildingGrade,
+            carpetArea: String(data.carpetArea || ''),
+            lastRefurbished: String(data.lastRefurbishedYear || ''),
+            ownership: data.ownershipType,
+            fourWheelerParkings: String(data.parkingFourWheeler || ''),
+            twoWheelerParkings: String(data.parkingTwoWheeler || ''),
+            powerBackup: data.powerBackup,
+            numLifts: String(data.numberOfLifts || ''),
+            hvacType: data.hvacType,
+            furnishingStatus: data.furnishingStatus,
+            buildingMaintained: String(data.maintainedById || ''),
+            amenityIds: (data.amenities || []).map((a: any) => a.amenityId),
+            propertyDescription: data.description,
+            mediaFiles: (data.media || []).map((m: any) => ({
+              uri: m.fileUrl,
+              fileName: m.fileName,
+              type: m.fileType,
+              isExisting: true,
+              mediaId: m.mediaId,
+            })),
+
+            // Step 3: Legal
+            titleStatus: data.titleStatus,
+            occupancyCertificate: data.occupancyCertificate,
+            leaseRegistration: data.leaseRegistration,
+            pendingLitigations: data.hasPendingLitigation ? 'yes' : 'no',
+            litigationNote: data.litigationDetails,
+            certifications: data.certifications ? data.certifications : {},
+            otherCertifications: data.certifications?.others || [''],
+
+            // Step 4: Lease
+            tenantType: data.tenantType,
+            leaseStartDate: data.leaseStartDate,
+            leaseExpiryDate: data.leaseEndDate,
+            lockInYears: String(data.lockInPeriodYears || ''),
+            lockInMonths: String(data.lockInPeriodMonths || ''),
+            leaseDuration: String(data.leaseDurationYears || ''),
+            rentType: data.rentType === 'Per Sq Ft' ? 'perSqFt' : 'lumpSum',
+            rentPerSqFt: String(data.rentPerSqftMonthly || ''),
+            totalMonthlyRent: String(data.totalMonthlyRent || ''),
+            securityDepositType:
+              data.securityDepositType === 'Months of Rent'
+                ? 'months'
+                : 'lumpSum',
+            securityDepositMonths: String(data.securityDepositMonths || ''),
+            securityDepositAmount: String(data.securityDepositAmount || ''),
+            escalationPercentage: String(data.annualEscalationPercent || ''),
+            escalationFrequency: String(data.escalationFrequencyYears || ''),
+            maintenanceScope: data.maintenanceCostsIncluded?.includes(
+              'included',
+            )
+              ? 'included'
+              : 'excluded',
+            maintenanceType:
+              data.maintenanceType === 'Per Sq Ft' ? 'perSqFt' : 'lumpSum',
+            maintenanceAmount: String(data.maintenanceAmount || ''),
+
+            // Step 5: Financial
+            sellingPrice: String(data.sellingPrice || ''),
+            propertyTax: String(data.propertyTaxAnnual || ''),
+            insurance: String(data.insuranceAnnual || ''),
+            otherCosts: String(data.otherCostsAnnual || ''),
+            additionalIncome: String(data.additionalIncomeAnnual || ''),
+
+            // Step 6: Location
+            microMarket: data.microMarket,
+            city: data.city,
+            state: data.state,
+            demandDrivers: data.demandDrivers,
+            futureInfrastructure: data.upcomingDevelopments,
+            connectivity: (data.connectivity || []).map(
+              (c: any, idx: number) => ({
+                id: idx + 1,
+                type: c.connectivityType,
+                name: c.name,
+                distance: String(c.distanceKm || ''),
+              }),
+            ),
+            faqs: data.faqs || [],
+          };
+
+          if (mappedData.connectivity.length === 0) {
+            mappedData.connectivity = [
+              { id: 1, type: '', name: '', distance: '' },
+            ];
+          }
+
+          setFormData(mappedData);
+          setInitialLoading(false);
+          setIsFormValid(true);
+        },
+        err => {
+          console.error('Error fetching property for edit:', err);
+          setInitialLoading(false);
+          Alert.alert('Error', 'Failed to fetch property details.');
+        },
+      );
+    }
+  }, [propertyId, isEditMode]);
 
   const submitProperty = async (finalData: any) => {
     try {
@@ -223,6 +354,12 @@ const ListPropertyScreen = () => {
       // Media
       if (finalData.mediaFiles && Array.isArray(finalData.mediaFiles)) {
         finalData.mediaFiles.forEach((file: any) => {
+          if (file.isExisting) {
+            // If it's an existing file, we might need a separate way to tell backend to KEEP it
+            // or just skip it if backend handles delta updates.
+            // For now, let's just not append it as a new file.
+            return;
+          }
           if (Platform.OS === 'web') {
             if (file.fileObject) {
               apiFormData.append('files', file.fileObject);
@@ -237,26 +374,39 @@ const ListPropertyScreen = () => {
         });
       }
 
+      const onSuccess = (response: any) => {
+        if (Platform.OS === 'web') {
+          navigate('/dashboard');
+        } else {
+          Alert.alert(
+            'Success',
+            isEditMode
+              ? 'Property Updated Successfully!'
+              : 'Property Listed Successfully!',
+            [{ text: 'OK', onPress: () => navigate('/dashboard') }],
+          );
+        }
+      };
+
+      const onError = (error: any) => {
+        const message =
+          error?.response?.data?.message ||
+          `Failed to ${
+            isEditMode ? 'update' : 'list'
+          } property. Please try again.`;
+        Alert.alert('Error', message);
+        console.error(
+          `Property ${isEditMode ? 'update' : 'creation'} error:`,
+          error,
+        );
+      };
+
       // Call API
-      createProperty(
-        apiFormData,
-        (response: any) => {
-          if (Platform.OS === 'web') {
-            navigate('/dashboard');
-          } else {
-            Alert.alert('Success', 'Property Listed Successfully!', [
-              { text: 'OK', onPress: () => navigate('/dashboard') },
-            ]);
-          }
-        },
-        (error: any) => {
-          const message =
-            error?.response?.data?.message ||
-            'Failed to list property. Please try again.';
-          Alert.alert('Error', message);
-          console.error('Property creation error:', error);
-        },
-      );
+      if (isEditMode && propertyId) {
+        updateProperty(propertyId, apiFormData, onSuccess, onError);
+      } else {
+        createProperty(apiFormData, onSuccess, onError);
+      }
     } catch (error) {
       console.error('Error preparing submission:', error);
       Alert.alert('Error', 'Something went wrong while submitting.');
@@ -384,13 +534,14 @@ const ListPropertyScreen = () => {
           style={[styles.heroSection, isMobile && styles.heroSectionMobile]}
         >
           <Text style={[styles.heroTitle, isMobile && styles.heroTitleMobile]}>
-            List Your Property
+            {isEditMode ? 'Edit Your Property' : 'List Your Property'}
           </Text>
           <Text
             style={[styles.heroSubtext, isMobile && styles.heroSubtextMobile]}
           >
-            Connect with serious investors looking for pre-leased commercial
-            properties across India
+            {isEditMode
+              ? 'Update your property details to keep investors informed'
+              : 'Connect with serious investors looking for pre-leased commercial properties across India'}
           </Text>
           <TouchableOpacity
             style={[
@@ -475,7 +626,16 @@ const ListPropertyScreen = () => {
         {/* Form Area */}
         <View style={styles.formCardWrapper}>
           <View style={[styles.formCard, isMobile && styles.formCardMobile]}>
-            {renderStep()}
+            {initialLoading ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#EE2529" />
+                <Text style={styles.loadingText}>
+                  Fetching property details...
+                </Text>
+              </View>
+            ) : (
+              renderStep()
+            )}
           </View>
         </View>
 
@@ -523,7 +683,11 @@ const ListPropertyScreen = () => {
                       isMobile && styles.nextBtnTextMobile,
                     ]}
                   >
-                    {currentStep === 6 ? 'List Property' : 'Next Step'}
+                    {currentStep === 6
+                      ? isEditMode
+                        ? 'Update Property'
+                        : 'List Property'
+                      : 'Next Step'}
                   </Text>
                   {currentStep < 6 && (
                     <ChevronRight size={isMobile ? 18 : 20} color="#FFF" />
@@ -542,6 +706,17 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: '#FAFAFA',
+  },
+  loadingContainer: {
+    flex: 1,
+    height: 400,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    color: '#666',
+    fontWeight: '600',
   },
   heroSection: {
     alignItems: 'center',

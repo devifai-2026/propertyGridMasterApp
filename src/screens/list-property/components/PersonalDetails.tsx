@@ -57,7 +57,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
     });
 
     const [otpSent, setOtpSent] = useState(false);
-    const [isOtpVerified, setIsOtpVerified] = useState(false);
+    const [isOtpVerified, setIsOtpVerified] = useState(!!initialData?.mobile);
     const [verificationId, setVerificationId] = useState('');
     const [errors, setErrors] = useState<any>({});
     const [isSubmitted, setIsSubmitted] = useState(false);

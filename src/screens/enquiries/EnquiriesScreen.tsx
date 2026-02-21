@@ -226,7 +226,12 @@ const EnquiriesScreen = () => {
       propertyId,
       payload,
       () => {
-        Alert.alert('Success', 'Enquiry submitted successfully!');
+        Alert.alert(
+          'Success',
+          user?.role === 'Broker' || user?.role === 'Investor'
+            ? 'Property assigned successfully!'
+            : 'Enquiry submitted successfully!',
+        );
         navigate('/dashboard');
       },
       err => {
@@ -260,7 +265,11 @@ const EnquiriesScreen = () => {
           </View>
 
           <View style={styles.headerBanner}>
-            <Text style={styles.title}>Enquire About This Property</Text>
+            <Text style={styles.title}>
+              {user?.role === 'Broker' || user?.role === 'Investor'
+                ? 'Assign Property'
+                : 'Enquire About This Property'}
+            </Text>
           </View>
 
           <Text style={styles.subtitle}>
@@ -499,10 +508,16 @@ const EnquiriesScreen = () => {
               <TouchableOpacity
                 style={[
                   styles.submitButton,
-                  user?.role !== 'Broker' && { backgroundColor: '#CCC' },
+                  user?.role !== 'Broker' &&
+                    user?.role !== 'Investor' && {
+                      backgroundColor: '#CCC',
+                    },
                 ]}
                 onPress={handleSubmit}
-                disabled={loading || user?.role !== 'Broker'}
+                disabled={
+                  loading ||
+                  (user?.role !== 'Broker' && user?.role !== 'Investor')
+                }
               >
                 {loading ? (
                   <View
@@ -527,12 +542,16 @@ const EnquiriesScreen = () => {
                     <Text style={styles.submitButtonText}>Processing...</Text>
                   </View>
                 ) : (
-                  <Text style={styles.submitButtonText}>Enquire</Text>
+                  <Text style={styles.submitButtonText}>
+                    {user?.role === 'Broker' || user?.role === 'Investor'
+                      ? 'Assign Property'
+                      : 'Enquire'}
+                  </Text>
                 )}
               </TouchableOpacity>
-              {user?.role !== 'Broker' && (
+              {user?.role !== 'Broker' && user?.role !== 'Investor' && (
                 <Text style={styles.roleWarningText}>
-                  * Only Brokers can submit property enquiries.
+                  * Only Brokers and Investors can assign property.
                 </Text>
               )}
             </View>

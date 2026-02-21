@@ -47,6 +47,7 @@ import {
   Mail,
   LayoutDashboard,
   Bell,
+  MessageSquare,
 } from 'lucide-react-native';
 
 const SideMenu: React.FC<SideMenuProps> = ({
@@ -176,6 +177,22 @@ const SideMenu: React.FC<SideMenuProps> = ({
                 />
                 <Text style={styles.menuItemText}>Investors</Text>
               </TouchableOpacity>
+              {isLoggedIn && user?.role === 'Owner' && (
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                    navigate('/my-notes');
+                    onClose();
+                  }}
+                >
+                  <MessageSquare
+                    size={20}
+                    color={COLORS.textSecondary}
+                    style={styles.menuItemIcon}
+                  />
+                  <Text style={styles.menuItemText}>My Notes</Text>
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => {

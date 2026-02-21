@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import {
   ChevronLeft,
@@ -19,9 +20,13 @@ import {
   Plane,
   Train,
   ChevronDown,
+  MessageSquare,
+  Clock,
+  User,
 } from 'lucide-react-native';
 import Layout from '../../layout/Layout';
 import { useNavigation } from '../../context/NavigationContext';
+import { useAuth } from '../../context/AuthContext';
 import { COLORS } from '../../constants/theme';
 import PropertyCard, { Property } from '../../components/PropertyCard';
 import {
@@ -57,10 +62,16 @@ const PropertyDetailsCard = ({
 );
 
 const PropertyDetailsScreen = () => {
-  const { currentPath, goBack } = useNavigation();
+  const { currentPath, navigate, goBack } = useNavigation();
+  const { user } = useAuth();
   const propertyId = currentPath.split('/propertyDetails/')[1];
   const [property, setProperty] = useState<Property | null>(null);
-  const { getPropertyById, loading } = usePropertyAPIs();
+  const [notesData, setNotesData] = useState<any[]>([]);
+  const [isNotesLoading, setIsNotesLoading] = useState(false);
+  const { getPropertyById, getPropertyNotesForOwner, loading } =
+    usePropertyAPIs();
+
+  const isOwner = user?.role === 'Owner';
   useEffect(() => {
     if (propertyId) {
       getPropertyById(propertyId, (data: any) => {
@@ -91,18 +102,58 @@ const PropertyDetailsScreen = () => {
   const [activeTab, setActiveTab] = useState('property');
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
+  useEffect(() => {
+    if (activeTab === 'notes' && propertyId) {
+      setIsNotesLoading(true);
+      getPropertyNotesForOwner(
+        propertyId,
+        (data: any) => {
+          setIsNotesLoading(false);
+          // Based on backend getPropertyNotesByOwner: returns property with managerNotes association
+          if (data && data.managerNotes) {
+            const allNotes: any[] = [];
+            data.managerNotes.forEach((record: any) => {
+              if (record.notes && Array.isArray(record.notes)) {
+                record.notes.forEach((n: any) => {
+                  allNotes.push({
+                    note: n.note,
+                    createdAt: n.createdAt,
+                    addedBy: record.salesExecutive
+                      ? `${record.salesExecutive.firstName} ${record.salesExecutive.lastName}`
+                      : 'Sales Representative',
+                  });
+                });
+              }
+            });
+            allNotes.sort(
+              (a, b) =>
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime(),
+            );
+            setNotesData(allNotes);
+          }
+        },
+        () => setIsNotesLoading(false),
+      );
+    }
+  }, [activeTab, propertyId]);
+
   const tabs = [
-    { id: 'property', label: 'Property Details', icon: Building },
-    { id: 'lease', label: 'Lease Details', icon: FileText },
+    { id: 'property', label: 'Property', icon: Building },
+    { id: 'lease', label: 'Lease', icon: FileText },
     { id: 'analytics', label: 'Analytics', icon: BarChart2 },
-    { id: 'location', label: 'Location Details', icon: MapPin },
-    { id: 'faqs', label: 'FAQs', icon: HelpCircle },
+    { id: 'location', label: 'Location', icon: MapPin },
+    isOwner
+      ? { id: 'notes', label: 'Notes', icon: MessageSquare }
+      : { id: 'faqs', label: 'FAQs', icon: HelpCircle },
   ];
 
-  if (loading) {
+  // Only show full screen loading if we don't have property data yet
+  if (loading && !property) {
     return (
       <View style={styles.loadingContainer}>
-        <Text>Loading property details...</Text>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+        <Text style={{ marginTop: 12 }}>Loading property details...</Text>
       </View>
     );
   }
@@ -127,6 +178,22 @@ const PropertyDetailsScreen = () => {
             <Text style={styles.premiumText}>Premium Location</Text>
           </View>
           <View style={styles.actionButtonsRow}>
+            {isOwner && (
+              <TouchableOpacity
+                style={[
+                  styles.actionOutlineBtn,
+                  { borderColor: COLORS.primary },
+                ]}
+                onPress={() => navigate(`/list-property/${propertyId}`)}
+              >
+                <FileText size={14} color={COLORS.primary} />
+                <Text
+                  style={[styles.actionOutlineText, { color: COLORS.primary }]}
+                >
+                  Edit
+                </Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity style={styles.actionOutlineBtn}>
               <Download size={14} color={COLORS.textSecondary} />
               <Text style={styles.actionOutlineText}>Download</Text>
@@ -609,6 +676,61 @@ const PropertyDetailsScreen = () => {
     );
   };
 
+  const renderNotesContent = () => {
+    if (!property) return null;
+
+    return (
+      <View style={styles.tabContent}>
+        <View style={styles.detailsHeader}>
+          <Text style={styles.descriptionTitle}>Manager Notes</Text>
+          <Text style={styles.descriptionText}>
+            Updates and observations from our property management team
+          </Text>
+        </View>
+
+        {isNotesLoading ? (
+          <View style={styles.emptyNotesContainer}>
+            <ActivityIndicator size="small" color={COLORS.primary} />
+            <Text style={styles.emptyNotesText}>Loading notes...</Text>
+          </View>
+        ) : notesData.length === 0 ? (
+          <View style={styles.emptyNotesContainer}>
+            <MessageSquare size={40} color="#CCC" />
+            <Text style={styles.emptyNotesText}>
+              No notes added yet for this property.
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.notesList}>
+            {notesData.map((note, index) => (
+              <TouchableOpacity
+                key={index}
+                style={styles.noteCard}
+                onPress={() => navigate(`/list-property/${propertyId}`)}
+              >
+                <View style={styles.noteHeader}>
+                  <View style={styles.noteUserRow}>
+                    <View style={styles.noteUserIcon}>
+                      <User size={14} color={COLORS.primary} />
+                    </View>
+                    <Text style={styles.noteUser}>{note.addedBy}</Text>
+                  </View>
+                  <View style={styles.noteTimeRow}>
+                    <Clock size={12} color="#999" />
+                    <Text style={styles.noteTime}>
+                      {new Date(note.createdAt).toLocaleDateString()}
+                    </Text>
+                  </View>
+                </View>
+                <Text style={styles.noteText}>{note.note}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </View>
+    );
+  };
+
   return (
     <Layout>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -680,6 +802,7 @@ const PropertyDetailsScreen = () => {
             {activeTab === 'analytics' && renderAnalyticsContent()}
             {activeTab === 'location' && renderLocationContent()}
             {activeTab === 'faqs' && renderFAQContent()}
+            {activeTab === 'notes' && renderNotesContent()}
           </View>
         </View>
 
@@ -999,6 +1122,74 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     backgroundColor: COLORS.white,
+  },
+  // Notes Styles
+  notesList: {
+    gap: 12,
+  },
+  noteCard: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#EEEEEE',
+  },
+  noteHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  noteUserRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  noteUserIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(238, 37, 41, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noteUser: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: COLORS.textDark,
+  },
+  noteTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  noteTime: {
+    fontSize: 11,
+    color: '#999',
+    fontWeight: '600',
+  },
+  noteText: {
+    fontSize: 14,
+    color: '#444',
+    lineHeight: 20,
+    fontWeight: '500',
+  },
+  emptyNotesContainer: {
+    padding: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 16,
+    borderStyle: 'dashed',
+    borderWidth: 2,
+    borderColor: '#EEEEEE',
+  },
+  emptyNotesText: {
+    marginTop: 12,
+    fontSize: 14,
+    color: '#999',
+    fontWeight: '600',
+    textAlign: 'center',
   },
 });
 

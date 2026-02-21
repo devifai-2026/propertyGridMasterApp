@@ -107,10 +107,65 @@ export const usePropertyAPIs = () => {
     });
   };
 
+  const getOwnerNotes = (
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: '/v1/owner/notes',
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data.data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
+  const getPropertyNotesForOwner = (
+    propertyId: string,
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: `/v1/owner/properties/${propertyId}/notes`,
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data.data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
+  const updateProperty = (
+    propertyId: string,
+    payload: FormData,
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.put({
+      route: `/v1/properties/${propertyId}`,
+      payload,
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   return {
     getProperties,
     getPropertyById,
+    getOwnerNotes,
+    getPropertyNotesForOwner,
     createProperty,
+    updateProperty,
     createPropertyInquiry,
     getAmenities,
     getCaretakers,
