@@ -329,7 +329,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
         )}
 
         <View style={styles.headerActions}>
-          {isLoggedIn && (
+          {isLoggedIn && user?.role === 'Owner' && (
             <TouchableOpacity
               style={styles.notificationBtn}
               onPress={() => navigate('/my-notes')}
