@@ -332,12 +332,9 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
           {isLoggedIn && (
             <TouchableOpacity
               style={styles.notificationBtn}
-              onPress={() => navigate('/notifications')}
+              onPress={() => navigate('/my-notes')}
             >
-              <Bell size={22} color={COLORS.primary} />
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>2</Text>
-              </View>
+              <MessageSquare size={22} color={COLORS.primary} />
             </TouchableOpacity>
           )}
 
