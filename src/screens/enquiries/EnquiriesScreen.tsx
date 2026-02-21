@@ -267,7 +267,7 @@ const EnquiriesScreen = () => {
           <View style={styles.headerBanner}>
             <Text style={styles.title}>
               {user?.role === 'Broker' || user?.role === 'Investor'
-                ? 'Assign Property'
+                ? 'Enquiry'
                 : 'Enquire About This Property'}
             </Text>
           </View>
@@ -544,7 +544,7 @@ const EnquiriesScreen = () => {
                 ) : (
                   <Text style={styles.submitButtonText}>
                     {user?.role === 'Broker' || user?.role === 'Investor'
-                      ? 'Assign Property'
+                      ? 'Enquiry'
                       : 'Enquire'}
                   </Text>
                 )}
