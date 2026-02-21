@@ -1,4 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, {
+  useState,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from 'react';
 import {
   View,
   Text,
@@ -85,15 +90,15 @@ const CITY_BY_STATE: any = {
 };
 
 const CONNECTIVITY_TYPES = [
-  { label: 'Airport', value: 'airport' },
-  { label: 'Railway Station', value: 'railway' },
-  { label: 'Metro Station', value: 'metro' },
-  { label: 'Highway', value: 'highway' },
-  { label: 'Bus Station', value: 'bus-station' },
-  { label: 'Hospital', value: 'hospital' },
-  { label: 'School', value: 'school' },
-  { label: 'Shopping Mall', value: 'shopping' },
-  { label: 'Office Park', value: 'office-park' },
+  { label: 'Airport', value: 'Airport' },
+  { label: 'Railway Station', value: 'Railway Station' },
+  { label: 'Metro Station', value: 'Metro Station' },
+  { label: 'Highway', value: 'Highway' },
+  { label: 'Bus Station', value: 'Bus Station' },
+  { label: 'Hospital', value: 'Hospital' },
+  { label: 'School', value: 'School' },
+  { label: 'Shopping Mall', value: 'Shopping Mall' },
+  { label: 'Office Park', value: 'Office Park' },
 ];
 
 interface LocationDetailsProps {
@@ -102,327 +107,336 @@ interface LocationDetailsProps {
   initialData?: any;
 }
 
-const LocationDetails: React.FC<LocationDetailsProps> = ({
-  onNext,
-  onFormValid,
-  initialData,
-}) => {
-  const { width } = useWindowDimensions();
-  const isSmallScreen = width < 768;
+const LocationDetails = forwardRef<any, LocationDetailsProps>(
+  ({ onNext, onFormValid, initialData }, ref) => {
+    const { width } = useWindowDimensions();
+    const isSmallScreen = width < 768;
 
-  const [formData, setFormData] = useState({
-    microMarket: initialData?.microMarket || '',
-    city: initialData?.city || '',
-    state: initialData?.state || '',
-    connectivity: initialData?.connectivity || [
-      { id: 1, type: '', name: '', distance: '' },
-    ],
-    demandDrivers: initialData?.demandDrivers || '',
-    futureInfrastructure: initialData?.futureInfrastructure || '',
-    faqs:
-      initialData?.faqs ||
-      ([] as { id: number; question: string; answer: string }[]),
-  });
-
-  const [errors, setErrors] = useState<any>({});
-  const [touched, setTouched] = useState<any>({});
-
-  useEffect(() => {
-    const isValid = validateFormSilently();
-    onFormValid(isValid);
-  }, [formData]);
-
-  const validateFormSilently = () => {
-    return (
-      formData.microMarket.trim() !== '' &&
-      formData.city.trim() !== '' &&
-      formData.state.trim() !== ''
-    );
-  };
-
-  const validateField = (name: string, value: string) => {
-    switch (name) {
-      case 'microMarket':
-        return !value?.trim() ? 'Micro Market is required' : '';
-      case 'city':
-        return !value?.trim() ? 'City is required' : '';
-      case 'state':
-        return !value?.trim() ? 'State is required' : '';
-      default:
-        return '';
-    }
-  };
-
-  const handleInputChange = (name: string, value: any) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
-
-    if (touched[name]) {
-      const error = validateField(name, value);
-      setErrors((prev: any) => ({ ...prev, [name]: error }));
-    }
-  };
-
-  const handleBlur = (name: string, value?: string) => {
-    setTouched((prev: any) => ({ ...prev, [name]: true }));
-    const valueToValidate =
-      value !== undefined
-        ? value
-        : (formData[name as keyof typeof formData] as string);
-    const error = validateField(name, valueToValidate);
-    setErrors((prev: any) => ({ ...prev, [name]: error }));
-  };
-
-  const handleConnectivityChange = (
-    id: number,
-    field: string,
-    value: string,
-  ) => {
-    setFormData(prev => ({
-      ...prev,
-      connectivity: prev.connectivity.map((item: any) =>
-        item.id === id ? { ...item, [field]: value } : item,
-      ),
+    useImperativeHandle(ref, () => ({
+      submit: () => {
+        onNext(formData);
+      },
     }));
-  };
 
-  const addConnectivity = () => {
-    setFormData(prev => ({
-      ...prev,
-      connectivity: [
-        ...prev.connectivity,
-        { id: Date.now(), type: '', name: '', distance: '' },
+    const [formData, setFormData] = useState({
+      microMarket: initialData?.microMarket || '',
+      city: initialData?.city || '',
+      state: initialData?.state || '',
+      connectivity: initialData?.connectivity || [
+        { id: 1, type: '', name: '', distance: '' },
       ],
-    }));
-  };
+      demandDrivers: initialData?.demandDrivers || '',
+      futureInfrastructure: initialData?.futureInfrastructure || '',
+      faqs:
+        initialData?.faqs ||
+        ([] as { id: number; question: string; answer: string }[]),
+    });
 
-  const removeConnectivity = (id: number) => {
-    setFormData(prev => ({
-      ...prev,
-      connectivity: prev.connectivity.filter((item: any) => item.id !== id),
-    }));
-  };
+    const [errors, setErrors] = useState<any>({});
+    const [touched, setTouched] = useState<any>({});
 
-  const addFaq = () => {
-    setFormData(prev => ({
-      ...prev,
-      faqs: [...prev.faqs, { id: Date.now(), question: '', answer: '' }],
-    }));
-  };
+    useEffect(() => {
+      const isValid = validateFormSilently();
+      onFormValid(isValid);
+    }, [formData]);
 
-  const handleFaqChange = (id: number, field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      faqs: prev.faqs.map((faq: any) =>
-        faq.id === id ? { ...faq, [field]: value } : faq,
-      ),
-    }));
-  };
+    const validateFormSilently = () => {
+      return (
+        formData.microMarket.trim() !== '' &&
+        formData.city.trim() !== '' &&
+        formData.state.trim() !== ''
+      );
+    };
 
-  const removeFaq = (id: number) => {
-    setFormData(prev => ({
-      ...prev,
-      faqs: prev.faqs.filter((faq: any) => faq.id !== id),
-    }));
-  };
+    const validateField = (name: string, value: string) => {
+      switch (name) {
+        case 'microMarket':
+          return !value?.trim() ? 'Micro Market is required' : '';
+        case 'city':
+          return !value?.trim() ? 'City is required' : '';
+        case 'state':
+          return !value?.trim() ? 'State is required' : '';
+        default:
+          return '';
+      }
+    };
 
-  return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          isSmallScreen && styles.sectionTitleMobile,
-        ]}
-      >
-        Location & Market Details
-      </Text>
+    const handleInputChange = (name: string, value: any) => {
+      setFormData(prev => ({ ...prev, [name]: value }));
 
-      <Text style={styles.subHeader}>Location Details</Text>
-      <View style={styles.fieldContainer}>
-        <Text style={styles.label}>Micro Market *</Text>
-        <TextInput
+      if (touched[name]) {
+        const error = validateField(name, value);
+        setErrors((prev: any) => ({ ...prev, [name]: error }));
+      }
+    };
+
+    const handleBlur = (name: string, value?: string) => {
+      setTouched((prev: any) => ({ ...prev, [name]: true }));
+      const valueToValidate =
+        value !== undefined
+          ? value
+          : (formData[name as keyof typeof formData] as string);
+      const error = validateField(name, valueToValidate);
+      setErrors((prev: any) => ({ ...prev, [name]: error }));
+    };
+
+    const handleConnectivityChange = (
+      id: number,
+      field: string,
+      value: string,
+    ) => {
+      setFormData(prev => ({
+        ...prev,
+        connectivity: prev.connectivity.map((item: any) =>
+          item.id === id ? { ...item, [field]: value } : item,
+        ),
+      }));
+    };
+
+    const addConnectivity = () => {
+      setFormData(prev => ({
+        ...prev,
+        connectivity: [
+          ...prev.connectivity,
+          { id: Date.now(), type: '', name: '', distance: '' },
+        ],
+      }));
+    };
+
+    const removeConnectivity = (id: number) => {
+      setFormData(prev => ({
+        ...prev,
+        connectivity: prev.connectivity.filter((item: any) => item.id !== id),
+      }));
+    };
+
+    const addFaq = () => {
+      setFormData(prev => ({
+        ...prev,
+        faqs: [...prev.faqs, { id: Date.now(), question: '', answer: '' }],
+      }));
+    };
+
+    const handleFaqChange = (id: number, field: string, value: string) => {
+      setFormData(prev => ({
+        ...prev,
+        faqs: prev.faqs.map((faq: any) =>
+          faq.id === id ? { ...faq, [field]: value } : faq,
+        ),
+      }));
+    };
+
+    const removeFaq = (id: number) => {
+      setFormData(prev => ({
+        ...prev,
+        faqs: prev.faqs.filter((faq: any) => faq.id !== id),
+      }));
+    };
+
+    return (
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <Text
           style={[
-            styles.input,
-            touched.microMarket && errors.microMarket && styles.inputError,
+            styles.sectionTitle,
+            isSmallScreen && styles.sectionTitleMobile,
           ]}
-          placeholder="Enter Micro Market"
-          value={formData.microMarket}
-          onChangeText={v => handleInputChange('microMarket', v)}
-          onBlur={(e: any) => handleBlur('microMarket', e.nativeEvent.text)}
-        />
-        {touched.microMarket && errors.microMarket && (
-          <Text style={styles.errorText}>{errors.microMarket}</Text>
-        )}
-      </View>
+        >
+          Location & Market Details
+        </Text>
 
-      <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
+        <Text style={styles.subHeader}>Location Details</Text>
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>State *</Text>
-          <CustomDropdown
-            placeholder="Select State"
-            value={formData.state}
-            options={INDIAN_STATES.map(s => ({ label: s, value: s }))}
-            onChange={v => {
-              handleInputChange('state', v);
-              // Clear city when state changes
-              handleInputChange('city', '');
-              handleBlur('state', v);
-            }}
-            onBlur={() => handleBlur('state')}
-            error={touched.state && !!errors.state}
-            searchable
+          <Text style={styles.label}>Micro Market *</Text>
+          <TextInput
+            style={[
+              styles.input,
+              touched.microMarket && errors.microMarket && styles.inputError,
+            ]}
+            placeholder="Enter Micro Market"
+            value={formData.microMarket}
+            onChangeText={v => handleInputChange('microMarket', v)}
+            onBlur={(e: any) => handleBlur('microMarket', e.nativeEvent.text)}
           />
-          {touched.state && errors.state && (
-            <Text style={styles.errorText}>{errors.state}</Text>
+          {touched.microMarket && errors.microMarket && (
+            <Text style={styles.errorText}>{errors.microMarket}</Text>
           )}
         </View>
 
-        <View style={styles.fieldContainer}>
-          <Text style={styles.label}>City *</Text>
-          <CustomDropdown
-            placeholder="Select City"
-            value={formData.city}
-            options={
-              formData.state && CITY_BY_STATE[formData.state]
-                ? CITY_BY_STATE[formData.state].map((c: string) => ({
-                    label: c,
-                    value: c,
-                  }))
-                : []
-            }
-            onChange={v => {
-              handleInputChange('city', v);
-              handleBlur('city', v);
-            }}
-            onBlur={() => handleBlur('city')}
-            error={touched.city && !!errors.city}
-            searchable
-          />
-          {touched.city && errors.city && (
-            <Text style={styles.errorText}>{errors.city}</Text>
-          )}
-        </View>
-      </View>
-
-      <Text style={styles.subHeader}>Connectivity Details</Text>
-      {formData.connectivity.map((item: any, index: number) => (
-        <View key={item.id} style={styles.connectivityCard}>
-          <View style={styles.connectivityHeader}>
-            <Text style={styles.itemNumber}>#{index + 1}</Text>
-            {formData.connectivity.length > 1 && (
-              <TouchableOpacity onPress={() => removeConnectivity(item.id)}>
-                <Trash2 size={18} color="#EE2529" />
-              </TouchableOpacity>
+        <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>State *</Text>
+            <CustomDropdown
+              placeholder="Select State"
+              value={formData.state}
+              options={INDIAN_STATES.map(s => ({ label: s, value: s }))}
+              onChange={v => {
+                handleInputChange('state', v);
+                // Clear city when state changes
+                handleInputChange('city', '');
+                handleBlur('state', v);
+              }}
+              onBlur={() => handleBlur('state')}
+              error={touched.state && !!errors.state}
+              searchable
+            />
+            {touched.state && errors.state && (
+              <Text style={styles.errorText}>{errors.state}</Text>
             )}
           </View>
+
           <View style={styles.fieldContainer}>
-            <Text style={styles.labelSmall}>Type</Text>
+            <Text style={styles.label}>City *</Text>
             <CustomDropdown
-              placeholder="Select Type"
-              value={item.type}
-              options={CONNECTIVITY_TYPES}
-              onChange={v => handleConnectivityChange(item.id, 'type', v)}
+              placeholder="Select City"
+              value={formData.city}
+              options={
+                formData.state && CITY_BY_STATE[formData.state]
+                  ? CITY_BY_STATE[formData.state].map((c: string) => ({
+                      label: c,
+                      value: c,
+                    }))
+                  : []
+              }
+              onChange={v => {
+                handleInputChange('city', v);
+                handleBlur('city', v);
+              }}
+              onBlur={() => handleBlur('city')}
+              error={touched.city && !!errors.city}
+              searchable
             />
+            {touched.city && errors.city && (
+              <Text style={styles.errorText}>{errors.city}</Text>
+            )}
           </View>
-          <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
-            <View style={[styles.fieldContainer, { flex: 2 }]}>
-              <Text style={styles.labelSmall}>Name</Text>
+        </View>
+
+        <Text style={styles.subHeader}>Connectivity Details</Text>
+        {formData.connectivity.map((item: any, index: number) => (
+          <View key={item.id} style={styles.connectivityCard}>
+            <View style={styles.connectivityHeader}>
+              <Text style={styles.itemNumber}>#{index + 1}</Text>
+              {formData.connectivity.length > 1 && (
+                <TouchableOpacity onPress={() => removeConnectivity(item.id)}>
+                  <Trash2 size={18} color="#EE2529" />
+                </TouchableOpacity>
+              )}
+            </View>
+            <View style={styles.fieldContainer}>
+              <Text style={styles.labelSmall}>Type</Text>
+              <CustomDropdown
+                placeholder="Select Type"
+                value={item.type}
+                options={CONNECTIVITY_TYPES}
+                onChange={v => handleConnectivityChange(item.id, 'type', v)}
+              />
+            </View>
+            <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
+              <View style={[styles.fieldContainer, { flex: 2 }]}>
+                <Text style={styles.labelSmall}>Name</Text>
+                <TextInput
+                  style={styles.inputSmall}
+                  placeholder="Enter Name"
+                  value={item.name}
+                  onChangeText={v =>
+                    handleConnectivityChange(item.id, 'name', v)
+                  }
+                />
+              </View>
+              <View style={styles.fieldContainer}>
+                <Text style={styles.labelSmall}>Distance (KM)</Text>
+                <TextInput
+                  style={styles.inputSmall}
+                  placeholder="0"
+                  keyboardType="numeric"
+                  value={item.distance}
+                  onChangeText={v =>
+                    handleConnectivityChange(item.id, 'distance', v)
+                  }
+                />
+              </View>
+            </View>
+          </View>
+        ))}
+
+        <TouchableOpacity
+          style={styles.addOutlineBtn}
+          onPress={addConnectivity}
+        >
+          <Plus size={18} color="#EE2529" />
+          <Text style={styles.addOutlineBtnText}>Add Connectivity</Text>
+        </TouchableOpacity>
+
+        <Text style={styles.subHeader}>Demand Drivers</Text>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Key factors driving property demand</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            placeholder="e.g., Proximity to campuses"
+            multiline
+            numberOfLines={3}
+            textAlignVertical="top"
+            value={formData.demandDrivers}
+            onChangeText={v => handleInputChange('demandDrivers', v)}
+          />
+        </View>
+
+        <Text style={styles.subHeader}>Future Infrastructure</Text>
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Upcoming developments and projects</Text>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            placeholder="e.g., Upcoming Ring Road"
+            multiline
+            numberOfLines={3}
+            textAlignVertical="top"
+            value={formData.futureInfrastructure}
+            onChangeText={v => handleInputChange('futureInfrastructure', v)}
+          />
+        </View>
+
+        <Text style={styles.subHeader}>Frequently Asked Questions</Text>
+        {formData.faqs.map((faq: any, index: number) => (
+          <View key={faq.id} style={styles.faqCard}>
+            <View style={styles.faqHeader}>
+              <Text style={styles.itemNumber}>FAQ #{index + 1}</Text>
+              <TouchableOpacity onPress={() => removeFaq(faq.id)}>
+                <Trash2 size={18} color="#EE2529" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.fieldContainer}>
+              <Text style={styles.labelSmall}>Question</Text>
               <TextInput
                 style={styles.inputSmall}
-                placeholder="Enter Name"
-                value={item.name}
-                onChangeText={v => handleConnectivityChange(item.id, 'name', v)}
+                placeholder="Enter Question"
+                value={faq.question}
+                onChangeText={v => handleFaqChange(faq.id, 'question', v)}
               />
             </View>
             <View style={styles.fieldContainer}>
-              <Text style={styles.labelSmall}>Distance (KM)</Text>
+              <Text style={styles.labelSmall}>Answer</Text>
               <TextInput
-                style={styles.inputSmall}
-                placeholder="0"
-                keyboardType="numeric"
-                value={item.distance}
-                onChangeText={v =>
-                  handleConnectivityChange(item.id, 'distance', v)
-                }
+                style={[styles.inputSmall, { height: 60, paddingTop: 8 }]}
+                placeholder="Enter Answer"
+                multiline
+                textAlignVertical="top"
+                value={faq.answer}
+                onChangeText={v => handleFaqChange(faq.id, 'answer', v)}
               />
             </View>
           </View>
-        </View>
-      ))}
+        ))}
 
-      <TouchableOpacity style={styles.addOutlineBtn} onPress={addConnectivity}>
-        <Plus size={18} color="#EE2529" />
-        <Text style={styles.addOutlineBtnText}>Add Connectivity</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.addOutlineBtn} onPress={addFaq}>
+          <Plus size={18} color="#EE2529" />
+          <Text style={styles.addOutlineBtnText}>Add FAQ</Text>
+        </TouchableOpacity>
 
-      <Text style={styles.subHeader}>Demand Drivers</Text>
-      <View style={styles.fieldContainer}>
-        <Text style={styles.label}>Key factors driving property demand</Text>
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          placeholder="e.g., Proximity to campuses"
-          multiline
-          numberOfLines={3}
-          textAlignVertical="top"
-          value={formData.demandDrivers}
-          onChangeText={v => handleInputChange('demandDrivers', v)}
-        />
-      </View>
-
-      <Text style={styles.subHeader}>Future Infrastructure</Text>
-      <View style={styles.fieldContainer}>
-        <Text style={styles.label}>Upcoming developments and projects</Text>
-        <TextInput
-          style={[styles.input, styles.textArea]}
-          placeholder="e.g., Upcoming Ring Road"
-          multiline
-          numberOfLines={3}
-          textAlignVertical="top"
-          value={formData.futureInfrastructure}
-          onChangeText={v => handleInputChange('futureInfrastructure', v)}
-        />
-      </View>
-
-      <Text style={styles.subHeader}>Frequently Asked Questions</Text>
-      {formData.faqs.map((faq: any, index: number) => (
-        <View key={faq.id} style={styles.faqCard}>
-          <View style={styles.faqHeader}>
-            <Text style={styles.itemNumber}>FAQ #{index + 1}</Text>
-            <TouchableOpacity onPress={() => removeFaq(faq.id)}>
-              <Trash2 size={18} color="#EE2529" />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.fieldContainer}>
-            <Text style={styles.labelSmall}>Question</Text>
-            <TextInput
-              style={styles.inputSmall}
-              placeholder="Enter Question"
-              value={faq.question}
-              onChangeText={v => handleFaqChange(faq.id, 'question', v)}
-            />
-          </View>
-          <View style={styles.fieldContainer}>
-            <Text style={styles.labelSmall}>Answer</Text>
-            <TextInput
-              style={[styles.inputSmall, { height: 60, paddingTop: 8 }]}
-              placeholder="Enter Answer"
-              multiline
-              textAlignVertical="top"
-              value={faq.answer}
-              onChangeText={v => handleFaqChange(faq.id, 'answer', v)}
-            />
-          </View>
-        </View>
-      ))}
-
-      <TouchableOpacity style={styles.addOutlineBtn} onPress={addFaq}>
-        <Plus size={18} color="#EE2529" />
-        <Text style={styles.addOutlineBtnText}>Add FAQ</Text>
-      </TouchableOpacity>
-
-      <View style={{ height: 40 }} />
-    </ScrollView>
-  );
-};
+        <View style={{ height: 40 }} />
+      </ScrollView>
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   container: {

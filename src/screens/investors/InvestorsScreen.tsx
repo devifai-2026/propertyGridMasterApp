@@ -11,12 +11,13 @@ import {
 import Layout from '../../layout/Layout';
 import { Mail, Phone, Edit, ArrowRight, User } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
+import { COLORS } from '../../constants/theme';
 import PortfolioTab from './components/PortfolioTab';
 import EnquiriesTab from './components/EnquiriesTab';
 import WishlistTab from './components/WishlistTab';
 
 const InvestorsScreen = () => {
-  const { user } = useAuth(); // Assuming useAuth provides user object, otherwise mock
+  const { user, switchUserRole } = useAuth();
   const [activeTab, setActiveTab] = useState<
     'portfolio' | 'enquiries' | 'wishlist'
   >('portfolio');
@@ -26,7 +27,7 @@ const InvestorsScreen = () => {
     name: 'Rohit Sharma',
     role: 'Investor',
     email: 'rohit.sharma@example.com',
-    mobile: '+91.987654-43210',
+    mobileNumber: '+91 98765 43210',
     joined: '26 Aug 2025',
     lastLogin: '13 Aug 2025',
   };
@@ -93,7 +94,9 @@ const InvestorsScreen = () => {
                   <Phone size={16} color="#EE2529" />
                   <View>
                     <Text style={styles.contactLabel}>MOBILE NO.</Text>
-                    <Text style={styles.contactValue}>{userData.mobile}</Text>
+                    <Text style={styles.contactValue}>
+                      {userData.mobileNumber || 'N/A'}
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -103,50 +106,39 @@ const InvestorsScreen = () => {
               </TouchableOpacity>
 
               <Text style={styles.metaText}>
-                Joined on: {userData.joined} {'\n'} Last log in:{' '}
-                {userData.lastLogin}
+                Joined on: {userData.joined || 'N/A'} {'\n'} Last log in:{' '}
+                {userData.lastLogin || 'N/A'}
               </Text>
             </View>
 
             {/* Switch Accounts */}
             <View style={styles.switchSection}>
               <Text style={styles.sectionTitle}>Switch accounts</Text>
-              {/* Account 1 */}
-              <View style={styles.accountCard}>
-                <View style={styles.accountInfo}>
-                  <Image
-                    source={require('../../assets/Dashboard/img.jpg')}
-                    style={styles.smallAvatar}
-                  />
-                  <View>
-                    <Text style={styles.accountName}>Rohit S</Text>
-                    <View style={styles.roleBadgeSmall}>
-                      <Text style={styles.roleTextSmall}>Broker</Text>
+              {['Broker', 'Owner', 'Investor']
+                .filter(r => r !== user?.role)
+                .map(role => (
+                  <View key={role} style={styles.accountCard}>
+                    <View style={styles.accountInfo}>
+                      <View style={styles.smallAvatarPlaceholder}>
+                        <User size={20} color={COLORS.primary} />
+                      </View>
+                      <View>
+                        <Text style={styles.accountName}>
+                          {user?.name || 'User'}
+                        </Text>
+                        <View style={styles.roleBadgeSmall}>
+                          <Text style={styles.roleTextSmall}>{role}</Text>
+                        </View>
+                      </View>
                     </View>
+                    <TouchableOpacity
+                      style={styles.switchBtn}
+                      onPress={() => switchUserRole(role)}
+                    >
+                      <Text style={styles.switchBtnText}>Switch</Text>
+                    </TouchableOpacity>
                   </View>
-                </View>
-                <TouchableOpacity style={styles.switchBtn}>
-                  <Text style={styles.switchBtnText}>Switch</Text>
-                </TouchableOpacity>
-              </View>
-              {/* Account 2 */}
-              <View style={styles.accountCard}>
-                <View style={styles.accountInfo}>
-                  <Image
-                    source={require('../../assets/Dashboard/img.jpg')}
-                    style={styles.smallAvatar}
-                  />
-                  <View>
-                    <Text style={styles.accountName}>Rohit S</Text>
-                    <View style={styles.roleBadgeSmall}>
-                      <Text style={styles.roleTextSmall}>Owner</Text>
-                    </View>
-                  </View>
-                </View>
-                <TouchableOpacity style={styles.switchBtn}>
-                  <Text style={styles.switchBtnText}>Create</Text>
-                </TouchableOpacity>
-              </View>
+                ))}
             </View>
 
             {/* Assistance */}
@@ -402,6 +394,14 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 5,
+  },
+  smallAvatarPlaceholder: {
+    width: 40,
+    height: 40,
+    borderRadius: 5,
+    backgroundColor: '#FDF2F2',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   accountName: {
     fontSize: 14,

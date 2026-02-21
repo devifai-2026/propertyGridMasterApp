@@ -18,6 +18,7 @@ import {
 import { useNavigation } from '../context/NavigationContext';
 import { useAuth } from '../context/AuthContext';
 import Footer from './Footer';
+import { COLORS } from '../constants/theme';
 
 // --- Components ---
 
@@ -25,6 +26,7 @@ interface SideMenuProps {
   visible: boolean;
   onClose: () => void;
   isLoggedIn: boolean;
+  user: any;
   onLoginClick: () => void;
   onLogoutClick: () => void;
 }
@@ -36,6 +38,7 @@ import {
   Calculator,
   Users,
   LogOut,
+  User as UserIcon,
   LogIn,
   Building2,
   TrendingUp,
@@ -43,12 +46,15 @@ import {
   HelpCircle,
   Mail,
   LayoutDashboard,
+  Bell,
+  MessageSquare,
 } from 'lucide-react-native';
 
 const SideMenu: React.FC<SideMenuProps> = ({
   visible,
   onClose,
   isLoggedIn,
+  user,
   onLoginClick,
   onLogoutClick,
 }) => {
@@ -73,13 +79,44 @@ const SideMenu: React.FC<SideMenuProps> = ({
         <View style={[styles.menuContainer, { height }]}>
           <SafeAreaView style={{ flex: 1 }}>
             <View style={styles.menuHeader}>
-              <Image
-                source={require('../assets/Navbar/Preleasegrid logo 1.png')}
-                style={{ width: 150, height: 45 }}
-                resizeMode="contain"
-              />
+              {isLoggedIn ? (
+                <TouchableOpacity
+                  style={styles.menuUserInfo}
+                  onPress={() => {
+                    navigate('/my-profile');
+                    onClose();
+                  }}
+                >
+                  <View style={[styles.profileCircle, styles.menuAvatar]}>
+                    <Text style={styles.menuAvatarText}>
+                      {user?.name
+                        ? user.name
+                            .split(' ')
+                            .map((n: string) => n[0])
+                            .join('')
+                            .toUpperCase()
+                            .slice(0, 2)
+                        : 'U'}
+                    </Text>
+                  </View>
+                  <View style={styles.menuUserDetails}>
+                    <Text style={styles.menuUserName}>
+                      {user?.name || 'User'}
+                    </Text>
+                    <Text style={styles.menuUserRole}>
+                      {user?.role || 'Investor'}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ) : (
+                <Image
+                  source={require('../assets/Navbar/Preleasegrid logo 1.png')}
+                  style={{ width: 150, height: 45 }}
+                  resizeMode="contain"
+                />
+              )}
               <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-                <X size={24} color="#333" />
+                <X size={24} color={COLORS.textDark} />
               </TouchableOpacity>
             </View>
 
@@ -91,7 +128,11 @@ const SideMenu: React.FC<SideMenuProps> = ({
                   onClose();
                 }}
               >
-                <Building2 size={20} color="#666" style={styles.menuItemIcon} />
+                <Building2
+                  size={20}
+                  color={COLORS.textSecondary}
+                  style={styles.menuItemIcon}
+                />
                 <Text style={styles.menuItemText}>Explore Properties</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -103,7 +144,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
               >
                 <Calculator
                   size={20}
-                  color="#666"
+                  color={COLORS.textSecondary}
                   style={styles.menuItemIcon}
                 />
                 <Text style={styles.menuItemText}>Calculators</Text>
@@ -115,7 +156,11 @@ const SideMenu: React.FC<SideMenuProps> = ({
                   onClose();
                 }}
               >
-                <Users size={20} color="#666" style={styles.menuItemIcon} />
+                <Users
+                  size={20}
+                  color={COLORS.textSecondary}
+                  style={styles.menuItemIcon}
+                />
                 <Text style={styles.menuItemText}>Explore Brokers</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -127,11 +172,27 @@ const SideMenu: React.FC<SideMenuProps> = ({
               >
                 <TrendingUp
                   size={20}
-                  color="#666"
+                  color={COLORS.textSecondary}
                   style={styles.menuItemIcon}
                 />
                 <Text style={styles.menuItemText}>Investors</Text>
               </TouchableOpacity>
+              {isLoggedIn && user?.role === 'Owner' && (
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                    navigate('/my-notes');
+                    onClose();
+                  }}
+                >
+                  <MessageSquare
+                    size={20}
+                    color={COLORS.textSecondary}
+                    style={styles.menuItemIcon}
+                  />
+                  <Text style={styles.menuItemText}>My Notes</Text>
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => {
@@ -139,7 +200,11 @@ const SideMenu: React.FC<SideMenuProps> = ({
                   onClose();
                 }}
               >
-                <LifeBuoy size={20} color="#666" style={styles.menuItemIcon} />
+                <LifeBuoy
+                  size={20}
+                  color={COLORS.textSecondary}
+                  style={styles.menuItemIcon}
+                />
                 <Text style={styles.menuItemText}>Contact Support</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -151,7 +216,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
               >
                 <HelpCircle
                   size={20}
-                  color="#666"
+                  color={COLORS.textSecondary}
                   style={styles.menuItemIcon}
                 />
                 <Text style={styles.menuItemText}>How It Works</Text>
@@ -163,7 +228,11 @@ const SideMenu: React.FC<SideMenuProps> = ({
                   onClose();
                 }}
               >
-                <Mail size={20} color="#666" style={styles.menuItemIcon} />
+                <Mail
+                  size={20}
+                  color={COLORS.textSecondary}
+                  style={styles.menuItemIcon}
+                />
                 <Text style={styles.menuItemText}>Contact Us</Text>
               </TouchableOpacity>
             </ScrollView>
@@ -180,10 +249,12 @@ const SideMenu: React.FC<SideMenuProps> = ({
                 >
                   <LogOut
                     size={20}
-                    color="#D32F2F"
+                    color={COLORS.primary}
                     style={styles.menuItemIcon}
                   />
-                  <Text style={[styles.menuItemText, { color: '#D32F2F' }]}>
+                  <Text
+                    style={[styles.menuItemText, { color: COLORS.primary }]}
+                  >
                     Log Out
                   </Text>
                 </TouchableOpacity>
@@ -197,10 +268,12 @@ const SideMenu: React.FC<SideMenuProps> = ({
                 >
                   <LogIn
                     size={20}
-                    color="#D32F2F"
+                    color={COLORS.primary}
                     style={styles.menuItemIcon}
                   />
-                  <Text style={[styles.menuItemText, { color: '#D32F2F' }]}>
+                  <Text
+                    style={[styles.menuItemText, { color: COLORS.primary }]}
+                  >
                     Sign In
                   </Text>
                 </TouchableOpacity>
@@ -216,7 +289,9 @@ const SideMenu: React.FC<SideMenuProps> = ({
 const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
   const { width } = useWindowDimensions();
   const { navigate } = useNavigation();
+  const { isLoggedIn, user } = useAuth();
   const isMobile = width < 768;
+
   return (
     <View style={styles.headerContainer}>
       <View
@@ -231,7 +306,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
         >
           <Image
             source={require('../assets/Navbar/Preleasegrid logo 1.png')}
-            style={styles.logo}
+            style={styles.logoImage}
             resizeMode="contain"
           />
         </TouchableOpacity>
@@ -254,27 +329,70 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
         )}
 
         <View style={styles.headerActions}>
-          <TouchableOpacity
-            style={[
-              styles.listPropertyBtn,
-              isMobile && {
-                borderWidth: 0,
-                paddingRight: 0,
-                paddingLeft: 0,
-                paddingVertical: 0,
-              },
-            ]}
-            onPress={() => navigate('/list-property')}
-          >
-            <View style={[styles.plusIconBg, isMobile && { marginRight: 0 }]}>
-              <Text style={styles.plusIcon}>+</Text>
-            </View>
-            {!isMobile && (
-              <Text style={styles.listPropertyText}>List Property</Text>
-            )}
-          </TouchableOpacity>
+          {isLoggedIn && user?.role === 'Owner' && (
+            <TouchableOpacity
+              style={styles.notificationBtn}
+              onPress={() => navigate('/my-notes')}
+            >
+              <MessageSquare size={22} color={COLORS.primary} />
+            </TouchableOpacity>
+          )}
+
+          {isLoggedIn && (
+            <TouchableOpacity
+              style={[styles.profileBtn, isMobile && styles.profileBtnMobile]}
+              onPress={() => navigate('/my-profile')}
+            >
+              <View style={styles.profileCircle}>
+                <Text style={styles.profileInitials}>
+                  {user?.name
+                    ? user.name
+                        .split(' ')
+                        .map((n: string) => n[0])
+                        .join('')
+                        .toUpperCase()
+                        .slice(0, 2)
+                    : 'U'}
+                </Text>
+              </View>
+              {!isMobile && (
+                <Text style={styles.profileName}>
+                  {user?.name?.split(' ')[0]}
+                </Text>
+              )}
+            </TouchableOpacity>
+          )}
+
+          {isLoggedIn ? (
+            <TouchableOpacity
+              style={[
+                styles.listPropertyBtn,
+                isMobile && {
+                  borderWidth: 0,
+                  paddingRight: 0,
+                  paddingLeft: 0,
+                  paddingVertical: 0,
+                },
+              ]}
+              onPress={() => navigate('/list-property')}
+            >
+              <View style={[styles.plusIconBg, isMobile && { marginRight: 0 }]}>
+                <Text style={styles.plusIcon}>+</Text>
+              </View>
+              {!isMobile && (
+                <Text style={styles.listPropertyText}>List Property</Text>
+              )}
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.signInBtn}
+              onPress={() => navigate('/login')}
+            >
+              <Text style={styles.signInText}>Sign In</Text>
+            </TouchableOpacity>
+          )}
           <TouchableOpacity style={styles.menuBtn} onPress={onMenuPress}>
-            <Menu size={24} color="#D32F2F" />
+            <Menu size={24} color={COLORS.primary} />
           </TouchableOpacity>
         </View>
       </View>
@@ -288,7 +406,7 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isLoggedIn, logout } = useAuth();
+  const { isLoggedIn, user, logout } = useAuth();
   const { navigate } = useNavigation();
 
   const handleLoginClick = () => {
@@ -305,6 +423,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         visible={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
         isLoggedIn={isLoggedIn}
+        user={user}
         onLoginClick={handleLoginClick}
         onLogoutClick={logout}
       />
@@ -322,7 +441,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
   },
   scrollContent: {
     flexGrow: 1,
@@ -365,9 +484,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  logo: {
+  logoImage: {
     height: 48,
-    width: 140,
+    width: 200,
   },
   navLinks: {
     flexDirection: 'row',
@@ -376,7 +495,7 @@ const styles = StyleSheet.create({
   navLinkText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#333',
+    color: COLORS.textSecondary,
   },
   headerActions: {
     flexDirection: 'row',
@@ -389,20 +508,20 @@ const styles = StyleSheet.create({
   },
   signInText: {
     fontWeight: '600',
-    color: '#333',
+    color: COLORS.textDark,
   },
   listPropertyBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#333',
+    borderColor: COLORS.textDark,
     borderRadius: 25,
     paddingLeft: 4,
     paddingRight: 16,
     paddingVertical: 6,
   },
   plusIconBg: {
-    backgroundColor: '#D32F2F',
+    backgroundColor: COLORS.primary,
     borderRadius: 12,
     width: 24,
     height: 24,
@@ -411,13 +530,13 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   plusIcon: {
-    color: '#fff',
+    color: COLORS.white,
     fontWeight: 'bold',
     fontSize: 16,
   },
   listPropertyText: {
     fontWeight: '600',
-    color: '#333',
+    color: COLORS.textDark,
   },
   menuBtn: {
     width: 44,
@@ -447,7 +566,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContent: {
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     borderRadius: 20,
     padding: 30,
     width: '100%',
@@ -465,12 +584,12 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#1A1A1A',
+    color: COLORS.textDark,
     marginBottom: 10,
   },
   modalSubtitle: {
     fontSize: 16,
-    color: '#666',
+    color: COLORS.textSecondary,
     textAlign: 'center',
   },
   inputGroup: {
@@ -479,32 +598,32 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: COLORS.textDark,
     marginBottom: 8,
   },
   textInput: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: COLORS.divider,
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    color: '#333',
+    color: COLORS.textDark,
   },
   dummyInfo: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: COLORS.background,
     padding: 15,
     borderRadius: 8,
     marginBottom: 30,
   },
   dummyTitle: {
     fontWeight: '700',
-    color: '#333',
+    color: COLORS.textDark,
     marginBottom: 8,
     fontSize: 14,
   },
   dummyText: {
     fontSize: 13,
-    color: '#666',
+    color: COLORS.textSecondary,
     marginBottom: 4,
   },
   modalActions: {
@@ -516,25 +635,25 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: COLORS.divider,
     alignItems: 'center',
   },
   btnOutlineText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#666',
+    color: COLORS.textSecondary,
   },
   btnFilled: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: '#D32F2F',
+    backgroundColor: COLORS.primary,
     alignItems: 'center',
   },
   btnFilledText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
+    color: COLORS.white,
   },
   // Side Menu Styles
   menuOverlay: {
@@ -557,7 +676,7 @@ const styles = StyleSheet.create({
   menuContainer: {
     width: '85%',
     maxWidth: 320,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     padding: 24,
     shadowColor: '#000',
     shadowOffset: { width: -5, height: 0 },
@@ -575,12 +694,12 @@ const styles = StyleSheet.create({
   menuTitle: {
     fontSize: 24,
     fontWeight: '600',
-    color: '#1A1A1A',
+    color: COLORS.textDark,
   },
   closeBtn: {
     padding: 8,
     borderRadius: 20,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: COLORS.background,
   },
   menuItems: {
     gap: 16,
@@ -591,7 +710,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 12,
     borderRadius: 12,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
   },
   menuItemIcon: {
     marginRight: 16,
@@ -603,14 +722,112 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#F0F0F0',
+    backgroundColor: COLORS.divider,
     marginVertical: 16,
   },
   dashboardButton: {
-    backgroundColor: '#FFF0F0',
+    backgroundColor: COLORS.lightRed,
     marginTop: 10,
     borderWidth: 1,
-    borderColor: '#EE2529',
+    borderColor: COLORS.primary,
+  },
+  profileBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    padding: 4,
+    paddingRight: 10,
+    borderRadius: 20,
+    backgroundColor: COLORS.lightRed,
+    borderWidth: 1,
+    borderColor: 'rgba(211, 47, 47, 0.1)',
+  },
+  profileBtnMobile: {
+    paddingRight: 4,
+  },
+  profileCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  profileName: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#333',
+  },
+  profileInitials: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: COLORS.white,
+  },
+  profileMenuBtn: {
+    backgroundColor: COLORS.lightRed,
+    marginTop: 12,
+  },
+  notificationBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.lightRed,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  badge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    backgroundColor: COLORS.primary,
+    borderRadius: 8,
+    minWidth: 16,
+    height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: COLORS.white,
+  },
+  badgeText: {
+    color: COLORS.white,
+    fontSize: 8,
+    fontWeight: '800',
+  },
+  menuUserInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
+  },
+  menuAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+  },
+  menuAvatarText: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: COLORS.white,
+  },
+  menuUserDetails: {
+    flex: 1,
+  },
+  menuUserName: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: COLORS.textDark,
+  },
+  menuUserRole: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.primary,
+    textTransform: 'uppercase',
   },
 });
 

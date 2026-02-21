@@ -1,18 +1,206 @@
 import React, { useState } from 'react';
 import {
-  Platform,
   View,
   Text,
   StyleSheet,
   Dimensions,
-  Image,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
-import { PieChart, LineChart, BarChart } from 'react-native-chart-kit';
-import { MapPin } from 'lucide-react-native';
+import { PieChart, LineChart } from 'react-native-chart-kit';
+import PropertyCard, { Property } from '../../../components/PropertyCard';
+import { useAuth } from '../../../context/AuthContext';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+export const DiversificationCard = ({ data }: { data: any[] }) => {
+  const pieChartData = data.map(item => ({
+    name: item.type,
+    population: item.percentage,
+    color: item.color,
+    legendFontColor: '#666',
+    legendFontSize: 13,
+  }));
+
+  const isWide = SCREEN_WIDTH > 768;
+  const chartWidthToUse = isWide ? 350 : SCREEN_WIDTH - 80;
+
+  return (
+    <View style={styles.chartCard}>
+      <Text style={styles.chartTitle}>Portfolio Diversification</Text>
+      <PieChart
+        data={pieChartData}
+        width={chartWidthToUse}
+        height={200}
+        chartConfig={{
+          color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+        }}
+        accessor="population"
+        backgroundColor="transparent"
+        paddingLeft="15"
+        absolute={false}
+        hasLegend={false}
+      />
+      <View style={styles.legend}>
+        {data.map((item, index) => (
+          <View key={index} style={styles.legendItem}>
+            <View style={[styles.legendDot, { backgroundColor: item.color }]} />
+            <Text style={styles.legendText}>
+              {item.type} {item.percentage}%
+            </Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+};
+
+export const IncomeTrackerCard = ({ data }: { data: any }) => {
+  const [containerWidth, setContainerWidth] = useState(0);
+  const isWide = SCREEN_WIDTH > 768;
+
+  const onLayout = (event: any) => {
+    const { width } = event.nativeEvent.layout;
+    setContainerWidth(width - 40);
+  };
+
+  const chartWidthToUse =
+    containerWidth > 0
+      ? containerWidth
+      : isWide
+      ? (SCREEN_WIDTH - 340) / 2
+      : SCREEN_WIDTH - 60;
+
+  return (
+    <View style={styles.chartCard} onLayout={onLayout}>
+      <Text style={styles.chartTitle}>Income Tracker</Text>
+      <View style={{ alignItems: 'center' }}>
+        <LineChart
+          data={{
+            labels: data.labels,
+            datasets: [
+              {
+                data: data.expected,
+                color: () => '#5DADE2',
+                strokeWidth: 2,
+              },
+              {
+                data: data.received,
+                color: () => '#EE2529',
+                strokeWidth: 2,
+              },
+            ],
+          }}
+          width={chartWidthToUse}
+          height={220}
+          fromZero
+          bezier={false}
+          withShadow={false}
+          withInnerLines
+          withOuterLines={false}
+          withVerticalLines={false}
+          yAxisSuffix="L"
+          chartConfig={{
+            backgroundGradientFrom: '#ffffff',
+            backgroundGradientTo: '#ffffff',
+            backgroundGradientFromOpacity: 0,
+            backgroundGradientToOpacity: 0,
+            decimalPlaces: 0,
+            color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+            labelColor: () => '#666666',
+            propsForBackgroundLines: {
+              stroke: '#E5E5E5',
+              strokeWidth: 1,
+            },
+          }}
+          style={{
+            borderRadius: 8,
+          }}
+        />
+      </View>
+
+      <View style={styles.legend}>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendLine, { backgroundColor: '#5DADE2' }]} />
+          <Text style={styles.legendText}>Expected</Text>
+        </View>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendLine, { backgroundColor: '#EE2529' }]} />
+          <Text style={styles.legendText}>Received</Text>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+export const LeaseRenewalsCard = ({ renewals }: { renewals: any[] }) => {
+  const isWide = SCREEN_WIDTH > 768;
+  return (
+    <View style={styles.tableCard}>
+      <View style={styles.tableHeader}>
+        <Text style={styles.tableTitle}>Upcoming Lease Renewals</Text>
+        <Text style={styles.expiringBadge}>
+          {renewals.length} Expiring Soon
+        </Text>
+      </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={{ width: '100%' }}
+        contentContainerStyle={{ flexGrow: 1 }}
+      >
+        <View
+          style={[
+            styles.table,
+            { width: isWide ? '100%' : 700, minWidth: '100%' },
+          ]}
+        >
+          <View style={styles.tableRow}>
+            <Text style={[styles.tableHeaderText, { flex: 1.5 }]}>
+              Property
+            </Text>
+            <Text style={[styles.tableHeaderText, { flex: 1 }]}>Location</Text>
+            <Text style={[styles.tableHeaderText, { flex: 1.2 }]}>Tenant</Text>
+            <Text style={[styles.tableHeaderText, { flex: 1 }]}>
+              Expiry Date
+            </Text>
+            <Text style={[styles.tableHeaderText, { flex: 1.2 }]}>
+              Annual Rent
+            </Text>
+            <Text style={[styles.tableHeaderText, { flex: 0.8 }]}>Action</Text>
+          </View>
+
+          {renewals.map(item => (
+            <View key={item.id} style={[styles.tableRow, styles.tableDataRow]}>
+              <Text style={[styles.tableDataText, { flex: 1.5 }]}>
+                {item.property}
+              </Text>
+              <Text style={[styles.tableDataText, { flex: 1 }]}>
+                {item.location}
+              </Text>
+              <Text style={[styles.tableDataText, { flex: 1.2 }]}>
+                {item.tenant}
+              </Text>
+              <Text style={[styles.tableDataText, { flex: 1 }]}>
+                {item.expiryDate}
+              </Text>
+              <Text style={[styles.tableDataText, { flex: 1.2 }]}>
+                {item.annualRent}
+              </Text>
+              <TouchableOpacity style={styles.viewButton}>
+                <Text style={styles.viewButtonText}>view</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    </View>
+  );
+};
 
 const PortfolioTab = () => {
+  const { user } = useAuth();
   const leaseRenewals = [
     {
       id: '1',
@@ -38,85 +226,97 @@ const PortfolioTab = () => {
     { type: 'Industrial', percentage: 15, color: '#5DADE2' },
   ];
 
-  const pieChartData = diversificationData.map(item => ({
-    name: item.type,
-    population: item.percentage,
-    color: item.color,
-    legendFontColor: '#666',
-    legendFontSize: 13,
-  }));
-
   const incomeData = {
     labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
     expected: [45, 50, 52, 55, 55],
     received: [45, 52, 50, 55, 58],
   };
 
-  // Format data specifically for recharts
-  const webChartData = incomeData.labels.map((label, index) => ({
-    name: label,
-    expected: incomeData.expected[index],
-    received: incomeData.received[index],
-  }));
-
-  const propertiesOwned = [
+  const propertiesOwned: Property[] = [
     {
       id: '1',
       title: 'Skyline Apartments',
       location: 'Bandra West, Mumbai',
-      image: require('../../../assets/FeaturedProperties/cardImg.png'),
-      investmentAmount: '₹10,00,000',
-      propertyType: 'Residential',
+      price: '₹10,00,000',
+      rent: '₹ 50,000',
+      tenure: 'Freehold',
+      roi: '5.5%',
+      type: 'Residential',
+      images: [
+        'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
+      ],
+      isVerified: 'completed',
+      verified: true,
+      badges: ['Owned', 'Rented'],
     },
     {
       id: '2',
       title: 'Tech Park Commercial',
       location: 'Whitefield, Bangalore',
-      image: require('../../../assets/FeaturedProperties/cardImg.png'),
-      investmentAmount: '₹15,00,000',
-      propertyType: 'Commercial',
+      price: '₹15,00,000',
+      rent: '₹ 1.2 L',
+      tenure: '99 Years',
+      roi: '8.2%',
+      type: 'Commercial',
+      images: [
+        'https://images.unsplash.com/photo-1486406140926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80',
+      ],
+      isVerified: 'completed',
+      verified: true,
+      badges: ['Owned'],
     },
     {
       id: '3',
       title: 'Green Valley Villas',
       location: 'Gurgaon, Delhi NCR',
-      image: require('../../../assets/FeaturedProperties/cardImg.png'),
-      investmentAmount: '₹8,00,000',
-      propertyType: 'Villa',
+      price: '₹8,00,000',
+      rent: '₹ 35,000',
+      tenure: 'Freehold',
+      roi: '4.8%',
+      type: 'Villa',
+      images: [
+        'https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?auto=format&fit=crop&w=800&q=80',
+      ],
+      isVerified: 'completed',
+      verified: true,
+      badges: ['Owned'],
     },
     {
       id: '4',
       title: 'Marina Bay Complex',
       location: 'Kochi, Kerala',
-      image: require('../../../assets/FeaturedProperties/cardImg.png'),
-      investmentAmount: '₹6,60,000',
-      propertyType: 'Commercial',
+      price: '₹6,60,000',
+      rent: '₹ 28,000',
+      tenure: 'Freehold',
+      roi: '5.1%',
+      type: 'Commercial',
+      images: [
+        'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&q=80',
+      ],
+      isVerified: 'completed',
+      verified: true,
+      badges: ['Owned'],
     },
     {
-      id: '4',
+      id: '5',
       title: 'Ocean View Residency',
       location: 'Marine Drive, Kochi',
-      image: require('../../../assets/FeaturedProperties/cardImg.png'),
-      investmentAmount: '₹12,00,000',
-      propertyType: 'Residential',
+      price: '₹12,00,000',
+      rent: '₹ 45,000',
+      tenure: 'Freehold',
+      roi: '6.0%',
+      type: 'Residential',
+      images: [
+        'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
+      ],
+      isVerified: 'completed',
+      verified: true,
+      badges: ['Owned'],
     },
   ];
 
-  const [containerWidth, setContainerWidth] = useState(0);
-  const screenWidth = Dimensions.get('window').width;
-  const isDesktop = screenWidth > 768;
-
-  const onLayout = (event: any) => {
-    const { width } = event.nativeEvent.layout;
-    setContainerWidth(width - 40); // Subtract padding
-  };
-
-  const chartWidthToUse =
-    containerWidth > 0
-      ? containerWidth
-      : isDesktop
-      ? (screenWidth - 340) / 2
-      : screenWidth - 60;
+  const { width } = Dimensions.get('window');
+  const isDesktop = width > 1024;
 
   return (
     <View style={styles.container}>
@@ -142,216 +342,30 @@ const PortfolioTab = () => {
       </View>
 
       <View style={styles.chartsRow}>
-        {/* Portfolio Diversification */}
-        <View style={styles.chartCard}>
-          <Text style={styles.chartTitle}>Portfolio Diversification</Text>
-          <PieChart
-            data={pieChartData}
-            width={chartWidth}
-            height={200}
-            chartConfig={{
-              color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-            }}
-            accessor="population"
-            backgroundColor="transparent"
-            paddingLeft="15"
-            absolute={false}
-            hasLegend={false}
-          />
-          <View style={styles.legend}>
-            {diversificationData.map((item, index) => (
-              <View key={index} style={styles.legendItem}>
-                <View
-                  style={[styles.legendDot, { backgroundColor: item.color }]}
-                />
-                <Text style={styles.legendText}>
-                  {item.type} {item.percentage}%
-                </Text>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Income Tracker */}
-        <View style={styles.chartCard} onLayout={onLayout}>
-          <Text style={styles.chartTitle}>Income Tracker</Text>
-          <View style={{ alignItems: 'center' }}>
-            <LineChart
-              data={{
-                labels: incomeData.labels,
-                datasets: [
-                  {
-                    data: incomeData.expected,
-                    color: () => '#5DADE2',
-                    strokeWidth: 2,
-                  },
-                  {
-                    data: incomeData.received,
-                    color: () => '#EE2529',
-                    strokeWidth: 2,
-                  },
-                ],
-              }}
-              width={chartWidthToUse}
-              height={220}
-              fromZero
-              bezier={false}
-              withShadow={false}
-              withInnerLines
-              withOuterLines={false}
-              withVerticalLines={false}
-              yAxisSuffix="L"
-              chartConfig={{
-                backgroundGradientFrom: '#ffffff',
-                backgroundGradientTo: '#ffffff',
-                backgroundGradientFromOpacity: 0,
-                backgroundGradientToOpacity: 0,
-                decimalPlaces: 0,
-                color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                labelColor: () => '#666666',
-                propsForBackgroundLines: {
-                  stroke: '#E5E5E5',
-                  strokeWidth: 1,
-                },
-              }}
-              style={{
-                borderRadius: 8,
-              }}
-            />
-          </View>
-
-          <View style={styles.legend}>
-            <View style={styles.legendItem}>
-              <View
-                style={[styles.legendLine, { backgroundColor: '#5DADE2' }]}
-              />
-              <Text style={styles.legendText}>Expected</Text>
-            </View>
-            <View style={styles.legendItem}>
-              <View
-                style={[styles.legendLine, { backgroundColor: '#EE2529' }]}
-              />
-              <Text style={styles.legendText}>Received</Text>
-            </View>
-          </View>
-        </View>
+        <DiversificationCard data={diversificationData} />
+        <IncomeTrackerCard data={incomeData} />
       </View>
 
-      {/* Upcoming Lease Renewals */}
-      <View style={styles.tableCard}>
-        <View style={styles.tableHeader}>
-          <Text style={styles.tableTitle}>Upcoming Lease Renewals</Text>
-          <Text style={styles.expiringBadge}>2 Expiring Soon</Text>
-        </View>
-
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={{ width: '100%' }}
-          contentContainerStyle={{ flexGrow: 1 }}
-        >
-          <View
-            style={[
-              styles.table,
-              { width: isDesktop ? '100%' : 700, minWidth: '100%' },
-            ]}
-          >
-            {/* Table Header */}
-            <View style={styles.tableRow}>
-              <Text style={[styles.tableHeaderText, { flex: 1.5 }]}>
-                Property
-              </Text>
-              <Text style={[styles.tableHeaderText, { flex: 1 }]}>
-                Location
-              </Text>
-              <Text style={[styles.tableHeaderText, { flex: 1.2 }]}>
-                Tenant
-              </Text>
-              <Text style={[styles.tableHeaderText, { flex: 1 }]}>
-                Expiry Date
-              </Text>
-              <Text style={[styles.tableHeaderText, { flex: 1.2 }]}>
-                Annual Rent
-              </Text>
-              <Text style={[styles.tableHeaderText, { flex: 0.8 }]}>
-                Action
-              </Text>
-            </View>
-
-            {/* Table Rows */}
-            {leaseRenewals.map(item => (
-              <View
-                key={item.id}
-                style={[styles.tableRow, styles.tableDataRow]}
-              >
-                <Text style={[styles.tableDataText, { flex: 1.5 }]}>
-                  {item.property}
-                </Text>
-                <Text style={[styles.tableDataText, { flex: 1 }]}>
-                  {item.location}
-                </Text>
-                <Text style={[styles.tableDataText, { flex: 1.2 }]}>
-                  {item.tenant}
-                </Text>
-                <Text style={[styles.tableDataText, { flex: 1 }]}>
-                  {item.expiryDate}
-                </Text>
-                <Text style={[styles.tableDataText, { flex: 1.2 }]}>
-                  {item.annualRent}
-                </Text>
-                <TouchableOpacity style={styles.viewButton}>
-                  <Text style={styles.viewButtonText}>view</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-        </ScrollView>
-      </View>
+      <LeaseRenewalsCard renewals={leaseRenewals} />
 
       {/* Properties Owned */}
+
       <View style={styles.propertiesSection}>
         <Text style={styles.sectionTitle}>Properties Owned</Text>
         <View style={styles.propertiesGrid}>
           {propertiesOwned.map(property => (
-            <View key={property.id} style={styles.propertyCard}>
-              <Image
-                source={property.image}
-                style={styles.propertyImage}
-                resizeMode="cover"
-              />
-              <View style={styles.propertyContent}>
-                <View style={styles.propertyHeader}>
-                  <Text style={styles.propertyTitle}>{property.title}</Text>
-                  <View style={styles.typeBadge}>
-                    <Text style={styles.typeText}>{property.propertyType}</Text>
-                  </View>
-                </View>
-                <View style={styles.locationRow}>
-                  <MapPin size={14} color="#767676" />
-                  <Text style={styles.locationText}>{property.location}</Text>
-                </View>
-                <View style={styles.divider} />
-                <View style={styles.investmentRow}>
-                  <Text style={styles.investmentLabel}>Investment Amount</Text>
-                  <Text style={styles.investmentValue}>
-                    {property.investmentAmount}
-                  </Text>
-                </View>
-                <TouchableOpacity style={styles.viewDetailsBtn}>
-                  <Text style={styles.viewDetailsBtnText}>View Details</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
+            <PropertyCard
+              key={property.id}
+              item={{ ...property, raw: { userId: user?.userId } }}
+              width={isDesktop ? '48%' : '100%'}
+              noView={false}
+            />
           ))}
         </View>
       </View>
     </View>
   );
 };
-
-const { width } = Dimensions.get('window');
-const isDesktop = width > 1024;
-const chartWidth = isDesktop ? 350 : width - 80;
 
 const styles = StyleSheet.create({
   container: {
@@ -366,7 +380,7 @@ const styles = StyleSheet.create({
   },
   summaryCard: {
     flex: 1,
-    minWidth: isDesktop ? 200 : '45%',
+    minWidth: 200,
     backgroundColor: '#fff',
     padding: 20,
     borderRadius: 8,
@@ -386,12 +400,14 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   chartsRow: {
-    flexDirection: isDesktop ? 'row' : 'column',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 20,
     marginBottom: 20,
   },
   chartCard: {
     flex: 1,
+    minWidth: 350,
     backgroundColor: '#fff',
     borderRadius: 8,
     padding: 20,
@@ -406,17 +422,12 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 20,
   },
-  chartWrapper: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    overflow: 'hidden',
-    marginBottom: 20,
-  },
   legend: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 15,
     justifyContent: 'center',
+    marginTop: 10,
   },
   legendItem: {
     flexDirection: 'row',
@@ -515,110 +526,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 20,
   },
-  propertyCard: {
-    width: isDesktop ? '48%' : '100%',
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  propertyImage: {
-    width: '100%',
-    height: 180,
-  },
-  propertyContent: {
-    padding: 15,
-  },
-  propertyHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 10,
-  },
-  propertyTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    flex: 1,
-  },
-  typeBadge: {
-    backgroundColor: '#FFF3CA',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  typeText: {
-    fontSize: 11,
-    color: '#EE2529',
-    fontWeight: '600',
-  },
-  locationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    marginBottom: 15,
-  },
-  locationText: {
-    fontSize: 13,
-    color: '#767676',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#eee',
-    marginVertical: 12,
-  },
-  investmentRow: {
-    marginBottom: 15,
-  },
-  investmentLabel: {
-    fontSize: 12,
-    color: '#767676',
-    marginBottom: 4,
-  },
-  investmentValue: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#EE2529',
-  },
-  viewDetailsBtn: {
-    borderWidth: 1,
-    borderColor: '#EE2529',
-    paddingVertical: 10,
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  viewDetailsBtnText: {
-    color: '#EE2529',
-    fontSize: 14,
-    fontWeight: '600',
-  },
 });
 
 export default PortfolioTab;
-
-const chartConfig = {
-  backgroundColor: '#ffffff',
-  backgroundGradientFrom: '#ffffff',
-  backgroundGradientTo: '#ffffff',
-  decimalPlaces: 0,
-
-  color: (opacity = 1) => `rgba(0,0,0,${opacity})`,
-  labelColor: (opacity = 1) => `rgba(102,102,102,${opacity})`,
-
-  propsForDots: {
-    r: '4',
-    strokeWidth: '2',
-  },
-
-  propsForBackgroundLines: {
-    stroke: '#E5E5E5',
-    strokeWidth: 1,
-  },
-
-  propsForLabels: {
-    fontSize: 12,
-  },
-};

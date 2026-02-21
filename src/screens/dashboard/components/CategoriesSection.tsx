@@ -7,13 +7,15 @@ import {
   useWindowDimensions,
   StyleSheet,
 } from 'react-native';
+import { COLORS } from '../../../constants/theme';
 
 const CATEGORIES = [
   {
     id: '1',
     title: 'Residential',
     count: '26 Property Listed',
-    image: 'https://images.unsplash.com/photo-1553456558-aff63285bdd1?auto=format&fit=crop&q=80&w=1000',
+    image:
+      'https://images.unsplash.com/photo-1553456558-aff63285bdd1?auto=format&fit=crop&q=80&w=1000',
   },
   {
     id: '2',
@@ -98,12 +100,12 @@ const CategoriesSection = () => {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 60,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     alignItems: 'center',
   },
   sectionTitle: {
     fontWeight: '400',
-    color: '#1A1A1A',
+    color: COLORS.textDark,
     marginBottom: 40,
     textAlign: 'center',
   },
@@ -115,7 +117,7 @@ const styles = StyleSheet.create({
     maxWidth: 1440,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
     borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -140,7 +142,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 20,
     left: 20,
-    color: '#fff',
+    color: COLORS.white,
     fontSize: 24,
     fontWeight: 'bold',
     textShadowColor: 'rgba(0, 0, 0, 0.5)',
@@ -152,7 +154,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.white,
   },
   countBadge: {
     backgroundColor: '#FFF8E1',
@@ -162,17 +164,17 @@ const styles = StyleSheet.create({
   },
   countText: {
     fontSize: 12,
-    color: '#666',
+    color: COLORS.textSecondary,
     fontWeight: '500',
   },
   exploreBtn: {
-    backgroundColor: '#D32F2F',
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 8,
   },
   exploreBtnText: {
-    color: '#fff',
+    color: COLORS.white,
     fontSize: 14,
     fontWeight: '600',
   },

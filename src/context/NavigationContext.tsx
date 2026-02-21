@@ -12,6 +12,7 @@ declare const window: any;
 interface NavigationContextType {
   currentPath: string;
   navigate: (path: string) => void;
+  goBack: () => void;
 }
 
 const NavigationContext = createContext<NavigationContextType | undefined>(
@@ -37,6 +38,13 @@ export const NavigationProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const goBack = () => {
+    if (isWeb && typeof window !== 'undefined') {
+      window.history.back();
+    }
+    // For mobile/simple implementation, we might need a history stack, but for now focus on web behavior or no-op
+  };
+
   useEffect(() => {
     if (isWeb && typeof window !== 'undefined') {
       const handlePopState = () => {
@@ -49,7 +57,7 @@ export const NavigationProvider = ({ children }: { children: ReactNode }) => {
   }, [isWeb]);
 
   return (
-    <NavigationContext.Provider value={{ currentPath, navigate }}>
+    <NavigationContext.Provider value={{ currentPath, navigate, goBack }}>
       {children}
     </NavigationContext.Provider>
   );
