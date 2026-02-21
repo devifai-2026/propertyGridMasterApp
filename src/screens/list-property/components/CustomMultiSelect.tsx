@@ -7,8 +7,9 @@ import {
   FlatList,
   StyleSheet,
   Pressable,
+  TextInput,
 } from 'react-native';
-import { ChevronDown, X } from 'lucide-react-native';
+import { ChevronDown, X, Search } from 'lucide-react-native';
 
 interface Option {
   label: string;
@@ -33,6 +34,12 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
   error = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Filter options based on search query
+  const filteredOptions = options.filter(option =>
+    option.label.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   // Derive selected labels
   const selectedLabels = value
@@ -51,6 +58,7 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
 
   const handleClose = () => {
     setIsOpen(false);
+    setSearchQuery('');
     if (onBlur) onBlur();
   };
 
@@ -79,9 +87,9 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
         onRequestClose={handleClose}
       >
         <Pressable style={styles.modalOverlay} onPress={handleClose}>
-          <View
+          <Pressable
             style={styles.modalContent}
-            onStartShouldSetResponder={() => true}
+            onPress={e => e.stopPropagation()}
           >
             {/* Header */}
             <View style={styles.modalHeader}>
@@ -94,9 +102,21 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
               </TouchableOpacity>
             </View>
 
+            {/* Search Bar */}
+            <View style={styles.searchContainer}>
+              <Search size={18} color="#999" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                clearButtonMode="while-editing"
+              />
+            </View>
+
             {/* Options List */}
             <FlatList
-              data={options}
+              data={filteredOptions}
               keyExtractor={item => String(item.value)}
               renderItem={({ item }) => {
                 const isSelected = value.includes(item.value);
@@ -126,9 +146,9 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
             />
 
             <TouchableOpacity style={styles.doneButton} onPress={handleClose}>
-              <Text style={styles.doneButtonText}>Done</Text>
+              <Text style={styles.doneButtonText}>Close</Text>
             </TouchableOpacity>
-          </View>
+          </Pressable>
         </Pressable>
       </Modal>
     </View>
@@ -241,6 +261,25 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontWeight: '600',
     fontSize: 14,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    margin: 16,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    height: 40,
+  },
+  searchIcon: {
+    marginRight: 8,
+  },
+  searchInput: {
+    flex: 1,
+    height: '100%',
+    fontSize: 14,
+    color: '#333',
+    padding: 0,
   },
 });
 
