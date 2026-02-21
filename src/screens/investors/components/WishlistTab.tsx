@@ -32,6 +32,7 @@ const WishlistTab = () => {
       isVerified: 'completed',
       verified: true,
       badges: ['MNC Client'],
+      raw: { userId: 'wishlist-owner-1' },
     },
     {
       id: '2',
@@ -48,6 +49,7 @@ const WishlistTab = () => {
       isVerified: 'completed',
       verified: true,
       badges: ['IT Park'],
+      raw: { userId: 'wishlist-owner-2' },
     },
   ];
 

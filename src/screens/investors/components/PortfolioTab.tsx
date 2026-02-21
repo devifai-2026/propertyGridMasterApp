@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { PieChart, LineChart } from 'react-native-chart-kit';
 import PropertyCard, { Property } from '../../../components/PropertyCard';
+import { useAuth } from '../../../context/AuthContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -199,6 +200,7 @@ export const LeaseRenewalsCard = ({ renewals }: { renewals: any[] }) => {
 };
 
 const PortfolioTab = () => {
+  const { user } = useAuth();
   const leaseRenewals = [
     {
       id: '1',
@@ -354,7 +356,7 @@ const PortfolioTab = () => {
           {propertiesOwned.map(property => (
             <PropertyCard
               key={property.id}
-              item={property}
+              item={{ ...property, raw: { userId: user?.userId } }}
               width={isDesktop ? '48%' : '100%'}
               noView={false}
             />

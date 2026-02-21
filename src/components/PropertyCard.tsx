@@ -20,6 +20,7 @@ import {
 } from 'lucide-react-native';
 import { COLORS } from '../constants/theme';
 import { useNavigation } from '../context/NavigationContext';
+import { useAuth } from '../context/AuthContext';
 
 export interface Property {
   id: string;
@@ -63,6 +64,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   style,
 }) => {
   const { navigate } = useNavigation();
+  const { user } = useAuth();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const hasImages = item.images && item.images.length > 0;
@@ -255,9 +257,14 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               <Text style={styles.viewBtnText}>View</Text>
             </TouchableOpacity>
           )}
-          <TouchableOpacity style={styles.enquireBtn} onPress={handleEnquire}>
-            <Text style={styles.enquireBtnText}>Enquire</Text>
-          </TouchableOpacity>
+          {/* {user &&
+            user.userId !== item.raw?.userId &&
+            user.userId !== item.raw?.added_by && ( */}
+          {user && (
+            <TouchableOpacity style={styles.enquireBtn} onPress={handleEnquire}>
+              <Text style={styles.enquireBtnText}>Enquire</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </View>

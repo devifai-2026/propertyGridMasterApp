@@ -27,6 +27,7 @@ const FEATURED_PROPERTIES: Property[] = [
     badges: ['MNC Client'],
     isVerified: 'completed',
     verified: true,
+    raw: { userId: 'mock-user' },
   },
   {
     id: '2',
@@ -43,6 +44,7 @@ const FEATURED_PROPERTIES: Property[] = [
     badges: ['MNC Client'],
     isVerified: 'completed',
     verified: true,
+    raw: { userId: 'mock-user' },
   },
   {
     id: '3',
@@ -59,6 +61,7 @@ const FEATURED_PROPERTIES: Property[] = [
     badges: ['MNC Client'],
     isVerified: 'completed',
     verified: true,
+    raw: { userId: 'mock-user' },
   },
 ];
 
@@ -103,6 +106,7 @@ const FeaturedSection = ({ properties }: { properties: any[] }) => {
           badges: p.tenantType ? [p.tenantType] : [],
           isVerified: p.isVerified,
           verified: p.isVerified === 'partial' || p.isVerified === 'completed',
+          raw: p,
         }))
       : FEATURED_PROPERTIES;
 
