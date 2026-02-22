@@ -26,6 +26,7 @@ const LoginScreen = () => {
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [verificationId, setVerificationId] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
   const { login } = useAuth();
   const { login: authenticate, sendOtp, loading: apiLoading } = useAuthAPIs();
   const { navigate } = useNavigation();
@@ -58,6 +59,7 @@ const LoginScreen = () => {
   }, []);
 
   const handleSendOtp = () => {
+    setErrorMsg('');
     if (phone.length === 10) {
       sendOtp(
         { mobileNumber: phone },
@@ -74,18 +76,15 @@ const LoginScreen = () => {
               'A 6-digit OTP has been sent to your mobile number',
             );
           } else {
-            Alert.alert('Error', response.message || 'Failed to send OTP');
+            setErrorMsg(response.message || 'Failed to send OTP');
           }
         },
         (error: any) => {
-          Alert.alert(
-            'Error',
-            error?.response?.data?.message || 'Failed to send OTP',
-          );
+          setErrorMsg(error?.response?.data?.message || 'Failed to send OTP');
         },
       );
     } else {
-      Alert.alert('Error', 'Please enter a valid 10-digit number');
+      setErrorMsg('Please enter a valid 10-digit number');
     }
   };
 
@@ -101,6 +100,7 @@ const LoginScreen = () => {
     if (digit && index < 5) {
       otpInputRefs.current[index + 1]?.focus();
     }
+    setErrorMsg('');
   };
 
   const handleOtpKeyPress = (e: any, index: number) => {
@@ -111,15 +111,15 @@ const LoginScreen = () => {
   };
 
   const handleVerifyOtp = async () => {
+    setErrorMsg('');
     if (otp.length === 6) {
       authenticate(
         { mobileNumber: phone, otp, verificationId },
         async (response: any) => {
           if (response.success) {
             if (!allowedRoles.includes(response.data.role)) {
-              Alert.alert(
-                'Access Denied',
-                'Only Owners, Brokers, and Investors can access this platform.',
+              setErrorMsg(
+                'Access Denied: Only Owners, Brokers, and Investors can access this platform.',
               );
               return;
             }
@@ -128,18 +128,15 @@ const LoginScreen = () => {
               navigate('/dashboard');
             }
           } else {
-            Alert.alert('Error', response.message || 'Login failed');
+            setErrorMsg(response.message || 'Login failed');
           }
         },
         (error: any) => {
-          Alert.alert(
-            'Error',
-            error?.response?.data?.message || 'Something went wrong',
-          );
+          setErrorMsg(error?.response?.data?.message || 'Something went wrong');
         },
       );
     } else {
-      Alert.alert('Error', 'Please enter the complete 6-digit OTP');
+      setErrorMsg('Please enter the complete 6-digit OTP');
     }
   };
 
@@ -180,7 +177,10 @@ const LoginScreen = () => {
                     keyboardType="numeric"
                     maxLength={10}
                     value={phone}
-                    onChangeText={setPhone}
+                    onChangeText={text => {
+                      setPhone(text);
+                      setErrorMsg('');
+                    }}
                     editable={!otpSent}
                   />
                 </View>
@@ -231,6 +231,12 @@ const LoginScreen = () => {
                     <Text style={styles.dummyText}>• Owner: 7550969934</Text>
                   </View>
                 )}
+
+                {errorMsg ? (
+                  <View style={styles.errorContainer}>
+                    <Text style={styles.errorText}>{errorMsg}</Text>
+                  </View>
+                ) : null}
 
                 <View style={styles.actions}>
                   <TouchableOpacity
@@ -413,6 +419,20 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textSecondary,
     marginBottom: 4,
+  },
+  errorContainer: {
+    backgroundColor: '#FFF5F5',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#FEB2B2',
+  },
+  errorText: {
+    color: '#C53030',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   actions: {
     flexDirection: 'row',
