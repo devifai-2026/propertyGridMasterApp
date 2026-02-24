@@ -205,23 +205,33 @@ const ListPropertyScreen = () => {
       const apiFormData = new FormData();
 
       // --- Basic Details ---
-      apiFormData.append('propertyType', finalData.propertyType || '');
-      apiFormData.append('carpetAreaSqft', finalData.carpetArea || '');
-      apiFormData.append('completionYear', finalData.builtYear || '');
-      apiFormData.append('lastRefurbished', finalData.lastRefurbished || '');
-      apiFormData.append('ownershipType', finalData.ownership || '');
-      apiFormData.append('buildingGrade', finalData.buildingGrade || '');
+      if (finalData.propertyType)
+        apiFormData.append('propertyType', finalData.propertyType);
+      if (finalData.carpetArea)
+        apiFormData.append('carpetAreaSqft', finalData.carpetArea);
+      if (finalData.builtYear)
+        apiFormData.append('completionYear', finalData.builtYear);
+      if (finalData.lastRefurbished)
+        apiFormData.append('lastRefurbished', finalData.lastRefurbished);
+      if (finalData.ownership)
+        apiFormData.append('ownershipType', finalData.ownership);
+      if (finalData.buildingGrade)
+        apiFormData.append('buildingGrade', finalData.buildingGrade);
 
       // Parking
       apiFormData.append('parkingSlots', finalData.fourWheelerParkings || '0');
       apiFormData.append('parkingRatio', finalData.twoWheelerParkings || '0');
 
       // Infrastructure
-      apiFormData.append('powerBackupKva', finalData.powerBackup || '');
+      if (finalData.powerBackup)
+        apiFormData.append('powerBackupKva', finalData.powerBackup);
       apiFormData.append('numberOfLifts', finalData.numLifts || '0');
-      apiFormData.append('hvacType', finalData.hvacType || '');
-      apiFormData.append('furnishingStatus', finalData.furnishingStatus || '');
-      apiFormData.append('caretakerId', finalData.buildingMaintained || '');
+      if (finalData.hvacType)
+        apiFormData.append('hvacType', finalData.hvacType);
+      if (finalData.furnishingStatus)
+        apiFormData.append('furnishingStatus', finalData.furnishingStatus);
+      if (finalData.buildingMaintained)
+        apiFormData.append('caretakerId', finalData.buildingMaintained);
 
       apiFormData.append(
         'amenityIds',
@@ -232,15 +242,15 @@ const ListPropertyScreen = () => {
       apiFormData.append('description', finalData.propertyDescription || '');
 
       // --- Legal Details ---
-      apiFormData.append('titleStatus', finalData.titleStatus || '');
-      apiFormData.append(
-        'occupancyCertificate',
-        finalData.occupancyCertificate || '',
-      );
-      apiFormData.append(
-        'leaseRegistration',
-        finalData.leaseRegistration || '',
-      );
+      if (finalData.titleStatus)
+        apiFormData.append('titleStatus', finalData.titleStatus);
+      if (finalData.occupancyCertificate)
+        apiFormData.append(
+          'occupancyCertificate',
+          finalData.occupancyCertificate,
+        );
+      if (finalData.leaseRegistration)
+        apiFormData.append('leaseRegistration', finalData.leaseRegistration);
       apiFormData.append(
         'hasPendingLitigation',
         finalData.pendingLitigations === 'yes' ? 'true' : 'false',
@@ -256,9 +266,12 @@ const ListPropertyScreen = () => {
       apiFormData.append('certifications', JSON.stringify(certs));
 
       // --- Lease Details ---
-      apiFormData.append('tenantType', finalData.tenantType || '');
-      apiFormData.append('leaseStartDate', finalData.leaseStartDate || '');
-      apiFormData.append('leaseEndDate', finalData.leaseExpiryDate || '');
+      if (finalData.tenantType)
+        apiFormData.append('tenantType', finalData.tenantType);
+      if (finalData.leaseStartDate)
+        apiFormData.append('leaseStartDate', finalData.leaseStartDate);
+      if (finalData.leaseExpiryDate)
+        apiFormData.append('leaseEndDate', finalData.leaseExpiryDate);
       apiFormData.append('lockInPeriodYears', finalData.lockInYears || '0');
       apiFormData.append('lockInPeriodMonths', finalData.lockInMonths || '0');
       apiFormData.append('leaseDurationYears', finalData.leaseDuration || '0');
