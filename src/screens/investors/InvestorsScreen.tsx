@@ -101,14 +101,14 @@ const InvestorsScreen = () => {
                 </View>
               </View>
 
-              <TouchableOpacity style={styles.editBtn}>
+              {/* <TouchableOpacity style={styles.editBtn}>
                 <Text style={styles.editBtnText}>Edit</Text>
               </TouchableOpacity>
 
               <Text style={styles.metaText}>
                 Joined on: {userData.joined || 'N/A'} {'\n'} Last log in:{' '}
                 {userData.lastLogin || 'N/A'}
-              </Text>
+              </Text> */}
             </View>
 
             {/* Switch Accounts */}
