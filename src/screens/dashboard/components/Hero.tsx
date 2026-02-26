@@ -9,9 +9,11 @@ import {
   StyleSheet,
 } from 'react-native';
 import { COLORS } from '../../../constants/theme';
+import { useNavigation } from '../../../context/NavigationContext';
 
 const Hero = () => {
   const { width } = useWindowDimensions();
+  const { navigate } = useNavigation();
   const isMobile = width < 768;
 
   return (
@@ -57,7 +59,10 @@ const Hero = () => {
         deliver steady, reliable income — with verified assets, trusted tenants,
         and zero management hassle.
       </Text>
-      <TouchableOpacity style={styles.getStartedBtn}>
+      <TouchableOpacity
+        style={styles.getStartedBtn}
+        onPress={() => navigate('/explore-properties')}
+      >
         <Text style={styles.getStartedText}>Get Started ➔</Text>
       </TouchableOpacity>
     </ImageBackground>

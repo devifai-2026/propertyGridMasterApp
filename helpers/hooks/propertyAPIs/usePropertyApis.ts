@@ -6,14 +6,14 @@ export const usePropertyAPIs = () => {
   const [loading, setLoading] = useState(false);
 
   const getProperties = (
-    onSuccess?: (data: any) => void,
+    onSuccess?: (data: any, meta?: any) => void,
     onError?: (error: any) => void,
     query?: string,
   ) => {
     apiCall.get({
       route: `/v1/properties${query ? `?${query}` : ''}`,
       onSuccess: data => {
-        if (onSuccess) onSuccess(decodeResponseData(data.data));
+        if (onSuccess) onSuccess(data.data, data);
       },
       onError: error => {
         if (onError) onError(error);
@@ -179,6 +179,39 @@ export const usePropertyAPIs = () => {
     });
   };
 
+  const getBrokers = (
+    onSuccess?: (data: any, meta?: any) => void,
+    onError?: (error: any) => void,
+    query?: string,
+  ) => {
+    apiCall.get({
+      route: `/v1/brokers${query ? `?${query}` : ''}`,
+      onSuccess: data => {
+        if (onSuccess) onSuccess(decodeResponseData(data.data), data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
+  const getPropertyCounts = (
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: '/v1/properties/counts',
+      onSuccess: data => {
+        if (onSuccess) onSuccess(decodeResponseData(data.data));
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   return {
     getProperties,
     getPropertyById,
@@ -190,6 +223,8 @@ export const usePropertyAPIs = () => {
     createPropertyInquiry,
     getAmenities,
     getCaretakers,
+    getPropertyCounts,
+    getBrokers,
     loading,
   };
 };

@@ -237,7 +237,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         <View style={styles.propDetailsRow}>
           <View style={styles.propDetailItem}>
             <Text style={styles.detailLabel}>
-              Cost: <Text style={styles.detailValue}>{item.price}</Text>
+              Cost:{' '}
+              <Text style={styles.detailValue}>
+                {item.price !== 'null' && item?.price ? item?.price : 0}
+              </Text>
             </Text>
             <Text style={styles.detailLabel}>
               Annual Rent: <Text style={styles.detailValue}>{item.rent}</Text>

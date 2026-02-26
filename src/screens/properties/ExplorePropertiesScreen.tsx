@@ -110,9 +110,12 @@ const ExplorePropertiesScreen = () => {
     }
   }, []);
 
-  const fetchProperties = (overrideFilters?: any) => {
+  const fetchProperties = (overrideFilters?: any, page: number = 1) => {
     let queryParams = [];
     const activeFilters = overrideFilters || filters;
+
+    queryParams.push(`page=${page}`);
+    queryParams.push(`limit=12`);
 
     // City
     if (activeFilters.city) queryParams.push(`city=${activeFilters.city}`);
@@ -150,12 +153,12 @@ const ExplorePropertiesScreen = () => {
     const queryString = queryParams.join('&');
 
     getProperties(
-      (data: any[]) => {
+      (data: any[], meta?: any) => {
         const mapped: Property[] = data.map((item: any) => ({
           id: item.propertyId.toString(),
           title: `${item.propertyType} Space`,
           location: `${item.city}, ${item.state}`,
-          price: `₹${item.sellingPrice} Cr`,
+          price: `₹${item.sellingPrice ?? 0} Cr`,
           rent: item.annualGrossRent ? `₹${item.annualGrossRent} L` : 'N/A',
           tenure: `${item.tenureLeftYears || 0} Yrs`,
           roi: item.netRentalYield ? `${item.netRentalYield}%` : 'N/A',
@@ -171,6 +174,10 @@ const ExplorePropertiesScreen = () => {
           raw: item,
         }));
         setProperties(mapped);
+        console.log('Pagination Metadata received:', meta?.pagination);
+        if (meta && meta.pagination) {
+          setPagination(meta.pagination);
+        }
       },
       (error: any) => {
         console.error('Error fetching properties automatically:', error);
@@ -219,6 +226,14 @@ const ExplorePropertiesScreen = () => {
     roi: '',
     tenure: '',
     city: '',
+  });
+
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    hasNextPage: false,
+    hasPrevPage: false,
   });
 
   const toggleFilters = () => setShowFilters(!showFilters);
@@ -706,6 +721,90 @@ const ExplorePropertiesScreen = () => {
               );
             })}
           </View>
+
+          {/* Pagination Controls */}
+          {pagination.totalPages > 1 && (
+            <View style={styles.paginationContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.pageBtn,
+                  !pagination.hasPrevPage && styles.pageBtnDisabled,
+                ]}
+                disabled={!pagination.hasPrevPage}
+                onPress={() =>
+                  fetchProperties(filters, pagination.currentPage - 1)
+                }
+              >
+                <Text
+                  style={[
+                    styles.pageBtnText,
+                    !pagination.hasPrevPage && styles.pageBtnTextDisabled,
+                  ]}
+                >
+                  Previous
+                </Text>
+              </TouchableOpacity>
+
+              <View style={styles.pageNumbers}>
+                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                  .filter(p => {
+                    // Show current page, and one page before/after
+                    return (
+                      p === 1 ||
+                      p === pagination.totalPages ||
+                      Math.abs(p - pagination.currentPage) <= 1
+                    );
+                  })
+                  .map((p, i, arr) => {
+                    return (
+                      <React.Fragment key={p}>
+                        {i > 0 && arr[i - 1] !== p - 1 && (
+                          <Text style={styles.paginationEllipsis}>...</Text>
+                        )}
+                        <TouchableOpacity
+                          style={[
+                            styles.pageNumberBtn,
+                            pagination.currentPage === p &&
+                              styles.activePageNumberBtn,
+                          ]}
+                          onPress={() => fetchProperties(filters, p)}
+                        >
+                          <Text
+                            style={[
+                              styles.pageNumberText,
+                              pagination.currentPage === p &&
+                                styles.activePageNumberText,
+                            ]}
+                          >
+                            {p}
+                          </Text>
+                        </TouchableOpacity>
+                      </React.Fragment>
+                    );
+                  })}
+              </View>
+
+              <TouchableOpacity
+                style={[
+                  styles.pageBtn,
+                  !pagination.hasNextPage && styles.pageBtnDisabled,
+                ]}
+                disabled={!pagination.hasNextPage}
+                onPress={() =>
+                  fetchProperties(filters, pagination.currentPage + 1)
+                }
+              >
+                <Text
+                  style={[
+                    styles.pageBtnText,
+                    !pagination.hasNextPage && styles.pageBtnTextDisabled,
+                  ]}
+                >
+                  Next
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       </View>
     </Layout>
@@ -1338,6 +1437,67 @@ const styles = StyleSheet.create({
     zIndex: 100,
     alignItems: 'center',
     width: '100%',
+  },
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 40,
+    marginBottom: 40,
+    gap: 15,
+  },
+  pageBtn: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  pageBtnDisabled: {
+    backgroundColor: '#f5f5f5',
+    borderColor: '#eee',
+  },
+  pageBtnText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#333',
+  },
+  pageBtnTextDisabled: {
+    color: '#ccc',
+  },
+  pageNumbers: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  pageNumberBtn: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  activePageNumberBtn: {
+    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+  },
+  pageNumberText: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
+  },
+  activePageNumberText: {
+    color: '#fff',
+    fontWeight: '700',
+  },
+  paginationEllipsis: {
+    color: '#666',
+    fontSize: 16,
+    paddingHorizontal: 5,
   },
 });
 
