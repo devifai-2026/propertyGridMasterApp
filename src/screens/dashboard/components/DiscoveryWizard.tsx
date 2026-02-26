@@ -17,6 +17,7 @@ import {
   Clock,
   LucideProps,
 } from 'lucide-react-native';
+import { useNavigation } from '../../../context/NavigationContext';
 
 interface Step {
   id: string;
@@ -74,9 +75,128 @@ const StepCard = ({
 
 const DiscoveryWizard = () => {
   const [activeStep, setActiveStep] = useState('1');
-  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  const [selections, setSelections] = useState<any>({
+    city: null,
+    roi: null,
+    type: null,
+    budget: null,
+    tenant: null,
+    tenure: null,
+  });
+
   const { width } = useWindowDimensions();
+  const { navigate } = useNavigation();
   const isMobile = width < 768;
+
+  const OPTIONS: any = {
+    '1': ['Pune', 'Mumbai', 'Gurgaon', 'New Delhi', 'Others'],
+    '2': [
+      { label: '5%+', value: '5' },
+      { label: '8%+', value: '8' },
+      { label: '10%+', value: '10' },
+      { label: '12%+', value: '12' },
+    ],
+    '3': ['Residential', 'Retail', 'Offices', 'Industrial', 'Others'],
+    '4': [
+      { label: '< 1 Cr', value: { min: '0', max: '1' } },
+      { label: '1 - 5 Cr', value: { min: '1', max: '5' } },
+      { label: '5 - 10 Cr', value: { min: '5', max: '10' } },
+      { label: '> 10 Cr', value: { min: '10', max: '1000' } },
+    ],
+    '5': ['Banks', 'IT/Tech', 'Retail', 'Logistics', 'Others'],
+    '6': [
+      { label: '< 3 Yrs', value: '1' },
+      { label: '3 - 6 Yrs', value: '3' },
+      { label: '6 - 9 Yrs', value: '6' },
+      { label: '9+ Yrs', value: '9' },
+    ],
+  };
+
+  const stepKeys: any = {
+    '1': 'city',
+    '2': 'roi',
+    '3': 'type',
+    '4': 'budget',
+    '5': 'tenant',
+    '6': 'tenure',
+  };
+
+  const handleSelection = (value: any) => {
+    const key = stepKeys[activeStep];
+    setSelections((prev: any) => ({ ...prev, [key]: value }));
+
+    // Auto-advance if not on last step
+    if (parseInt(activeStep) < 6) {
+      setActiveStep(String(parseInt(activeStep) + 1));
+    }
+  };
+
+  const handleShowProperties = () => {
+    let queryParams = [];
+    if (selections.city) queryParams.push(`city=${selections.city}`);
+    if (selections.roi)
+      queryParams.push(`minROI=${selections.roi.value || selections.roi}`);
+    if (selections.type) queryParams.push(`propertyTypes=${selections.type}`);
+    if (selections.budget) {
+      queryParams.push(
+        `minPrice=${
+          selections.budget.value?.min || selections.budget.min || 0
+        }`,
+      );
+      queryParams.push(
+        `maxPrice=${
+          selections.budget.value?.max || selections.budget.max || 1000
+        }`,
+      );
+    }
+    if (selections.tenure)
+      queryParams.push(
+        `minTenure=${selections.tenure.value || selections.tenure}`,
+      );
+
+    const queryString =
+      queryParams.length > 0 ? `?${queryParams.join('&')}` : '';
+    navigate(`/explore-properties${queryString}`);
+  };
+
+  const renderOptions = () => {
+    const currentOptions = OPTIONS[activeStep];
+    const currentKey = stepKeys[activeStep];
+    const currentSelection = selections[currentKey];
+
+    return (
+      <View style={[styles.wizardOptions, isMobile && { gap: 10 }]}>
+        {currentOptions.map((opt: any) => {
+          const label = opt.label || opt;
+          const value = opt.value || opt;
+          const isSelected =
+            JSON.stringify(currentSelection) === JSON.stringify(opt);
+
+          return (
+            <TouchableOpacity
+              key={label}
+              style={[
+                styles.cityOption,
+                isMobile && { width: (width - (isMobile ? 40 : 120) - 10) / 2 },
+                isSelected && styles.cityOptionSelected,
+              ]}
+              onPress={() => handleSelection(opt)}
+            >
+              <Text
+                style={[
+                  styles.cityOptionText,
+                  isSelected && styles.cityOptionTextSelected,
+                  isMobile && { fontSize: 16 },
+                ]}
+              >
+                {label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    );
+  };
 
   return (
     <View
@@ -119,7 +239,7 @@ const DiscoveryWizard = () => {
         </View>
         <View style={styles.wizardProgressBadge}>
           <Text style={styles.wizardStepText}>
-            {parseInt(activeStep) * 16}%
+            {Math.round((parseInt(activeStep) / 6) * 100)}%
           </Text>
         </View>
 
@@ -130,36 +250,26 @@ const DiscoveryWizard = () => {
           Select your {STEPS.find(s => s.id === activeStep)?.label} Preference.
         </Text>
 
-        <View style={[styles.wizardOptions, isMobile && { gap: 10 }]}>
-          {['Pune', 'Mumbai', 'Gurgaon', 'New Delhi'].map(city => (
-            <TouchableOpacity
-              key={city}
-              style={[
-                styles.cityOption,
-                isMobile && { width: (width - (isMobile ? 40 : 120) - 10) / 2 },
-                selectedCity === city && styles.cityOptionSelected,
-              ]}
-              onPress={() => setSelectedCity(city)}
-            >
-              <Text
-                style={[
-                  styles.cityOptionText,
-                  selectedCity === city && styles.cityOptionTextSelected,
-                  isMobile && { fontSize: 16 },
-                ]}
-              >
-                {city}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        {renderOptions()}
 
         <View style={styles.wizardActions}>
-          <TouchableOpacity style={[styles.skipBtn, isMobile && { flex: 1 }]}>
-            <Text style={styles.skipBtnText}>Skip</Text>
+          <TouchableOpacity
+            style={[styles.skipBtn, isMobile && { flex: 1 }]}
+            onPress={() => {
+              if (parseInt(activeStep) < 6) {
+                setActiveStep(String(parseInt(activeStep) + 1));
+              } else {
+                handleShowProperties();
+              }
+            }}
+          >
+            <Text style={styles.skipBtnText}>
+              {parseInt(activeStep) < 6 ? 'Skip' : 'Finish'}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.showPropertiesBtn, isMobile && { flex: 2 }]}
+            onPress={handleShowProperties}
           >
             <Text style={styles.showPropertiesText}>Show Properties</Text>
           </TouchableOpacity>

@@ -35,7 +35,15 @@ import CompareBanner from '../dashboard/components/CompareBanner';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
 import { COLORS } from '../../constants/theme';
 
-// Property Interface is now imported from PropertyCard
+declare const window: any;
+
+const componentUnitTypes = [
+  { id: 'Residential', label: 'Residential' },
+  { id: 'Retail', label: 'Retail' },
+  { id: 'Offices', label: 'Offices' },
+  { id: 'Industrial', label: 'Industrial' },
+  { id: 'Others', label: 'Others' },
+];
 
 const ExplorePropertiesScreen = () => {
   const { width } = useWindowDimensions();
@@ -46,13 +54,68 @@ const ExplorePropertiesScreen = () => {
   const [currentImageIndices, setCurrentImageIndices] = useState<{
     [key: string]: number;
   }>({});
+
   useEffect(() => {
-    fetchProperties();
+    // Parse query params from window.location.search if on Web
+    let initialFilters = {
+      pricing: { min: '', max: '' },
+      unit: [] as string[],
+      rent: { min: '', max: '' },
+      roi: '',
+      tenure: '',
+      city: '',
+    };
+    let hasParams = false;
+
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+
+      const city = params.get('city');
+      const minPrice = params.get('minPrice');
+      const maxPrice = params.get('maxPrice');
+      const propertyTypes = params.get('propertyTypes');
+      const minROI = params.get('minROI');
+      const minTenure = params.get('minTenure');
+
+      if (city) {
+        initialFilters.city = city;
+        hasParams = true;
+      }
+      if (minPrice || maxPrice) {
+        initialFilters.pricing = { min: minPrice || '', max: maxPrice || '' };
+        hasParams = true;
+      }
+      if (propertyTypes) {
+        const types = propertyTypes.split(',');
+        initialFilters.unit = types
+          .map(t => componentUnitTypes.find(c => c.label === t)?.id)
+          .filter(Boolean) as string[];
+        hasParams = true;
+      }
+      if (minROI) {
+        initialFilters.roi = minROI;
+        hasParams = true;
+      }
+      if (minTenure) {
+        initialFilters.tenure = minTenure;
+        hasParams = true;
+      }
+    }
+
+    if (hasParams) {
+      setFilters(initialFilters);
+      fetchProperties(initialFilters);
+    } else {
+      fetchProperties();
+    }
   }, []);
 
   const fetchProperties = (overrideFilters?: any) => {
     let queryParams = [];
     const activeFilters = overrideFilters || filters;
+
+    // City
+    if (activeFilters.city) queryParams.push(`city=${activeFilters.city}`);
 
     // Pricing
     if (activeFilters.pricing?.min)
@@ -155,6 +218,7 @@ const ExplorePropertiesScreen = () => {
     rent: { min: '', max: '' },
     roi: '',
     tenure: '',
+    city: '',
   });
 
   const toggleFilters = () => setShowFilters(!showFilters);
@@ -172,20 +236,11 @@ const ExplorePropertiesScreen = () => {
       rent: { min: '', max: '' },
       roi: '',
       tenure: '',
+      city: '',
     };
     setFilters(emptyFilters);
     fetchProperties(emptyFilters);
   };
-
-  const componentUnitTypes = [
-    { id: 'residential', label: 'Residential' },
-    { id: 'commercial', label: 'Commercial' },
-    { id: 'industrial', label: 'Industrial' },
-    { id: 'retail', label: 'Retail' },
-    { id: 'office', label: 'Office Space' },
-    { id: 'warehouse', label: 'Warehouse' },
-    { id: 'mixed-use', label: 'Mixed-Use' },
-  ];
 
   const handleUnitToggle = (id: string) => {
     setFilters(prev => {

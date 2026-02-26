@@ -108,7 +108,7 @@ const FeaturedSection = ({ properties }: { properties: any[] }) => {
           verified: p.isVerified === 'partial' || p.isVerified === 'completed',
           raw: p,
         }))
-      : FEATURED_PROPERTIES;
+      : [];
 
   const handleToggleCompare = (property: Property) => {
     setSelectedProperties(prev => {
