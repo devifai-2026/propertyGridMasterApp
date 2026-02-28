@@ -90,6 +90,24 @@ export const useAuthAPIs = () => {
     });
   };
 
+  const changeMobile = (
+    payload: { newMobileNumber: string; otp: string; verificationId: string },
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.patch({
+      route: '/v1/change-mobile',
+      payload,
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   const switchRole = (
     payload: { roleName: string },
     onSuccess?: (data: any) => void,
@@ -137,5 +155,6 @@ export const useAuthAPIs = () => {
     verifyOtp,
     switchRole,
     logout,
+    changeMobile,
   };
 };

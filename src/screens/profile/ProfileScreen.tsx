@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,6 +7,9 @@ import {
   ScrollView,
   Image,
   useWindowDimensions,
+  Modal,
+  TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import {
   User,
@@ -25,14 +28,23 @@ import { Alert } from 'react-native';
 import Layout from '../../layout/Layout';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
-import { useEffect } from 'react';
+import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
 import { COLORS } from '../../constants/theme';
 
 const ProfileScreen = () => {
-  const { user, logout, switchUserRole, isLoggedIn, isLoading } = useAuth();
+  const { user, login, logout, switchUserRole, isLoggedIn, isLoading } =
+    useAuth();
   const { navigate } = useNavigation();
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
+
+  const [isMobileModalVisible, setMobileModalVisible] = useState(false);
+  const [mobileStep, setMobileStep] = useState<'phone' | 'otp'>('phone');
+  const [newMobile, setNewMobile] = useState('');
+  const [otp, setOtp] = useState('');
+  const [verificationId, setVerificationId] = useState('');
+  const [mobileApiError, setMobileApiError] = useState('');
+  const { sendOtp, changeMobile, loading: apiLoading } = useAuthAPIs();
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
@@ -56,6 +68,72 @@ const ProfileScreen = () => {
     if (success) {
       Alert.alert('Success', `Switched to ${role} role`);
     }
+  };
+
+  const handleSendOtp = () => {
+    setMobileApiError('');
+    if (newMobile.length !== 10) {
+      setMobileApiError('Please enter a valid 10-digit mobile number');
+      return;
+    }
+    if (newMobile === user?.mobileNumber) {
+      setMobileApiError('New number must be different from current number');
+      return;
+    }
+    sendOtp(
+      { mobileNumber: newMobile },
+      (res: any) => {
+        if (res.success && res.data?.verificationId) {
+          setVerificationId(res.data.verificationId);
+          setMobileStep('otp');
+          setMobileApiError('');
+        } else {
+          setMobileApiError(res.message || 'Failed to send OTP');
+        }
+      },
+      (err: any) => {
+        setMobileApiError(err?.response?.data?.message || 'Failed to send OTP');
+      },
+    );
+  };
+
+  const handleChangeMobile = () => {
+    setMobileApiError('');
+    if (otp.length < 6) {
+      setMobileApiError('Please enter a valid OTP');
+      return;
+    }
+    changeMobile(
+      { newMobileNumber: newMobile, otp, verificationId },
+      async (res: any) => {
+        if (res.success) {
+          Alert.alert('Success', 'Mobile number updated successfully');
+          setMobileModalVisible(false);
+          setMobileStep('phone');
+          setNewMobile('');
+          setOtp('');
+          setMobileApiError('');
+
+          if (user && login) {
+            const updatedUser = {
+              ...user,
+              mobileNumber: res.data.mobileNumber || newMobile,
+              accessToken: res.data.accessToken || user.accessToken,
+              refreshToken: res.data.refreshToken || user.refreshToken,
+              token: res.data.accessToken || user.accessToken,
+            };
+            await login(updatedUser);
+          }
+        } else {
+          setMobileApiError(res.message || 'Failed to update mobile number');
+        }
+      },
+      (err: any) => {
+        setMobileApiError(
+          err?.response?.data?.message || 'Failed to update mobile number',
+        );
+      },
+    );
   };
 
   const ProfileItem = ({
@@ -134,6 +212,13 @@ const ProfileScreen = () => {
                 Icon={Phone}
                 label="Phone Number"
                 value={user?.mobileNumber || 'N/A'}
+                onPress={() => {
+                  setMobileStep('phone');
+                  setNewMobile('');
+                  setOtp('');
+                  setMobileApiError('');
+                  setMobileModalVisible(true);
+                }}
               />
             </View>
           </View>
@@ -216,6 +301,95 @@ const ProfileScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Change Mobile Modal */}
+      <Modal
+        visible={isMobileModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setMobileModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Change Mobile Number</Text>
+
+            {mobileStep === 'phone' ? (
+              <>
+                <Text style={styles.modalLabel}>New Mobile Number</Text>
+                <TextInput
+                  style={styles.modalInput}
+                  value={newMobile}
+                  onChangeText={setNewMobile}
+                  keyboardType="phone-pad"
+                  maxLength={10}
+                  placeholder="Enter 10-digit number"
+                />
+                {mobileApiError ? (
+                  <Text style={styles.errorText}>{mobileApiError}</Text>
+                ) : null}
+                <View style={styles.modalActions}>
+                  <TouchableOpacity
+                    style={[styles.modalBtn, styles.modalCancelBtn]}
+                    onPress={() => setMobileModalVisible(false)}
+                  >
+                    <Text style={styles.modalCancelText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.modalBtn, styles.modalPrimaryBtn]}
+                    onPress={handleSendOtp}
+                    disabled={apiLoading}
+                  >
+                    {apiLoading ? (
+                      <ActivityIndicator color="#FFF" size="small" />
+                    ) : (
+                      <Text style={styles.modalPrimaryText}>Send OTP</Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </>
+            ) : (
+              <>
+                <Text style={styles.modalLabel}>Enter OTP</Text>
+                <TextInput
+                  style={styles.modalInput}
+                  value={otp}
+                  onChangeText={setOtp}
+                  keyboardType="number-pad"
+                  maxLength={6}
+                  placeholder="Enter 6-digit OTP"
+                />
+                {mobileApiError ? (
+                  <Text style={styles.errorText}>{mobileApiError}</Text>
+                ) : null}
+                <View style={styles.modalActions}>
+                  <TouchableOpacity
+                    style={[styles.modalBtn, styles.modalCancelBtn]}
+                    onPress={() => {
+                      setMobileStep('phone');
+                      setMobileApiError('');
+                    }}
+                  >
+                    <Text style={styles.modalCancelText}>Back</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.modalBtn, styles.modalPrimaryBtn]}
+                    onPress={handleChangeMobile}
+                    disabled={apiLoading}
+                  >
+                    {apiLoading ? (
+                      <ActivityIndicator color="#FFF" size="small" />
+                    ) : (
+                      <Text style={styles.modalPrimaryText}>
+                        Verify & Update
+                      </Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </>
+            )}
+          </View>
+        </View>
+      </Modal>
     </Layout>
   );
 };
@@ -383,6 +557,83 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     backgroundColor: COLORS.primary,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#FFF',
+    borderRadius: 20,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: COLORS.textDark,
+    marginBottom: 20,
+  },
+  modalLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#6B7280',
+    marginBottom: 8,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    color: COLORS.textDark,
+    marginBottom: 24,
+    backgroundColor: '#F9FAFB',
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 12,
+  },
+  modalBtn: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalCancelBtn: {
+    backgroundColor: '#F3F4F6',
+  },
+  modalPrimaryBtn: {
+    backgroundColor: COLORS.primary,
+    minWidth: 120,
+  },
+  modalCancelText: {
+    color: '#4B5563',
+    fontWeight: '600',
+    fontSize: 15,
+  },
+  modalPrimaryText: {
+    color: '#FFF',
+    fontWeight: '600',
+    fontSize: 15,
+  },
+  errorText: {
+    color: COLORS.primary,
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 16,
+    textAlign: 'center',
   },
 });
 

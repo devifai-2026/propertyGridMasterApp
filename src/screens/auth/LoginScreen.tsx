@@ -226,7 +226,7 @@ const LoginScreen = () => {
                     <Text style={styles.dummyTitle}>
                       Dummy Login Credentials:
                     </Text>
-                    <Text style={styles.dummyText}>• Investor: 7550969935</Text>
+                    <Text style={styles.dummyText}>• Investor: 7550969999</Text>
                     <Text style={styles.dummyText}>• Broker: 7550969932</Text>
                     <Text style={styles.dummyText}>• Owner: 7550969934</Text>
                   </View>
