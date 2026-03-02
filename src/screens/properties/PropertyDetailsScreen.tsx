@@ -113,26 +113,30 @@ const PropertyDetailsScreen = () => {
         propertyId,
         (data: any) => {
           setIsNotesLoading(false);
-          // Based on backend getPropertyNotesByOwner: returns property with managerNotes association
-          if (data && data.managerNotes) {
-            const allNotes: any[] = [];
-            data.managerNotes.forEach((record: any) => {
-              if (record.notes && Array.isArray(record.notes)) {
-                record.notes.forEach((n: any) => {
-                  allNotes.push({
-                    note: n.note,
-                    createdAt: n.createdAt,
-                    addedBy: record.salesExecutive
-                      ? `${record.salesExecutive.firstName} ${record.salesExecutive.lastName}`
-                      : 'Sales Representative',
-                  });
-                });
-              }
+          // Backend getPropertyNotesByOwner returns only approved notes
+          // Each record has: originalNote, adminNote, isEdited, salesExecutive, createdAt, salesExecutiveId
+          console.log(data)
+          if (data && data.managerNotes && Array.isArray(data.managerNotes)) {
+            const allNotes = data.managerNotes.map((record: any) => {
+              const noteText = record.isEdited && record.adminNote
+                ? record.adminNote
+                : record.originalNote || '';
+              const isOwnerNote = record.salesExecutiveId === user?.userId;
+              return {
+                note: noteText,
+                createdAt: record.createdAt,
+                addedBy: isOwnerNote
+                  ? 'You'
+                  : record.salesExecutive
+                    ? `${record.salesExecutive.firstName} ${record.salesExecutive.lastName}`
+                    : 'Sales Representative',
+                isOwnerNote,
+              };
             });
             allNotes.sort(
-              (a, b) =>
-                new Date(b.createdAt).getTime() -
-                new Date(a.createdAt).getTime(),
+              (a: any, b: any) =>
+                new Date(a.createdAt).getTime() -
+                new Date(b.createdAt).getTime(),
             );
             setNotesData(allNotes);
           }
