@@ -5,7 +5,6 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  FlatList,
   useWindowDimensions,
   ActivityIndicator,
 } from 'react-native';
@@ -15,6 +14,7 @@ import {
   Building2,
   MapPin,
   User,
+  ChevronRight,
 } from 'lucide-react-native';
 import Layout from '../../layout/Layout';
 import { useNavigation } from '../../context/NavigationContext';
@@ -24,14 +24,13 @@ import { COLORS } from '../../constants/theme';
 
 const NotesScreen = () => {
   const { width } = useWindowDimensions();
-  const { isLoggedIn, isLoading: authLoading, user: currentUser } = useAuth();
+  const { isLoggedIn, isLoading: authLoading } = useAuth();
   const { navigate } = useNavigation();
   const { getOwnerNotes, loading: notesLoading } = usePropertyAPIs();
   const [notes, setNotes] = useState<any[]>([]);
 
   const isDesktop = width >= 1024;
   const isTablet = width >= 768 && width < 1024;
-  const numColumns = isDesktop ? 2 : 1;
 
   useEffect(() => {
     if (!authLoading && !isLoggedIn) {
@@ -43,6 +42,7 @@ const NotesScreen = () => {
     if (isLoggedIn) {
       getOwnerNotes(
         data => {
+          console.log('Notes data:', data);
           setNotes(data || []);
         },
         err => {
@@ -56,69 +56,42 @@ const NotesScreen = () => {
     return null;
   }
 
-  const renderItem = ({ item }: { item: any }) => (
-    <TouchableOpacity
-      style={[
-        styles.noteItem,
-        isDesktop && styles.desktopNoteItem,
-        !item.read && styles.unreadNoteItem,
-      ]}
-      activeOpacity={0.7}
-      onPress={() => navigate(`/list-property/${item.propertyId}`)}
-    >
-      <View style={styles.noteHeader}>
-        <View style={styles.agentInfo}>
-          <View style={styles.avatarContainer}>
-            <View style={styles.iconCircle}>
-              <User size={18} color={COLORS.primary} strokeWidth={2.5} />
-            </View>
-            <View style={styles.onlineBadge} />
-          </View>
-          <View>
-            <Text style={styles.agentName}>{item.addedBy}</Text>
-            <Text style={styles.agentTitle}>Property Consultant</Text>
-          </View>
-        </View>
-        <View style={styles.timeBadge}>
-          <Clock size={12} color={COLORS.primary} style={{ marginRight: 4 }} />
-          <Text style={styles.timeText}>
-            {new Date(item.createdAt).toLocaleDateString(undefined, {
-              month: 'short',
-              day: 'numeric',
-            })}
-          </Text>
-        </View>
-      </View>
+  // Group notes by propertyId
+  const grouped: Record<string, { property: any; notes: any[] }> = {};
+  notes.forEach(note => {
+    const pid = note.propertyId || 'unknown';
+    if (!grouped[pid]) {
+      grouped[pid] = {
+        property: {
+          propertyId: pid,
+          microMarket: note.microMarket,
+          location: note.location,
+          city: note.city,
+        },
+        notes: [],
+      };
+    }
+    grouped[pid].notes.push(note);
+  });
+  const propertyGroups = Object.values(grouped);
 
-      <View style={styles.propertySection}>
-        <View style={styles.propertyChip}>
-          <Building2 size={12} color="#666" style={{ marginRight: 4 }} />
-          <Text style={styles.chipText}>
-            {item.microMarket || 'Main Market'}
-          </Text>
-        </View>
-        <View style={styles.propertyChip}>
-          <MapPin size={12} color="#666" style={{ marginRight: 4 }} />
-          <Text style={styles.chipText}>{item.location}</Text>
-        </View>
-      </View>
-
-      <View style={styles.messageBubble}>
-        <MessageSquare size={16} color="#999" style={styles.quoteIcon} />
-        <Text style={styles.noteText} numberOfLines={isDesktop ? 3 : undefined}>
-          {item.note}
-        </Text>
-      </View>
-
-      <View style={styles.cardFooter}>
-        <Text style={styles.viewDetailsText}>View Property Details →</Text>
-      </View>
-    </TouchableOpacity>
-  );
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    return new Date(dateStr).toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
   return (
     <Layout>
-      <View style={styles.container}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
         <View
           style={[
             styles.content,
@@ -126,16 +99,17 @@ const NotesScreen = () => {
             isTablet && styles.tabletContent,
           ]}
         >
+          {/* Header */}
           <View style={styles.pageHeader}>
             <View style={styles.headerInfo}>
               <Text style={styles.pageTitle}>Activity Notes</Text>
               <Text style={styles.pageSubtitle}>
-                Real-time updates and observations from our field agents.
+                All notes and updates across your properties.
               </Text>
             </View>
             {notes.length > 0 && !notesLoading && (
               <View style={styles.countBadge}>
-                <Text style={styles.countText}>{notes.length} Total</Text>
+                <Text style={styles.countText}>{notes.length} Notes</Text>
               </View>
             )}
           </View>
@@ -145,7 +119,7 @@ const NotesScreen = () => {
               <ActivityIndicator size="large" color={COLORS.primary} />
               <Text style={styles.loaderText}>Syncing latest notes...</Text>
             </View>
-          ) : notes.length === 0 ? (
+          ) : propertyGroups.length === 0 ? (
             <View style={styles.emptyContainer}>
               <View style={styles.emptyIllustration}>
                 <View
@@ -166,7 +140,7 @@ const NotesScreen = () => {
               </View>
               <Text style={styles.emptyTitle}>Your feed is quiet</Text>
               <Text style={styles.emptySubtitle}>
-                No field notes have been added yet. check back soon for updates
+                No field notes have been added yet. Check back soon for updates
                 on your property portfolio.
               </Text>
               <TouchableOpacity
@@ -177,19 +151,121 @@ const NotesScreen = () => {
               </TouchableOpacity>
             </View>
           ) : (
-            <FlatList
-              data={notes}
-              renderItem={renderItem}
-              keyExtractor={(item, index) => index.toString()}
-              numColumns={numColumns}
-              key={numColumns} // Force re-render on column change
-              columnWrapperStyle={isDesktop ? styles.columnWrapper : undefined}
-              contentContainerStyle={styles.listContainer}
-              showsVerticalScrollIndicator={false}
-            />
+            <View style={styles.groupsList}>
+              {propertyGroups.map(group => (
+                <View key={group.property.propertyId} style={styles.propertyCard}>
+                  {/* Property Header */}
+                  <TouchableOpacity
+                    style={styles.propertyHeader}
+                    activeOpacity={0.7}
+                    onPress={() =>
+                      navigate(`/propertyDetails/${group.property.propertyId}`)
+                    }
+                  >
+                    <View style={{ flex: 1 }}>
+                      <View style={styles.propertyChips}>
+                        {group.property.microMarket && (
+                          <View style={styles.chip}>
+                            <Building2 size={11} color="#666" />
+                            <Text style={styles.chipText}>
+                              {group.property.microMarket}
+                            </Text>
+                          </View>
+                        )}
+                        {group.property.location && (
+                          <View style={styles.chip}>
+                            <MapPin size={11} color="#666" />
+                            <Text style={styles.chipText}>
+                              {group.property.location}
+                            </Text>
+                          </View>
+                        )}
+                      </View>
+                      <Text style={styles.notesCount}>
+                        {group.notes.length}{' '}
+                        {group.notes.length === 1 ? 'note' : 'notes'}
+                      </Text>
+                    </View>
+                    <ChevronRight size={20} color="#9CA3AF" />
+                  </TouchableOpacity>
+
+                  {/* All Notes */}
+                  <View style={styles.notesList}>
+                    {group.notes.map((note: any, idx: number) => (
+                      <View
+                        key={note.noteId || idx}
+                        style={[
+                          styles.noteItem,
+                          idx === group.notes.length - 1 && { borderBottomWidth: 0 },
+                        ]}
+                      >
+                        <View style={styles.noteHeader}>
+                          <View style={styles.avatarContainer}>
+                            <View
+                              style={[
+                                styles.iconCircle,
+                                note.isOwnerNote && { backgroundColor: '#EDE9FE' },
+                              ]}
+                            >
+                              {note.isOwnerNote ? (
+                                <MessageSquare
+                                  size={14}
+                                  color="#7C3AED"
+                                  strokeWidth={2.5}
+                                />
+                              ) : (
+                                <User
+                                  size={14}
+                                  color={COLORS.primary}
+                                  strokeWidth={2.5}
+                                />
+                              )}
+                            </View>
+                          </View>
+                          <View style={{ flex: 1 }}>
+                            <Text style={styles.noteSender}>
+                              {note.addedBy || 'Unknown'}
+                            </Text>
+                            <Text style={styles.noteRole}>
+                              {note.isOwnerNote ? 'Client' : 'Property Consultant'}
+                            </Text>
+                          </View>
+                          <View style={styles.timeBadge}>
+                            <Clock size={10} color="#9CA3AF" />
+                            <Text style={styles.timeText}>
+                              {formatDate(note.createdAt)}
+                            </Text>
+                          </View>
+                        </View>
+                        <View style={styles.messageBubble}>
+                          <Text style={styles.noteText}>
+                            {note.isEdited && note.adminNote
+                              ? note.adminNote
+                              : note.originalNote || note.note || ''}
+                          </Text>
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+
+                  {/* View Property */}
+                  <TouchableOpacity
+                    style={styles.cardFooter}
+                    activeOpacity={0.7}
+                    onPress={() =>
+                      navigate(`/propertyDetails/${group.property.propertyId}`)
+                    }
+                  >
+                    <Text style={styles.viewDetailsText}>
+                      View Property Details →
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
           )}
         </View>
-      </View>
+      </ScrollView>
     </Layout>
   );
 };
@@ -198,8 +274,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F3F4F6',
+  },
+  scrollContent: {
     alignItems: 'center',
-    minHeight: '100%',
+    paddingBottom: 40,
   },
   content: {
     width: '100%',
@@ -210,14 +288,14 @@ const styles = StyleSheet.create({
     maxWidth: 800,
   },
   desktopContent: {
-    maxWidth: 1200,
+    maxWidth: 900,
     paddingTop: 48,
   },
   pageHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    marginBottom: 32,
+    marginBottom: 24,
   },
   headerInfo: {
     flex: 1,
@@ -248,7 +326,6 @@ const styles = StyleSheet.create({
     color: '#374151',
   },
   loaderContainer: {
-    flex: 1,
     paddingTop: 100,
     alignItems: 'center',
   },
@@ -258,18 +335,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 16,
   },
-  listContainer: {
-    paddingBottom: 40,
-  },
-  columnWrapper: {
-    justifyContent: 'space-between',
+  // ── Property groups ──
+  groupsList: {
     gap: 20,
   },
-  noteItem: {
+  propertyCard: {
     backgroundColor: '#FFF',
     borderRadius: 24,
-    padding: 20,
-    marginBottom: 16,
+    overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.03,
@@ -278,129 +351,114 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#F3F4F6',
   },
-  desktopNoteItem: {
-    flex: 1,
-    maxWidth: '48.5%',
-    marginBottom: 20,
-  },
-  unreadNoteItem: {
-    borderColor: 'rgba(238, 37, 41, 0.2)',
-    backgroundColor: '#FFFBFB',
-  },
-  noteHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  agentInfo: {
+  propertyHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    padding: 20,
+    backgroundColor: '#F9FAFB',
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
   },
-  avatarContainer: {
-    position: 'relative',
-    marginRight: 12,
+  propertyChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 4,
   },
-  iconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 15,
-    backgroundColor: '#FEE2E2',
+  chip: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 4,
+    backgroundColor: '#FFF',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
-  onlineBadge: {
-    position: 'absolute',
-    bottom: -2,
-    right: -2,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#10B981',
-    borderWidth: 2,
-    borderColor: '#FFF',
+  chipText: {
+    fontSize: 12,
+    color: '#374151',
+    fontWeight: '700',
   },
-  agentName: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#111827',
-  },
-  agentTitle: {
+  notesCount: {
     fontSize: 11,
     color: '#9CA3AF',
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    marginTop: 1,
+    marginTop: 2,
+  },
+  // ── Notes list ──
+  notesList: {
+    paddingHorizontal: 20,
+  },
+  noteItem: {
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  noteHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+    gap: 10,
+  },
+  avatarContainer: {},
+  iconCircle: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: '#FEE2E2',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noteSender: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: '#111827',
+  },
+  noteRole: {
+    fontSize: 10,
+    color: '#9CA3AF',
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   timeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
+    gap: 4,
   },
   timeText: {
-    fontSize: 12,
-    color: '#374151',
-    fontWeight: '700',
-  },
-  propertySection: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 16,
-  },
-  propertyChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F9FAFB',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
-  },
-  chipText: {
     fontSize: 11,
-    color: '#4B5563',
+    color: '#9CA3AF',
     fontWeight: '600',
   },
   messageBubble: {
     backgroundColor: '#F9FAFB',
-    padding: 16,
-    borderRadius: 20,
-    position: 'relative',
-  },
-  quoteIcon: {
-    position: 'absolute',
-    top: -8,
-    left: 12,
-    backgroundColor: '#F9FAFB',
-    padding: 2,
+    padding: 14,
+    borderRadius: 16,
   },
   noteText: {
-    fontSize: 15,
+    fontSize: 14,
     color: '#374151',
-    lineHeight: 24,
+    lineHeight: 22,
     fontWeight: '500',
   },
+  // ── Footer ──
   cardFooter: {
-    marginTop: 16,
-    paddingTop: 16,
+    paddingVertical: 14,
     borderTopWidth: 1,
     borderTopColor: '#F3F4F6',
+    alignItems: 'center',
   },
   viewDetailsText: {
     fontSize: 13,
     color: COLORS.primary,
     fontWeight: '700',
-    textAlign: 'center',
   },
+  // ── Empty ──
   emptyContainer: {
     alignItems: 'center',
     justifyContent: 'center',
