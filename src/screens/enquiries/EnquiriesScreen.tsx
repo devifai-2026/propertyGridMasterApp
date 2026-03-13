@@ -216,7 +216,7 @@ const EnquiriesScreen = () => {
     }
 
     const payload = {
-      inquiries: [{ question: formData.question }],
+      inquiry: formData.question,
       source: Platform.OS === 'web' ? 'web' : 'mobile',
     };
 
@@ -351,7 +351,7 @@ const EnquiriesScreen = () => {
             </View>
 
             <View style={styles.row}>
-              <View style={[styles.inputGroup, { flex: 1.5 }]}>
+              <View style={[styles.inputGroup, { flex: 1 }]}>
                 <Text style={styles.label}>Confirm Phone No.</Text>
                 <View style={styles.phoneInputContainer}>
                   <TextInput
@@ -428,14 +428,16 @@ const EnquiriesScreen = () => {
                       </Text>
                     </TouchableOpacity>
                   )}
-                  {isVerified && (
+                </View>
+                {isVerified && (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
                     <View style={styles.verifiedBadge}>
                       <Check size={16} color={COLORS.white} />
                     </View>
-                  )}
-                </View>
-                {isVerified && (
-                  <Text style={styles.verifiedText}>✓ Verified</Text>
+                    <Text style={[styles.verifiedText, { marginTop: 0, marginLeft: 6 }]}>
+                      Verified
+                    </Text>
+                  </View>
                 )}
               </View>
             </View>
@@ -730,10 +732,10 @@ const styles = StyleSheet.create({
   otpContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 4,
   },
   otpInput: {
-    width: 38,
+    width: 32,
     height: 48,
     borderWidth: 1.5,
     borderColor: '#D1D5DB',
