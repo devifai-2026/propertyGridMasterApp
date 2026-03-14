@@ -147,6 +147,22 @@ export const useAuthAPIs = () => {
     });
   };
 
+  const getAvailableRoles = (
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: '/v1/available-roles',
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   return {
     loading,
     login,
@@ -156,5 +172,6 @@ export const useAuthAPIs = () => {
     switchRole,
     logout,
     changeMobile,
+    getAvailableRoles,
   };
 };

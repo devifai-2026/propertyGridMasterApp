@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -15,12 +15,23 @@ import { COLORS } from '../../constants/theme';
 import PortfolioTab from './components/PortfolioTab';
 import EnquiriesTab from './components/EnquiriesTab';
 import WishlistTab from './components/WishlistTab';
+import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
 
 const InvestorsScreen = () => {
   const { user, switchUserRole } = useAuth();
   const [activeTab, setActiveTab] = useState<
     'portfolio' | 'enquiries' | 'wishlist'
   >('portfolio');
+  const [availableRoles, setAvailableRoles] = useState<string[]>([]);
+  const { getAvailableRoles } = useAuthAPIs();
+
+  useEffect(() => {
+    getAvailableRoles((res: any) => {
+      if (res.success && Array.isArray(res.data)) {
+        setAvailableRoles(res.data);
+      }
+    });
+  }, [getAvailableRoles]);
 
   // Mock User if not available
   const userData = user || {
@@ -114,31 +125,39 @@ const InvestorsScreen = () => {
             {/* Switch Accounts */}
             <View style={styles.switchSection}>
               <Text style={styles.sectionTitle}>Switch accounts</Text>
-              {['Broker', 'Owner', 'Investor']
-                .filter(r => r !== user?.role)
-                .map(role => (
-                  <View key={role} style={styles.accountCard}>
-                    <View style={styles.accountInfo}>
-                      <View style={styles.smallAvatarPlaceholder}>
-                        <User size={20} color={COLORS.primary} />
-                      </View>
-                      <View>
-                        <Text style={styles.accountName}>
-                          {user?.name || 'User'}
-                        </Text>
-                        <View style={styles.roleBadgeSmall}>
-                          <Text style={styles.roleTextSmall}>{role}</Text>
+              {availableRoles.length > 1 ? (
+                availableRoles
+                  .filter(r => r !== user?.role)
+                  .map(role => (
+                    <View key={role} style={styles.accountCard}>
+                      <View style={styles.accountInfo}>
+                        <View style={styles.smallAvatarPlaceholder}>
+                          <User size={20} color={COLORS.primary} />
+                        </View>
+                        <View>
+                          <Text style={styles.accountName}>
+                            {user?.name || 'User'}
+                          </Text>
+                          <View style={styles.roleBadgeSmall}>
+                            <Text style={styles.roleTextSmall}>{role}</Text>
+                          </View>
                         </View>
                       </View>
+                      <TouchableOpacity
+                        style={styles.switchBtn}
+                        onPress={() => switchUserRole(role)}
+                      >
+                        <Text style={styles.switchBtnText}>Switch</Text>
+                      </TouchableOpacity>
                     </View>
-                    <TouchableOpacity
-                      style={styles.switchBtn}
-                      onPress={() => switchUserRole(role)}
-                    >
-                      <Text style={styles.switchBtnText}>Switch</Text>
-                    </TouchableOpacity>
-                  </View>
-                ))}
+                  ))
+              ) : (
+                <View style={styles.accountCard}>
+                  <Text style={{ color: '#999', fontSize: 13 }}>
+                    No other roles available for this number
+                  </Text>
+                </View>
+              )}
             </View>
 
             {/* Assistance */}

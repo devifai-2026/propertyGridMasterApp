@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,10 +6,13 @@ import {
   Dimensions,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from 'react-native';
 import { PieChart, LineChart } from 'react-native-chart-kit';
 import PropertyCard, { Property } from '../../../components/PropertyCard';
 import { useAuth } from '../../../context/AuthContext';
+import { COLORS } from '../../../constants/theme';
+import { usePropertyAPIs } from '../../../../helpers/hooks/propertyAPIs/usePropertyApis';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -201,6 +204,41 @@ export const LeaseRenewalsCard = ({ renewals }: { renewals: any[] }) => {
 
 const PortfolioTab = () => {
   const { user } = useAuth();
+  const { getProperties, loading: propertiesLoading } = usePropertyAPIs();
+  const [propertiesOwned, setPropertiesOwned] = useState<Property[]>([]);
+
+  useEffect(() => {
+    if (user?.userId) {
+      // Fetch properties added by the current user
+      const query = `addedBy=${user.userId}`;
+
+      getProperties((data: any[]) => {
+        if (Array.isArray(data)) {
+          const formattedProps: Property[] = data.map((item: any) => ({
+            id: item.propertyId,
+            title: item.propertyType || 'Property',
+            location: `${item.microMarket || ''}, ${item.city || ''}`.trim() || 'N/A',
+            price: item.sellingPrice ? `₹${item.sellingPrice}` : 'N/A',
+            rent: item.annualGrossRent ? `₹${item.annualGrossRent}` : 'N/A',
+            tenure: item.leaseEndDate ? `${new Date(item.leaseEndDate).toLocaleDateString()}` : 'N/A',
+            roi: item.grossRentalYield ? `${item.grossRentalYield}%` : 'N/A',
+            type: item.propertyType || 'N/A',
+            images: item.media && item.media.length > 0 
+              ? item.media.map((m: any) => m.fileUrl) 
+              : null,
+            isVerified: item.isVerified,
+            verified: item.isVerified === 'completed',
+            badges: item.ownershipType ? [item.ownershipType] : [],
+            raw: item
+          }));
+          setPropertiesOwned(formattedProps);
+        }
+      }, (err: any) => {
+        console.error('Failed to fetch properties:', err);
+      }, query);
+    }
+  }, [user?.userId, user?.role]);
+
   const leaseRenewals = [
     {
       id: '1',
@@ -231,89 +269,6 @@ const PortfolioTab = () => {
     expected: [45, 50, 52, 55, 55],
     received: [45, 52, 50, 55, 58],
   };
-
-  const propertiesOwned: Property[] = [
-    {
-      id: '1',
-      title: 'Skyline Apartments',
-      location: 'Bandra West, Mumbai',
-      price: '₹10,00,000',
-      rent: '₹ 50,000',
-      tenure: 'Freehold',
-      roi: '5.5%',
-      type: 'Residential',
-      images: [
-        'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
-      ],
-      isVerified: 'completed',
-      verified: true,
-      badges: ['Owned', 'Rented'],
-    },
-    {
-      id: '2',
-      title: 'Tech Park Commercial',
-      location: 'Whitefield, Bangalore',
-      price: '₹15,00,000',
-      rent: '₹ 1.2 L',
-      tenure: '99 Years',
-      roi: '8.2%',
-      type: 'Commercial',
-      images: [
-        'https://images.unsplash.com/photo-1486406140926-c627a92ad1ab?auto=format&fit=crop&w=800&q=80',
-      ],
-      isVerified: 'completed',
-      verified: true,
-      badges: ['Owned'],
-    },
-    {
-      id: '3',
-      title: 'Green Valley Villas',
-      location: 'Gurgaon, Delhi NCR',
-      price: '₹8,00,000',
-      rent: '₹ 35,000',
-      tenure: 'Freehold',
-      roi: '4.8%',
-      type: 'Villa',
-      images: [
-        'https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?auto=format&fit=crop&w=800&q=80',
-      ],
-      isVerified: 'completed',
-      verified: true,
-      badges: ['Owned'],
-    },
-    {
-      id: '4',
-      title: 'Marina Bay Complex',
-      location: 'Kochi, Kerala',
-      price: '₹6,60,000',
-      rent: '₹ 28,000',
-      tenure: 'Freehold',
-      roi: '5.1%',
-      type: 'Commercial',
-      images: [
-        'https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=800&q=80',
-      ],
-      isVerified: 'completed',
-      verified: true,
-      badges: ['Owned'],
-    },
-    {
-      id: '5',
-      title: 'Ocean View Residency',
-      location: 'Marine Drive, Kochi',
-      price: '₹12,00,000',
-      rent: '₹ 45,000',
-      tenure: 'Freehold',
-      roi: '6.0%',
-      type: 'Residential',
-      images: [
-        'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80',
-      ],
-      isVerified: 'completed',
-      verified: true,
-      badges: ['Owned'],
-    },
-  ];
 
   const { width } = Dimensions.get('window');
   const isDesktop = width > 1024;
@@ -353,14 +308,25 @@ const PortfolioTab = () => {
       <View style={styles.propertiesSection}>
         <Text style={styles.sectionTitle}>Properties Owned</Text>
         <View style={styles.propertiesGrid}>
-          {propertiesOwned.map(property => (
-            <PropertyCard
-              key={property.id}
-              item={{ ...property, raw: { userId: user?.userId } }}
-              width={isDesktop ? '48%' : '100%'}
-              noView={false}
-            />
-          ))}
+          {propertiesLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator color={COLORS.primary} size="large" />
+              <Text style={styles.loadingText}>Loading properties...</Text>
+            </View>
+          ) : propertiesOwned.length > 0 ? (
+            propertiesOwned.map(property => (
+              <PropertyCard
+                key={property.id}
+                item={{ ...property, raw: { userId: user?.userId } }}
+                width={isDesktop ? '48%' : '100%'}
+                noView={false}
+              />
+            ))
+          ) : (
+            <View style={styles.emptyStateContainer}>
+              <Text style={styles.emptyText}>No properties found in your portfolio.</Text>
+            </View>
+          )}
         </View>
       </View>
     </View>
@@ -525,6 +491,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 20,
+  },
+  loadingContainer: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+  },
+  loadingText: {
+    marginTop: 10,
+    color: '#666',
+    fontSize: 14,
+  },
+  emptyStateContainer: {
+    padding: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderStyle: 'dashed',
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  emptyText: {
+    color: '#999',
+    textAlign: 'center',
+    fontSize: 14,
   },
 });
 

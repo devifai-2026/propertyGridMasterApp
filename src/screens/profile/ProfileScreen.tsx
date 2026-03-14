@@ -44,11 +44,24 @@ const ProfileScreen = () => {
   const [otp, setOtp] = useState('');
   const [verificationId, setVerificationId] = useState('');
   const [mobileApiError, setMobileApiError] = useState('');
-  const { sendOtp, changeMobile, loading: apiLoading } = useAuthAPIs();
+  const [availableRoles, setAvailableRoles] = useState<string[]>([]);
+  const {
+    sendOtp,
+    changeMobile,
+    getAvailableRoles,
+    loading: apiLoading,
+  } = useAuthAPIs();
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
       navigate('/login');
+    } else if (isLoggedIn) {
+      // Fetch available roles for switching
+      getAvailableRoles((res: any) => {
+        if (res.success && Array.isArray(res.data)) {
+          setAvailableRoles(res.data);
+        }
+      });
     }
   }, [isLoggedIn, isLoading, navigate]);
 
@@ -245,48 +258,58 @@ const ProfileScreen = () => {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Switch Role</Text>
             <View style={styles.card}>
-              {['Broker', 'Investor', 'Owner'].map((role, index) => (
-                <React.Fragment key={role}>
-                  <TouchableOpacity
-                    style={[
-                      styles.profileItem,
-                      user?.role === role && styles.activeRoleItem,
-                    ]}
-                    onPress={() => handleSwitchRole(role)}
-                  >
-                    <View style={styles.itemLeft}>
-                      <View
-                        style={[
-                          styles.iconContainer,
-                          user?.role === role && {
-                            backgroundColor: COLORS.lightRed,
-                          },
-                        ]}
-                      >
-                        <Shield
-                          size={20}
-                          color={user?.role === role ? COLORS.primary : '#666'}
-                        />
-                      </View>
-                      <View>
-                        <Text
+              {availableRoles.length > 0 ? (
+                availableRoles.map((role, index) => (
+                  <React.Fragment key={role}>
+                    <TouchableOpacity
+                      style={[
+                        styles.profileItem,
+                        user?.role === role && styles.activeRoleItem,
+                      ]}
+                      onPress={() => handleSwitchRole(role)}
+                    >
+                      <View style={styles.itemLeft}>
+                        <View
                           style={[
-                            styles.itemValue,
-                            user?.role === role && { color: COLORS.primary },
+                            styles.iconContainer,
+                            user?.role === role && {
+                              backgroundColor: COLORS.lightRed,
+                            },
                           ]}
                         >
-                          {role}
-                        </Text>
-                        {user?.role === role && (
-                          <Text style={styles.activeLabel}>Active</Text>
-                        )}
+                          <Shield
+                            size={20}
+                            color={user?.role === role ? COLORS.primary : '#666'}
+                          />
+                        </View>
+                        <View>
+                          <Text
+                            style={[
+                              styles.itemValue,
+                              user?.role === role && { color: COLORS.primary },
+                            ]}
+                          >
+                            {role}
+                          </Text>
+                          {user?.role === role && (
+                            <Text style={styles.activeLabel}>Active</Text>
+                          )}
+                        </View>
                       </View>
-                    </View>
-                    {user?.role === role && <View style={styles.activeDot} />}
-                  </TouchableOpacity>
-                  {index < 2 && <View style={styles.divider} />}
-                </React.Fragment>
-              ))}
+                      {user?.role === role && <View style={styles.activeDot} />}
+                    </TouchableOpacity>
+                    {index < availableRoles.length - 1 && (
+                      <View style={styles.divider} />
+                    )}
+                  </React.Fragment>
+                ))
+              ) : (
+                <View style={{ padding: 20 }}>
+                  <Text style={{ color: '#999', textAlign: 'center' }}>
+                    No other roles available for this number
+                  </Text>
+                </View>
+              )}
             </View>
           </View>
 

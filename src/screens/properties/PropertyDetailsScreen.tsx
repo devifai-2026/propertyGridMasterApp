@@ -113,14 +113,10 @@ const PropertyDetailsScreen = () => {
         propertyId,
         (data: any) => {
           setIsNotesLoading(false);
-          // Backend getPropertyNotesByOwner returns only approved notes
-          // Each record has: originalNote, adminNote, isEdited, salesExecutive, createdAt, salesExecutiveId
-          console.log(data)
-          if (data && data.managerNotes && Array.isArray(data.managerNotes)) {
-            const allNotes = data.managerNotes.map((record: any) => {
-              const noteText = record.isEdited && record.adminNote
-                ? record.adminNote
-                : record.originalNote || '';
+          // Backend now returns the array of formatted notes directly
+          if (data && Array.isArray(data)) {
+            const allNotes = data.map((record: any) => {
+              const noteText = record.adminNote || record.originalNote || '';
               const isOwnerNote = record.salesExecutiveId === user?.userId;
               return {
                 note: noteText,
@@ -135,10 +131,13 @@ const PropertyDetailsScreen = () => {
             });
             allNotes.sort(
               (a: any, b: any) =>
-                new Date(a.createdAt).getTime() -
-                new Date(b.createdAt).getTime(),
+                new Date(b.createdAt).getTime() -
+                new Date(a.createdAt).getTime(),
             );
             setNotesData(allNotes);
+          } else {
+            console.warn('Property notes response is not an array:', data);
+            setNotesData([]);
           }
         },
         () => setIsNotesLoading(false),
@@ -146,14 +145,20 @@ const PropertyDetailsScreen = () => {
     }
   }, [activeTab, propertyId]);
 
+  const isAddedByUser =
+    property?.raw?.ownerId === user?.userId ||
+    property?.raw?.brokerId === user?.userId ||
+    property?.raw?.salesId === user?.userId;
+
   const tabs = [
     { id: 'property', label: 'Property', icon: Building },
     { id: 'lease', label: 'Lease', icon: FileText },
     { id: 'analytics', label: 'Analytics', icon: BarChart2 },
     { id: 'location', label: 'Location', icon: MapPin },
-    isOwner
-      ? { id: 'notes', label: 'Notes', icon: MessageSquare }
-      : { id: 'faqs', label: 'FAQs', icon: HelpCircle },
+    ...(isAddedByUser
+      ? [{ id: 'notes', label: 'Notes', icon: MessageSquare }]
+      : []),
+    { id: 'faqs', label: 'FAQs', icon: HelpCircle },
   ];
 
   // Only show full screen loading if we don't have property data yet
