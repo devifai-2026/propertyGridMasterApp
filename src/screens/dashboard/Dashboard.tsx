@@ -28,7 +28,7 @@ const Dashboard = () => {
         easing: Easing.out(Easing.ease),
       }),
     ]).start();
-    getProperties(r => setProperties(r));
+    getProperties(r => setProperties(r), r => console.log(r), 'isVerified=completed');
   }, []);
   return (
     <Layout>

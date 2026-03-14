@@ -163,6 +163,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
                 />
                 <Text style={styles.menuItemText}>Explore Brokers</Text>
               </TouchableOpacity>
+              {user?.role && 
               <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => {
@@ -179,6 +180,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
                   {user?.role || 'Investors'}
                 </Text>
               </TouchableOpacity>
+              }
               {isLoggedIn && user?.role === 'Owner' && (
                 <TouchableOpacity
                   style={styles.menuItem}
@@ -324,9 +326,11 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
             <TouchableOpacity onPress={() => navigate('/explore-brokers')}>
               <Text style={styles.navLinkText}>Explore Brokers</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigate('/investors')}>
-              <Text style={styles.navLinkText}>{user?.role || 'Investors'}</Text>
-            </TouchableOpacity>
+            {user?.role && 
+              <TouchableOpacity onPress={() => navigate('/investors')}>
+                <Text style={styles.navLinkText}>{user?.role || 'Investors'}</Text>
+              </TouchableOpacity>
+            }
           </View>
         )}
 
