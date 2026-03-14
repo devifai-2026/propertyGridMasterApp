@@ -7,78 +7,31 @@ import {
   ScrollView,
   Dimensions,
 } from 'react-native';
-import { ChevronDown } from 'lucide-react-native';
-
-interface Enquiry {
-  id: string;
-  date: string;
-  property: string;
-  location: string;
-  tenant: string;
-  cost: string;
-}
+import { usePropertyAPIs } from '../../../../helpers/hooks/propertyAPIs/usePropertyApis';
+import { useNavigation } from '../../../context/NavigationContext';
+import { COLORS } from '../../../constants/theme';
+import { ActivityIndicator } from 'react-native';
 
 const EnquiriesTab = () => {
-  const [timeFilter, setTimeFilter] = useState('Last 30 Days');
-  const [sortBy, setSortBy] = useState('Date');
-  const [showAs, setShowAs] = useState('grid');
+  const [enquiries, setEnquiries] = useState<any[]>([]);
+  const { getMyInquiries, loading } = usePropertyAPIs();
+  const { navigate } = useNavigation();
 
   const { width } = Dimensions.get('window');
   const isDesktop = width > 768;
 
-  const enquiries: Enquiry[] = [
-    {
-      id: '1',
-      date: '15/12/2025',
-      property: 'Residential Space',
-      location: 'Pune',
-      tenant: 'AP Realtors',
-      cost: '₹2.6 Crore',
-    },
-    {
-      id: '2',
-      date: '20/12/2025',
-      property: 'Commercial Space',
-      location: 'Mumbai',
-      tenant: 'Global Innovations',
-      cost: '₹3.6 Crore',
-    },
-    {
-      id: '3',
-      date: '15/12/2025',
-      property: 'Residential Space',
-      location: 'Pune',
-      tenant: 'AP Realtors',
-      cost: '₹2.6 Crore',
-    },
-  ];
+  React.useEffect(() => {
+    getMyInquiries((data: any) => {
+      if (data && Array.isArray(data)) {
+        setEnquiries(data);
+      }
+    });
+  }, []);
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Properties Under Enquiry</Text>
-
-        <View style={styles.filtersRow}>
-          <TouchableOpacity style={styles.filterButton}>
-            <Text style={styles.filterText}>{timeFilter}</Text>
-            <ChevronDown size={16} color="#666" />
-          </TouchableOpacity>
-
-          <View style={styles.filterGroup}>
-            <Text style={styles.filterLabel}>Sort by:</Text>
-            <TouchableOpacity style={styles.filterButton}>
-              <Text style={styles.filterText}>{sortBy}</Text>
-              <ChevronDown size={16} color="#666" />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.filterGroup}>
-            <Text style={styles.filterLabel}>Show as:</Text>
-            <TouchableOpacity style={styles.filterButton}>
-              <ChevronDown size={16} color="#666" />
-            </TouchableOpacity>
-          </View>
-        </View>
       </View>
 
       <ScrollView
@@ -106,28 +59,41 @@ const EnquiriesTab = () => {
           </View>
 
           {/* Table Rows */}
-          {enquiries.map(item => (
-            <View key={item.id} style={[styles.tableRow, styles.tableDataRow]}>
-              <Text style={[styles.tableDataText, { flex: 1 }]}>
-                {item.date}
-              </Text>
-              <Text style={[styles.tableDataText, { flex: 1.5 }]}>
-                {item.property}
-              </Text>
-              <Text style={[styles.tableDataText, { flex: 1 }]}>
-                {item.location}
-              </Text>
-              <Text style={[styles.tableDataText, { flex: 1.2 }]}>
-                {item.tenant}
-              </Text>
-              <Text style={[styles.tableDataText, { flex: 1 }]}>
-                {item.cost}
-              </Text>
-              <TouchableOpacity style={styles.viewButton}>
-                <Text style={styles.viewButtonText}>view</Text>
-              </TouchableOpacity>
+          {loading && enquiries.length === 0 ? (
+            <View style={{ padding: 40 }}>
+              <ActivityIndicator size="large" color={COLORS.primary} />
             </View>
-          ))}
+          ) : enquiries.length === 0 ? (
+            <View style={{ padding: 40, alignItems: 'center' }}>
+              <Text style={{ color: '#666' }}>No enquiries found.</Text>
+            </View>
+          ) : (
+            enquiries.map(item => (
+              <View key={item.id} style={[styles.tableRow, styles.tableDataRow]}>
+                <Text style={[styles.tableDataText, { flex: 1 }]}>
+                  {new Date(item.createdAt).toLocaleDateString()}
+                </Text>
+                <Text style={[styles.tableDataText, { flex: 1.5 }]}>
+                  {item.property?.propertyType} Space
+                </Text>
+                <Text style={[styles.tableDataText, { flex: 1 }]}>
+                  {item.property?.city}
+                </Text>
+                <Text style={[styles.tableDataText, { flex: 1.2 }]}>
+                  {item.inquirer?.firstName} {item.inquirer?.lastName}
+                </Text>
+                <Text style={[styles.tableDataText, { flex: 1 }]}>
+                  ₹{item.property?.sellingPrice} Cr
+                </Text>
+                <TouchableOpacity
+                  style={styles.viewButton}
+                  onPress={() => navigate(`/enquiry-details/${item.id}`)}
+                >
+                  <Text style={styles.viewButtonText}>view</Text>
+                </TouchableOpacity>
+              </View>
+            ))
+          )}
         </View>
       </ScrollView>
     </View>
@@ -146,36 +112,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#EE2529',
     marginBottom: 20,
-  },
-  filtersRow: {
-    flexDirection: 'row',
-    gap: 15,
-    alignItems: 'center',
-    flexWrap: 'wrap',
-  },
-  filterButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 6,
-    backgroundColor: '#fff',
-  },
-  filterText: {
-    fontSize: 13,
-    color: '#666',
-  },
-  filterGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  filterLabel: {
-    fontSize: 13,
-    color: '#666',
   },
   table: {
     backgroundColor: '#fff',

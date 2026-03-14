@@ -14,7 +14,8 @@ import {
   NavigationProvider,
   useNavigation,
 } from './src/context/NavigationContext';
-import { AuthProvider } from './src/context/AuthContext';
+import { AuthProvider, useAuth } from './src/context/AuthContext';
+import { ActivityIndicator } from 'react-native';
 import SignupScreen from './src/screens/auth/SignupScreen';
 import ProfileScreen from './src/screens/profile/ProfileScreen';
 import NotificationsScreen from './src/screens/notifications/NotificationsScreen';
@@ -25,9 +26,29 @@ import BlogsScreen from './src/screens/blogs/BlogsScreen';
 import PrivacyPolicyScreen from './src/screens/legal/PrivacyPolicyScreen';
 import TermsOfServiceScreen from './src/screens/legal/TermsOfServiceScreen';
 import NotesScreen from './src/screens/notes/NotesScreen';
+import EnquiryDetailsScreen from './src/screens/enquiries/EnquiryDetailsScreen';
 
 const AppContent = () => {
-  const { currentPath } = useNavigation();
+  const { currentPath, navigate } = useNavigation();
+  const { isLoggedIn, isLoading } = useAuth();
+
+  // Redirect to login if accessing private pages while not logged in
+  const privatePages = ['/investors', '/my-profile'];
+  const isPrivate = privatePages.some(page => currentPath.startsWith(page));
+
+  React.useEffect(() => {
+    if (!isLoading && isPrivate && !isLoggedIn) {
+      navigate('/login');
+    }
+  }, [currentPath, isLoggedIn, isLoading, isPrivate]);
+
+  if (isLoading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#EE2529" />
+      </View>
+    );
+  }
 
   // Simple Router Switch
   const renderScreen = () => {
@@ -51,7 +72,7 @@ const AppContent = () => {
       case currentPath.startsWith('/contact-brokers'):
         return <ExploreBrokersScreen />;
       case currentPath === '/investors':
-        return <InvestorsScreen />;
+        return isLoggedIn ? <InvestorsScreen /> : <LoginScreen />;
       case currentPath === '/list-property':
       case currentPath.startsWith('/list-property/'):
         return <ListPropertyScreen />;
@@ -64,7 +85,7 @@ const AppContent = () => {
       case currentPath === '/signup':
         return <SignupScreen />;
       case currentPath === '/my-profile':
-        return <ProfileScreen />;
+        return isLoggedIn ? <ProfileScreen /> : <LoginScreen />;
       case currentPath === '/notifications':
         return <NotificationsScreen />;
       case currentPath === '/my-notes':
@@ -72,6 +93,8 @@ const AppContent = () => {
       case currentPath === '/enquiry':
       case currentPath.startsWith('/enquiry/'):
         return <EnquiriesScreen />;
+      case currentPath.startsWith('/enquiry-details/'):
+        return <EnquiryDetailsScreen />;
       case currentPath === '/blogs':
         return <BlogsScreen />;
       case currentPath === '/privacy-policy':

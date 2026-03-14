@@ -1,94 +1,79 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-} from 'react-native';
-import { ChevronDown } from 'lucide-react-native';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import PropertyCard, { Property } from '../../../components/PropertyCard';
+import { usePropertyAPIs } from '../../../../helpers/hooks/propertyAPIs/usePropertyApis';
+import { ActivityIndicator } from 'react-native';
+import { COLORS } from '../../../constants/theme';
 
 const WishlistTab = () => {
-  const [timeFilter, setTimeFilter] = useState('Last 30 Days');
+  const [wishlistProperties, setWishlistProperties] = useState<Property[]>([]);
+  const { getWishlist, toggleLikeProperty, loading } = usePropertyAPIs();
 
-  // Dummy data matching Property interface
-  const properties: Property[] = [
-    {
-      id: '1',
-      title: 'Commercial Space',
-      location: 'Mumbai, Mundhva',
-      price: '₹ 2.5 Cr',
-      rent: '₹ 2.5 L',
-      tenure: '5 Years',
-      roi: '8.5%',
-      type: 'Commercial',
-      images: [
-        'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
-        'https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=800&q=80',
-      ],
-      isVerified: 'completed',
-      verified: true,
-      badges: ['MNC Client'],
-      raw: { userId: 'wishlist-owner-1' },
-    },
-    {
-      id: '2',
-      title: 'Office Complex',
-      location: 'Pune, Kharadi',
-      price: '₹ 4.2 Cr',
-      rent: '₹ 3.8 L',
-      tenure: '9 Years',
-      roi: '9.2%',
-      type: 'Commercial',
-      images: [
-        'https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=800&q=80',
-      ],
-      isVerified: 'completed',
-      verified: true,
-      badges: ['IT Park'],
-      raw: { userId: 'wishlist-owner-2' },
-    },
-  ];
+  const fetchWishlist = () => {
+    getWishlist((data: any) => {
+      if (data && Array.isArray(data)) {
+        const mapped: Property[] = data.map((item: any) => ({
+          id: item.propertyId,
+          title: `${item.propertyType} Space`,
+          location: `${item.city}, ${item.state}`,
+          price: `₹${item.sellingPrice} Cr`,
+          rent: item.annualGrossRent ? `₹${item.annualGrossRent} L` : 'N/A',
+          tenure: `${item.tenureLeftYears || 0} Yrs`,
+          roi: item.netRentalYield ? `${item.netRentalYield}%` : 'N/A',
+          type: item.propertyType,
+          images:
+            item.media && item.media.length > 0
+              ? item.media.map((m: any) => m.fileUrl)
+              : null,
+          badges: [item.tenantType, item.buildingGrade].filter(Boolean),
+          isVerified: item.isVerified,
+          verified:
+            item.isVerified === 'partial' || item.isVerified === 'completed',
+          raw: item,
+        }));
+        setWishlistProperties(mapped);
+      }
+    });
+  };
+
+  React.useEffect(() => {
+    fetchWishlist();
+  }, []);
 
   const handleRemove = (id: string) => {
-    console.log('Remove from wishlist:', id);
-    // Add logic to remove from wishlist
+    toggleLikeProperty(id, () => {
+      // Remove from local state
+      setWishlistProperties(prev => prev.filter(p => p.id !== id));
+    });
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>Properties liked</Text>
-
-        <View style={styles.filtersRow}>
-          <TouchableOpacity style={styles.filterButton}>
-            <Text style={styles.filterText}>{timeFilter}</Text>
-            <ChevronDown size={16} color="#666" />
-          </TouchableOpacity>
-
-          <View style={styles.filterGroup}>
-            <Text style={styles.filterLabel}>Sort by: Date</Text>
-            <ChevronDown size={16} color="#666" />
-          </View>
-
-          <View style={styles.filterGroup}>
-            <Text style={styles.filterLabel}>Show as:</Text>
-            <ChevronDown size={16} color="#666" />
-          </View>
-        </View>
       </View>
 
       <View style={styles.propertiesGrid}>
-        {properties.map(property => (
-          <PropertyCard
-            key={property.id}
-            item={property}
-            width={isDesktop ? '48%' : '100%'}
-          />
-        ))}
+        {loading && wishlistProperties.length === 0 ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={COLORS.primary} />
+          </View>
+        ) : wishlistProperties.length === 0 ? (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>
+              No properties in your wishlist.
+            </Text>
+          </View>
+        ) : (
+          wishlistProperties.map(property => (
+            <PropertyCard
+              key={property.id}
+              item={property}
+              width={isDesktop ? '48%' : '100%'}
+              onRemove={handleRemove}
+            />
+          ))
+        )}
       </View>
     </View>
   );
@@ -144,6 +129,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    padding: 40,
+    alignItems: 'center',
+  },
+  emptyContainer: {
+    flex: 1,
+    padding: 40,
+    alignItems: 'center',
+  },
+  emptyText: {
+    color: '#666',
+    fontSize: 16,
   },
 });
 

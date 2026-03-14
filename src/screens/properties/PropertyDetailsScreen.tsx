@@ -24,6 +24,7 @@ import {
   MessageSquare,
   Clock,
   User,
+  Heart,
 } from 'lucide-react-native';
 import Layout from '../../layout/Layout';
 import { useNavigation } from '../../context/NavigationContext';
@@ -69,11 +70,19 @@ const PropertyDetailsScreen = () => {
   const [property, setProperty] = useState<Property | null>(null);
   const [notesData, setNotesData] = useState<any[]>([]);
   const [isNotesLoading, setIsNotesLoading] = useState(false);
-  const { getPropertyById, getPropertyNotesForOwner, addOwnerNote, loading } =
-    usePropertyAPIs();
+  const {
+    getPropertyById,
+    getPropertyNotesForOwner,
+    addOwnerNote,
+    toggleLikeProperty,
+    checkIfLiked,
+    loading,
+  } = usePropertyAPIs();
 
   const [newNote, setNewNote] = useState('');
   const [isSubmittingNote, setIsSubmittingNote] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
 
   const isOwner = user?.role === 'Owner';
   useEffect(() => {
@@ -100,8 +109,13 @@ const PropertyDetailsScreen = () => {
         };
         setProperty(mappedProperty);
       });
+      if (user) {
+        checkIfLiked(propertyId, (data: any) => {
+          setIsLiked(!!data?.isLiked);
+        });
+      }
     }
-  }, [propertyId]);
+  }, [propertyId, user]);
 
   const [activeTab, setActiveTab] = useState('property');
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
@@ -192,7 +206,45 @@ const PropertyDetailsScreen = () => {
             <Text style={styles.premiumText}>Premium Location</Text>
           </View>
           <View style={styles.actionButtonsRow}>
-            {(user?.userId === property.raw.added_by) && (
+            {user && (
+              <TouchableOpacity
+                style={[
+                  styles.actionOutlineBtn,
+                  { borderColor: isLiked ? COLORS.primary : COLORS.textSecondary },
+                ]}
+                onPress={() => {
+                  if (isLiking) return;
+                  setIsLiking(true);
+                  toggleLikeProperty(
+                    propertyId,
+                    () => {
+                      setIsLiked(!isLiked);
+                      setIsLiking(false);
+                    },
+                    () => setIsLiking(false),
+                  );
+                }}
+              >
+                {isLiking ? (
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                ) : (
+                  <Heart
+                    size={14}
+                    color={isLiked ? COLORS.primary : COLORS.textSecondary}
+                    fill={isLiked ? COLORS.primary : 'transparent'}
+                  />
+                )}
+                <Text
+                  style={[
+                    styles.actionOutlineText,
+                    { color: isLiked ? COLORS.primary : COLORS.textSecondary },
+                  ]}
+                >
+                  {isLiked ? 'Wishlisted' : 'Wishlist'}
+                </Text>
+              </TouchableOpacity>
+            )}
+            {user?.userId === property.raw.added_by && (
               <TouchableOpacity
                 style={[
                   styles.actionOutlineBtn,
@@ -704,7 +756,7 @@ const PropertyDetailsScreen = () => {
           note: newNote.trim(),
           createdAt: new Date().toISOString(),
           addedBy:
-            `${user?.firstName || 'Owner'} ${user?.lastName || ''}`.trim() ||
+            `${user?.firstName || 'You'} ${user?.lastName || ''}`.trim() ||
             'You',
         };
         setNotesData([newNoteEntry, ...notesData]);
@@ -718,7 +770,6 @@ const PropertyDetailsScreen = () => {
 
   const renderNotesContent = () => {
     if (!property) return null;
-console.log(notesData)
     return (
       <View style={styles.tabContent}>
         <View style={styles.detailsHeader}>
@@ -795,35 +846,35 @@ console.log(notesData)
         ) : (
           <View style={styles.notesList}>
             {notesData.map((note, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.noteCard}
-                onPress={() => navigate(`/list-property/${propertyId}`)}
-              >
-                <View style={styles.noteHeader}>
-                  <View style={styles.noteUserRow}>
-                    <View style={styles.noteUserIcon}>
-                      <User size={14} color={COLORS.primary} />
+              <View key={index} style={styles.noteCard}>
+                <View style={styles.noteCardHeader}>
+                  <View style={styles.noteAuthorInfo}>
+                    <View style={styles.avatarMini}>
+                      <User size={12} color={COLORS.primary} />
                     </View>
-                    <Text style={styles.noteUser}>{note.addedBy}</Text>
+                    <Text style={styles.noteAuthor}>{note.addedBy}</Text>
+                    {note.isOwnerNote && (
+                      <View style={styles.youBadge}>
+                        <Text style={styles.youBadgeText}>Owner</Text>
+                      </View>
+                    )}
                   </View>
-                  <View style={styles.noteTimeRow}>
-                    <Clock size={12} color="#999" />
+                  <View style={styles.noteTimeContainer}>
+                    <Clock size={12} color={COLORS.textSecondary} />
                     <Text style={styles.noteTime}>
-                      {new Date(note.createdAt).toLocaleDateString()}
+                      {new Date(note.createdAt).toLocaleString()}
                     </Text>
                   </View>
                 </View>
+
                 <Text style={styles.noteText}>{note.note}</Text>
+
                 {note.isEdited && (
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 4 }}>
-                    <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#6366f1' }} />
-                    <Text style={{ fontSize: 10, color: '#6366f1', fontWeight: '600' }}>
-                      Reviewed &amp; updated by Admin
-                    </Text>
+                  <View style={styles.editedBadge}>
+                    <Text style={styles.editedText}>Edited by Admin</Text>
                   </View>
                 )}
-              </TouchableOpacity>
+              </View>
             ))}
           </View>
         )}
@@ -1311,6 +1362,60 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontWeight: '600',
     fontSize: 14,
+  },
+  noteCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  noteAuthorInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  avatarMini: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: 'rgba(238, 37, 41, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noteAuthor: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: COLORS.textDark,
+  },
+  youBadge: {
+    backgroundColor: '#000',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  youBadgeText: {
+    color: '#FFF',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  noteTimeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  editedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#EEEEEE',
+    gap: 4,
+  },
+  editedText: {
+    fontSize: 10,
+    color: '#6366f1',
+    fontWeight: '600',
   },
 });
 

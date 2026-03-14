@@ -116,7 +116,6 @@ const EnquiriesScreen = () => {
       sendOtp(
         { mobileNumber },
         (res: any) => {
-          console.log('OTP Send Response:', res);
           if (res.success) {
             setOtpSent(true);
             setIsVerified(false);
@@ -160,11 +159,9 @@ const EnquiriesScreen = () => {
       return;
     }
 
-    console.log('Verifying OTP:', { code, verificationId });
     verifyOtp(
       { otp: code, verificationId },
       (res: any) => {
-        console.log('OTP Verify Response:', res);
         if (res.success) {
           setIsVerified(true);
           Alert.alert('Verified', 'Mobile number verified successfully!');
@@ -180,10 +177,6 @@ const EnquiriesScreen = () => {
   };
 
   const handleSubmit = () => {
-    console.log('handleSubmit called');
-    console.log('formData:', formData);
-    console.log('isVerified:', isVerified);
-    console.log('propertyId:', propertyId);
 
     if (!user) {
       Alert.alert(
@@ -220,7 +213,6 @@ const EnquiriesScreen = () => {
       source: Platform.OS === 'web' ? 'web' : 'mobile',
     };
 
-    console.log('Sending payload:', payload);
 
     createPropertyInquiry(
       propertyId,

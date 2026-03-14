@@ -31,7 +31,7 @@ const InvestorsScreen = () => {
         setAvailableRoles(res.data);
       }
     });
-  }, [getAvailableRoles]);
+  }, []);
 
   // Mock User if not available
   const userData = user || {
@@ -228,6 +228,7 @@ const InvestorsScreen = () => {
             </View>
 
             {/* Summary Cards */}
+            {activeTab === 'portfolio' && 
             <View style={styles.summaryRow}>
               {summaryData.map((item, index) => (
                 <View key={index} style={styles.summaryCard}>
@@ -243,6 +244,7 @@ const InvestorsScreen = () => {
                 </View>
               ))}
             </View>
+            }
 
             {/* Tab Content */}
             <View style={styles.tabContent}>

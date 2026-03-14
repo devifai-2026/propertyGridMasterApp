@@ -93,7 +93,6 @@ export const request = async <T = any, R = any>(
           const refreshToken = user.refreshToken;
 
           if (refreshToken) {
-            console.log('Access token expired. Attempting refresh...');
 
             // Call refresh token API directly with axios to avoid recursion loops
             // The backend endpoint is GET /api/v1/refresh-token
@@ -124,7 +123,6 @@ export const request = async <T = any, R = any>(
               }
 
               const { accessToken } = refreshedData;
-              console.log('Token refreshed successfully.');
 
               // Update stored user with new access token
               // The app expects 'token' field for the access token as seen in headers.ts

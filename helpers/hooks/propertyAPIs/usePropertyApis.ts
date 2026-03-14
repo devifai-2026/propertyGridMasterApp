@@ -212,6 +212,90 @@ export const usePropertyAPIs = () => {
     });
   };
 
+  const getWishlist = (
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: '/v1/wishlist',
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data.data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+ 
+  const toggleLikeProperty = (
+    propertyId: string,
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.post({
+      route: `/v1/properties/${propertyId}/like`,
+      payload: {},
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+ 
+  const checkIfLiked = (
+    propertyId: string,
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: `/v1/properties/${propertyId}/like`,
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data.data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+ 
+  const getMyInquiries = (
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: '/v1/my-inquiries',
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data.data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
+  const getInquiryById = (
+    id: string,
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: `/v1/inquiries/${id}`,
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data.data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+ 
   return {
     getProperties,
     getPropertyById,
@@ -225,6 +309,11 @@ export const usePropertyAPIs = () => {
     getCaretakers,
     getPropertyCounts,
     getBrokers,
+    getWishlist,
+    toggleLikeProperty,
+    checkIfLiked,
+    getMyInquiries,
+    getInquiryById,
     loading,
   };
 };

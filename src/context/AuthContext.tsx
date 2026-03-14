@@ -33,10 +33,12 @@ interface AuthContextType {
 }
 
 import { useAuthAPIs } from '../../helpers/hooks/authAPIs/useAuthAPIs';
+// import { useNavigation } from './NavigationContext';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  // const { navigate } = useNavigation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -106,6 +108,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await AsyncStorage.removeItem('user');
       setIsLoggedIn(false);
       setUser(null);
+      // navigate('/login');
     } catch (e) {
       console.error('Error clearing auth state:', e);
       // Ensure cleanup happens even if error
