@@ -183,7 +183,6 @@ const PropertyDetailsScreen = () => {
       </View>
     );
   }
-
   const renderPropertyContent = () => (
     <View style={styles.tabContent}>
       {/* Description Section */}
@@ -193,7 +192,7 @@ const PropertyDetailsScreen = () => {
             <Text style={styles.premiumText}>Premium Location</Text>
           </View>
           <View style={styles.actionButtonsRow}>
-            {isOwner && (
+            {(user?.userId === property.raw.added_by) && (
               <TouchableOpacity
                 style={[
                   styles.actionOutlineBtn,
