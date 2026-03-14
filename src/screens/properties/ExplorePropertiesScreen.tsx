@@ -115,7 +115,7 @@ const ExplorePropertiesScreen = () => {
     const activeFilters = overrideFilters || filters;
 
     queryParams.push(`page=${page}`);
-    queryParams.push(`isVerified=completed`);
+    queryParams.push(`isVerified=completedOrPartial`);
     queryParams.push(`limit=12`);
 
     // City

@@ -116,16 +116,18 @@ const PropertyDetailsScreen = () => {
           // Backend now returns the array of formatted notes directly
           if (data && Array.isArray(data)) {
             const allNotes = data.map((record: any) => {
+              // Show admin-edited note if available, otherwise the original
               const noteText = record.adminNote || record.originalNote || '';
               const isOwnerNote = record.salesExecutiveId === user?.userId;
               return {
                 note: noteText,
                 createdAt: record.createdAt,
+                isEdited: !!record.isEdited,
                 addedBy: isOwnerNote
                   ? 'You'
                   : record.salesExecutive
                     ? `${record.salesExecutive.firstName} ${record.salesExecutive.lastName}`
-                    : 'Sales Representative',
+                    : 'Property Team',
                 isOwnerNote,
               };
             });
@@ -717,7 +719,7 @@ const PropertyDetailsScreen = () => {
 
   const renderNotesContent = () => {
     if (!property) return null;
-
+console.log(notesData)
     return (
       <View style={styles.tabContent}>
         <View style={styles.detailsHeader}>
@@ -814,6 +816,14 @@ const PropertyDetailsScreen = () => {
                   </View>
                 </View>
                 <Text style={styles.noteText}>{note.note}</Text>
+                {note.isEdited && (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 4 }}>
+                    <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#6366f1' }} />
+                    <Text style={{ fontSize: 10, color: '#6366f1', fontWeight: '600' }}>
+                      Reviewed &amp; updated by Admin
+                    </Text>
+                  </View>
+                )}
               </TouchableOpacity>
             ))}
           </View>
