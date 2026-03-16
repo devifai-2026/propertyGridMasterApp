@@ -42,6 +42,7 @@ const ProfileScreen = () => {
   const [mobileStep, setMobileStep] = useState<'phone' | 'otp'>('phone');
   const [newMobile, setNewMobile] = useState('');
   const [otp, setOtp] = useState('');
+  const [switchingToRole, setSwitchingToRole] = useState<string | null>(null);
   const [verificationId, setVerificationId] = useState('');
   const [mobileApiError, setMobileApiError] = useState('');
   const [availableRoles, setAvailableRoles] = useState<string[]>([]);
@@ -75,9 +76,11 @@ const ProfileScreen = () => {
   };
 
   const handleSwitchRole = async (role: string) => {
-    if (role === user?.role) return;
+    if (role === user?.role || switchingToRole) return;
 
+    setSwitchingToRole(role);
     const success = await switchUserRole(role);
+    setSwitchingToRole(null);
     if (success) {
       Alert.alert('Success', `Switched to ${role} role`);
     }
@@ -265,8 +268,10 @@ const ProfileScreen = () => {
                       style={[
                         styles.profileItem,
                         user?.role === role && styles.activeRoleItem,
+                        switchingToRole && { opacity: 0.7 }
                       ]}
                       onPress={() => handleSwitchRole(role)}
+                      disabled={!!switchingToRole}
                     >
                       <View style={styles.itemLeft}>
                         <View
@@ -296,7 +301,12 @@ const ProfileScreen = () => {
                           )}
                         </View>
                       </View>
-                      {user?.role === role && <View style={styles.activeDot} />}
+                      {user?.role === role && !switchingToRole && (
+                        <View style={styles.activeDot} />
+                      )}
+                      {switchingToRole === role && (
+                        <ActivityIndicator size="small" color={COLORS.primary} />
+                      )}
                     </TouchableOpacity>
                     {index < availableRoles.length - 1 && (
                       <View style={styles.divider} />

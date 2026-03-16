@@ -181,7 +181,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
                 </Text>
               </TouchableOpacity>
               }
-              {isLoggedIn && user?.role === 'Owner' && (
+              {/* {isLoggedIn && user?.role === 'Owner' && (
                 <TouchableOpacity
                   style={styles.menuItem}
                   onPress={() => {
@@ -196,7 +196,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
                   />
                   <Text style={styles.menuItemText}>My Notes</Text>
                 </TouchableOpacity>
-              )}
+              )} */}
               <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => {
@@ -335,14 +335,14 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
         )}
 
         <View style={styles.headerActions}>
-          {isLoggedIn && user?.role === 'Owner' && (
+          {/* {isLoggedIn && user?.role === 'Owner' && (
             <TouchableOpacity
               style={styles.notificationBtn}
               onPress={() => navigate('/my-notes')}
             >
               <MessageSquare size={22} color={COLORS.primary} />
             </TouchableOpacity>
-          )}
+          )} */}
 
           {isLoggedIn && (
             <TouchableOpacity
