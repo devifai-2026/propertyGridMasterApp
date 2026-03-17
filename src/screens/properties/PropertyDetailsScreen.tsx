@@ -69,6 +69,7 @@ const PropertyDetailsScreen = () => {
   const propertyId = currentPath.split('/propertyDetails/')[1];
   const [property, setProperty] = useState<Property | null>(null);
   const [notesData, setNotesData] = useState<any[]>([]);
+  const [notesCount, setNotesCount] = useState(0);
   const [isNotesLoading, setIsNotesLoading] = useState(false);
   const {
     getPropertyById,
@@ -117,6 +118,26 @@ const PropertyDetailsScreen = () => {
     }
   }, [propertyId, user]);
 
+  const isAddedByUser =
+    property?.raw?.ownerId === user?.userId ||
+    property?.raw?.brokerId === user?.userId ||
+    property?.raw?.salesId === user?.userId;
+
+  // Pre-fetch notes count so the badge is visible before the tab is opened
+  useEffect(() => {
+    if (propertyId && isAddedByUser) {
+      getPropertyNotesForOwner(
+        propertyId,
+        (data: any) => {
+          if (data && Array.isArray(data)) {
+            setNotesCount(data.length);
+          }
+        },
+        () => {},
+      );
+    }
+  }, [propertyId, isAddedByUser]);
+
   const [activeTab, setActiveTab] = useState('property');
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
@@ -151,6 +172,7 @@ const PropertyDetailsScreen = () => {
                 new Date(a.createdAt).getTime(),
             );
             setNotesData(allNotes);
+            setNotesCount(allNotes.length);
           } else {
             console.warn('Property notes response is not an array:', data);
             setNotesData([]);
@@ -161,10 +183,6 @@ const PropertyDetailsScreen = () => {
     }
   }, [activeTab, propertyId]);
 
-  const isAddedByUser =
-    property?.raw?.ownerId === user?.userId ||
-    property?.raw?.brokerId === user?.userId ||
-    property?.raw?.salesId === user?.userId;
 
   const tabs = [
     { id: 'property', label: 'Property', icon: Building },
@@ -759,7 +777,9 @@ const PropertyDetailsScreen = () => {
             `${user?.firstName || 'You'} ${user?.lastName || ''}`.trim() ||
             'You',
         };
-        setNotesData([newNoteEntry, ...notesData]);
+        const updated = [newNoteEntry, ...notesData];
+        setNotesData(updated);
+        setNotesCount(updated.length);
       },
       (err: any) => {
         setIsSubmittingNote(false);
@@ -773,10 +793,36 @@ const PropertyDetailsScreen = () => {
     return (
       <View style={styles.tabContent}>
         <View style={styles.detailsHeader}>
-          <Text style={styles.descriptionTitle}>Manager Notes</Text>
-          <Text style={styles.descriptionText}>
-            Updates and observations from our property management team
-          </Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'flex-start',
+              justifyContent: 'space-between',
+            }}
+          >
+            <View style={{ flex: 1 }}>
+              <Text style={styles.descriptionTitle}>Manager Notes</Text>
+              <Text style={styles.descriptionText}>
+                Updates and observations from our property management team
+              </Text>
+            </View>
+            {user?.userId === property.raw.added_by && (
+              <TouchableOpacity
+                style={[
+                  styles.actionOutlineBtn,
+                  { borderColor: COLORS.primary, marginLeft: 12 },
+                ]}
+                onPress={() => navigate(`/list-property/${propertyId}`)}
+              >
+                <FileText size={14} color={COLORS.primary} />
+                <Text
+                  style={[styles.actionOutlineText, { color: COLORS.primary }]}
+                >
+                  Edit Property
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
         {property.isVerified !== 'completed' && (
@@ -925,17 +971,27 @@ const PropertyDetailsScreen = () => {
               {tabs.map(tab => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
+                const isNotes = tab.id === 'notes';
                 return (
                   <TouchableOpacity
                     key={tab.id}
                     style={styles.tab}
                     onPress={() => setActiveTab(tab.id)}
                   >
-                    <Icon
-                      size={20}
-                      color={isActive ? COLORS.primary : COLORS.textSecondary}
-                      style={styles.tabIcon}
-                    />
+                    <View style={{ position: 'relative' }}>
+                      <Icon
+                        size={20}
+                        color={isActive ? COLORS.primary : COLORS.textSecondary}
+                        style={styles.tabIcon}
+                      />
+                      {isNotes && notesCount > 0 && (
+                        <View style={styles.notesBadge}>
+                          <Text style={styles.notesBadgeText}>
+                            {notesCount > 99 ? '99+' : notesCount}
+                          </Text>
+                        </View>
+                      )}
+                    </View>
                     <Text
                       style={[styles.tabText, isActive && styles.activeTabText]}
                     >
@@ -1416,6 +1472,24 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: '#6366f1',
     fontWeight: '600',
+  },
+  notesBadge: {
+    position: 'absolute',
+    top: -5,
+    right: -7,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+  },
+  notesBadgeText: {
+    color: '#FFF',
+    fontSize: 9,
+    fontWeight: '700',
+    lineHeight: 12,
   },
 });
 

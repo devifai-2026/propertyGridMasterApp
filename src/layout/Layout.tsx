@@ -83,7 +83,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
                 <TouchableOpacity
                   style={styles.menuUserInfo}
                   onPress={() => {
-                    navigate('/my-profile');
+                    navigate('/investors');
                     onClose();
                   }}
                 >
@@ -163,7 +163,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
                 />
                 <Text style={styles.menuItemText}>Explore Brokers</Text>
               </TouchableOpacity>
-              {user?.role && 
+              {/* {user?.role && 
               <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => {
@@ -180,7 +180,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
                   {user?.role || 'Investors'}
                 </Text>
               </TouchableOpacity>
-              }
+              } */}
               {/* {isLoggedIn && user?.role === 'Owner' && (
                 <TouchableOpacity
                   style={styles.menuItem}
@@ -326,11 +326,11 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
             <TouchableOpacity onPress={() => navigate('/explore-brokers')}>
               <Text style={styles.navLinkText}>Explore Brokers</Text>
             </TouchableOpacity>
-            {user?.role && 
+            {/* {user?.role && 
               <TouchableOpacity onPress={() => navigate('/investors')}>
                 <Text style={styles.navLinkText}>{user?.role || 'Investors'}</Text>
               </TouchableOpacity>
-            }
+            } */}
           </View>
         )}
 
@@ -347,7 +347,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
           {isLoggedIn && (
             <TouchableOpacity
               style={[styles.profileBtn, isMobile && styles.profileBtnMobile]}
-              onPress={() => navigate('/my-profile')}
+              onPress={() => navigate('/investors')}
             >
               <View style={styles.profileCircle}>
                 <Text style={styles.profileInitials}>
