@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   StyleSheet,
   TextInput,
   Pressable,
+  Dimensions,
 } from 'react-native';
 import { ChevronDown, X, Search } from 'lucide-react-native';
 
@@ -37,6 +38,9 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+  
+  const containerRef = useRef<View>(null);
 
   const selectedOption = options.find(opt => opt.value === value);
 
@@ -52,6 +56,17 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
     setSearchQuery('');
   };
 
+  const handleToggle = () => {
+    if (!isOpen) {
+      containerRef.current?.measureInWindow((x, y, width, height) => {
+        setDropdownPos({ top: y + height + 5, left: x, width });
+        setIsOpen(true);
+      });
+    } else {
+      handleClose();
+    }
+  };
+
   const handleClose = () => {
     setIsOpen(false);
     setSearchQuery('');
@@ -59,16 +74,17 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   };
 
   return (
-    <View>
+    <View ref={containerRef} style={styles.container}>
       <TouchableOpacity
         style={[styles.dropdown, error && styles.dropdownError]}
-        onPress={() => setIsOpen(true)}
+        onPress={handleToggle}
       >
         <Text
           style={[
             styles.dropdownText,
             !selectedOption && styles.placeholderText,
           ]}
+          numberOfLines={1}
         >
           {selectedOption ? selectedOption.label : placeholder}
         </Text>
@@ -81,22 +97,20 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
         animationType="fade"
         onRequestClose={handleClose}
       >
-        <Pressable style={styles.modalOverlay} onPress={handleClose}>
-          <View
-            style={styles.modalContent}
-            onStartShouldSetResponder={() => true}
-          >
-            {/* Header */}
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{placeholder}</Text>
-              <TouchableOpacity
-                onPress={handleClose}
-                style={styles.closeButton}
-              >
-                <X size={24} color="#666" />
-              </TouchableOpacity>
-            </View>
-
+        <Pressable 
+          style={StyleSheet.absoluteFill} 
+          onPress={handleClose} 
+        />
+        <View
+          style={[
+            styles.popoverContent,
+            {
+              top: dropdownPos.top,
+              left: dropdownPos.left,
+              width: dropdownPos.width,
+            }
+          ]}
+        >
             {/* Search */}
             {searchable && (
               <View style={styles.searchContainer}>
@@ -140,15 +154,18 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
               )}
               style={styles.optionsList}
               showsVerticalScrollIndicator={false}
+              nestedScrollEnabled={true}
             />
           </View>
-        </Pressable>
       </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+  },
   dropdown: {
     backgroundColor: '#F2F2F2',
     height: 44,
@@ -162,6 +179,7 @@ const styles = StyleSheet.create({
   },
   dropdownError: {
     borderColor: '#EE2529',
+    backgroundColor: '#FFF5F5',
   },
   dropdownText: {
     fontSize: 14,
@@ -173,49 +191,30 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    backgroundColor: 'transparent',
   },
-  modalContent: {
+  popoverContent: {
+    position: 'absolute',
     backgroundColor: '#FFF',
     borderRadius: 12,
-    width: '100%',
-    maxWidth: 500,
-    maxHeight: '80%',
+    borderWidth: 1,
+    borderColor: '#EEE',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEE',
-  },
-  modalTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#333',
-    flex: 1,
-  },
-  closeButton: {
-    padding: 4,
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 5,
+    maxHeight: 300,
+    overflow: 'hidden',
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F5F5F5',
-    margin: 16,
-    marginBottom: 8,
+    margin: 8,
     paddingHorizontal: 12,
     borderRadius: 8,
-    height: 40,
+    height: 36,
   },
   searchIcon: {
     marginRight: 8,
@@ -224,15 +223,16 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     color: '#333',
+    paddingVertical: 5,
   },
   optionsList: {
-    maxHeight: 400,
+    maxHeight: 250,
   },
   option: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
+    padding: 14,
     borderBottomWidth: 1,
     borderBottomColor: '#F5F5F5',
   },
