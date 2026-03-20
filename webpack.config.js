@@ -18,6 +18,7 @@ const babelLoaderConfiguration = {
     path.resolve(appDirectory, 'node_modules/react-native-chart-kit'),
     path.resolve(appDirectory, 'node_modules/react-native-svg'),
     path.resolve(appDirectory, 'node_modules/react-native-image-picker'),
+    path.resolve(appDirectory, 'node_modules/react-native-linear-gradient'),
   ],
   use: {
     loader: 'babel-loader',
@@ -77,6 +78,7 @@ module.exports = {
       'react-native$': 'react-native-web',
       '@react-native-async-storage/async-storage':
         '@react-native-async-storage/async-storage/lib/commonjs/index.js',
+      'react-native-linear-gradient': 'react-native-web-linear-gradient',
     },
     // If you're working on a multi-platform project, web extensions should be listed first.
     extensions: [
