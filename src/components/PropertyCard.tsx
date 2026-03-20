@@ -17,13 +17,14 @@ import {
   Image as LucideImage,
   ChevronLeft,
   ChevronRight,
-  Share2,
   Heart,
 } from 'lucide-react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { COLORS } from '../constants/theme';
+import { COLORS, FONTS } from '../constants/theme';
 import { useNavigation } from '../context/NavigationContext';
 import { useAuth } from '../context/AuthContext';
+import VerifiedSvg from './VerifiedSvg';
+import ShareIcon from './ShareIcon';
 
 export interface Property {
   id: string;
@@ -113,18 +114,14 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             <Text style={styles.propLocationText}>{item.location}</Text>
           </View>
         </View>
-
+        
         {/* Verified Badge */}
         {(item.isVerified === 'partial' || item.isVerified === 'completed') && (
           <View style={styles.verifiedBadgeContainer}>
-            <LinearGradient
-              colors={['#EE2529', '#C73834']}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
-              style={styles.verifiedBadgeSlant}
-            >
-              <Text style={styles.verifiedText}>Verified</Text>
-            </LinearGradient>
+            <VerifiedSvg width={100} height={28} />
+            <View style={styles.verifiedTextOverlay}>
+              <Text style={styles.verifiedText}>{item.isVerified === 'completed' ? 'Verified' : 'Partial'}</Text>
+            </View>
           </View>
         )}
       </View>
@@ -163,7 +160,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         {/* Share and Favorite Buttons */}
         <View style={styles.actionButtons}>
           <TouchableOpacity style={styles.iconButton}>
-            <Share2 size={20} color={COLORS.white} />
+            <ShareIcon size={22} color={COLORS.white} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconButton}>
             <Heart size={20} color={COLORS.white} />
@@ -294,8 +291,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   propCategory: {
+    fontFamily: FONTS.main,
     fontSize: 26,
-    fontWeight: '400',
+    fontWeight: '200',
     color: '#333',
     marginBottom: 2,
   },
@@ -306,28 +304,30 @@ const styles = StyleSheet.create({
   propLocationText: {
     fontSize: 15,
     color: '#666',
-    fontWeight: '400',
-  },
+    fontWeight: '200',
+  }, 
   verifiedBadgeContainer: {
     position: 'absolute',
-    top: 16,
+    top: 14,
     right: 0,
     zIndex: 10,
   },
-  verifiedBadgeSlant: {
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderTopLeftRadius: 15,
-    borderBottomLeftRadius: 15,
-    // Using simple skew for the angled effect
-    transform: [{ skewX: '-15deg' }],
-    marginRight: -10, // Pull it to the edge
+  verifiedTextOverlay: {
+    position: 'absolute',
+    paddingLeft: 15,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   verifiedText: {
+    fontFamily: FONTS.main,
     color: COLORS.white,
-    fontSize: 16,
-    fontWeight: '600',
-    transform: [{ skewX: '15deg' }], // Counter-skew text
+    fontSize: 13,
+    fontWeight: '700',
+    backgroundColor: 'transparent',
   },
   propImageContainer: {
     height: 280,
@@ -344,6 +344,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   noImageText: {
+    fontFamily: FONTS.main,
     marginTop: 6,
     fontSize: 14,
     color: COLORS.textSecondary,
@@ -406,9 +407,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF9C4',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 10,
+    borderRadius: 100,
   },
   mncBadgeText: {
+    fontFamily: FONTS.main,
     color: '#938131',
     fontSize: 14,
     fontWeight: '600',
@@ -429,6 +431,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   compareText: {
+    fontFamily: FONTS.main,
     color: '#ED2B2B',
     fontWeight: '600',
     fontSize: 14,
@@ -445,55 +448,60 @@ const styles = StyleSheet.create({
   },
   propDetailItem: {
     flex: 1,
-    gap: 12,
+    gap: 8,
   },
   detailLabel: {
+    fontFamily: FONTS.main,
     fontSize: 14,
-    color: '#999',
-    fontWeight: '500',
+    color: '#999999',
+    fontWeight: '400',
   },
   detailValue: {
-    color: '#000',
+    fontFamily: FONTS.main,
+    color: '#000000',
     fontWeight: '700',
-    fontSize: 18,
+    fontSize: 16,
   },
   roiCardContainer: {
     borderRadius: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
     elevation: 4,
-    minWidth: 70,
+    minWidth: 75,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: '#f1f5f9',
+    borderWidth: 0,
   },
   roiCardGradient: {
-    paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 110,
+    minHeight: 80,
   },
   roiLabel: {
+    fontFamily: FONTS.main,
     fontSize: 18,
-    color: '#111',
+    color: '#000000',
     fontWeight: '800',
     marginBottom: 4,
+    letterSpacing: 1,
   },
   roiValueContainer: {
     flexDirection: 'row',
     alignItems: 'baseline',
   },
   roiValueText: {
-    fontSize: 26,
-    color: '#EE2529',
+    fontFamily: FONTS.main,
+    fontSize: 22,
+    color: '#E63946',
     fontWeight: '800',
   },
   percentageSymbol: {
-    fontSize: 16,
-    color: '#EE2529',
+    fontFamily: FONTS.main,
+    fontSize: 15,
+    color: '#E63946',
     fontWeight: '800',
     marginLeft: 1,
   },
@@ -515,6 +523,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   viewBtnText: {
+    fontFamily: FONTS.main,
     color: '#666',
     fontWeight: '500',
     fontSize: 13,
@@ -522,7 +531,7 @@ const styles = StyleSheet.create({
   enquireBtnWrapper: {
     flex: 1,
     maxWidth: 80,
-    borderRadius: 125,
+    borderRadius: 5,
     overflow: 'hidden',
   },
   enquireBtnGradient: {
@@ -531,6 +540,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   enquireBtnText: {
+    fontFamily: FONTS.main,
     color: COLORS.white,
     fontWeight: '500',
     fontSize: 13,

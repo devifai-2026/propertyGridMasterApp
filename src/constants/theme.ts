@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 export const COLORS = {
   primary: '#D32F2F',
   secondary: '#FF5722', // Deep Orange for accents if needed
@@ -9,4 +11,12 @@ export const COLORS = {
   success: '#2E7D32',
   error: '#D32F2F',
   lightRed: '#FFF0F0',
+};
+
+export const FONTS = {
+  main: Platform.select({
+    ios: 'Avenir Next',
+    android: 'Avenir Next LT Pro',
+    web: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
+  }) || 'Avenir Next',
 };

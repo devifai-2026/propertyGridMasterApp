@@ -71,7 +71,7 @@ const FeaturedSection = ({ properties }: { properties: any[] }) => {
   const [selectedProperties, setSelectedProperties] = useState<Property[]>([]);
   const isMobile = width < 768;
 
-  const containerPadding = isMobile ? 20 : 60;
+  const containerPadding = width < 768 ? 20 : width < 1100 ? 60 : 120;
   const availableWidth = width - containerPadding * 2;
   const gap = 20;
 
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
     marginTop: 60,
   },
   sectionTitle: {
-    fontWeight: '400',
+    fontWeight: '200',
     color: COLORS.textDark,
     marginBottom: 40,
     textAlign: 'center',
