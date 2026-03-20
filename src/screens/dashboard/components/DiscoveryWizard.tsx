@@ -7,7 +7,7 @@ import {
   useWindowDimensions,
   StyleSheet,
 } from 'react-native';
-import { COLORS } from '../../../constants/theme';
+import { COLORS, FONTS } from '../../../constants/theme';
 import {
   Building2,
   Percent,
@@ -38,38 +38,45 @@ const StepCard = ({
   item,
   active,
   onPress,
+  isLast,
 }: {
   item: Step;
   active: boolean;
   onPress: () => void;
+  isLast?: boolean;
 }) => {
   const { width } = useWindowDimensions();
+  const isMobile = width < 768;
   const IconComponent = item.Icon;
+  
   return (
-    <TouchableOpacity
-      style={[
-        styles.stepCard,
-        active && styles.stepCardActive,
-        { width: width < 768 ? 90 : 120, height: width < 768 ? 90 : 120 },
-      ]}
-      onPress={onPress}
-    >
-      <IconComponent
-        size={width < 768 ? 24 : 32}
-        color={active ? COLORS.primary : COLORS.textSecondary}
-        strokeWidth={1.5}
-        style={styles.stepIcon}
-      />
-      <Text
+    <View style={styles.stepWrapper}>
+      <TouchableOpacity
         style={[
-          styles.stepLabel,
-          active && styles.stepLabelActive,
-          { fontSize: width < 768 ? 12 : 14 },
+          styles.stepCard,
+          active && styles.stepCardActive,
+          { width: isMobile ? 90 : 120, height: isMobile ? 90 : 120 },
         ]}
+        onPress={onPress}
       >
-        {item.label}
-      </Text>
-    </TouchableOpacity>
+        <IconComponent
+          size={isMobile ? 24 : 32}
+          color={active ? '#EE2529' : '#888'}
+          strokeWidth={active ? 2.5 : 1.5}
+          style={styles.stepIcon}
+        />
+        <Text
+          style={[
+            styles.stepLabel,
+            active && styles.stepLabelActive,
+            { fontSize: isMobile ? 12 : 14 },
+          ]}
+        >
+          {item.label}
+        </Text>
+      </TouchableOpacity>
+      <View style={[styles.stepProgressLine, active && styles.stepProgressLineActive]} />
+    </View>
   );
 };
 
@@ -209,24 +216,27 @@ const DiscoveryWizard = () => {
         Discover Opportunities Built for You
       </Text>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={[
-          styles.stepsScroll,
-          !isMobile && { justifyContent: 'center', flexGrow: 1 },
-        ]}
-        style={{ flexGrow: 0, marginBottom: 40, width: '100%' }}
-      >
-        {STEPS.map(step => (
-          <StepCard
-            key={step.id}
-            item={step}
-            active={activeStep === step.id}
-            onPress={() => setActiveStep(step.id)}
-          />
-        ))}
-      </ScrollView>
+      <View style={styles.stepsContainer}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={[
+            styles.stepsScroll,
+            !isMobile && { justifyContent: 'center', flexGrow: 1 },
+          ]}
+          style={{ flexGrow: 0, width: '100%' }}
+        >
+          {STEPS.map((step, index) => (
+            <StepCard
+              key={step.id}
+              item={step}
+              active={activeStep === step.id}
+              onPress={() => setActiveStep(step.id)}
+              isLast={index === STEPS.length - 1}
+            />
+          ))}
+        </ScrollView>
+      </View>
 
       <View
         style={[
@@ -234,16 +244,18 @@ const DiscoveryWizard = () => {
           isMobile && { paddingVertical: 20, paddingHorizontal: 15 },
         ]}
       >
-        <View style={styles.wizardStepBadge}>
-          <Text style={styles.wizardStepText}>Step {activeStep} of 6</Text>
-        </View>
-        <View style={styles.wizardProgressBadge}>
-          <Text style={styles.wizardStepText}>
-            {Math.round((parseInt(activeStep) / 6) * 100)}%
-          </Text>
+        <View style={styles.badgeRow}>
+          <View style={styles.wizardStepBadge}>
+            <Text style={styles.wizardStepText}>Step {activeStep} of 6</Text>
+          </View>
+          <View style={styles.wizardProgressBadge}>
+            <Text style={styles.wizardStepText}>
+              {Math.round((parseInt(activeStep) / 6) * 100)}%
+            </Text>
+          </View>
         </View>
 
-        <Text style={[styles.wizardQuestion, { fontSize: isMobile ? 22 : 28 }]}>
+        <Text style={[styles.wizardQuestion, { fontSize: isMobile ? 22 : 36 }]}>
           What's your {STEPS.find(s => s.id === activeStep)?.label} Preference?
         </Text>
         <Text style={styles.wizardSubtext}>
@@ -281,103 +293,129 @@ const DiscoveryWizard = () => {
 
 const styles = StyleSheet.create({
   wizardContainer: {
-    marginTop: 40,
+    paddingVertical: 50,
     alignItems: 'center',
     width: '100%',
+    backgroundColor: '#FFFFFF',
   },
   wizardTitle: {
-    fontWeight: '500',
-    color: COLORS.textDark,
-    marginBottom: 40,
+    fontFamily: FONTS.main,
+    fontWeight: '400',
+    color: '#1A1A1A',
+    marginBottom: 50,
     textAlign: 'center',
   },
+  stepsContainer: {
+    width: '100%',
+    maxWidth: 900,
+    marginBottom: 40,
+  },
   stepsScroll: {
-    paddingHorizontal: 10,
-    gap: 10,
+    paddingHorizontal: 20,
+    gap: 15,
+  },
+  stepWrapper: {
+    alignItems: 'center',
+    gap: 15,
   },
   stepCard: {
-    width: 120,
-    height: 120,
-    borderWidth: 1,
-    borderColor: COLORS.divider,
+    backgroundColor: '#FFF',
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.white,
-    marginRight: 10,
+    borderWidth: 1.5,
+    borderColor: '#EAEAEA',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 2,
   },
   stepCardActive: {
-    borderColor: COLORS.primary,
-    borderWidth: 2,
-    shadowColor: COLORS.primary,
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
+    borderColor: '#EE2529',
+    backgroundColor: '#FFF',
+    shadowColor: '#EE2529',
+    shadowOpacity: 0.08,
   },
   stepIcon: {
-    marginBottom: 10,
+    marginBottom: 8,
   },
   stepLabel: {
+    fontFamily: FONTS.main,
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: '#888',
     fontWeight: '600',
     textAlign: 'center',
+    paddingHorizontal: 10,
   },
   stepLabelActive: {
-    color: COLORS.primary,
+    color: '#EE2529',
+  },
+  stepProgressLine: {
+    height: 4,
+    width: '100%',
+    backgroundColor: '#EAEAEA',
+    borderRadius: 2,
+  },
+  stepProgressLineActive: {
+    backgroundColor: '#EE2529',
   },
   wizardContentCard: {
     width: '100%',
-    maxWidth: 800,
-    backgroundColor: COLORS.white,
+    maxWidth: 900,
+    backgroundColor: '#FFF',
     borderRadius: 24,
-    paddingHorizontal: 20,
-    paddingVertical: 40,
+    paddingHorizontal: 30,
+    paddingVertical: 50,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.05,
-    shadowRadius: 20,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.06,
+    shadowRadius: 30,
+    elevation: 8,
     position: 'relative',
-    marginTop: 20,
-    alignSelf: 'center',
     borderWidth: 1,
-    borderColor: COLORS.divider,
+    borderColor: '#F0F0F0',
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    position: 'absolute',
+    top: 25,
+    paddingHorizontal: 30,
   },
   wizardStepBadge: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    backgroundColor: '#FFF8E1',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    backgroundColor: '#FFF9E6',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 100,
   },
   wizardProgressBadge: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    backgroundColor: '#FFF8E1',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    backgroundColor: '#FFF9E6',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 100,
   },
   wizardStepText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
+    fontFamily: FONTS.main,
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#444',
   },
   wizardQuestion: {
-    fontWeight: '900',
-    color: COLORS.textDark,
-    marginBottom: 10,
+    fontFamily: FONTS.main,
+    fontWeight: '400',
+    color: '#1A1A1A',
+    marginBottom: 15,
     textAlign: 'center',
     marginTop: 20,
   },
   wizardSubtext: {
-    fontSize: 16,
-    color: COLORS.textSecondary,
-    marginBottom: 40,
+    fontFamily: FONTS.main,
+    fontSize: 18,
+    color: '#666',
+    marginBottom: 45,
     textAlign: 'center',
   },
   wizardOptions: {
@@ -385,33 +423,39 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
     gap: 20,
-    marginBottom: 40,
+    marginBottom: 50,
+    width: '100%',
   },
   cityOption: {
-    width: 150,
-    height: 100,
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
+    width: 200,
+    height: 120,
+    backgroundColor: '#FFF',
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#eee',
+    borderColor: '#F0F0F0',
     shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.05,
-    shadowRadius: 5,
+    shadowRadius: 12,
+    elevation: 3,
   },
   cityOptionSelected: {
-    borderColor: COLORS.primary,
-    borderWidth: 2,
-    backgroundColor: COLORS.lightRed,
+    borderColor: '#EE2529',
+    backgroundColor: '#FFF',
+    shadowColor: '#EE2529',
+    shadowOpacity: 0.1,
   },
   cityOptionText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: COLORS.textDark,
+    fontFamily: FONTS.main,
+    fontSize: 20,
+    fontWeight: '500',
+    color: '#666',
   },
   cityOptionTextSelected: {
-    color: COLORS.primary,
+    color: '#EE2529',
+    fontWeight: '700',
   },
   wizardActions: {
     flexDirection: 'row',
@@ -419,24 +463,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   skipBtn: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderWidth: 1,
-    borderColor: COLORS.divider,
-    borderRadius: 8,
+    height: 54,
+    minWidth: 120,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#EAEAEA',
+    borderRadius: 12,
+    paddingHorizontal: 30,
   },
   skipBtnText: {
-    color: COLORS.textSecondary,
-    fontWeight: '600',
+    fontFamily: FONTS.main,
+    color: '#666',
+    fontSize: 16,
+    fontWeight: '500',
   },
   showPropertiesBtn: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-    borderRadius: 8,
+    backgroundColor: '#EE2529',
+    height: 54,
+    minWidth: 180,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+    paddingHorizontal: 40,
+    shadowColor: '#EE2529',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+    elevation: 10,
   },
   showPropertiesText: {
-    color: COLORS.white,
+    fontFamily: FONTS.main,
+    color: '#FFF',
+    fontSize: 16,
     fontWeight: '600',
   },
 });
