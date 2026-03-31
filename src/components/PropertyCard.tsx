@@ -70,6 +70,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   const { navigate } = useNavigation();
   const { user } = useAuth();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isLocationExpanded, setIsLocationExpanded] = useState(false);
 
   const hasImages = item.images && item.images.length > 0;
   const imageCount = hasImages ? item.images!.length : 0;
@@ -109,10 +110,20 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       <View style={styles.propHeader}>
         <View style={styles.headerTextGroup}>
           <Text style={styles.propCategory}>{item.title}</Text>
-          <View style={styles.locationRow}>
+          <TouchableOpacity 
+            style={styles.locationRow}
+            onPress={() => setIsLocationExpanded(!isLocationExpanded)}
+            activeOpacity={0.7}
+          >
             <MapPin size={16} color="#EF4444" style={{ marginRight: 4 }} />
-            <Text style={styles.propLocationText}>{item.location}</Text>
-          </View>
+            <Text 
+              style={styles.propLocationText}
+              numberOfLines={isLocationExpanded ? undefined : 1}
+              ellipsizeMode="tail"
+            >
+              {item.location}
+            </Text>
+          </TouchableOpacity>
         </View>
         
         {/* Verified Badge */}
@@ -141,7 +152,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               resizeMode="cover"
             />
             {/* Slideshow Controls */}
-            {imageCount > 1 && (
+            {imageCount >= 1 && (
               <View style={styles.dotsContainer}>
                 {item.images!.map((_, idx) => (
                   <View
@@ -160,10 +171,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         {/* Share and Favorite Buttons */}
         <View style={styles.actionButtons}>
           <TouchableOpacity style={styles.iconButton}>
-            <ShareIcon size={22} color={COLORS.white} />
+            <ShareIcon size={15} color={COLORS.white} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconButton}>
-            <Heart size={20} color={COLORS.white} />
+            <Heart size={15} color={COLORS.white} />
           </TouchableOpacity>
         </View>
 
@@ -289,11 +300,12 @@ const styles = StyleSheet.create({
   },
   headerTextGroup: {
     flex: 1,
+    paddingRight: 110,
   },
   propCategory: {
     fontFamily: FONTS.main,
-    fontSize: 26,
-    fontWeight: '200',
+    fontSize: 24,
+    fontWeight: '400',
     color: '#333',
     marginBottom: 2,
   },
@@ -302,13 +314,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   propLocationText: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#666',
-    fontWeight: '200',
+    fontWeight: '400',
   }, 
   verifiedBadgeContainer: {
     position: 'absolute',
-    top: 14,
+    bottom: 15,
     right: 0,
     zIndex: 10,
   },
@@ -351,21 +363,21 @@ const styles = StyleSheet.create({
   },
   dotsContainer: {
     position: 'absolute',
-    bottom: 15,
+    bottom: 55, // Positioned above the blurred bar
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 6,
+    gap: 8,
     zIndex: 10,
   },
   dot: {
     width: 10,
     height: 10,
-    borderRadius: 2,
+    borderRadius: 100,
     backgroundColor: 'rgba(255,255,255,0.7)',
   },
   activeDot: {
-    backgroundColor: '#ED2B2B',
+    backgroundColor: '#EE2529',
   },
   actionButtons: {
     position: 'absolute',
@@ -375,27 +387,29 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   iconButton: {
-    backgroundColor: 'rgba(51, 51, 51, 0.6)', // Darker gray in ss
-    borderRadius: 12,
-    width: 45,
-    height: 45,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    borderRadius: 100,
+    width: 32,
+    height: 32,
     alignItems: 'center',
     justifyContent: 'center',
   },
   blurContainer: {
     position: 'absolute',
-    bottom: 0,
+    bottom: -6,
     left: 0,
     right: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     paddingVertical: 10,
     paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
     ...Platform.select({
       web: {
-        backdropFilter: 'blur(10px)',
+        backdropFilter: 'blur(6px)',
       },
     }),
   } as ViewStyle,
@@ -411,9 +425,9 @@ const styles = StyleSheet.create({
   },
   mncBadgeText: {
     fontFamily: FONTS.main,
-    color: '#938131',
-    fontSize: 14,
-    fontWeight: '600',
+    color: '#767676', // User specified color
+    fontSize: 16,
+    fontWeight: '400',
   },
   compareBtnInternal: {
     backgroundColor: COLORS.white,
@@ -452,15 +466,15 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontFamily: FONTS.main,
-    fontSize: 14,
-    color: '#999999',
+    fontSize: 16,
+    color: '#666',
     fontWeight: '400',
   },
   detailValue: {
     fontFamily: FONTS.main,
     color: '#000000',
-    fontWeight: '700',
-    fontSize: 16,
+    fontWeight: '600',
+    fontSize: 18,
   },
   roiCardContainer: {
     borderRadius: 20,
@@ -475,18 +489,18 @@ const styles = StyleSheet.create({
   },
   roiCardGradient: {
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingVertical: 10,
     alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 80,
+    justifyContent: 'flex-start',
+    minHeight: 70,
   },
   roiLabel: {
     fontFamily: FONTS.main,
-    fontSize: 18,
+    fontSize: 24,
     color: '#000000',
-    fontWeight: '800',
-    marginBottom: 4,
-    letterSpacing: 1,
+    fontWeight: '600',
+    marginBottom: 2,
+    letterSpacing: 0.5,
   },
   roiValueContainer: {
     flexDirection: 'row',
@@ -494,15 +508,15 @@ const styles = StyleSheet.create({
   },
   roiValueText: {
     fontFamily: FONTS.main,
-    fontSize: 22,
+    fontSize: 16,
     color: '#E63946',
-    fontWeight: '800',
+    fontWeight: '600',
   },
   percentageSymbol: {
     fontFamily: FONTS.main,
-    fontSize: 15,
+    fontSize: 14,
     color: '#E63946',
-    fontWeight: '800',
+    fontWeight: '600',
     marginLeft: 1,
   },
   propActions: {
@@ -514,8 +528,8 @@ const styles = StyleSheet.create({
   },
   viewBtn: {
     flex: 1,
-    maxWidth: 60,
-    paddingVertical: 13,
+    maxWidth: 80,
+    paddingVertical: 10,
     borderWidth: 1.2,
     borderColor: '#888',
     borderRadius: 5,
@@ -525,25 +539,25 @@ const styles = StyleSheet.create({
   viewBtnText: {
     fontFamily: FONTS.main,
     color: '#666',
-    fontWeight: '500',
-    fontSize: 13,
+    fontWeight: '600',
+    fontSize: 14,
   },
   enquireBtnWrapper: {
     flex: 1,
-    maxWidth: 80,
+    maxWidth: 100,
     borderRadius: 5,
     overflow: 'hidden',
   },
   enquireBtnGradient: {
-    paddingVertical: 13,
+    paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   enquireBtnText: {
     fontFamily: FONTS.main,
     color: COLORS.white,
-    fontWeight: '500',
-    fontSize: 13,
+    fontWeight: '600',
+    fontSize: 14,
   },
   removeBtn: {
     position: 'absolute',

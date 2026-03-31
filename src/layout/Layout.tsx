@@ -48,6 +48,7 @@ import {
   LayoutDashboard,
   Bell,
   MessageSquare,
+  ChevronDown,
 } from 'lucide-react-native';
 
 const SideMenu: React.FC<SideMenuProps> = ({
@@ -346,31 +347,6 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
 
           {isLoggedIn && (
             <TouchableOpacity
-              style={[styles.profileBtn, isMobile && styles.profileBtnMobile]}
-              onPress={() => navigate('/investors')}
-            >
-              <View style={styles.profileCircle}>
-                <Text style={styles.profileInitials}>
-                  {user?.name
-                    ? user.name
-                        .split(' ')
-                        .map((n: string) => n[0])
-                        .join('')
-                        .toUpperCase()
-                        .slice(0, 2)
-                    : 'U'}
-                </Text>
-              </View>
-              {!isMobile && (
-                <Text style={styles.profileName}>
-                  {user?.name?.split(' ')[0]}
-                </Text>
-              )}
-            </TouchableOpacity>
-          )}
-
-          {isLoggedIn ? (
-            <TouchableOpacity
               style={[
                 styles.listPropertyBtn,
                 isMobile && {
@@ -388,6 +364,34 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
               {!isMobile && (
                 <Text style={styles.listPropertyText}>List Property</Text>
               )}
+            </TouchableOpacity>
+          )}
+
+          {isLoggedIn ? (
+            <TouchableOpacity
+              style={[styles.profileBtn, isMobile && styles.profileBtnMobile]}
+              onPress={() => navigate('/investors')}
+            >
+              <View style={styles.profileCircle}>
+                {user?.profileImage ? (
+                  <Image
+                    source={{ uri: user.profileImage }}
+                    style={{ width: '100%', height: '100%' }}
+                  />
+                ) : (
+                  <Text style={styles.profileInitials}>
+                    {user?.name
+                      ? user.name
+                          .split(' ')
+                          .map((n: string) => n[0])
+                          .join('')
+                          .toUpperCase()
+                          .slice(0, 2)
+                      : 'U'}
+                  </Text>
+                )}
+              </View>
+              <ChevronDown size={18} color={COLORS.primary} strokeWidth={3} />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
@@ -501,12 +505,12 @@ const styles = StyleSheet.create({
   navLinkText: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: '#262626',
   },
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 15,
+    gap: 12,
   },
   signInBtn: {
     paddingVertical: 8,
@@ -520,45 +524,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.textDark,
-    borderRadius: 25,
+    borderColor: '#262626',
+    borderRadius: 30,
     paddingLeft: 4,
     paddingRight: 16,
-    paddingVertical: 6,
+    paddingVertical: 4,
+    height: 44,
   },
   plusIconBg: {
     backgroundColor: COLORS.primary,
-    borderRadius: 12,
-    width: 24,
-    height: 24,
+    borderRadius: 18,
+    width: 36,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 8,
   },
   plusIcon: {
     color: COLORS.white,
-    fontWeight: 'bold',
-    fontSize: 16,
+    fontWeight: '400',
+    fontSize: 20,
   },
   listPropertyText: {
-    fontWeight: '600',
-    color: COLORS.textDark,
+    fontWeight: '400',
+    color: '#262626',
+    fontSize: 16,
+    marginLeft: 8,
   },
   menuBtn: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: '#FFF0F0',
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(238, 37, 41, 0.1)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   menuIcon: {
     color: '#D32F2F',
@@ -740,38 +739,35 @@ const styles = StyleSheet.create({
   profileBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    padding: 4,
+    gap: 8,
+    padding: 3,
     paddingRight: 10,
-    borderRadius: 20,
-    backgroundColor: COLORS.lightRed,
+    borderRadius: 30,
+    backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: 'rgba(211, 47, 47, 0.1)',
+    borderColor: '#262626',
+    height: 44,
   },
   profileBtnMobile: {
-    paddingRight: 4,
+    paddingRight: 3,
   },
   profileCircle: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: COLORS.primary,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#888',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
+    overflow: 'hidden',
   },
   profileName: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#333',
+    fontWeight: '400',
+    color: '#262626',
   },
   profileInitials: {
-    fontSize: 13,
-    fontWeight: '800',
+    fontSize: 14,
+    fontWeight: '400',
     color: COLORS.white,
   },
   profileMenuBtn: {

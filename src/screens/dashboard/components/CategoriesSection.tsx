@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { COLORS } from '../../../constants/theme';
+import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '../../../context/NavigationContext';
 import { usePropertyAPIs } from '../../../../helpers/hooks/propertyAPIs/usePropertyApis';
 
@@ -64,15 +65,22 @@ const CategoryCard = ({
       </View>
       <View style={styles.cardFooter}>
         <View style={styles.countBadge}>
-          <Text style={styles.countText}>{count} Property Listed</Text>
+          <Text style={styles.countText}>{count} Properties Listed</Text>
         </View>
         <TouchableOpacity
-          style={styles.exploreBtn}
+          activeOpacity={0.8}
           onPress={() =>
             navigate(`/explore-properties?propertyTypes=${item.value}`)
           }
         >
-          <Text style={styles.exploreBtnText}>Explore</Text>
+          <LinearGradient
+            colors={['#EE2529', '#C73834']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.exploreBtn}
+          >
+            <Text style={styles.exploreBtnText}>Explore</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
     </View>
@@ -96,16 +104,16 @@ const CategoriesSection = () => {
     );
   }, []);
 
-  const containerPadding = isMobile ? 20 : 60;
-  const availableWidth = Math.min(width, 1440) - containerPadding * 2;
+  const containerPadding = isMobile ? 20 : 0;
+  const availableWidth = (width * 0.9) - containerPadding * 2;
   const gap = 20;
 
   // Responsive columns
-  let cols = 5;
+  let cols = 4;
   if (width < 600) cols = 1;
-  else if (width < 900) cols = 2;
-  else if (width < 1200) cols = 3;
-  else cols = 5;
+  else if (width < 800) cols = 2;
+  else if (width < 1000) cols = 3;
+  else cols = 4;
 
   const cardWidth = (availableWidth - gap * (cols - 1)) / cols;
 
@@ -113,7 +121,7 @@ const CategoriesSection = () => {
     <View style={styles.outerContainer}>
       <View style={[styles.container, { paddingHorizontal: containerPadding }]}>
         <View style={styles.headerRow}>
-          <Text style={[styles.sectionTitle, { fontSize: isMobile ? 24 : 34 }]}>
+          <Text style={[styles.sectionTitle, { fontSize: isMobile ? 28 : 42 }]}>
             Explore all <Text style={styles.highlightText}>Categories</Text>
           </Text>
           {loading && <ActivityIndicator color={COLORS.primary} size="small" />}
@@ -142,7 +150,7 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: 60,
     width: '100%',
-    maxWidth: 1440,
+    maxWidth: '90%',
   },
   headerRow: {
     flexDirection: 'row',
@@ -152,14 +160,13 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   sectionTitle: {
-    fontWeight: '300',
-    color: COLORS.textDark,
+    fontWeight: '400',
+    color: '#262626',
     textAlign: 'center',
     letterSpacing: -0.5,
   },
   highlightText: {
-    color: COLORS.primary,
-    fontWeight: '700',
+    fontWeight: '400',
   },
   grid: {
     flexDirection: 'row',
@@ -191,47 +198,41 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.15)',
+    backgroundColor: 'rgba(0,0,0,0.1)',
   },
   categoryTitle: {
     position: 'absolute',
-    bottom: 18,
+    top: 20,
     left: 20,
     color: COLORS.white,
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '700',
-    letterSpacing: 0.2,
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 4,
+    letterSpacing: 0.5,
   },
   cardFooter: {
     padding: 15,
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    gap: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: COLORS.white,
   },
   countBadge: {
-    backgroundColor: 'rgba(255, 107, 107, 0.08)',
+    backgroundColor: '#FFF9E6',
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 6,
+    paddingVertical: 6,
+    borderRadius: 12,
   },
   countText: {
-    fontSize: 11,
-    color: COLORS.primary,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    fontSize: 12,
+    color: '#262626',
+    fontWeight: '500',
   },
   exploreBtn: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     borderRadius: 8,
-    width: '100%',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   exploreBtnText: {
     color: COLORS.white,

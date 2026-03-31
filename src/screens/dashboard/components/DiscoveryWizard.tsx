@@ -8,74 +8,80 @@ import {
   StyleSheet,
 } from 'react-native';
 import { COLORS, FONTS } from '../../../constants/theme';
-import {
-  Building2,
-  Percent,
-  Home,
-  DollarSign,
-  User,
-  Clock,
-  LucideProps,
-} from 'lucide-react-native';
 import { useNavigation } from '../../../context/NavigationContext';
+import LinearGradient from 'react-native-linear-gradient';
+import {
+  CitiesIcon,
+  AnnualReturnsIcon,
+  PropertyTypeIcon,
+  BudgetIcon,
+  TenantTypeIcon,
+  TenureLeftIcon,
+} from '../../../components/common/WizardIcons';
+
+
 
 interface Step {
   id: string;
   label: string;
-  Icon: React.FC<LucideProps>;
+  Icon: React.FC<{ color: string; size: number; style?: any }>;
 }
 
 const STEPS: Step[] = [
-  { id: '1', label: 'Cities', Icon: Building2 },
-  { id: '2', label: 'Annual Returns', Icon: Percent },
-  { id: '3', label: 'Property Type', Icon: Home },
-  { id: '4', label: 'Budget', Icon: DollarSign },
-  { id: '5', label: 'Tenant Type', Icon: User },
-  { id: '6', label: 'Tenure Left', Icon: Clock },
+  { id: '1', label: 'Cities', Icon: CitiesIcon },
+  { id: '2', label: 'Annual\nReturns', Icon: AnnualReturnsIcon },
+  { id: '3', label: 'Property\nType', Icon: PropertyTypeIcon },
+  { id: '4', label: 'Budget', Icon: BudgetIcon },
+  { id: '5', label: 'Tenant\nType', Icon: TenantTypeIcon },
+  { id: '6', label: 'Tenure\nLeft', Icon: TenureLeftIcon },
 ];
 
 const StepCard = ({
   item,
   active,
   onPress,
-  isLast,
 }: {
   item: Step;
   active: boolean;
   onPress: () => void;
-  isLast?: boolean;
 }) => {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const IconComponent = item.Icon;
   
   return (
-    <View style={styles.stepWrapper}>
+    <View style={styles.stepItemWrapper}>
       <TouchableOpacity
         style={[
           styles.stepCard,
           active && styles.stepCardActive,
-          { width: isMobile ? 90 : 120, height: isMobile ? 90 : 120 },
+          { width: isMobile ? 85 : 125, height: isMobile ? 95 : 125 },
         ]}
         onPress={onPress}
+        activeOpacity={0.7}
       >
         <IconComponent
-          size={isMobile ? 24 : 32}
-          color={active ? '#EE2529' : '#888'}
-          strokeWidth={active ? 2.5 : 1.5}
+          size={isMobile ? 20 : 30}
+          color={active ? COLORS.primary : '#666'}
           style={styles.stepIcon}
         />
         <Text
           style={[
             styles.stepLabel,
             active && styles.stepLabelActive,
-            { fontSize: isMobile ? 12 : 14 },
+            { fontSize: isMobile ? 12 : 18 },
           ]}
         >
           {item.label}
         </Text>
       </TouchableOpacity>
-      <View style={[styles.stepProgressLine, active && styles.stepProgressLineActive]} />
+      <View
+        style={[
+          styles.stepProgressIndicator,
+          active && styles.stepProgressIndicatorActive,
+          { width: isMobile ? 85 : 125 },
+        ]}
+      />
     </View>
   );
 };
@@ -96,7 +102,7 @@ const DiscoveryWizard = () => {
   const isMobile = width < 768;
 
   const OPTIONS: any = {
-    '1': ['Pune', 'Mumbai', 'Gurgaon', 'New Delhi', 'Others'],
+    '1': ['Pune', 'Mumbai', 'New Delhi', 'Gurgaon', 'Mumbai', 'New Delhi'],
     '2': [
       { label: '5%+', value: '5' },
       { label: '8%+', value: '8' },
@@ -226,13 +232,12 @@ const DiscoveryWizard = () => {
           ]}
           style={{ flexGrow: 0, width: '100%' }}
         >
-          {STEPS.map((step, index) => (
+          {STEPS.map((step) => (
             <StepCard
               key={step.id}
               item={step}
               active={activeStep === step.id}
               onPress={() => setActiveStep(step.id)}
-              isLast={index === STEPS.length - 1}
             />
           ))}
         </ScrollView>
@@ -241,7 +246,7 @@ const DiscoveryWizard = () => {
       <View
         style={[
           styles.wizardContentCard,
-          isMobile && { paddingVertical: 20, paddingHorizontal: 15 },
+          isMobile && { width: '95%', paddingVertical: 40, paddingHorizontal: 20 },
         ]}
       >
         <View style={styles.badgeRow}>
@@ -263,29 +268,37 @@ const DiscoveryWizard = () => {
         </Text>
 
         {renderOptions()}
+      </View>
 
-        <View style={styles.wizardActions}>
-          <TouchableOpacity
-            style={[styles.skipBtn, isMobile && { flex: 1 }]}
-            onPress={() => {
-              if (parseInt(activeStep) < 6) {
-                setActiveStep(String(parseInt(activeStep) + 1));
-              } else {
-                handleShowProperties();
-              }
-            }}
-          >
-            <Text style={styles.skipBtnText}>
-              {parseInt(activeStep) < 6 ? 'Skip' : 'Finish'}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.showPropertiesBtn, isMobile && { flex: 2 }]}
-            onPress={handleShowProperties}
+      <View style={styles.wizardActions}>
+        <TouchableOpacity
+          style={[styles.skipBtn, isMobile && { flex: 1 }]}
+          onPress={() => {
+            if (parseInt(activeStep) < 6) {
+              setActiveStep(String(parseInt(activeStep) + 1));
+            } else {
+              handleShowProperties();
+            }
+          }}
+        >
+          <Text style={styles.skipBtnText}>
+            {parseInt(activeStep) < 6 ? 'Skip' : 'Finish'}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[isMobile && { flex: 2 }]}
+          onPress={handleShowProperties}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={['#EE2529', '#C73834']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.showPropertiesBtn}
           >
             <Text style={styles.showPropertiesText}>Show Properties</Text>
-          </TouchableOpacity>
-        </View>
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -300,78 +313,92 @@ const styles = StyleSheet.create({
   },
   wizardTitle: {
     fontFamily: FONTS.main,
+    fontSize: 42,
     fontWeight: '400',
-    color: '#1A1A1A',
-    marginBottom: 50,
+    color: '#262626',
+    marginBottom: 40,
     textAlign: 'center',
   },
   stepsContainer: {
     width: '100%',
     maxWidth: 900,
     marginBottom: 40,
+    position: 'relative',
+    paddingBottom: 4,
+  },
+  stepsBaseLine: {
+    position: 'absolute',
+    bottom: 0,
+    left: 20,
+    right: 20,
+    height: 3,
+    backgroundColor: '#EAEAEA',
+    borderRadius: 2,
   },
   stepsScroll: {
     paddingHorizontal: 20,
-    gap: 15,
+    gap: 10,
   },
-  stepWrapper: {
+  stepItemWrapper: {
     alignItems: 'center',
-    gap: 15,
+    gap: 12,
   },
   stepCard: {
     backgroundColor: '#FFF',
     borderRadius: 16,
     alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-    borderColor: '#EAEAEA',
+    justifyContent: 'flex-start',
+    paddingTop: 24,
+    borderTopWidth: 5,
+    borderTopColor: '#666',
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: '#F0F0F0',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.08,
+    shadowRadius: 15,
+    elevation: 4,
   },
   stepCardActive: {
-    borderColor: '#EE2529',
-    backgroundColor: '#FFF',
-    shadowColor: '#EE2529',
-    shadowOpacity: 0.08,
+    borderTopColor: COLORS.primary,
+    borderColor: 'rgba(211, 47, 47, 0.1)',
   },
   stepIcon: {
-    marginBottom: 8,
+    marginBottom: 12,
   },
   stepLabel: {
     fontFamily: FONTS.main,
-    fontSize: 14,
-    color: '#888',
+    color: '#666',
     fontWeight: '600',
     textAlign: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
   },
   stepLabelActive: {
-    color: '#EE2529',
+    color: COLORS.primary,
+    fontWeight: '700',
   },
-  stepProgressLine: {
+  stepProgressIndicator: {
     height: 4,
-    width: '100%',
     backgroundColor: '#EAEAEA',
     borderRadius: 2,
   },
-  stepProgressLineActive: {
-    backgroundColor: '#EE2529',
+  stepProgressIndicatorActive: {
+    backgroundColor: COLORS.primary,
   },
   wizardContentCard: {
-    width: '100%',
+    width: '60%',
     maxWidth: 900,
     backgroundColor: '#FFF',
-    borderRadius: 24,
+    borderRadius: 20,
     paddingHorizontal: 30,
-    paddingVertical: 50,
+    paddingVertical: 60,
     alignItems: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.06,
-    shadowRadius: 30,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.04,
+    shadowRadius: 20,
     elevation: 8,
     position: 'relative',
     borderWidth: 1,
@@ -386,116 +413,121 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
   },
   wizardStepBadge: {
-    backgroundColor: '#FFF9E6',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    backgroundColor: '#FFF3CA',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 100,
   },
   wizardProgressBadge: {
-    backgroundColor: '#FFF9E6',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    backgroundColor: '#FFF3CA',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 100,
   },
   wizardStepText: {
     fontFamily: FONTS.main,
-    fontSize: 14,
+    fontSize: 12, // Slightly smaller for mobile compatibility
     fontWeight: '500',
-    color: '#444',
+    color: '#8B7B3E',
   },
   wizardQuestion: {
     fontFamily: FONTS.main,
     fontWeight: '400',
     color: '#1A1A1A',
-    marginBottom: 15,
+    marginBottom: 10,
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 10,
   },
   wizardSubtext: {
     fontFamily: FONTS.main,
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: '400',
     color: '#666',
-    marginBottom: 45,
+    marginBottom: 35,
     textAlign: 'center',
   },
   wizardOptions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 20,
-    marginBottom: 50,
-    width: '100%',
+    gap: 30,
+    marginBottom: 40,
+    width: '85%',
+    maxWidth: 700,
   },
   cityOption: {
-    width: 200,
-    height: 120,
-    backgroundColor: '#FFF',
-    borderRadius: 16,
+    width: '24%',
+    height: 135,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#F0F0F0',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
+    borderColor: '#EAEAEA',
+    shadowColor: '#999',
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
     elevation: 3,
   },
   cityOptionSelected: {
-    borderColor: '#EE2529',
+    borderWidth: 0,
     backgroundColor: '#FFF',
-    shadowColor: '#EE2529',
-    shadowOpacity: 0.1,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: -3, height: 4 },
+    shadowOpacity: 0.35,
+    shadowRadius: 8,
+    elevation: 6,
   },
   cityOptionText: {
     fontFamily: FONTS.main,
-    fontSize: 20,
-    fontWeight: '500',
-    color: '#666',
+    fontSize: 22,
+    fontWeight: '600',
+    color: '#555',
   },
   cityOptionTextSelected: {
-    color: '#EE2529',
+    color: COLORS.primary,
     fontWeight: '700',
   },
   wizardActions: {
     flexDirection: 'row',
-    gap: 20,
+    gap: 15,
     alignItems: 'center',
+    marginTop: 30,
   },
   skipBtn: {
-    height: 54,
-    minWidth: 120,
+    height: 48,
+    minWidth: 100,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1.5,
-    borderColor: '#EAEAEA',
-    borderRadius: 12,
-    paddingHorizontal: 30,
+    borderWidth: 1,
+    borderColor: '#CCC',
+    borderRadius: 8,
+    paddingHorizontal: 20,
   },
   skipBtnText: {
     fontFamily: FONTS.main,
     color: '#666',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '500',
   },
   showPropertiesBtn: {
-    backgroundColor: '#EE2529',
-    height: 54,
+    height: 48,
     minWidth: 180,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 12,
-    paddingHorizontal: 40,
-    shadowColor: '#EE2529',
-    shadowOffset: { width: 0, height: 10 },
+    borderRadius: 8,
+    paddingHorizontal: 30,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
-    shadowRadius: 15,
-    elevation: 10,
+    shadowRadius: 8,
+    elevation: 4,
   },
   showPropertiesText: {
     fontFamily: FONTS.main,
     color: '#FFF',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
   },
 });

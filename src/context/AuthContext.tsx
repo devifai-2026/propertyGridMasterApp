@@ -21,6 +21,7 @@ interface User {
   lastLogin?: string;
   accessToken: string;
   refreshToken: string;
+  profileImage?: string;
 }
 
 interface AuthContextType {
