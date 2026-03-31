@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -7,793 +7,666 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
-  useWindowDimensions,
-  ImageBackground,
-  Image,
+  Modal,
+  TouchableWithoutFeedback,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   Animated,
   Easing,
-  Platform,
+  Image,
 } from 'react-native';
-import { Briefcase, Building2, Home, Smartphone } from 'lucide-react-native';
-import Layout from '../../layout/Layout';
+import LinearGradient from 'react-native-linear-gradient';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
 import { COLORS } from '../../constants/theme';
 
-const SignupScreen = () => {
+type Role = 'owner_investor' | 'broker' | null;
+type Screen = 'role' | 'details' | 'otp';
+
+const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
+  // ── Screen navigation
+  const [currentScreen, setCurrentScreen] = useState<Screen>('role');
+  const [selectedRole, setSelectedRole] = useState<Role>(null);
+
+  // ── Form state
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    email: '',
     phone: '',
-    userType: '', // 'investor', 'broker', or 'owner'
+    reraNumber: '',
+    email: '',
   });
-  const [otp, setOtp] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
-  const [verificationId, setVerificationId] = useState('');
-  const [focusedOtpIndex, setFocusedOtpIndex] = useState<number | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  // ── OTP state
+  const [otp, setOtp] = useState('');
+  const [verificationId, setVerificationId] = useState('');
+  const [otpError, setOtpError] = useState('');
+  const [otpFilled, setOtpFilled] = useState(false);
+
+  // ── Modal
+  const [modalVisible, setModalVisible] = useState(true);
+
   const { login } = useAuth();
   const { signup: register, sendOtp, loading: apiLoading } = useAuthAPIs();
-  const { navigate } = useNavigation();
-  const { width } = useWindowDimensions();
-  const isMobile = width < 768;
-  const isDesktop = width >= 1024;
-  const isSmallMobile = width < 400;
+  const { openLoginModal, closeSignupModal } = useNavigation();
 
-  // Refs for OTP inputs
   const otpInputRefs = useRef<Array<TextInput | null>>([]);
 
-  // Animation value
+  // ── Animation
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(20)).current;
+  const slideAnim = useRef(new Animated.Value(40)).current;
 
-  React.useEffect(() => {
+  useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-        easing: Easing.out(Easing.ease),
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-        easing: Easing.out(Easing.ease),
-      }),
+      Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true, easing: Easing.out(Easing.ease) }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 300, useNativeDriver: true, easing: Easing.out(Easing.ease) }),
     ]).start();
-  }, []);
+  }, [currentScreen]);
+
+  const resetAnim = (cb: () => void) => {
+    fadeAnim.setValue(0);
+    slideAnim.setValue(40);
+    cb();
+  };
+
+  const handleClose = () => {
+    setModalVisible(false);
+    if (onClose) {
+      onClose();
+    } else {
+      closeSignupModal();
+    }
+  };
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    if (fieldErrors[field]) setFieldErrors(prev => ({ ...prev, [field]: '' }));
   };
 
-  const isFormValid = () => {
-    return (
-      formData.firstName.trim() !== '' &&
-      formData.lastName.trim() !== '' &&
-      formData.email.trim() !== '' &&
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) &&
-      formData.phone.length === 10 &&
-      formData.userType !== ''
+  // ── Validation
+  const validateDetails = () => {
+    const errors: Record<string, string> = {};
+    if (!formData.firstName.trim()) errors.firstName = 'Required';
+    if (!formData.lastName.trim()) errors.lastName = 'Required';
+    if (formData.phone.length !== 10) errors.phone = 'Enter a valid mobile number';
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = 'Enter a valid Email ID';
+    }
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // ── Screen 1 → 2
+  const handleRoleContinue = () => {
+    if (!selectedRole) return;
+    resetAnim(() => setCurrentScreen('details'));
+  };
+
+  // ── Screen 2 → 3 (send OTP)
+  const handleDetailsContinue = () => {
+    if (!validateDetails()) return;
+    sendOtp(
+      { mobileNumber: formData.phone },
+      (response: any) => {
+        if (response.success) {
+          setVerificationId(response.data.verificationId);
+          setOtpError('');
+          resetAnim(() => setCurrentScreen('otp'));
+          setTimeout(() => otpInputRefs.current[0]?.focus(), 150);
+        } else {
+          Alert.alert('Error', response.message || 'Failed to send OTP');
+        }
+      },
+      (error: any) => {
+        Alert.alert('Error', error?.response?.data?.message || 'Failed to send OTP');
+      },
     );
   };
 
-  const handleSendOtp = () => {
-    if (isFormValid()) {
-      sendOtp(
-        { mobileNumber: formData.phone },
-        (response: any) => {
-          if (response.success) {
-            setVerificationId(response.data.verificationId);
-            setOtpSent(true);
-            // Auto-focus first OTP input after a short delay
-            setTimeout(() => {
-              otpInputRefs.current[0]?.focus();
-            }, 100);
-            Alert.alert(
-              'OTP Sent',
-              'A 6-digit OTP has been sent to your mobile number',
-            );
-          } else {
-            Alert.alert('Error', response.message || 'Failed to send OTP');
-          }
-        },
-        (error: any) => {
-          Alert.alert(
-            'Error',
-            error?.response?.data?.message || 'Failed to send OTP',
-          );
-        },
-      );
-    } else {
-      Alert.alert('Error', 'Please fill in all required fields correctly');
-    }
-  };
-
+  // ── OTP input handlers
   const handleOtpChange = (text: string, index: number) => {
-    // Only allow digits
     const digit = text.replace(/[^0-9]/g, '');
-
-    const newOtp = otp.split('');
-    newOtp[index] = digit;
-    setOtp(newOtp.join(''));
-
-    // Auto-focus next input if digit entered
-    if (digit && index < 5) {
-      otpInputRefs.current[index + 1]?.focus();
-    }
+    const arr = otp.split('');
+    arr[index] = digit;
+    const newOtp = arr.join('');
+    setOtp(newOtp);
+    setOtpError('');
+    if (digit && index < 3) otpInputRefs.current[index + 1]?.focus();
+    setOtpFilled(newOtp.length === 4 && !newOtp.includes(''));
   };
 
   const handleOtpKeyPress = (e: any, index: number) => {
-    // Handle backspace on empty field - move to previous input
     if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
       otpInputRefs.current[index - 1]?.focus();
     }
   };
 
-  const handleSignup = async () => {
-    if (otp.length === 6) {
-      register(
-        {
-          mobileNumber: formData.phone,
-          email: formData.email,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          roleName:
-            formData.userType.charAt(0).toUpperCase() +
-            formData.userType.slice(1), // investor -> Investor
-          otp,
-          verificationId,
-        },
-        async (response: any) => {
-          if (response.success) {
-            if (Platform.OS === 'web') {
-              navigate('/login');
-            } else {
-              Alert.alert(
-                'Success',
-                'Account created successfully! Please login to continue.',
-                [{ text: 'OK', onPress: () => navigate('/login') }],
-              );
-            }
-          } else {
-            Alert.alert('Error', response.message || 'Signup failed');
-          }
-        },
-        (error: any) => {
-          Alert.alert(
-            'Error',
-            error?.response?.data?.message || 'Something went wrong',
-          );
-        },
-      );
-    } else {
-      Alert.alert('Error', 'Please enter the complete 6-digit OTP');
-    }
+  const handleResendOtp = () => {
+    setOtp('');
+    setOtpError('');
+    setOtpFilled(false);
+    sendOtp(
+      { mobileNumber: formData.phone },
+      (response: any) => {
+        if (response.success) {
+          setVerificationId(response.data.verificationId);
+          setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
+        } else {
+          setOtpError(response.message || 'Failed to resend OTP');
+        }
+      },
+      (error: any) => {
+        setOtpError(error?.response?.data?.message || 'Failed to resend OTP');
+      },
+    );
   };
 
-  return (
-    <Layout>
-      <View style={styles.scrollContainer}>
-        <View style={[styles.container, isDesktop && styles.desktopContainer]}>
-          <Animated.View
-            style={[
-              styles.contentWrapper,
-              isDesktop && styles.desktopContentWrapper,
-              {
-                opacity: fadeAnim,
-                transform: [{ translateY: slideAnim }],
-              },
-            ]}
-          >
-            <View
-              style={[
-                styles.formSection,
-                isDesktop && styles.desktopFormSection,
-              ]}
-            >
-              <View style={styles.card}>
-                <View style={styles.header}>
-                  <Text style={styles.title}>Create Account</Text>
-                  <Text style={styles.subtitle}>
-                    Sign up to get started with your property journey
-                  </Text>
-                </View>
+  // ── Screen 3 → Submit
+  const handleVerifyAndSignup = async () => {
+    if (otp.length < 4) { setOtpError('Please enter the complete OTP'); return; }
+    register(
+      {
+        mobileNumber: formData.phone,
+        email: formData.email,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        roleName: selectedRole === 'broker' ? 'Broker' : 'Investor',
+        reraNumber: selectedRole === 'broker' ? formData.reraNumber : undefined,
+        otp,
+        verificationId,
+      },
+      async (response: any) => {
+        if (response.success) {
+          setModalVisible(false);
+          closeSignupModal();
+          openLoginModal();
+        } else {
+          setOtpError(response.message || 'Verification failed. Double-check your OTP and try once more.');
+        }
+      },
+      (error: any) => {
+        setOtpError(error?.response?.data?.message || "That doesn't seem right. Double-check your OTP and try once more.");
+      },
+    );
+  };
 
-                {!otpSent ? (
-                  <>
-                    {/* Name Fields */}
-                    <View
-                      style={[styles.row, isSmallMobile && styles.rowStack]}
-                    >
-                      <View
-                        style={[
-                          styles.inputGroup,
-                          !isSmallMobile && styles.halfWidth,
-                        ]}
-                      >
-                        <Text style={styles.inputLabel}>First Name *</Text>
-                        <TextInput
-                          style={[
-                            styles.textInput,
-                            focusedField === 'firstName' &&
-                              styles.textInputFocused,
-                          ]}
-                          placeholder="John"
-                          placeholderTextColor={COLORS.textSecondary}
-                          value={formData.firstName}
-                          onChangeText={text => handleChange('firstName', text)}
-                          onFocus={() => setFocusedField('firstName')}
-                          onBlur={() => setFocusedField(null)}
-                        />
-                      </View>
+  // ──────────────────────────────────────────
+  // RENDER HELPERS
+  // ──────────────────────────────────────────
 
-                      <View
-                        style={[
-                          styles.inputGroup,
-                          !isSmallMobile && styles.halfWidth,
-                        ]}
-                      >
-                        <Text style={styles.inputLabel}>Last Name *</Text>
-                        <TextInput
-                          style={[
-                            styles.textInput,
-                            focusedField === 'lastName' &&
-                              styles.textInputFocused,
-                          ]}
-                          placeholder="Doe"
-                          placeholderTextColor={COLORS.textSecondary}
-                          value={formData.lastName}
-                          onChangeText={text => handleChange('lastName', text)}
-                          onFocus={() => setFocusedField('lastName')}
-                          onBlur={() => setFocusedField(null)}
-                        />
-                      </View>
-                    </View>
-
-                    {/* Email */}
-                    <View style={styles.inputGroup}>
-                      <Text style={styles.inputLabel}>Email Address *</Text>
-                      <TextInput
-                        style={[
-                          styles.textInput,
-                          focusedField === 'email' && styles.textInputFocused,
-                        ]}
-                        placeholder="john.doe@example.com"
-                        placeholderTextColor={COLORS.textSecondary}
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                        value={formData.email}
-                        onChangeText={text => handleChange('email', text)}
-                        onFocus={() => setFocusedField('email')}
-                        onBlur={() => setFocusedField(null)}
-                      />
-                    </View>
-
-                    {/* Phone */}
-                    <View style={styles.inputGroup}>
-                      <Text style={styles.inputLabel}>Mobile Number *</Text>
-                      <TextInput
-                        style={[
-                          styles.textInput,
-                          focusedField === 'phone' && styles.textInputFocused,
-                        ]}
-                        placeholder="9876543210"
-                        placeholderTextColor={COLORS.textSecondary}
-                        keyboardType="numeric"
-                        maxLength={10}
-                        value={formData.phone}
-                        onChangeText={text => handleChange('phone', text)}
-                        onFocus={() => setFocusedField('phone')}
-                        onBlur={() => setFocusedField(null)}
-                      />
-                    </View>
-
-                    {/* User Type Selection */}
-                    <View style={styles.inputGroup}>
-                      <Text style={styles.inputLabel}>I am a *</Text>
-                      <View
-                        style={[
-                          styles.userTypeContainer,
-                          isSmallMobile && styles.userTypeContainerStack,
-                        ]}
-                      >
-                        {[
-                          {
-                            id: 'investor',
-                            label: 'Investor',
-                            Icon: Briefcase,
-                          },
-                          { id: 'broker', label: 'Broker', Icon: Building2 },
-                          { id: 'owner', label: 'Owner', Icon: Home },
-                        ].map(type => (
-                          <TouchableOpacity
-                            key={type.id}
-                            style={[
-                              styles.userTypeCard,
-                              isSmallMobile && styles.userTypeCardSmall,
-                              formData.userType === type.id &&
-                                styles.userTypeCardActive,
-                            ]}
-                            onPress={() => handleChange('userType', type.id)}
-                          >
-                            <type.Icon
-                              size={isSmallMobile ? 20 : 24}
-                              color={
-                                formData.userType === type.id
-                                  ? COLORS.primary
-                                  : COLORS.textSecondary
-                              }
-                              strokeWidth={2.5}
-                            />
-                            <Text
-                              style={[
-                                styles.userTypeLabel,
-                                formData.userType === type.id &&
-                                  styles.userTypeLabelActive,
-                              ]}
-                            >
-                              {type.label}
-                            </Text>
-                          </TouchableOpacity>
-                        ))}
-                      </View>
-                    </View>
-                  </>
-                ) : (
-                  /* OTP Section */
-                  <View style={styles.otpSection}>
-                    <View style={styles.otpIconContainer}>
-                      <Smartphone
-                        size={32}
-                        color={COLORS.primary}
-                        strokeWidth={2}
-                      />
-                    </View>
-                    <Text style={styles.otpTitle}>Verify Your Number</Text>
-                    <Text style={styles.otpHint}>
-                      We've sent a 6-digit code to{'\n'}
-                      <Text style={styles.phoneHighlight}>
-                        +91 {formData.phone}
-                      </Text>
-                    </Text>
-
-                    <View
-                      style={[
-                        styles.otpInputGroup,
-                        isSmallMobile && styles.otpInputGroupSmall,
-                      ]}
-                    >
-                      {[0, 1, 2, 3, 4, 5].map(index => (
-                        <TextInput
-                          key={index}
-                          ref={ref => {
-                            otpInputRefs.current[index] = ref;
-                          }}
-                          style={[
-                            styles.otpInput,
-                            isSmallMobile && styles.otpInputSmall,
-                            focusedOtpIndex === index && styles.otpInputFocused,
-                            otp[index] && styles.otpInputFilled,
-                          ]}
-                          maxLength={1}
-                          keyboardType="number-pad"
-                          value={otp[index] || ''}
-                          onChangeText={text => handleOtpChange(text, index)}
-                          onKeyPress={e => handleOtpKeyPress(e, index)}
-                          onFocus={() => setFocusedOtpIndex(index)}
-                          onBlur={() => setFocusedOtpIndex(null)}
-                          selectTextOnFocus
-                          autoComplete="one-time-code"
-                        />
-                      ))}
-                    </View>
-
-                    <TouchableOpacity
-                      style={styles.resendBtn}
-                      onPress={() => {
-                        setOtp('');
-                        Alert.alert(
-                          'OTP Resent',
-                          'A new OTP has been sent to your mobile number',
-                        );
-                      }}
-                    >
-                      <Text style={styles.resendText}>
-                        Didn't receive code? Resend
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={styles.changeNumberBtn}
-                      onPress={() => {
-                        setOtpSent(false);
-                        setOtp('');
-                      }}
-                    >
-                      <Text style={styles.changeNumberText}>Change Number</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-
-                {/* Action Buttons */}
-                <View style={styles.actions}>
-                  <TouchableOpacity
-                    style={styles.btnOutline}
-                    onPress={() => navigate('/login')}
-                  >
-                    <Text style={styles.btnOutlineText}>
-                      {otpSent ? 'Back' : 'Sign In'}
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.btnFilled,
-                      (otpSent ? otp.length !== 6 : !isFormValid()) &&
-                        styles.btnDisabled,
-                    ]}
-                    onPress={otpSent ? handleSignup : handleSendOtp}
-                    disabled={
-                      apiLoading ||
-                      (otpSent ? otp.length !== 6 : !isFormValid())
-                    }
-                  >
-                    <Text style={styles.btnFilledText}>
-                      {apiLoading
-                        ? 'Processing...'
-                        : otpSent
-                        ? 'Create Account'
-                        : 'Continue'}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-
-                {/* Terms */}
-                {!otpSent && (
-                  <Text style={styles.termsText}>
-                    By signing up, you agree to our{' '}
-                    <Text style={styles.termsLink}>Terms of Service</Text> and{' '}
-                    <Text style={styles.termsLink}>Privacy Policy</Text>
-                  </Text>
-                )}
-              </View>
-            </View>
-
-            {isDesktop && (
-              <View style={styles.imageSection}>
-                <Image
-                  source={require('../../assets/Banner/property.png')}
-                  style={styles.sideImage}
-                  resizeMode="cover"
-                />
-              </View>
-            )}
-          </Animated.View>
+  const renderHeader = () => (
+    <>
+      <View style={styles.header}>
+        <View style={styles.logoContainer}>
+          <Image
+            source={require('../../assets/Navbar/Preleasegrid logo 1.png')}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
         </View>
+        <TouchableOpacity onPress={handleClose} style={styles.closeButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <Text style={styles.closeButtonText}>✕</Text>
+        </TouchableOpacity>
       </View>
-    </Layout>
+    </>
+  );
+
+  // ── SCREEN 1: Role selection
+  const renderRoleScreen = () => (
+    <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+      <Text style={styles.screenHeading}>
+        <Text style={styles.signUpBold}>Sign UP.</Text>
+        {' '}To live in our space.
+      </Text>
+      <Text style={styles.screenSub}>Tell us who you are to personalize your experience</Text>
+
+      <View style={styles.roleRow}>
+        {/* Owner / Investor */}
+        <TouchableOpacity
+          style={[styles.roleCardWrapper, selectedRole === 'owner_investor' && styles.roleCardActive]}
+          onPress={() => setSelectedRole('owner_investor')}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={['#D7EFF7', '#FFFFFF']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            locations={[0.0761, 0.7484]}
+            style={styles.roleCard}
+          >
+            <Image source={require('../../assets/SignUp/Owner.png')} style={styles.roleIcon} resizeMode="contain" />
+            <Text style={styles.roleTitle}>Owner/{'\n'}Investor</Text>
+            <Text style={styles.roleDesc}>Find profitable{'\n'}opportunities</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        {/* Broker */}
+        <TouchableOpacity
+          style={[styles.roleCardWrapper, selectedRole === 'broker' && styles.roleCardActive]}
+          onPress={() => setSelectedRole('broker')}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            
+             colors={['#FDEDEE', '#FFFFFF']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            locations={[0.0761, 0.7484]}
+            style={styles.roleCard}
+          >
+            <Image source={require('../../assets/SignUp/broker.png')} style={styles.roleIcon} resizeMode="contain" />
+            <Text style={styles.roleTitle}>Broker</Text>
+            <Text style={styles.roleDesc}>Connect buyers{'\n'}and sellers</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={styles.btnOutline} onPress={() => {
+          setModalVisible(false);
+          closeSignupModal();
+          openLoginModal();
+        }}>
+          <Text style={styles.btnOutlineText}>Back to Sign In</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.btnPrimary}
+          onPress={handleRoleContinue}
+        >
+          <LinearGradient
+            colors={['#EE2529', '#C73834']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={styles.btnGradient}
+          >
+            <Text style={styles.btnPrimaryText}>Continue</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+    </Animated.View>
+  );
+
+  // ── SCREEN 2: Account details
+  const renderDetailsScreen = () => (
+    <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+      <Text style={styles.screenHeading}>Create your account</Text>
+      <Text style={styles.screenSub}>Just a few details to get you started</Text>
+
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ width: '100%' }}>
+        {/* First + Last Name row */}
+        <View style={styles.nameRow}>
+          <View style={styles.nameField}>
+            <Text style={styles.inputLabel}>First Name <Text style={styles.required}>*</Text></Text>
+            <TextInput
+              style={[
+                styles.textInput,
+                focusedField === 'firstName' && styles.textInputFocused,
+                fieldErrors.firstName && styles.textInputError,
+              ]}
+              placeholder="Enter your first name"
+              placeholderTextColor="#9CA3AF"
+              value={formData.firstName}
+              onChangeText={t => handleChange('firstName', t)}
+              onFocus={() => setFocusedField('firstName')}
+              onBlur={() => setFocusedField(null)}
+            />
+          </View>
+          <View style={styles.nameField}>
+            <Text style={styles.inputLabel}>Last Name <Text style={styles.required}>*</Text></Text>
+            <TextInput
+              style={[
+                styles.textInput,
+                focusedField === 'lastName' && styles.textInputFocused,
+                fieldErrors.lastName && styles.textInputError,
+              ]}
+              placeholder="Enter your last name"
+              placeholderTextColor="#9CA3AF"
+              value={formData.lastName}
+              onChangeText={t => handleChange('lastName', t)}
+              onFocus={() => setFocusedField('lastName')}
+              onBlur={() => setFocusedField(null)}
+            />
+          </View>
+        </View>
+
+        {/* Mobile Number */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Mobile Number <Text style={styles.required}>*</Text></Text>
+          <TextInput
+            style={[
+              styles.textInput,
+              focusedField === 'phone' && styles.textInputFocused,
+              fieldErrors.phone && styles.textInputError,
+            ]}
+            placeholder="Enter your contact number"
+            placeholderTextColor="#9CA3AF"
+            keyboardType="numeric"
+            maxLength={10}
+            value={formData.phone}
+            onChangeText={t => handleChange('phone', t)}
+            onFocus={() => setFocusedField('phone')}
+            onBlur={() => setFocusedField(null)}
+          />
+          {fieldErrors.phone ? (
+            <View style={styles.errorRow}>
+              <Text style={styles.errorIcon}>▲</Text>
+              <Text style={styles.errorText}>{fieldErrors.phone}</Text>
+            </View>
+          ) : null}
+        </View>
+
+        {/* RERA Number — broker only, optional */}
+        {selectedRole === 'broker' && (
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>RERA Number</Text>
+            <TextInput
+              style={[
+                styles.textInput,
+                focusedField === 'reraNumber' && styles.textInputFocused,
+              ]}
+              placeholder="Enter your RERA number"
+              placeholderTextColor="#9CA3AF"
+              value={formData.reraNumber}
+              onChangeText={t => handleChange('reraNumber', t)}
+              onFocus={() => setFocusedField('reraNumber')}
+              onBlur={() => setFocusedField(null)}
+            />
+          </View>
+        )}
+
+        {/* Email */}
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Email</Text>
+          <TextInput
+            style={[
+              styles.textInput,
+              focusedField === 'email' && styles.textInputFocused,
+              fieldErrors.email && styles.textInputError,
+            ]}
+            placeholder="Enter your Email"
+            placeholderTextColor="#9CA3AF"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={formData.email}
+            onChangeText={t => handleChange('email', t)}
+            onFocus={() => setFocusedField('email')}
+            onBlur={() => setFocusedField(null)}
+          />
+          {fieldErrors.email ? (
+            <View style={styles.errorRow}>
+              <Text style={styles.errorIcon}>▲</Text>
+              <Text style={styles.errorText}>{fieldErrors.email}</Text>
+            </View>
+          ) : null}
+        </View>
+
+        {/* Checkboxes */}
+        <TouchableOpacity style={styles.checkRow} onPress={() => setTermsAccepted(p => !p)}>
+          <View style={[styles.checkbox, termsAccepted && styles.checkboxChecked]}>
+            {termsAccepted && <Text style={styles.checkmark}>✓</Text>}
+          </View>
+          <Text style={styles.checkLabel}>
+            I agree to the <Text style={styles.checkLink}>terms & conditions</Text>
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.checkRow} onPress={() => setPrivacyAccepted(p => !p)}>
+          <View style={[styles.checkbox, privacyAccepted && styles.checkboxChecked]}>
+            {privacyAccepted && <Text style={styles.checkmark}>✓</Text>}
+          </View>
+          <Text style={styles.checkLabel}>
+            I agree to the <Text style={styles.checkLink}>Privacy Policy</Text>
+          </Text>
+        </TouchableOpacity>
+      </KeyboardAvoidingView>
+
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={styles.btnOutline} onPress={() => resetAnim(() => setCurrentScreen('role'))}>
+          <Text style={styles.btnOutlineText}>Back</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.btnPrimary, apiLoading && styles.buttonDisabled]}
+          onPress={handleDetailsContinue}
+          disabled={apiLoading}
+        >
+          <LinearGradient
+            colors={['#EE2529', '#C73834']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={styles.btnGradient}
+          >
+            <Text style={styles.btnPrimaryText}>{apiLoading ? 'Sending...' : 'Continue'}</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+    </Animated.View>
+  );
+
+  // ── SCREEN 3: OTP verification
+  const renderOtpScreen = () => (
+    <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+      <Text style={styles.screenHeading}>Verify your Contact Number</Text>
+      <Text style={styles.screenSub}>
+        We sent a verification code to{' '}
+        <Text style={styles.phoneHighlight}>+91 ........</Text>
+      </Text>
+
+      <View style={styles.otpRow}>
+        {[0, 1, 2, 3].map(index => (
+          <TextInput
+            key={index}
+            ref={ref => { otpInputRefs.current[index] = ref; }}
+            style={[
+              styles.otpInput,
+              otpError ? styles.otpInputError : null,
+              otp[index] && otpError ? styles.otpInputErrorFilled : null,
+            ]}
+            maxLength={1}
+            keyboardType="number-pad"
+            value={otp[index] || ''}
+            onChangeText={text => handleOtpChange(text, index)}
+            onKeyPress={e => handleOtpKeyPress(e, index)}
+            selectTextOnFocus
+          />
+        ))}
+      </View>
+
+      {otpError ? (
+        <Text style={styles.otpErrorText}>{otpError}</Text>
+      ) : null}
+
+      <Text style={styles.otpResendText}>
+        Didn't received OTP?{' '}
+        <Text style={styles.otpResendLink} onPress={handleResendOtp}>Click to resend OTP.</Text>
+      </Text>
+
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={styles.btnOutline} onPress={() => resetAnim(() => setCurrentScreen('details'))}>
+          <Text style={styles.btnOutlineText}>Back</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.btnPrimary}
+          onPress={handleVerifyAndSignup}
+          disabled={!otpFilled || apiLoading}
+        >
+          <LinearGradient
+            colors={['#EE2529', '#C73834']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={styles.btnGradient}
+          >
+            <Text style={styles.btnPrimaryText}>{apiLoading ? 'Verifying...' : 'Verify & Continue'}</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+    </Animated.View>
+  );
+
+  // ──────────────────────────────────────────
+  // MAIN RENDER
+  // ──────────────────────────────────────────
+  return (
+    <Modal animationType="none" transparent visible={modalVisible} onRequestClose={handleClose}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.overlay}>
+          <TouchableWithoutFeedback>
+            <View style={styles.card}>
+              <ScrollView 
+                showsVerticalScrollIndicator={false} 
+                keyboardShouldPersistTaps="handled"
+                scrollEnabled={false}
+              >
+                {renderHeader()}
+                {currentScreen === 'role'    && renderRoleScreen()}
+                {currentScreen === 'details' && renderDetailsScreen()}
+                {currentScreen === 'otp'     && renderOtpScreen()}
+              </ScrollView>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+      </TouchableWithoutFeedback>
+    </Modal>
   );
 };
 
+// ──────────────────────────────────────────
+// STYLES
+// ──────────────────────────────────────────
 const styles = StyleSheet.create({
-  backgroundImage: {
+  overlay: {
     flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  scrollContainer: {
-    flexGrow: 1,
-  },
-  container: {
-    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
     justifyContent: 'center',
     alignItems: 'center',
-    minHeight: '100%',
-  },
-  desktopContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 40,
-  },
-  contentWrapper: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  desktopContentWrapper: {
-    flexDirection: 'row',
-    maxWidth: 900,
-    width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 24,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.15,
-    shadowRadius: 30,
-    elevation: 20,
-  },
-  formSection: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  desktopFormSection: {
-    flex: 1,
-    padding: 10,
-  },
-  imageSection: {
-    flex: 1,
-    height: '100%',
-    minHeight: 450,
-    padding: 10,
-    backgroundColor: 'transparent',
-  },
-  sideImage: {
-    width: '100%',
-    height: '100%',
-    flex: 1,
-    borderRadius: 20,
   },
   card: {
+    width: '90%',
+    maxWidth: 460,
     backgroundColor: COLORS.white,
-    borderRadius: 20,
-    padding: 20,
-    width: '100%',
-    maxWidth: 420,
+    borderRadius: 24,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 32,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.06,
-    shadowRadius: 16,
-    elevation: 8,
-    marginVertical: 16,
-    // On desktop, the card shadow/border is handled by the wrapper
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 12,
+    maxHeight: '92%',
   },
+
+  /* ── Header ── */
   header: {
-    marginBottom: 24,
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: COLORS.textDark,
-    marginBottom: 6,
-    letterSpacing: -0.3,
-  },
-  subtitle: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  row: {
     flexDirection: 'row',
-    gap: 12,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
   },
-  rowStack: {
-    flexDirection: 'column',
-    gap: 0,
+  logoContainer: { flexDirection: 'row', alignItems: 'center', height: 40 },
+  logoImage: { width: 120, height: 40 },
+  closeButton:     { width: 28, height: 28, justifyContent: 'center', alignItems: 'center' },
+  closeButtonText: { fontSize: 16, color: '#EE2529', fontWeight: '600', lineHeight: 18 },
+  divider: { height: 1, backgroundColor: '#E5E7EB', marginBottom: 20, marginHorizontal: -24 },
+
+  /* ── Shared headings ── */
+  screenHeading: {
+    fontSize: 18, fontWeight: '600', color: '#1F2937',
+    textAlign: 'center',lineHeight: 24,backgroundColor:"#FFFCF4",paddingTop: 10,
+    marginBottom: 6,
   },
-  inputGroup: {
-    marginBottom: 16,
+  signUpBold: { fontWeight: '700' },
+  screenSub: {
+    fontSize: 13, color: '#6B7280', lineHeight: 18,
+    textAlign: 'center', marginBottom: 32,
   },
-  halfWidth: {
-    flex: 1,
+
+  /* ── Role cards ── */
+  roleRow: { flexDirection: 'row', gap: 16, marginBottom: 36 },
+  roleCardWrapper: {
+    flex: 1, borderRadius: 16,
+    borderWidth: 2.5, borderColor: 'transparent',
+    overflow: 'hidden',
   },
-  inputLabel: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: COLORS.textDark,
-    marginBottom: 8,
-    letterSpacing: 0.1,
+  roleCardActive: { borderColor: '#EE2529' },
+  roleCard: { padding: 20, alignItems: 'center', borderRadius: 14 },
+  roleIcon:  { width: 48, height: 48, marginBottom: 12 },
+  roleTitle: { fontSize: 15, fontWeight: '700', color: '#1F2937', textAlign: 'center', marginBottom: 6, lineHeight: 18 },
+  roleDesc:  { fontSize: 12, color: '#6B7280', textAlign: 'center', lineHeight: 16 },
+
+  /* ── Buttons ── */
+  buttonRow:   { flexDirection: 'row', gap: 12, marginTop: 24 },
+  btnOutline: {
+    flex: 1, borderWidth: 1.5, borderColor: '#D1D5DB', borderRadius: 12,
+    paddingVertical: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.white,
   },
+  btnOutlineText: { fontSize: 15, fontWeight: '600', color: '#374151', lineHeight: 18 },
+  btnPrimary: {
+    flex: 1, borderRadius: 5, overflow: 'hidden',
+  },
+  btnGradient: {
+    paddingVertical: 14, alignItems: 'center', justifyContent: 'center',
+  },
+  btnPrimaryText: { fontSize: 15, fontWeight: '600', color: COLORS.white, lineHeight: 18 },
+  buttonDisabled: { opacity: 0.5 },
+
+  /* ── Form inputs ── */
+  nameRow:   { flexDirection: 'row', gap: 12, marginBottom: 18 },
+  nameField: { flex: 1 },
+  inputGroup:  { marginBottom: 18 },
+  inputLabel:  { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 8, lineHeight: 16 },
+  required:    { color: '#EE2529' },
   textInput: {
-    backgroundColor: COLORS.background,
-    borderWidth: 2,
-    borderColor: COLORS.divider,
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-    color: COLORS.textDark,
-    fontWeight: '500',
+    borderWidth: 1.5, borderColor: '#E5E7EB', borderRadius: 10,
+    paddingHorizontal: 14, paddingVertical: 13, fontSize: 15, color: '#1F2937', backgroundColor: '#F9FAFB', lineHeight: 18,
   },
-  textInputFocused: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.white,
+  textInputFocused: { borderColor: '#3B82F6', backgroundColor: COLORS.white },
+  textInputError:   { borderColor: '#EE2529' },
+
+  /* ── Field errors ── */
+  errorRow:  { flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 5 },
+  errorIcon: { color: '#EE2529', fontSize: 10, fontWeight: '700' },
+  errorText: { color: '#EE2529', fontSize: 12, lineHeight: 14 },
+
+  /* ── Checkboxes ── */
+  checkRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 12 },
+  checkbox: {
+    width: 18, height: 18, borderWidth: 1.5, borderColor: '#D1D5DB',
+    borderRadius: 4, alignItems: 'center', justifyContent: 'center', marginTop: 2,
   },
-  userTypeContainer: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  userTypeContainerStack: {
-    flexDirection: 'column',
-  },
-  userTypeCard: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-    borderWidth: 2,
-    borderColor: COLORS.divider,
-    borderRadius: 10,
-    paddingVertical: 14,
-    paddingHorizontal: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 80,
-  },
-  userTypeCardSmall: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    minHeight: 0,
-    gap: 12,
-  },
-  userTypeCardActive: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.lightRed,
-  },
-  userTypeLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
-    marginTop: 6,
-  },
-  userTypeLabelActive: {
-    color: COLORS.primary,
-    fontWeight: '700',
-  },
-  otpSection: {
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  otpIconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: COLORS.lightRed,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-  otpTitle: {
-    fontSize: 20,
-    fontWeight: '800',
-    color: COLORS.textDark,
-    marginBottom: 6,
-  },
-  otpHint: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginBottom: 20,
-    lineHeight: 18,
-    paddingHorizontal: 16,
-  },
-  phoneHighlight: {
-    fontWeight: '700',
-    color: COLORS.textDark,
-  },
-  otpInputGroup: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 10,
-    marginBottom: 18,
-  },
-  otpInputGroupSmall: {
-    gap: 8,
+  checkboxChecked: { backgroundColor: '#EE2529', borderColor: '#EE2529' },
+  checkmark:  { color: COLORS.white, fontSize: 11, fontWeight: '700' },
+  checkLabel: { fontSize: 13, color: '#374151', lineHeight: 16, flex: 1 },
+  checkLink:  { color: '#3B82F6', textDecorationLine: 'underline' },
+
+  /* ── OTP ── */
+  phoneHighlight: { fontWeight: '700', color: '#1F2937' },
+  otpRow: {
+    flexDirection: 'row', justifyContent: 'center',
+    gap: 12, marginBottom: 20, marginTop: 12,
   },
   otpInput: {
-    width: 42,
-    height: 42,
-    backgroundColor: COLORS.background,
-    borderRadius: 10,
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '700',
-    borderWidth: 2,
-    borderColor: COLORS.divider,
-    color: COLORS.textDark,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
+    width: 64, height: 64, borderWidth: 1.5, borderColor: '#E5E7EB',
+    borderRadius: 12, textAlign: 'center', fontSize: 26, fontWeight: '700',
+    color: '#1F2937', backgroundColor: '#F9FAFB',
   },
-  otpInputSmall: {
-    width: 36,
-    height: 36,
-    fontSize: 16,
+  otpInputError:       { borderColor: '#EE2529' },
+  otpInputErrorFilled: { borderColor: '#EE2529', color: '#EE2529' },
+  otpErrorText: {
+    color: '#EE2529', fontSize: 13, textAlign: 'center',
+    marginBottom: 16, lineHeight: 18, paddingHorizontal: 8,
   },
-  otpInputFocused: {
-    borderColor: COLORS.primary,
-    backgroundColor: COLORS.white,
-    shadowOpacity: 0.12,
-    shadowRadius: 6,
-    elevation: 3,
+  otpResendText: {
+    fontSize: 13, color: '#6B7280', textAlign: 'center',
+    marginBottom: 8, lineHeight: 18,
   },
-  otpInputFilled: {
-    borderColor: COLORS.success,
-    backgroundColor: '#ECFDF5',
-  },
-  resendBtn: {
-    alignSelf: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 6,
-    marginBottom: 6,
-  },
-  resendText: {
-    fontSize: 12,
-    color: COLORS.primary,
-    fontWeight: '600',
-  },
-  changeNumberBtn: {
-    alignSelf: 'center',
-    paddingVertical: 6,
-    paddingHorizontal: 6,
-  },
-  changeNumberText: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    fontWeight: '600',
-    textDecorationLine: 'underline',
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 6,
-  },
-  btnOutline: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: COLORS.divider,
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-  },
-  btnOutlineText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: COLORS.textSecondary,
-  },
-  btnFilled: {
-    flex: 1,
-    paddingVertical: 14,
-    borderRadius: 10,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    shadowColor: COLORS.primary,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    elevation: 5,
-  },
-  btnFilledText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: COLORS.white,
-    letterSpacing: 0.2,
-  },
-  btnDisabled: {
-    backgroundColor: COLORS.divider,
-    shadowOpacity: 0,
-    elevation: 0,
-  },
-  termsText: {
-    fontSize: 11,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginTop: 18,
-    lineHeight: 16,
-    paddingHorizontal: 8,
-  },
-  termsLink: {
-    color: COLORS.primary,
-    fontWeight: '600',
-    textDecorationLine: 'underline',
+  otpResendLink: {
+    color: '#1F2937', fontWeight: '500', textDecorationLine: 'underline',
   },
 });
 
