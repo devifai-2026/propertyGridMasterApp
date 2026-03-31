@@ -8,10 +8,22 @@ import {
   Platform,
   StyleSheet,
 } from 'react-native';
-import { ArrowUpRight } from 'lucide-react-native';
+import Svg, { Circle, Path } from 'react-native-svg';
 import LinearGradient from 'react-native-linear-gradient';
 import { COLORS, FONTS } from '../../../constants/theme';
 import { useNavigation } from '../../../context/NavigationContext';
+
+const GetStartedIcon = () => (
+  <Svg width="32" height="32" viewBox="0 0 39 39" fill="none">
+    <Circle cx="19.5" cy="19.5" r="19.5" fill="white"/>
+    <Path 
+      fillRule="evenodd" 
+      clipRule="evenodd" 
+      d="M25.0596 12.7441C25.2439 12.9284 25.3458 13.1801 25.3429 13.4436L25.2348 23.2809C25.2288 23.8297 24.7789 24.2795 24.2302 24.2855C23.6814 24.2916 23.2413 23.8515 23.2474 23.3027L23.3291 15.8645L13.6779 25.5156C13.2856 25.908 12.6564 25.9149 12.2726 25.5311C11.8888 25.1473 11.8957 24.5181 12.288 24.1257L21.9392 14.4746L14.5009 14.5563C13.9521 14.5623 13.5121 14.1223 13.5181 13.5735C13.5242 13.0247 13.974 12.5749 14.5228 12.5689L24.3601 12.4608C24.6236 12.4579 24.8753 12.5598 25.0596 12.7441Z" 
+      fill="#EE2529"
+    />
+  </Svg>
+);
 
 const Hero = () => {
   const { width } = useWindowDimensions();
@@ -65,9 +77,7 @@ const Hero = () => {
               style={styles.getStartedBtn}
             >
               <Text style={styles.getStartedText}>Get Started</Text>
-              <View style={styles.arrowCircle}>
-                <ArrowUpRight size={20} color="#EE2529" strokeWidth={3} />
-              </View>
+              <GetStartedIcon />
             </LinearGradient>
           </TouchableOpacity>
         </View>
@@ -109,7 +119,7 @@ const styles = StyleSheet.create({
   },
   heroTitleRed: {
     fontFamily: FONTS.main,
-    fontWeight: '400', 
+    fontWeight: '700', 
     color: '#EE2529',
     textAlign: 'center',
     textTransform: 'capitalize',
@@ -137,25 +147,17 @@ const styles = StyleSheet.create({
   getStartedBtn: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     paddingVertical: 8,
-    paddingLeft: 35,
-    paddingRight: 8,
+    paddingHorizontal: 20,
     borderRadius: 100,
   },
   getStartedText: {
     fontFamily: FONTS.main,
     color: '#fff',
-    fontSize: 18,
-    fontWeight: '500', // Making it a bit more readable than 100
-    marginRight: 15,
-  },
-  arrowCircle: {
-    backgroundColor: '#fff',
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
+    fontSize: 16,
+    fontWeight: '600', 
+    marginRight: 10,
   },
 });
 

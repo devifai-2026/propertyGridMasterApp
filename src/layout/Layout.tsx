@@ -51,6 +51,20 @@ import {
   ChevronDown,
 } from 'lucide-react-native';
 
+import Svg, { Circle, Path } from 'react-native-svg';
+
+const ListPropertyIcon = () => (
+  <Svg width="32" height="32" viewBox="0 0 38 38" fill="none">
+    <Circle cx="19" cy="19" r="19" fill="#EE2529"/>
+    <Path 
+      d="M18.9985 11V19.808M18.9985 28.41V19.808M18.9985 19.808H27.41M18.9985 19.808H10" 
+      stroke="white" 
+      strokeWidth="2.5" 
+      strokeLinecap="round"
+    />
+  </Svg>
+);
+
 const SideMenu: React.FC<SideMenuProps> = ({
   visible,
   onClose,
@@ -358,8 +372,8 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
               ]}
               onPress={() => navigate('/list-property')}
             >
-              <View style={[styles.plusIconBg, isMobile && { marginRight: 0 }]}>
-                <Text style={styles.plusIcon}>+</Text>
+              <View style={[isMobile ? { marginRight: 0 } : { marginRight: 8 }]}>
+                <ListPropertyIcon />
               </View>
               {!isMobile && (
                 <Text style={styles.listPropertyText}>List Property</Text>
@@ -526,23 +540,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#262626',
     borderRadius: 30,
-    paddingLeft: 4,
+    paddingLeft: 3.5,
     paddingRight: 16,
-    paddingVertical: 4,
-    height: 44,
-  },
-  plusIconBg: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 18,
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  plusIcon: {
-    color: COLORS.white,
-    fontWeight: '400',
-    fontSize: 20,
+    paddingVertical: 3.5,
+    height: 40,
   },
   listPropertyText: {
     fontWeight: '400',
@@ -746,15 +747,15 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderWidth: 1,
     borderColor: '#262626',
-    height: 44,
+    height: 40,
   },
   profileBtnMobile: {
     paddingRight: 3,
   },
   profileCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: '#888',
     alignItems: 'center',
     justifyContent: 'center',

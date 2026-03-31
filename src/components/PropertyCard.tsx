@@ -419,8 +419,8 @@ const styles = StyleSheet.create({
   },
   mncBadge: {
     backgroundColor: '#FFF9C4',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 100,
   },
   mncBadgeText: {
@@ -477,7 +477,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   roiCardContainer: {
-    borderRadius: 20,
+    borderRadius: 15,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
@@ -489,17 +489,17 @@ const styles = StyleSheet.create({
   },
   roiCardGradient: {
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingVertical: 4,
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    minHeight: 70,
+    justifyContent: 'center',
+    minHeight: 65,
   },
   roiLabel: {
     fontFamily: FONTS.main,
-    fontSize: 24,
+    fontSize: 18,
     color: '#000000',
     fontWeight: '600',
-    marginBottom: 2,
+    marginBottom: 0,
     letterSpacing: 0.5,
   },
   roiValueContainer: {
