@@ -413,6 +413,29 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
       <Text style={styles.screenSub}>Just a few details to get you started</Text>
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ width: '100%' }}>
+        {selectedRole === 'broker' && (
+          <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Profile Photo</Text>
+              <TouchableOpacity style={styles.photoUploadBox} onPress={handlePickPhoto} activeOpacity={0.75}>
+                {profilePhotoPreview ? (
+                  <Image source={{ uri: profilePhotoPreview }} style={styles.photoPreview} />
+                ) : (
+                  <View style={styles.photoPlaceholder}>
+                    <Text style={styles.photoUploadIcon}>↑</Text>
+                    <Text style={styles.photoUploadText}>Upload Photo</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+              {profilePhotoPreview && (
+                <TouchableOpacity onPress={() => { setProfilePhotoFile(null); setProfilePhotoPreview(null); }} style={{ marginTop: 6 }}>
+                  <Text style={{ fontSize: 12, color: COLORS.primary, fontWeight: '600' }}>Remove photo</Text>
+                </TouchableOpacity>
+              )}
+              {Platform.OS === 'web' && (
+                <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} onChange={handleFileChange} />
+              )}
+            </View>)
+          }
         {/* First + Last Name row */}
         <View style={styles.nameRow}>
           <View style={styles.nameField}>
@@ -478,27 +501,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
         {/* Broker-only fields */}
         {selectedRole === 'broker' && (
           <>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Profile Photo</Text>
-              <TouchableOpacity style={styles.photoUploadBox} onPress={handlePickPhoto} activeOpacity={0.75}>
-                {profilePhotoPreview ? (
-                  <Image source={{ uri: profilePhotoPreview }} style={styles.photoPreview} />
-                ) : (
-                  <View style={styles.photoPlaceholder}>
-                    <Text style={styles.photoUploadIcon}>↑</Text>
-                    <Text style={styles.photoUploadText}>Upload Photo</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-              {profilePhotoPreview && (
-                <TouchableOpacity onPress={() => { setProfilePhotoFile(null); setProfilePhotoPreview(null); }} style={{ marginTop: 6 }}>
-                  <Text style={{ fontSize: 12, color: COLORS.primary, fontWeight: '600' }}>Remove photo</Text>
-                </TouchableOpacity>
-              )}
-              {Platform.OS === 'web' && (
-                <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} onChange={handleFileChange} />
-              )}
-            </View>
+            
 
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>RERA Number</Text>
@@ -767,7 +770,7 @@ const styles = StyleSheet.create({
   },
   card: {
     width: 673,
-    height: 745,
+    height: 645,
     backgroundColor: COLORS.white,
     borderRadius: 24,
     overflow: 'hidden',
