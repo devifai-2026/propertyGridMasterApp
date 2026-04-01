@@ -26,7 +26,11 @@ import PropertyCard, { Property } from '../../components/PropertyCard';
 
 const BrokerTabView = () => {
   const { user } = useAuth();
-  const { getProperties, getBrokerStats, loading: propertyLoading } = usePropertyAPIs();
+  const {
+    getProperties,
+    getBrokerStats,
+    loading: propertyLoading,
+  } = usePropertyAPIs();
   const [brokerProperties, setBrokerProperties] = useState<Property[]>([]);
   const [stats, setStats] = useState<any>({
     activeDeals: 0,
@@ -40,28 +44,36 @@ const BrokerTabView = () => {
         if (data) setStats(data);
       });
 
-      getProperties((data: any[]) => {
-        if (Array.isArray(data)) {
-          const formattedProps: Property[] = data.map((item: any) => ({
-            id: item.propertyId,
-            title: item.propertyType || 'Property',
-            location: `${item.microMarket || ''}, ${item.city || ''}`.trim() || 'N/A',
-            price: item.sellingPrice ? `₹${item.sellingPrice}` : 'N/A',
-            rent: item.annualGrossRent ? `₹${item.annualGrossRent}` : 'N/A',
-            tenure: item.leaseEndDate ? `${new Date(item.leaseEndDate).toLocaleDateString()}` : 'N/A',
-            roi: item.grossRentalYield ? `${item.grossRentalYield}%` : 'N/A',
-            type: item.propertyType || 'N/A',
-            images: item.media && item.media.length > 0 
-              ? item.media.map((m: any) => m.fileUrl) 
-              : null,
-            isVerified: item.isVerified,
-            verified: item.isVerified === 'completed',
-            badges: item.ownershipType ? [item.ownershipType] : [],
-            raw: item
-          }));
-          setBrokerProperties(formattedProps);
-        }
-      }, undefined, `brokerId=${user.userId}`);
+      getProperties(
+        (data: any[]) => {
+          if (Array.isArray(data)) {
+            const formattedProps: Property[] = data.map((item: any) => ({
+              id: item.propertyId,
+              title: item.propertyType || 'Property',
+              location:
+                `${item.microMarket || ''}, ${item.city || ''}`.trim() || 'N/A',
+              price: item.sellingPrice ? `₹${item.sellingPrice}` : 'N/A',
+              rent: item.annualGrossRent ? `₹${item.annualGrossRent}` : 'N/A',
+              tenure: item.leaseEndDate
+                ? `${new Date(item.leaseEndDate).toLocaleDateString()}`
+                : 'N/A',
+              roi: item.grossRentalYield ? `${item.grossRentalYield}%` : 'N/A',
+              type: item.propertyType || 'N/A',
+              images:
+                item.media && item.media.length > 0
+                  ? item.media.map((m: any) => m.fileUrl)
+                  : null,
+              isVerified: item.isVerified,
+              verified: item.isVerified === 'completed',
+              badges: item.ownershipType ? [item.ownershipType] : [],
+              raw: item,
+            }));
+            setBrokerProperties(formattedProps);
+          }
+        },
+        undefined,
+        `brokerId=${user.userId}`,
+      );
     }
   }, [user?.userId]);
 
@@ -85,31 +97,33 @@ const BrokerTabView = () => {
       <View style={styles.listHeader}>
         <Text style={styles.listTitle}>Properties Listed</Text>
       </View>
-
       {propertyLoading ? (
         <ActivityIndicator color={COLORS.primary} size="large" />
       ) : brokerProperties.length > 0 ? (
         <View style={styles.propertiesGrid}>
           {brokerProperties.map(p => (
             <PropertyCard
-              key={p.id}
-              item={p}
-              width={isDesktop ? '48%' : '100%'}
-              noView={false}
+            key={p.id}
+            item={p}
+            width={isDesktop ? '48%' : '100%'}
+            noView={false}
             />
           ))}
         </View>
       ) : (
         <View style={styles.emptyState}>
-          <Text style={styles.emptyText}>No properties listed as a broker.</Text>
+          <Text style={styles.emptyText}>
+            No properties listed as a broker.
+          </Text>
         </View>
       )}
+      <EnquiriesTab roleType="broker" />
     </View>
   );
 };
 
 const OwnerTabView = () => {
-  return <PortfolioTab />; 
+  return <PortfolioTab />;
 };
 
 const InvestorsScreen = () => {
@@ -121,7 +135,7 @@ const InvestorsScreen = () => {
   const [roleStatuses, setRoleStatuses] = useState<any[]>([]);
   const [loadingRoles, setLoadingRoles] = useState(true);
   const { sendOtp, changeMobile, loading: authLoading } = useAuthAPIs();
-  
+
   // Change Mobile State
   const [isMobileModalVisible, setIsMobileModalVisible] = useState(false);
   const [newMobile, setNewMobile] = useState('');
@@ -155,7 +169,7 @@ const InvestorsScreen = () => {
       },
       (err: any) => {
         Alert.alert('Error', err?.message || 'Failed to send OTP');
-      }
+      },
     );
   };
 
@@ -166,10 +180,10 @@ const InvestorsScreen = () => {
     }
 
     changeMobile(
-      { 
-        newMobileNumber: newMobile, 
-        otp, 
-        verificationId 
+      {
+        newMobileNumber: newMobile,
+        otp,
+        verificationId,
       },
       (res: any) => {
         if (res.success) {
@@ -183,7 +197,7 @@ const InvestorsScreen = () => {
       },
       (err: any) => {
         Alert.alert('Error', err?.message || 'Failed to update mobile number');
-      }
+      },
     );
   };
 
@@ -226,10 +240,12 @@ const InvestorsScreen = () => {
           <Lock size={48} color="#EE2529" />
           <Text style={styles.lockedTitle}>{activeTab} Access Locked</Text>
           <Text style={styles.lockedText}>
-            You haven't acquired the {activeTab} role yet. 
+            You haven't acquired the {activeTab} role yet.
             {activeTab === 'Owner' && ' List a property to become an owner!'}
-            {activeTab === 'Broker' && ' Complete your broker profile to start listing!'}
-            {activeTab === 'Investor' && ' Make an inquiry to become an investor!'}
+            {activeTab === 'Broker' &&
+              ' Complete your broker profile to start listing!'}
+            {activeTab === 'Investor' &&
+              ' Make an inquiry to become an investor!'}
           </Text>
         </View>
       );
@@ -241,7 +257,7 @@ const InvestorsScreen = () => {
       case 'Investor':
         return (
           <View>
-             <EnquiriesTab />
+            <EnquiriesTab roleType="investor" />
           </View>
         );
       case 'Owner':
@@ -309,7 +325,7 @@ const InvestorsScreen = () => {
                       <Text style={styles.contactValue}>
                         {userData.mobileNumber || userData.mobile || 'N/A'}
                       </Text>
-                      <TouchableOpacity 
+                      <TouchableOpacity
                         style={styles.editBtnSmall}
                         onPress={handleOpenMobileModal}
                       >
@@ -400,7 +416,7 @@ const InvestorsScreen = () => {
                     onChangeText={setNewMobile}
                     maxLength={10}
                   />
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.modalActionBtn}
                     onPress={handleSendOtp}
                     disabled={authLoading}
@@ -425,7 +441,7 @@ const InvestorsScreen = () => {
                     onChangeText={setOtp}
                     maxLength={6}
                   />
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.modalActionBtn}
                     onPress={handleChangeMobile}
                     disabled={authLoading}
@@ -433,14 +449,18 @@ const InvestorsScreen = () => {
                     {authLoading ? (
                       <ActivityIndicator color="#FFF" size="small" />
                     ) : (
-                      <Text style={styles.modalActionBtnText}>Verify & Change</Text>
+                      <Text style={styles.modalActionBtnText}>
+                        Verify & Change
+                      </Text>
                     )}
                   </TouchableOpacity>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.resendBtn}
                     onPress={() => setStep('request')}
                   >
-                    <Text style={styles.resendBtnText}>Try different number</Text>
+                    <Text style={styles.resendBtnText}>
+                      Try different number
+                    </Text>
                   </TouchableOpacity>
                 </>
               )}
@@ -719,7 +739,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f3f4f6',
     borderRadius: 4,
   },
-  
+
   // Modal Styles
   modalOverlay: {
     flex: 1,

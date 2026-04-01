@@ -266,9 +266,10 @@ export const usePropertyAPIs = () => {
   const getMyInquiries = (
     onSuccess?: (data: any) => void,
     onError?: (error: any) => void,
+    query?: string,
   ) => {
     apiCall.get({
-      route: '/v1/my-inquiries',
+      route: `/v1/my-inquiries${query ? `?${query}` : ''}`,
       onSuccess: data => {
         if (onSuccess) onSuccess(data.data);
       },

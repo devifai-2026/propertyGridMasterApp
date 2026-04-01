@@ -12,7 +12,7 @@ import { useNavigation } from '../../../context/NavigationContext';
 import { COLORS } from '../../../constants/theme';
 import { ActivityIndicator } from 'react-native';
 
-const EnquiriesTab = () => {
+const EnquiriesTab = ({ roleType }: { roleType?: 'investor' | 'broker' }) => {
   const [enquiries, setEnquiries] = useState<any[]>([]);
   const { getMyInquiries, loading } = usePropertyAPIs();
   const { navigate } = useNavigation();
@@ -25,8 +25,8 @@ const EnquiriesTab = () => {
       if (data && Array.isArray(data)) {
         setEnquiries(data);
       }
-    });
-  }, []);
+    }, undefined, roleType ? `inquirerRoleType=${roleType}` : '');
+  }, [roleType]);
 
   return (
     <View style={styles.container}>

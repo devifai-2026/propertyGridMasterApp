@@ -38,6 +38,7 @@ const EnquiriesScreen = () => {
     question: '',
     termsAccepted: false,
     privacyAccepted: false,
+    inquirerRoleType: 'investor' as 'investor' | 'broker',
   });
 
   const otpInputRefs = useRef<Array<TextInput | null>>([]);
@@ -55,6 +56,7 @@ const EnquiriesScreen = () => {
         lastName: user.lastName || user.name.split(' ')[1] || '',
         email: user.email || '',
         phone: user.mobileNumber || '',
+        inquirerRoleType: user.role === 'Broker' ? 'broker' : 'investor',
       }));
     }
   }, [user]);
@@ -211,6 +213,7 @@ const EnquiriesScreen = () => {
     const payload = {
       inquiry: formData.question,
       source: Platform.OS === 'web' ? 'web' : 'mobile',
+      inquirerRoleType: formData.inquirerRoleType,
     };
 
 
@@ -327,6 +330,60 @@ const EnquiriesScreen = () => {
                   value={formData.lastName}
                   onChangeText={v => handleInputChange('lastName', v)}
                 />
+              </View>
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>
+                Enquiring as <Text style={styles.required}>*</Text>
+              </Text>
+              <View style={styles.radioGroup}>
+                <TouchableOpacity
+                  activeOpacity={0.6}
+                  style={[
+                    styles.radioOption,
+                    formData.inquirerRoleType === 'investor' && styles.radioOptionActive,
+                  ]}
+                  onPress={() => handleInputChange('inquirerRoleType', 'investor')}
+                >
+                  <View
+                    style={[
+                      styles.radioCircle,
+                      formData.inquirerRoleType === 'investor' && styles.radioCircleActive,
+                    ]}
+                  />
+                  <Text
+                    style={[
+                      styles.radioLabel,
+                      formData.inquirerRoleType === 'investor' && styles.radioLabelActive,
+                    ]}
+                  >
+                    Investor
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity={0.6}
+                  style={[
+                    styles.radioOption,
+                    formData.inquirerRoleType === 'broker' && styles.radioOptionActive,
+                  ]}
+                  onPress={() => handleInputChange('inquirerRoleType', 'broker')}
+                >
+                  <View
+                    style={[
+                      styles.radioCircle,
+                      formData.inquirerRoleType === 'broker' && styles.radioCircleActive,
+                    ]}
+                  />
+                  <Text
+                    style={[
+                      styles.radioLabel,
+                      formData.inquirerRoleType === 'broker' && styles.radioLabelActive,
+                    ]}
+                  >
+                    Broker
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -837,6 +894,48 @@ const styles = StyleSheet.create({
     marginTop: 12,
     textAlign: 'center',
     fontStyle: 'italic',
+  },
+  radioGroup: {
+    flexDirection: 'row',
+    gap: 20,
+    marginTop: 10,
+    marginBottom: 20,
+  },
+  radioOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderWidth: 1.5,
+    borderColor: '#D1D5DB',
+    borderRadius: 8,
+    backgroundColor: '#FFF',
+    minWidth: 130,
+  },
+  radioOptionActive: {
+    borderColor: COLORS.primary,
+    backgroundColor: '#FFF5F5',
+  },
+  radioCircle: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    borderWidth: 2,
+    borderColor: '#D1D5DB',
+  },
+  radioCircleActive: {
+    borderColor: COLORS.primary,
+    borderWidth: 5,
+  },
+  radioLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: COLORS.textSecondary,
+  },
+  radioLabelActive: {
+    color: COLORS.primary,
+    fontWeight: '700',
   },
 });
 
