@@ -309,7 +309,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
 
 const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
   const { width } = useWindowDimensions();
-  const { navigate, currentPath } = useNavigation();
+  const { navigate, currentPath, openLoginModal } = useNavigation();
   const { isLoggedIn, user } = useAuth();
   const [isHovered, setIsHovered] = useState(false);
   const isMobile = width < 768;
