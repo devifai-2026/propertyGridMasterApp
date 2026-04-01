@@ -589,7 +589,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 24,
     overflow: 'hidden',
-    paddingHorizontal: 48,
     paddingTop: 24,
     paddingBottom: 32,
     shadowColor: '#000',
@@ -605,6 +604,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 14,
+    paddingHorizontal: 48,
   },
   logoContainer: { flexDirection: 'row', alignItems: 'center', height: 40 },
   logoImage: { width: 120, height: 40 },
@@ -634,7 +634,7 @@ const styles = StyleSheet.create({
 
   /* ── Role cards ── */
   roleCenter: { flex: 1, justifyContent: 'center' },
-  roleRow: { flexDirection: 'row', gap: 16, marginBottom: 36 },
+  roleRow: { flexDirection: 'row', gap: 16, marginBottom: 36 , paddingHorizontal: 48,},
   roleCardWrapper: {
     flex: 1, borderRadius: 16,
   },
@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
   roleDesc:  { fontSize: 12, color: '#6B7280', textAlign: 'center', lineHeight: 16 },
 
   /* ── Buttons ── */
-  buttonRow:   { flexDirection: 'row', gap: 12, marginTop: 48 },
+  buttonRow:   { flexDirection: 'row', gap: 12, marginTop: 48 ,paddingHorizontal: 48, },
   btnOutline: {
     flex: 1, borderWidth: 1.5, borderColor: '#D1D5DB', borderRadius: 12,
     paddingVertical: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.white,
@@ -681,9 +681,9 @@ const styles = StyleSheet.create({
   buttonDisabled: { opacity: 0.5 },
 
   /* ── Form inputs ── */
-  nameRow:   { flexDirection: 'row', gap: 16, marginBottom: 32 },
+  nameRow:   { flexDirection: 'row', gap: 16, marginBottom: 32 ,paddingHorizontal: 48 },
   nameField: { flex: 1 },
-  inputGroup:  { marginBottom: 32 },
+  inputGroup:  { marginBottom: 32 , paddingHorizontal: 48, },
   inputLabel:  { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 8, lineHeight: 16 },
   required:    { color: '#EE2529' },
   textInput: {
@@ -699,7 +699,7 @@ const styles = StyleSheet.create({
   errorText: { color: '#EE2529', fontSize: 12, lineHeight: 14 },
 
   /* ── Checkboxes ── */
-  checkRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 14 },
+  checkRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 14 , paddingHorizontal: 48},
   checkbox: {
     width: 18, height: 18, borderWidth: 1.5, borderColor: '#D1D5DB',
     borderRadius: 4, alignItems: 'center', justifyContent: 'center', marginTop: 2,
