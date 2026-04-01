@@ -5,7 +5,6 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  Alert,
   Modal,
   TouchableWithoutFeedback,
   Keyboard,
@@ -28,6 +27,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
   const [otpSent, setOtpSent] = useState(false);
   const [verificationId, setVerificationId] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [otpError, setOtpError] = useState(false);
   const [modalVisible, setModalVisible] = useState(true);
   const { login } = useAuth();
   const { login: authenticate, sendOtp, loading: apiLoading } = useAuthAPIs();
@@ -106,8 +106,9 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
     const newOtp = otp.split('');
     newOtp[index] = digit;
     setOtp(newOtp.join(''));
-    if (digit && index < 5) otpInputRefs.current[index + 1]?.focus();
+    if (digit && index < 3) otpInputRefs.current[index + 1]?.focus();
     setErrorMsg('');
+    setOtpError(false);
   };
 
   const handleOtpKeyPress = (e: any, index: number) => {
@@ -118,31 +119,38 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
 
   const handleResendOtp = () => {
     setOtp('');
+    setOtpError(false);
+    setErrorMsg('');
     sendOtp(
       { mobileNumber: phone },
       (response: any) => {
         if (response.success) {
           setVerificationId(response.data.verificationId);
-          Alert.alert('Success', 'OTP resent successfully');
           setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
         } else {
-          setErrorMsg(response.message || 'Failed to resend OTP');
+          setErrorMsg(
+            'Having trouble receiving your OTP? Please check your mobile number. If the issue persists, contact our support team',
+          );
         }
       },
       (error: any) => {
-        setErrorMsg(error?.response?.data?.message || 'Failed to resend OTP');
+        setErrorMsg(
+          'Having trouble receiving your OTP? Please check your mobile number. If the issue persists, contact our support team',
+        );
       },
     );
   };
 
   const handleVerifyOtp = async () => {
     setErrorMsg('');
-    if (otp.length === 6) {
+    setOtpError(false);
+    if (otp.length === 4) {
       authenticate(
         { mobileNumber: phone, otp, verificationId },
         async (response: any) => {
           if (response.success) {
             if (!allowedRoles.includes(response.data.role)) {
+              setOtpError(true);
               setErrorMsg(
                 'Access Denied: Only Owners, Brokers, and Investors can access this platform.',
               );
@@ -158,15 +166,22 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
               }
             }
           } else {
-            setErrorMsg(response.message || 'Login failed');
+            setOtpError(true);
+            setErrorMsg(
+              "That doesn't seem right. Double-check your OTP and try once more.",
+            );
           }
         },
         (error: any) => {
-          setErrorMsg(error?.response?.data?.message || 'Something went wrong');
+          setOtpError(true);
+          setErrorMsg(
+            "That doesn't seem right. Double-check your OTP and try once more.",
+          );
         },
       );
     } else {
-      setErrorMsg('Please enter the complete 6-digit OTP');
+      setOtpError(true);
+      setErrorMsg('Please enter the complete 4-digit OTP');
     }
   };
 
@@ -176,11 +191,10 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
         styles.modalContent,
         { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
       ]}>
-      {/* ── TOP CREAM SECTION: Header + Welcome ── */}
-      <View style={styles.topSection}>
-        {/* Header: Logo left, Close right */}
+
+      {/* ── HEADER SECTION ── */}
+      <View style={styles.headerSection}>
         <View style={styles.header}>
-          {/* Logo */}
           <View style={styles.logoContainer}>
             <Image
               source={require('../../assets/Navbar/Preleasegrid logo 1.png')}
@@ -188,37 +202,42 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
               resizeMode="contain"
             />
           </View>
-
-          {/* Close */}
-          <TouchableOpacity onPress={handleClose} style={styles.closeButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+          <TouchableOpacity
+            onPress={handleClose}
+            style={styles.closeButton}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
             <Text style={styles.closeButtonText}>✕</Text>
           </TouchableOpacity>
         </View>
+      </View>
 
-        {/* Divider */}
-        <View style={styles.divider} />
+      {/* ── WELCOME / TITLE SECTION ── */}
+      <View style={styles.welcomeContainer}>
+        <Text style={styles.welcomeTitle}>
+          {!otpSent ? 'Welcome' : 'Verify your Contact Number'}
+        </Text>
+      </View>
 
-        {/* Welcome title + subtitle inside cream area */}
+      {/* ── SUBTITLE SECTION ── */}
+      <View style={styles.subtitleContainer}>
         {!otpSent ? (
-          <View style={styles.titleArea}>
-            <Text style={styles.welcomeTitle}>Welcome</Text>
-            <Text style={styles.welcomeSubtitle}>Sign in to your account to continue</Text>
-          </View>
+          <Text style={styles.welcomeSubtitle}>
+            Sign in to your account to continue
+          </Text>
         ) : (
-          <View style={styles.titleArea}>
-            <Text style={styles.welcomeTitle}>Verify your Contact Number</Text>
-            <Text style={styles.welcomeSubtitle}>
-              We sent a verification code to{' '}
-              <Text style={styles.verifyPhone}>+91 .........</Text>
-            </Text>
-          </View>
+          <Text style={styles.welcomeSubtitle}>
+            We sent a verification code to{' '}
+            <Text style={styles.verifyPhone}>+91 .........</Text>
+          </Text>
         )}
       </View>
 
-      {/* ── WHITE BODY SECTION ── */}
-      <View style={styles.bodySection}>
+      {/* ── FORM SECTION ── */}
+      <View style={styles.formSection}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardView}>
+
           {!otpSent ? (
             /* ══════ SCREEN 1: Phone entry ══════ */
             <>
@@ -234,7 +253,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
                   maxLength={10}
                   value={phone}
                   onChangeText={text => {
-                    setPhone(text);
+                    setPhone(text.replace(/[^0-9]/g, ''));
                     setErrorMsg('');
                   }}
                 />
@@ -255,13 +274,8 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[
-                    styles.btnPrimary,
-                    // phone.length !== 10 && styles.buttonDisabled,
-                  ]}
-                  onPress={handleSendOtp}
-                  // disabled={apiLoading}
-                  >
+                  style={styles.btnPrimary}
+                  onPress={handleSendOtp}>
                   <LinearGradient
                     colors={['#EE2529', '#C73834']}
                     start={{ x: 0, y: 0.5 }}
@@ -273,18 +287,28 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
                   </LinearGradient>
                 </TouchableOpacity>
               </View>
+
+              {!!errorMsg && (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>{errorMsg}</Text>
+                </View>
+              )}
             </>
           ) : (
             /* ══════ SCREEN 2: OTP entry ══════ */
             <>
+              {/* OTP Boxes */}
               <View style={styles.otpInputGroup}>
-                {[0, 1, 2, 3, 4, 5].map(index => (
+                {[0, 1, 2, 3].map(index => (
                   <TextInput
                     key={index}
                     ref={ref => {
                       otpInputRefs.current[index] = ref;
                     }}
-                    style={styles.otpInput}
+                    style={[
+                      styles.otpInput,
+                      otpError && styles.otpInputError,
+                    ]}
                     maxLength={1}
                     keyboardType="number-pad"
                     value={otp[index] || ''}
@@ -295,15 +319,24 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
                 ))}
               </View>
 
-              <TouchableOpacity
-                onPress={handleResendOtp}
-                style={styles.resendContainer}>
-                <Text style={styles.resendText}>
-                  Didn't received OTP?{' '}
-                  <Text style={styles.resendLink}>Click to resend OTP.</Text>
-                </Text>
-              </TouchableOpacity>
+              {/* Error message */}
+              {!!errorMsg && (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>{errorMsg}</Text>
+                </View>
+              )}
 
+              {/* Resend OTP + Contact Support links */}
+              <View style={styles.resendContainer}>
+                <TouchableOpacity onPress={handleResendOtp}>
+                  <Text style={styles.resendLink}>Resend OTP</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => { /* open support */ }}>
+                  <Text style={styles.resendLink}>Contact Support</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Buttons */}
               <View style={styles.buttonRow}>
                 <TouchableOpacity
                   style={styles.btnBack}
@@ -311,18 +344,14 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
                     setOtpSent(false);
                     setOtp('');
                     setErrorMsg('');
+                    setOtpError(false);
                   }}>
                   <Text style={styles.btnBackText}>Back</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[
-                    styles.btnPrimary,
-                    // otp.length !== 6 && styles.buttonDisabled,
-                  ]}
-                  onPress={handleVerifyOtp}
-                  // disabled={apiLoading || otp.length !== 6}
-                  >
+                  style={styles.btnPrimary}
+                  onPress={handleVerifyOtp}>
                   <LinearGradient
                     colors={['#EE2529', '#C73834']}
                     start={{ x: 0, y: 0.5 }}
@@ -337,11 +366,6 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
             </>
           )}
 
-          {!!errorMsg && (
-            <View style={styles.errorContainer}>
-              <Text style={styles.errorText}>{errorMsg}</Text>
-            </View>
-          )}
         </KeyboardAvoidingView>
       </View>
     </Animated.View>
@@ -366,15 +390,14 @@ const styles = StyleSheet.create({
   /* ── Overlay ── */
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   /* ── Card ── */
   modalContent: {
-    width: '90%',
-    maxWidth: 420,
+    width: 673,
     backgroundColor: COLORS.white,
     borderRadius: 20,
     overflow: 'hidden',
@@ -385,216 +408,221 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
 
-  /* ── TOP CREAM SECTION ── */
-  topSection: {
-    // backgroundColor: '#FFFCF4',   // light cream background for welcome
-    paddingTop: 18,
-    paddingHorizontal: 20,
-    paddingBottom: 0,
+  /* ── HEADER SECTION ── */
+  headerSection: {
+    backgroundColor: COLORS.white,
   },
-
-  /* ── Header row ── */
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingTop: 20,
+    paddingBottom: 16,
+    paddingHorizontal: 24,
   },
   logoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    height: 40,
   },
   logoImage: {
-    width: 120,
-    height: 40,
+    width: 155,
+    height: 50,
   },
   closeButton: {
-    width: 28,
-    height: 28,
+    width: 32,
+    height: 32,
     justifyContent: 'center',
     alignItems: 'center',
   },
   closeButtonText: {
-    fontSize: 16,
+    fontSize: 20,
     color: '#EE2529',
     fontWeight: '600',
-    lineHeight: 18,
   },
-
-  /* ── Divider ── */
   divider: {
-    height: 0,
-    backgroundColor: 'transparent',
-    marginBottom: 0,
+    height: 1,
+    backgroundColor: '#E5E7EB',
   },
 
-  /* ── Title area (still in cream bg) ── */
-  titleArea: {
-    paddingTop: 2,
-    paddingBottom: 20,
+  /* ── WELCOME CONTAINER ── */
+  welcomeContainer: {
+    backgroundColor: '#FFFCF4',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   welcomeTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '700',
     color: '#1A1A1A',
-    backgroundColor:"#FFFCF4",
-    width: '100%',
     textAlign: 'center',
-    paddingTop: 10,
-    marginBottom: 6,
-    fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+  },
+
+  /* ── SUBTITLE CONTAINER ── */
+  subtitleContainer: {
+    backgroundColor: COLORS.white,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   welcomeSubtitle: {
-    fontSize: 13.5,
-    color: '#888',
+    fontSize: 13,
+    color: '#9CA3AF',
     textAlign: 'center',
+    lineHeight: 18,
   },
   verifyPhone: {
     fontWeight: '600',
     color: '#1F2937',
   },
 
-  /* ── WHITE BODY SECTION ── */
-  bodySection: {
+  /* ── FORM SECTION ── */
+  formSection: {
     backgroundColor: COLORS.white,
-    paddingHorizontal: 20,
-    paddingTop: 22,
-    paddingBottom: 28,
+    paddingHorizontal: 32,
+    paddingTop: 8,
+    paddingBottom: 40,
+  },
+  keyboardView: {
+    width: '100%',
   },
 
   /* ── Input ── */
   inputGroup: {
-    marginBottom: 35,
+    marginBottom: 28,
   },
   inputLabel: {
-    fontSize: 13.5,
-    fontWeight: '600',
-    color: '#222',
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
     marginBottom: 8,
   },
   required: {
     color: '#EE2529',
   },
   textInput: {
-    borderWidth: 1.5,
-    borderColor: '#D1D5DB',
-    borderRadius: 10,
-    paddingVertical: 13,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    paddingVertical: 12,
     paddingHorizontal: 14,
     fontSize: 15,
     color: '#1F2937',
-    backgroundColor: '#FAFAFA',
-    fontFamily: Platform.OS === 'ios' ? 'System' : 'sans-serif',
+    backgroundColor: '#FFFFFF',
   },
 
   /* ── Button row ── */
   buttonRow: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 12,
+    marginTop: 8,
   },
 
-  /* Sign Up — outline, narrower */
+  /* Sign Up button */
   btnOutline: {
-    flex: 0.72,
-    borderWidth: 1.5,
-    borderColor: '#D1D5DB',
-    borderRadius: 5,
-    paddingVertical: 14,
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.white,
   },
   btnOutlineText: {
-    fontSize: 14.5,
+    fontSize: 14,
     fontWeight: '600',
     color: '#374151',
   },
 
-  /* Continue — gradient, wider, more rounded */
+  /* Continue / Verify button */
   btnPrimary: {
     flex: 1,
-    borderRadius: 5,
+    borderRadius: 8,
     overflow: 'hidden',
   },
   btnGradient: {
-    paddingVertical: 14,
+    paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   btnPrimaryText: {
-    fontSize: 14.5,
+    fontSize: 14,
     fontWeight: '600',
     color: COLORS.white,
-    letterSpacing: 0.2,
   },
 
-  /* Back button (OTP screen) */
+  /* Back button */
   btnBack: {
-    flex: 0.72,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 10,
-    paddingVertical: 14,
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   btnBackText: {
-    fontSize: 14.5,
+    fontSize: 14,
     fontWeight: '600',
     color: '#374151',
-  },
-
-  buttonDisabled: {
-    opacity: 0.45,
   },
 
   /* ── OTP inputs ── */
   otpInputGroup: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 10,
+    gap: 12,
     marginBottom: 20,
   },
   otpInput: {
-    width: 48,
-    height: 56,
-    backgroundColor: '#F9FAFB',
-    borderRadius: 10,
+    width: 72,
+    height: 72,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
     textAlign: 'center',
-    fontSize: 22,
-    fontWeight: '700',
+    fontSize: 26,
+    fontWeight: '600',
     borderWidth: 1.5,
-    borderColor: '#D1D5DB',
+    borderColor: '#E5E7EB',
     color: '#1F2937',
   },
-
-  /* ── Resend ── */
-  resendContainer: {
-    alignItems: 'center',
-    marginBottom: 16,
+  otpInputError: {
+    borderColor: '#EE2529',
+    borderWidth: 1.5,
   },
-  resendText: {
-    fontSize: 13,
-    color: '#6B7280',
+
+  /* ── Resend + Contact Support ── */
+  resendContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 24,
+    marginTop: 16,
+    marginBottom: 24,
   },
   resendLink: {
-    color: '#EE2529',
+    fontSize: 13,
     fontWeight: '600',
+    color: '#1F2937',
     textDecorationLine: 'underline',
   },
 
   /* ── Error ── */
   errorContainer: {
-    backgroundColor: '#FEF2F2',
+    // backgroundColor: '#FEF2F2',
     padding: 12,
     borderRadius: 8,
-    marginTop: 14,
+    marginTop: 4,
+    marginBottom: 4,
   },
   errorText: {
-    color: '#DC2626',
+    color: '#EE2529',
     fontSize: 13,
     textAlign: 'center',
+    lineHeight: 18,
   },
 });
 
