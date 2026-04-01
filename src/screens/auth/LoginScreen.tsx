@@ -1,62 +1,82 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
   View,
   TextInput,
   TouchableOpacity,
-  Alert,
+  Modal,
+  TouchableWithoutFeedback,
+  Keyboard,
+  KeyboardAvoidingView,
   Platform,
-  useWindowDimensions,
-  Image,
-  ImageBackground,
-  ScrollView,
   Animated,
   Easing,
+  Image,
 } from 'react-native';
-import Layout from '../../layout/Layout';
+import LinearGradient from 'react-native-linear-gradient';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
 import { COLORS } from '../../constants/theme';
 import { allowedRoles } from '../../../helpers/allowedRoles';
 
-const LoginScreen = () => {
+const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [verificationId, setVerificationId] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [otpError, setOtpError] = useState(false);
+  const [modalVisible, setModalVisible] = useState(true);
   const { login } = useAuth();
   const { login: authenticate, sendOtp, loading: apiLoading } = useAuthAPIs();
-  const { navigate } = useNavigation();
-  const { width } = useWindowDimensions();
-  const isMobile = width < 768;
-  const isDesktop = width >= 1024;
+  const { openSignupModal, closeLoginModal } = useNavigation();
 
-  // Refs for OTP inputs
   const otpInputRefs = useRef<Array<TextInput | null>>([]);
-
-  // Animation value
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(20)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (modalVisible) {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+          easing: Easing.out(Easing.ease),
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+          easing: Easing.out(Easing.ease),
+        }),
+      ]).start();
+    }
+  }, [modalVisible]);
+
+  const handleClose = () => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
+        toValue: 0,
+        duration: 200,
         useNativeDriver: true,
-        easing: Easing.out(Easing.ease),
       }),
       Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 800,
+        toValue: 50,
+        duration: 200,
         useNativeDriver: true,
-        easing: Easing.out(Easing.ease),
       }),
-    ]).start();
-  }, []);
+    ]).start(() => {
+      setModalVisible(false);
+      if (onClose) {
+        onClose();
+      } else {
+        closeLoginModal();
+      }
+    });
+  };
 
   const handleSendOtp = () => {
     setErrorMsg('');
@@ -67,14 +87,7 @@ const LoginScreen = () => {
           if (response.success) {
             setVerificationId(response.data.verificationId);
             setOtpSent(true);
-            // Auto-focus first OTP input after a short delay
-            setTimeout(() => {
-              otpInputRefs.current[0]?.focus();
-            }, 100);
-            Alert.alert(
-              'OTP Sent',
-              'A 6-digit OTP has been sent to your mobile number',
-            );
+            setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
           } else {
             setErrorMsg(response.message || 'Failed to send OTP');
           }
@@ -89,35 +102,55 @@ const LoginScreen = () => {
   };
 
   const handleOtpChange = (text: string, index: number) => {
-    // Only allow digits
     const digit = text.replace(/[^0-9]/g, '');
-
     const newOtp = otp.split('');
     newOtp[index] = digit;
     setOtp(newOtp.join(''));
-
-    // Auto-focus next input if digit entered
-    if (digit && index < 5) {
-      otpInputRefs.current[index + 1]?.focus();
-    }
+    if (digit && index < 5) otpInputRefs.current[index + 1]?.focus();
     setErrorMsg('');
+    setOtpError(false);
   };
 
   const handleOtpKeyPress = (e: any, index: number) => {
-    // Handle backspace on empty field - move to previous input
     if (e.nativeEvent.key === 'Backspace' && !otp[index] && index > 0) {
       otpInputRefs.current[index - 1]?.focus();
     }
   };
 
+  const handleResendOtp = () => {
+    setOtp('');
+    setOtpError(false);
+    setErrorMsg('');
+    sendOtp(
+      { mobileNumber: phone },
+      (response: any) => {
+        if (response.success) {
+          setVerificationId(response.data.verificationId);
+          setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
+        } else {
+          setErrorMsg(
+            'Having trouble receiving your OTP? Please check your mobile number. If the issue persists, contact our support team',
+          );
+        }
+      },
+      (error: any) => {
+        setErrorMsg(
+          'Having trouble receiving your OTP? Please check your mobile number. If the issue persists, contact our support team',
+        );
+      },
+    );
+  };
+
   const handleVerifyOtp = async () => {
     setErrorMsg('');
+    setOtpError(false);
     if (otp.length === 6) {
       authenticate(
         { mobileNumber: phone, otp, verificationId },
         async (response: any) => {
           if (response.success) {
             if (!allowedRoles.includes(response.data.role)) {
+              setOtpError(true);
               setErrorMsg(
                 'Access Denied: Only Owners, Brokers, and Investors can access this platform.',
               );
@@ -125,392 +158,471 @@ const LoginScreen = () => {
             }
             const success = await login(response.data);
             if (success) {
-              navigate('/dashboard');
+              setModalVisible(false);
+              if (onClose) {
+                onClose();
+              } else {
+                closeLoginModal();
+              }
             }
           } else {
-            setErrorMsg(response.message || 'Login failed');
+            setOtpError(true);
+            setErrorMsg(
+              "That doesn't seem right. Double-check your OTP and try once more.",
+            );
           }
         },
         (error: any) => {
-          setErrorMsg(error?.response?.data?.message || 'Something went wrong');
+          setOtpError(true);
+          setErrorMsg(
+            "That doesn't seem right. Double-check your OTP and try once more.",
+          );
         },
       );
     } else {
+      setOtpError(true);
       setErrorMsg('Please enter the complete 6-digit OTP');
     }
   };
 
-  return (
-    <Layout>
-      <View style={styles.scrollContainer}>
-        <View style={[styles.container, isDesktop && styles.desktopContainer]}>
-          <Animated.View
-            style={[
-              styles.contentWrapper,
-              isDesktop && styles.desktopContentWrapper,
-              {
-                opacity: fadeAnim,
-                transform: [{ translateY: slideAnim }],
-              },
-            ]}
-          >
-            <View
-              style={[
-                styles.formSection,
-                isDesktop && styles.desktopFormSection,
-              ]}
-            >
-              <View style={styles.card}>
-                <View style={styles.header}>
-                  <Text style={styles.title}>Welcome</Text>
-                  <Text style={styles.subtitle}>
-                    Sign in to your account to continue
-                  </Text>
-                </View>
+  const renderLoginContent = () => (
+    <Animated.View
+      style={[
+        styles.modalContent,
+        { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
+      ]}>
 
-                <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Mobile Number *</Text>
-                  <TextInput
-                    style={styles.textInput}
-                    placeholder="Enter your contact number"
-                    placeholderTextColor={COLORS.textSecondary}
-                    keyboardType="numeric"
-                    maxLength={10}
-                    value={phone}
-                    onChangeText={text => {
-                      setPhone(text);
-                      setErrorMsg('');
-                    }}
-                    editable={!otpSent}
-                  />
-                </View>
-
-                {otpSent && (
-                  <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>Enter OTP *</Text>
-                    <View style={styles.otpInputGroup}>
-                      {[0, 1, 2, 3, 4, 5].map(index => (
-                        <TextInput
-                          key={index}
-                          ref={ref => {
-                            otpInputRefs.current[index] = ref;
-                          }}
-                          style={styles.otpInput}
-                          maxLength={1}
-                          keyboardType="number-pad"
-                          value={otp[index] || ''}
-                          onChangeText={text => handleOtpChange(text, index)}
-                          onKeyPress={e => handleOtpKeyPress(e, index)}
-                          selectTextOnFocus
-                          autoComplete="one-time-code"
-                        />
-                      ))}
-                    </View>
-                    <TouchableOpacity
-                      style={styles.resendBtn}
-                      onPress={() => {
-                        setOtp('');
-                        Alert.alert(
-                          'OTP Resent',
-                          'A new OTP has been sent to your mobile number',
-                        );
-                      }}
-                    >
-                      <Text style={styles.resendText}>Resend OTP</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-
-                {!otpSent && (
-                  <View style={styles.dummyInfo}>
-                    <Text style={styles.dummyTitle}>
-                      Dummy Login Credentials:
-                    </Text>
-                    <Text style={styles.dummyText}>• Investor: 7550969999</Text>
-                    <Text style={styles.dummyText}>• Broker: 7550969932</Text>
-                    <Text style={styles.dummyText}>• Owner: 7550969934</Text>
-                  </View>
-                )}
-
-                {errorMsg ? (
-                  <View style={styles.errorContainer}>
-                    <Text style={styles.errorText}>{errorMsg}</Text>
-                  </View>
-                ) : null}
-
-                <View style={styles.actions}>
-                  <TouchableOpacity
-                    style={styles.btnOutline}
-                    onPress={() => navigate('/dashboard')}
-                  >
-                    <Text style={styles.btnOutlineText}>Cancel</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.btnFilled,
-                      (otpSent ? otp.length !== 6 : phone.length !== 10) &&
-                        styles.btnDisabled,
-                    ]}
-                    onPress={otpSent ? handleVerifyOtp : handleSendOtp}
-                    disabled={
-                      apiLoading ||
-                      (otpSent ? otp.length !== 6 : phone.length !== 10)
-                    }
-                  >
-                    <Text style={styles.btnFilledText}>
-                      {apiLoading
-                        ? 'Processing...'
-                        : otpSent
-                        ? 'Verify & Login'
-                        : 'Send OTP'}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-
-                {!otpSent && (
-                  <View style={styles.signupSection}>
-                    <Text style={styles.signupText}>
-                      Don't have an account?
-                    </Text>
-                    <TouchableOpacity onPress={() => navigate('/signup')}>
-                      <Text style={styles.signupLink}>Sign up</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-              </View>
-            </View>
-
-            {isDesktop && (
-              <View style={styles.imageSection}>
-                <Image
-                  source={require('../../assets/Banner/property.png')}
-                  style={styles.sideImage}
-                  resizeMode="cover"
-                />
-              </View>
-            )}
-          </Animated.View>
+      {/* ── HEADER SECTION ── */}
+      <View style={styles.headerSection}>
+        <View style={styles.header}>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require('../../assets/Navbar/Preleasegrid logo 1.png')}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+          </View>
+          <TouchableOpacity
+            onPress={handleClose}
+            style={styles.closeButton}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+            <Text style={styles.closeButtonText}>✕</Text>
+          </TouchableOpacity>
         </View>
       </View>
-    </Layout>
+
+      {/* ── WELCOME / TITLE SECTION ── */}
+      <View style={styles.welcomeContainer}>
+        <Text style={styles.welcomeTitle}>
+          {!otpSent ? 'Welcome' : 'Verify your Contact Number'}
+        </Text>
+      </View>
+
+      {/* ── SUBTITLE SECTION ── */}
+      <View style={styles.subtitleContainer}>
+        {!otpSent ? (
+          <Text style={styles.welcomeSubtitle}>
+            Sign in to your account to continue
+          </Text>
+        ) : (
+          <Text style={styles.welcomeSubtitle}>
+            We sent a verification code to{' '}
+            <Text style={styles.verifyPhone}>+91 .........</Text>
+          </Text>
+        )}
+      </View>
+
+      {/* ── FORM SECTION ── */}
+      <View style={styles.formSection}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardView}>
+
+          {!otpSent ? (
+            /* ══════ SCREEN 1: Phone entry ══════ */
+            <>
+              <View style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>
+                  Mobile Number <Text style={styles.required}>*</Text>
+                </Text>
+                <TextInput
+                  style={styles.textInput}
+                  placeholder="Enter your contact number"
+                  placeholderTextColor="#9CA3AF"
+                  keyboardType="numeric"
+                  maxLength={10}
+                  value={phone}
+                  onChangeText={text => {
+                    setPhone(text.replace(/[^0-9]/g, ''));
+                    setErrorMsg('');
+                  }}
+                />
+              </View>
+
+              <View style={styles.buttonRow}>
+                <TouchableOpacity
+                  style={styles.btnOutline}
+                  onPress={() => {
+                    setModalVisible(false);
+                    closeLoginModal();
+                    openSignupModal();
+                  }}
+                  disabled={apiLoading}>
+                  <Text style={styles.btnOutlineText}>
+                    {apiLoading ? 'Please wait...' : 'Sign Up'}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.btnPrimary}
+                  onPress={handleSendOtp}>
+                  <LinearGradient
+                    colors={['#EE2529', '#C73834']}
+                    start={{ x: 0, y: 0.5 }}
+                    end={{ x: 1, y: 0.5 }}
+                    style={styles.btnGradient}>
+                    <Text style={styles.btnPrimaryText}>
+                      {apiLoading ? 'Sending...' : 'Continue'}
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+
+              {!!errorMsg && (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>{errorMsg}</Text>
+                </View>
+              )}
+            </>
+          ) : (
+            /* ══════ SCREEN 2: OTP entry ══════ */
+            <>
+              {/* OTP Boxes */}
+              <View style={styles.otpInputGroup}>
+                {[0, 1, 2, 3, 4, 5].map(index => (
+                  <TextInput
+                    key={index}
+                    ref={ref => {
+                      otpInputRefs.current[index] = ref;
+                    }}
+                    style={[
+                      styles.otpInput,
+                      otpError && styles.otpInputError,
+                    ]}
+                    maxLength={1}
+                    keyboardType="number-pad"
+                    value={otp[index] || ''}
+                    onChangeText={text => handleOtpChange(text, index)}
+                    onKeyPress={e => handleOtpKeyPress(e, index)}
+                    selectTextOnFocus
+                  />
+                ))}
+              </View>
+
+              {/* Error message */}
+              {!!errorMsg && (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>{errorMsg}</Text>
+                </View>
+              )}
+
+              {/* Resend OTP + Contact Support links */}
+              <View style={styles.resendContainer}>
+                <TouchableOpacity onPress={handleResendOtp}>
+                  <Text style={styles.resendLink}>Resend OTP</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => { /* open support */ }}>
+                  <Text style={styles.resendLink}>Contact Support</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Buttons */}
+              <View style={styles.buttonRow}>
+                <TouchableOpacity
+                  style={styles.btnBack}
+                  onPress={() => {
+                    setOtpSent(false);
+                    setOtp('');
+                    setErrorMsg('');
+                    setOtpError(false);
+                  }}>
+                  <Text style={styles.btnBackText}>Back</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.btnPrimary}
+                  onPress={handleVerifyOtp}>
+                  <LinearGradient
+                    colors={['#EE2529', '#C73834']}
+                    start={{ x: 0, y: 0.5 }}
+                    end={{ x: 1, y: 0.5 }}
+                    style={styles.btnGradient}>
+                    <Text style={styles.btnPrimaryText}>
+                      {apiLoading ? 'Verifying...' : 'Verify & Continue'}
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+
+        </KeyboardAvoidingView>
+      </View>
+    </Animated.View>
+  );
+
+  return (
+    <Modal
+      animationType="none"
+      transparent={true}
+      visible={modalVisible}
+      onRequestClose={handleClose}>
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.modalOverlay}>
+          <TouchableWithoutFeedback>{renderLoginContent()}</TouchableWithoutFeedback>
+        </View>
+      </TouchableWithoutFeedback>
+    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  backgroundImage: {
+  /* ── Overlay ── */
+  modalOverlay: {
     flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-  scrollContainer: {
-    flexGrow: 1,
-  },
-  container: {
-    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 16,
-    minHeight: '100%',
   },
-  desktopContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 40,
-  },
-  contentWrapper: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  desktopContentWrapper: {
-    flexDirection: 'row',
-    maxWidth: 900,
-    width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 24,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.15,
-    shadowRadius: 30,
-    elevation: 20,
-  },
-  formSection: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  desktopFormSection: {
-    flex: 1,
-    padding: 10,
-    justifyContent: 'center',
-  },
-  imageSection: {
-    flex: 1,
-    height: '100%',
-    minHeight: 450,
-    backgroundColor: 'transparent',
-    padding: 10,
-  },
-  sideImage: {
-    width: '100%',
-    height: '100%',
-    flex: 1,
-    borderRadius: 20,
-  },
-  card: {
+
+  /* ── Card ── */
+  modalContent: {
+    width: 673,
     backgroundColor: COLORS.white,
     borderRadius: 20,
-    padding: 20,
-    width: '100%',
-    maxWidth: 420,
+    overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 12 },
-    shadowOpacity: 0.06,
-    shadowRadius: 16,
-    elevation: 8,
-    marginVertical: 16,
-    // On desktop, the card shadow/border is mostly handled by wrapper, but we keep basic styling
+    shadowOpacity: 0.2,
+    shadowRadius: 24,
+    elevation: 12,
+  },
+
+  /* ── HEADER SECTION ── */
+  headerSection: {
+    backgroundColor: COLORS.white,
   },
   header: {
-    marginBottom: 30,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 20,
+    paddingBottom: 16,
+    paddingHorizontal: 24,
+  },
+  logoContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: COLORS.textDark,
-    marginBottom: 10,
+  logoImage: {
+    width: 155,
+    height: 50,
   },
-  subtitle: {
-    fontSize: 16,
-    color: COLORS.textSecondary,
+  closeButton: {
+    width: 32,
+    height: 32,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 20,
+    color: '#EE2529',
+    fontWeight: '600',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+  },
+
+  /* ── WELCOME CONTAINER ── */
+  welcomeContainer: {
+    backgroundColor: '#FFFCF4',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  welcomeTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1A1A1A',
     textAlign: 'center',
   },
+
+  /* ── SUBTITLE CONTAINER ── */
+  subtitleContainer: {
+    backgroundColor: COLORS.white,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  welcomeSubtitle: {
+    fontSize: 13,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  verifyPhone: {
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+
+  /* ── FORM SECTION ── */
+  formSection: {
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 32,
+    paddingTop: 8,
+    paddingBottom: 40,
+  },
+  keyboardView: {
+    width: '100%',
+  },
+
+  /* ── Input ── */
   inputGroup: {
-    marginBottom: 20,
+    marginBottom: 28,
   },
   inputLabel: {
     fontSize: 14,
-    fontWeight: '600',
-    color: COLORS.textDark,
+    fontWeight: '500',
+    color: '#374151',
     marginBottom: 8,
+  },
+  required: {
+    color: '#EE2529',
   },
   textInput: {
     borderWidth: 1,
-    borderColor: COLORS.divider,
+    borderColor: '#E5E7EB',
     borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    color: COLORS.textDark,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    fontSize: 15,
+    color: '#1F2937',
+    backgroundColor: '#FFFFFF',
   },
-  dummyInfo: {
-    backgroundColor: COLORS.background,
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 30,
-  },
-  dummyTitle: {
-    fontWeight: '700',
-    color: COLORS.textDark,
-    marginBottom: 8,
-    fontSize: 14,
-  },
-  dummyText: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    marginBottom: 4,
-  },
-  errorContainer: {
-    backgroundColor: '#FFF5F5',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#FEB2B2',
-  },
-  errorText: {
-    color: '#C53030',
-    fontSize: 14,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-  actions: {
+
+  /* ── Button row ── */
+  buttonRow: {
     flexDirection: 'row',
-    gap: 15,
+    gap: 12,
+    marginTop: 8,
   },
+
+  /* Sign Up button */
   btnOutline: {
     flex: 1,
-    paddingVertical: 14,
-    borderRadius: 8,
     borderWidth: 1,
-    borderColor: COLORS.divider,
+    borderColor: '#E5E7EB',
+    borderRadius: 8,
+    paddingVertical: 12,
     alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.white,
   },
   btnOutlineText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: '#374151',
   },
-  btnFilled: {
+
+  /* Continue / Verify button */
+  btnPrimary: {
     flex: 1,
-    paddingVertical: 14,
     borderRadius: 8,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
+    overflow: 'hidden',
   },
-  btnFilledText: {
-    fontSize: 16,
+  btnGradient: {
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  btnPrimaryText: {
+    fontSize: 14,
     fontWeight: '600',
     color: COLORS.white,
   },
-  btnDisabled: {
-    backgroundColor: COLORS.divider,
-    opacity: 0.6,
+
+  /* Back button */
+  btnBack: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
+  btnBackText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+  },
+
+  /* ── OTP inputs ── */
   otpInputGroup: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 12,
-    marginBottom: 15,
+    marginBottom: 20,
   },
   otpInput: {
-    width: 44,
-    height: 44,
-    backgroundColor: COLORS.background,
-    borderRadius: 8,
+    width: 72,
+    height: 72,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
     textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '700',
-    borderWidth: 2,
-    borderColor: COLORS.divider,
-    color: COLORS.textDark,
-  },
-  resendBtn: {
-    alignSelf: 'center',
-    paddingVertical: 8,
-  },
-  resendText: {
-    fontSize: 14,
-    color: COLORS.primary,
+    fontSize: 26,
     fontWeight: '600',
-    textDecorationLine: 'underline',
+    borderWidth: 1.5,
+    borderColor: '#E5E7EB',
+    color: '#1F2937',
   },
-  signupSection: {
+  otpInputError: {
+    borderColor: '#EE2529',
+    borderWidth: 1.5,
+  },
+
+  /* ── Resend + Contact Support ── */
+  resendContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 24,
-    gap: 6,
+    gap: 24,
+    marginTop: 16,
+    marginBottom: 24,
   },
-  signupText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  signupLink: {
-    fontSize: 14,
-    color: COLORS.primary,
-    fontWeight: '700',
+  resendLink: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#1F2937',
     textDecorationLine: 'underline',
+  },
+
+  /* ── Error ── */
+  errorContainer: {
+    backgroundColor: '#FEF2F2',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 4,
+    marginBottom: 4,
+  },
+  errorText: {
+    color: '#EE2529',
+    fontSize: 13,
+    textAlign: 'center',
+    lineHeight: 18,
   },
 });
 

@@ -29,7 +29,7 @@ import NotesScreen from './src/screens/notes/NotesScreen';
 import EnquiryDetailsScreen from './src/screens/enquiries/EnquiryDetailsScreen';
 
 const AppContent = () => {
-  const { currentPath, navigate } = useNavigation();
+  const { currentPath, navigate, showLoginModal, showSignupModal, closeLoginModal, closeSignupModal } = useNavigation();
   const { isLoggedIn, isLoading } = useAuth();
 
   // Redirect to login if accessing private pages while not logged in
@@ -56,8 +56,6 @@ const AppContent = () => {
       case currentPath === '/dashboard':
       case currentPath === '/':
         return <Dashboard />;
-      case currentPath === '/login':
-        return <LoginScreen />;
       case currentPath.startsWith('/compare/'):
         const ids = currentPath.split('/compare/')[1];
         return <PropertyComparisonScreen propertyIds={ids} />;
@@ -82,10 +80,8 @@ const AppContent = () => {
         return <SupportScreen />;
       case currentPath === '/how-it-works':
         return <HowItWorksScreen />;
-      case currentPath === '/signup':
-        return <SignupScreen />;
       case currentPath === '/my-profile':
-        return isLoggedIn ? <ProfileScreen /> : <LoginScreen />;
+        return isLoggedIn ? <ProfileScreen /> : <Dashboard />;
       case currentPath === '/notifications':
         return <NotificationsScreen />;
       case currentPath === '/my-notes':
@@ -107,7 +103,17 @@ const AppContent = () => {
     }
   };
 
-  return <>{renderScreen()}</>;
+  return (
+    <View style={{ flex: 1 }}>
+      {renderScreen()}
+      {showLoginModal && (
+        <LoginScreen onClose={closeLoginModal} />
+      )}
+      {showSignupModal && (
+        <SignupScreen onClose={closeSignupModal} />
+      )}
+    </View>
+  );
 };
 
 const App = () => {

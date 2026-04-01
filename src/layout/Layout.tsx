@@ -29,6 +29,7 @@ interface SideMenuProps {
   user: any;
   onLoginClick: () => void;
   onLogoutClick: () => void;
+  onOpenLoginModal?: () => void;
 }
 
 import {
@@ -72,6 +73,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
   user,
   onLoginClick,
   onLogoutClick,
+  onOpenLoginModal,
 }) => {
   const { height } = useWindowDimensions();
   const { navigate } = useNavigation();
@@ -281,7 +283,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
                 <TouchableOpacity
                   style={styles.menuItem}
                   onPress={() => {
-                    onLoginClick();
+                    onOpenLoginModal?.();
                     onClose();
                   }}
                 >
@@ -433,7 +435,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
           ) : (
             <TouchableOpacity
               style={styles.signInBtn}
-              onPress={() => navigate('/login')}
+              onPress={openLoginModal}
             >
               <Text style={styles.signInText}>Sign In</Text>
             </TouchableOpacity>
@@ -454,11 +456,11 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isLoggedIn, user, logout } = useAuth();
-  const { navigate } = useNavigation();
+  const { navigate, openLoginModal } = useNavigation();
 
   const handleLoginClick = () => {
     setIsMenuOpen(false);
-    navigate('/login');
+    openLoginModal();
   };
 
   return (
@@ -473,6 +475,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         user={user}
         onLoginClick={handleLoginClick}
         onLogoutClick={logout}
+        onOpenLoginModal={openLoginModal}
       />
 
       <ScrollView
