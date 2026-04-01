@@ -48,7 +48,22 @@ import {
   LayoutDashboard,
   Bell,
   MessageSquare,
+  ChevronDown,
 } from 'lucide-react-native';
+
+import Svg, { Circle, Path } from 'react-native-svg';
+
+const ListPropertyIcon = () => (
+  <Svg width="32" height="32" viewBox="0 0 38 38" fill="none">
+    <Circle cx="19" cy="19" r="19" fill="#EE2529"/>
+    <Path 
+      d="M18.9985 11V19.808M18.9985 28.41V19.808M18.9985 19.808H27.41M18.9985 19.808H10" 
+      stroke="white" 
+      strokeWidth="2.5" 
+      strokeLinecap="round"
+    />
+  </Svg>
+);
 
 const SideMenu: React.FC<SideMenuProps> = ({
   visible,
@@ -292,12 +307,21 @@ const SideMenu: React.FC<SideMenuProps> = ({
 
 const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
   const { width } = useWindowDimensions();
-  const { navigate } = useNavigation();
+  const { navigate, currentPath } = useNavigation();
   const { isLoggedIn, user } = useAuth();
+  const [isHovered, setIsHovered] = useState(false);
   const isMobile = width < 768;
 
+  const headerActiveStyle = isHovered && !isMobile ? styles.headerContainerHover : {};
+
   return (
-    <View style={styles.headerContainer}>
+    <View 
+      style={[styles.headerContainer, headerActiveStyle]}
+      {...(Platform.OS === 'web' ? {
+        onMouseEnter: () => setIsHovered(true),
+        onMouseLeave: () => setIsHovered(false),
+      } : {})}
+    >
       <View
         style={[
           styles.headerContent,
@@ -318,19 +342,35 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
         {!isMobile && (
           <View style={styles.navLinks}>
             <TouchableOpacity onPress={() => navigate('/explore-properties')}>
-              <Text style={styles.navLinkText}>Explore Properties</Text>
+              <Text
+                style={[
+                  styles.navLinkText,
+                  currentPath === '/explore-properties' && styles.navLinkActive,
+                ]}
+              >
+                Explore Properties
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigate('/calculators')}>
-              <Text style={styles.navLinkText}>Calculators</Text>
+              <Text
+                style={[
+                  styles.navLinkText,
+                  currentPath === '/calculators' && styles.navLinkActive,
+                ]}
+              >
+                Calculators
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigate('/explore-brokers')}>
-              <Text style={styles.navLinkText}>Explore Brokers</Text>
+              <Text
+                style={[
+                  styles.navLinkText,
+                  currentPath === '/explore-brokers' && styles.navLinkActive,
+                ]}
+              >
+                Explore Brokers
+              </Text>
             </TouchableOpacity>
-            {/* {user?.role && 
-              <TouchableOpacity onPress={() => navigate('/investors')}>
-                <Text style={styles.navLinkText}>{user?.role || 'Investors'}</Text>
-              </TouchableOpacity>
-            } */}
           </View>
         )}
 
@@ -346,31 +386,6 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
 
           {isLoggedIn && (
             <TouchableOpacity
-              style={[styles.profileBtn, isMobile && styles.profileBtnMobile]}
-              onPress={() => navigate('/investors')}
-            >
-              <View style={styles.profileCircle}>
-                <Text style={styles.profileInitials}>
-                  {user?.name
-                    ? user.name
-                        .split(' ')
-                        .map((n: string) => n[0])
-                        .join('')
-                        .toUpperCase()
-                        .slice(0, 2)
-                    : 'U'}
-                </Text>
-              </View>
-              {!isMobile && (
-                <Text style={styles.profileName}>
-                  {user?.name?.split(' ')[0]}
-                </Text>
-              )}
-            </TouchableOpacity>
-          )}
-
-          {isLoggedIn ? (
-            <TouchableOpacity
               style={[
                 styles.listPropertyBtn,
                 isMobile && {
@@ -382,12 +397,38 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
               ]}
               onPress={() => navigate('/list-property')}
             >
-              <View style={[styles.plusIconBg, isMobile && { marginRight: 0 }]}>
-                <Text style={styles.plusIcon}>+</Text>
-              </View>
+              <ListPropertyIcon />
               {!isMobile && (
                 <Text style={styles.listPropertyText}>List Property</Text>
               )}
+            </TouchableOpacity>
+          )}
+
+          {isLoggedIn ? (
+            <TouchableOpacity
+              style={[styles.profileBtn, isMobile && styles.profileBtnMobile]}
+              onPress={() => navigate('/investors')}
+            >
+              <View style={styles.profileCircle}>
+                {user?.profileImage ? (
+                  <Image
+                    source={{ uri: user.profileImage }}
+                    style={{ width: '100%', height: '100%' }}
+                  />
+                ) : (
+                  <Text style={styles.profileInitials}>
+                    {user?.name
+                      ? user.name
+                          .split(' ')
+                          .map((n: string) => n[0])
+                          .join('')
+                          .toUpperCase()
+                          .slice(0, 2)
+                      : 'U'}
+                  </Text>
+                )}
+              </View>
+              <ChevronDown size={18} color={COLORS.primary} strokeWidth={3} />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
@@ -472,9 +513,23 @@ const styles = StyleSheet.create({
     elevation: 5,
     ...Platform.select({
       web: {
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-      },
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        transition: 'all 0.3s ease',
+      } as any,
+    }),
+  },
+  headerContainerHover: {
+    backgroundColor: 'rgba(255, 255, 255, 0.35)',
+    borderColor: 'rgba(230, 230, 230, 0.6)',
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+    ...Platform.select({
+      web: {
+        backdropFilter: 'blur(25px)',
+        WebkitBackdropFilter: 'blur(25px)',
+        transform: 'translateY(-2px)',
+      } as any,
     }),
   },
   headerContent: {
@@ -482,7 +537,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    maxWidth: 1440,
+    maxWidth: 1800,
     alignSelf: 'center',
     paddingHorizontal: 20,
   },
@@ -501,12 +556,15 @@ const styles = StyleSheet.create({
   navLinkText: {
     fontSize: 15,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: '#262626',
+  },
+  navLinkActive: {
+    color: '#EE2529',
   },
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 15,
+    gap: 12,
   },
   signInBtn: {
     paddingVertical: 8,
@@ -519,46 +577,29 @@ const styles = StyleSheet.create({
   listPropertyBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.textDark,
-    borderRadius: 25,
-    paddingLeft: 4,
-    paddingRight: 16,
-    paddingVertical: 6,
-  },
-  plusIconBg: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 12,
-    width: 24,
-    height: 24,
-    alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 8,
-  },
-  plusIcon: {
-    color: COLORS.white,
-    fontWeight: 'bold',
-    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#262626',
+    borderRadius: 30,
+    paddingHorizontal: 15,
+    paddingVertical: 3.5,
+    height: 44,
+    gap: 8,
   },
   listPropertyText: {
-    fontWeight: '600',
-    color: COLORS.textDark,
+    fontWeight: '400',
+    color: '#262626',
+    fontSize: 16,
+    marginLeft: 8,
   },
   menuBtn: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: '#FFF0F0',
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(238, 37, 41, 0.1)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   menuIcon: {
     color: '#D32F2F',
@@ -740,38 +781,35 @@ const styles = StyleSheet.create({
   profileBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    padding: 4,
+    gap: 8,
+    padding: 3,
     paddingRight: 10,
-    borderRadius: 20,
-    backgroundColor: COLORS.lightRed,
+    borderRadius: 30,
+    backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: 'rgba(211, 47, 47, 0.1)',
+    borderColor: '#262626',
+    height: 40,
   },
   profileBtnMobile: {
-    paddingRight: 4,
+    paddingRight: 3,
   },
   profileCircle: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: COLORS.primary,
+    backgroundColor: '#888',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
+    overflow: 'hidden',
   },
   profileName: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#333',
+    fontWeight: '400',
+    color: '#262626',
   },
   profileInitials: {
-    fontSize: 13,
-    fontWeight: '800',
+    fontSize: 14,
+    fontWeight: '400',
     color: COLORS.white,
   },
   profileMenuBtn: {
