@@ -129,31 +129,31 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     });
   };
 
-  if (!user) {
-    return (
-      <TouchableOpacity
-        activeOpacity={0.95}
-        onPress={() => navigate('/login')}
-        style={[styles.propertyCard, styles.lockedCard, { width }, style]}
-      >
-        <LinearGradient
-          colors={['#F9FAFB', '#FFFFFF']}
-          style={styles.lockedGradient}
-        >
-          <View style={styles.lockedIconCircle}>
-            <MapPin size={24} color="#ccc" style={{ marginBottom: 8 }} />
-          </View>
-          <Text style={styles.lockedTitle}>Exclusive Property Listing</Text>
-          <Text style={styles.lockedSub}>
-            Please sign in to view location, pricing, and ROI details of this premium space.
-          </Text>
-          <View style={styles.lockedLoginBtn}>
-            <Text style={styles.lockedLoginBtnText}>Sign In to Unlock</Text>
-          </View>
-        </LinearGradient>
-      </TouchableOpacity>
-    );
-  }
+  // if (!user) {
+  //   return (
+  //     <TouchableOpacity
+  //       activeOpacity={0.95}
+  //       onPress={() => navigate('/login')}
+  //       style={[styles.propertyCard, styles.lockedCard, { width }, style]}
+  //     >
+  //       <LinearGradient
+  //         colors={['#F9FAFB', '#FFFFFF']}
+  //         style={styles.lockedGradient}
+  //       >
+  //         <View style={styles.lockedIconCircle}>
+  //           <MapPin size={24} color="#ccc" style={{ marginBottom: 8 }} />
+  //         </View>
+  //         <Text style={styles.lockedTitle}>Exclusive Property Listing</Text>
+  //         <Text style={styles.lockedSub}>
+  //           Please sign in to view location, pricing, and ROI details of this premium space.
+  //         </Text>
+  //         <View style={styles.lockedLoginBtn}>
+  //           <Text style={styles.lockedLoginBtnText}>Sign In to Unlock</Text>
+  //         </View>
+  //       </LinearGradient>
+  //     </TouchableOpacity>
+  //   );
+  // }
 
   return (
     <View style={[styles.propertyCard, { width }, style]}>
@@ -182,7 +182,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           <View style={styles.verifiedBadgeContainer}>
             <VerifiedSvg width={100} height={28} />
             <View style={styles.verifiedTextOverlay}>
-              <Text style={styles.verifiedText}>{item.isVerified === 'completed' ? 'Verified' : 'Partial'}</Text>
+              <Text style={styles.verifiedText}>
+                {item.isVerified === 'completed' ? 'Verified' : 'Partial'}
+              </Text>
             </View>
           </View>
         )}
@@ -224,13 +226,18 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           <TouchableOpacity style={styles.iconButton}>
             <ShareIcon size={15} color={COLORS.white} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton} onPress={handleToggleLike}>
-            <Heart
-              size={15}
-              color={isLiked ? COLORS.primary : COLORS.white}
-              fill={isLiked ? COLORS.primary : 'transparent'}
-            />
-          </TouchableOpacity>
+          {user && (
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={handleToggleLike}
+            >
+              <Heart
+                size={15}
+                color={isLiked ? COLORS.primary : COLORS.white}
+                fill={isLiked ? COLORS.primary : 'transparent'}
+              />
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Overlay Bar for MNC Client and Compare */}
@@ -252,8 +259,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               onPress={() => onToggleCompare(item)}
             >
               <View style={styles.compareBtnContent}>
-                <Plus size={16} color={isSelected ? COLORS.white : "#EF4444"} />
-                <Text style={[styles.compareText, isSelected && { color: COLORS.white }]}>
+                <Plus size={16} color={isSelected ? COLORS.white : '#EF4444'} />
+                <Text
+                  style={[
+                    styles.compareText,
+                    isSelected && { color: COLORS.white },
+                  ]}
+                >
                   {isSelected ? 'Selected' : 'Compare'}
                 </Text>
               </View>
@@ -267,7 +279,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         <View style={styles.propDetailsRow}>
           <View style={styles.propDetailItem}>
             <Text style={styles.detailLabel}>
-              Cost: <Text style={styles.detailValue}>
+              Cost:{' '}
+              <Text style={styles.detailValue}>
                 {item.price !== 'null' && item?.price ? item?.price : '0'}
               </Text>
             </Text>
@@ -275,7 +288,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               Annual Rent : <Text style={styles.detailValue}>{item.rent}</Text>
             </Text>
             <Text style={styles.detailLabel}>
-              Tenure Left : <Text style={styles.detailValue}>{item.tenure}</Text>
+              Tenure Left :{' '}
+              <Text style={styles.detailValue}>{item.tenure}</Text>
             </Text>
           </View>
 
@@ -373,7 +387,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     fontWeight: '400',
-  }, 
+  },
   verifiedBadgeContainer: {
     position: 'absolute',
     bottom: 15,
