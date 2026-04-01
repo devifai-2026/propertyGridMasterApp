@@ -149,13 +149,20 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
         { mobileNumber: phone, otp, verificationId },
         async (response: any) => {
           if (response.success) {
-            if (!allowedRoles.includes(response.data.role)) {
-              setOtpError(true);
-              setErrorMsg(
-                'Access Denied: Only Owners, Brokers, and Investors can access this platform.',
-              );
-              return;
+            const userRoles = response.data.roles || [];
+            console.log(response)
+            if (!response.data.role && userRoles.length > 0) {
+              response.data.role = userRoles[0];
             }
+            // const hasAllowedRole = userRoles.some((role: string) => allowedRoles.includes(role));
+
+            // if (!hasAllowedRole) {
+            //   setOtpError(true);
+            //   setErrorMsg(
+            //     'Access Denied: Only Owners, Brokers, and Investors can access this platform.',
+            //   );
+            //   return;
+            // }
             const success = await login(response.data);
             if (success) {
               setModalVisible(false);

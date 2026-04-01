@@ -69,6 +69,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // but we'll also update headers.ts or just rely on storing the whole object
       const userToStore = {
         ...userData,
+        role: userData.role || (Array.isArray(userData.roles) ? userData.roles[0] : null),
         token: userData.accessToken, // for backward compatibility with headers.ts
       };
       await AsyncStorage.setItem('user', JSON.stringify(userToStore));

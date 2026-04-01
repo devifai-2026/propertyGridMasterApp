@@ -186,6 +186,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
         firstName: formData.firstName,
         lastName: formData.lastName,
         roleName: selectedRole === 'broker' ? 'Broker' : 'Investor',
+        joinType: selectedRole === 'broker' ? 'broker' : 'investor',
         reraNumber: selectedRole === 'broker' ? formData.reraNumber : undefined,
         otp,
         verificationId,

@@ -34,6 +34,7 @@ export const useAuthAPIs = () => {
       firstName: string;
       lastName: string;
       roleName: string;
+      joinType: string;
       otp: string;
       verificationId: string;
       reraNumber?: string;

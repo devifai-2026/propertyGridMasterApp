@@ -18,21 +18,10 @@ import WishlistTab from './components/WishlistTab';
 import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
 
 const InvestorsScreen = () => {
-  const { user, switchUserRole } = useAuth();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<
     'portfolio' | 'enquiries' | 'wishlist'
   >('portfolio');
-  const [availableRoles, setAvailableRoles] = useState<string[]>([]);
-  const { getAvailableRoles } = useAuthAPIs();
-
-  useEffect(() => {
-    getAvailableRoles((res: any) => {
-      if (res.success && Array.isArray(res.data)) {
-        setAvailableRoles(res.data);
-      }
-    });
-  }, []);
-
   // Mock User if not available
   const userData = user || {
     name: 'Rohit Sharma',
@@ -121,45 +110,6 @@ const InvestorsScreen = () => {
                 {userData.lastLogin || 'N/A'}
               </Text> */}
             </View>
-
-            {/* Switch Accounts */}
-            <View style={styles.switchSection}>
-              <Text style={styles.sectionTitle}>Switch accounts</Text>
-              {availableRoles.length > 1 ? (
-                availableRoles
-                  .filter(r => r !== user?.role)
-                  .map(role => (
-                    <View key={role} style={styles.accountCard}>
-                      <View style={styles.accountInfo}>
-                        <View style={styles.smallAvatarPlaceholder}>
-                          <User size={20} color={COLORS.primary} />
-                        </View>
-                        <View>
-                          <Text style={styles.accountName}>
-                            {user?.name || 'User'}
-                          </Text>
-                          <View style={styles.roleBadgeSmall}>
-                            <Text style={styles.roleTextSmall}>{role}</Text>
-                          </View>
-                        </View>
-                      </View>
-                      <TouchableOpacity
-                        style={styles.switchBtn}
-                        onPress={() => switchUserRole(role)}
-                      >
-                        <Text style={styles.switchBtnText}>Switch</Text>
-                      </TouchableOpacity>
-                    </View>
-                  ))
-              ) : (
-                <View style={styles.accountCard}>
-                  <Text style={{ color: '#999', fontSize: 13 }}>
-                    No other roles available for this number
-                  </Text>
-                </View>
-              )}
-            </View>
-
             {/* Assistance */}
             <View style={styles.assistanceCard}>
               <Text style={styles.assistanceTitle}>Need Assistance?</Text>
