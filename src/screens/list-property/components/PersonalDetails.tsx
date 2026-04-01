@@ -25,12 +25,13 @@ interface PersonalDetailsProps {
   onNext: (data: any) => void;
   onFormValid: (isValid: boolean) => void;
   initialData?: any;
+  isEditMode?: boolean;
 }
 
 // ...
 
 const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
-  ({ onNext, onFormValid, initialData }, ref) => {
+  ({ onNext, onFormValid, initialData, isEditMode }, ref) => {
     const { user } = useAuth();
     const { width } = useWindowDimensions();
     const isSmallScreen = width < 768;
@@ -383,39 +384,69 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
 
         <View style={styles.fieldContainer}>
           <Text style={styles.label}>List Property Under *</Text>
-          <View style={styles.radioGroup}>
+          <View
+            style={[styles.radioGroup, isEditMode && styles.radioGroupDisabled]}
+          >
             <TouchableOpacity
               style={styles.radioButton}
-              onPress={() => handleChange('listUnder', 'broker')}
+              onPress={() => !isEditMode && handleChange('listUnder', 'broker')}
+              disabled={isEditMode}
             >
               <View
                 style={[
                   styles.radioCircle,
                   formData.listUnder === 'broker' && styles.radioActive,
+                  isEditMode && styles.radioCircleDisabled,
                 ]}
               >
                 {formData.listUnder === 'broker' && (
-                  <View style={styles.radioInner} />
+                  <View
+                    style={[
+                      styles.radioInner,
+                      isEditMode && styles.radioInnerDisabled,
+                    ]}
+                  />
                 )}
               </View>
-              <Text style={styles.radioLabel}>Broker</Text>
+              <Text
+                style={[
+                  styles.radioLabel,
+                  isEditMode && styles.radioLabelDisabled,
+                ]}
+              >
+                Broker
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.radioButton}
-              onPress={() => handleChange('listUnder', 'owner')}
+              onPress={() => !isEditMode && handleChange('listUnder', 'owner')}
+              disabled={isEditMode}
             >
               <View
                 style={[
                   styles.radioCircle,
                   formData.listUnder === 'owner' && styles.radioActive,
+                  isEditMode && styles.radioCircleDisabled,
                 ]}
               >
                 {formData.listUnder === 'owner' && (
-                  <View style={styles.radioInner} />
+                  <View
+                    style={[
+                      styles.radioInner,
+                      isEditMode && styles.radioInnerDisabled,
+                    ]}
+                  />
                 )}
               </View>
-              <Text style={styles.radioLabel}>Owner</Text>
+              <Text
+                style={[
+                  styles.radioLabel,
+                  isEditMode && styles.radioLabelDisabled,
+                ]}
+              >
+                Owner
+              </Text>
             </TouchableOpacity>
           </View>
           {touched.listUnder && errors.listUnder && (
@@ -807,6 +838,18 @@ const styles = StyleSheet.create({
   linkText: {
     color: '#2196F3',
     textDecorationLine: 'underline',
+  },
+  radioInnerDisabled: {
+    backgroundColor: '#9ca3af',
+  },
+  radioGroupDisabled: {
+    opacity: 0.7,
+  },
+  radioCircleDisabled: {
+    borderColor: '#d1d5db',
+  },
+  radioLabelDisabled: {
+    color: '#6b7280',
   },
 });
 

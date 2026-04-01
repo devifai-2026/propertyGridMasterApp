@@ -472,6 +472,7 @@ const ListPropertyScreen = () => {
             onNext={handleNext}
             onFormValid={setIsFormValid}
             initialData={formData}
+            isEditMode={isEditMode}
           />
         );
       case 2:
