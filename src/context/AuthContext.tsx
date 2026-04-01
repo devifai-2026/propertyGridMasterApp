@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { decodeResponseData } from '../../helpers/api/decoder';
 
 interface User {
   userId: string;
@@ -80,10 +81,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (userToStore.role === 'Broker') {
         getBrokerProfile(async (res: any) => {
-          if (res.success && res.data?.profilePhoto) {
-            const withPhoto = { ...userToStore, profilePhoto: res.data.profilePhoto };
-            await AsyncStorage.setItem('user', JSON.stringify(withPhoto));
-            setUser(withPhoto);
+          if (res.success && res.data) {
+            const decoded = decodeResponseData(res.data);
+            if (decoded?.profilePhoto) {
+              const userStr = await AsyncStorage.getItem('user');
+              const current = userStr ? JSON.parse(userStr) : userToStore;
+              const withPhoto = { ...current, profilePhoto: decoded.profilePhoto };
+              await AsyncStorage.setItem('user', JSON.stringify(withPhoto));
+              setUser(withPhoto);
+            }
           }
         });
       }
@@ -134,7 +140,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
   const updateUser = async (updates: Partial<User>): Promise<void> => {
     try {
-      const updatedUser = { ...user, ...updates } as User;
+      const userStr = await AsyncStorage.getItem('user');
+      const current = userStr ? JSON.parse(userStr) : user;
+      const updatedUser = { ...current, ...updates } as User;
       await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
       setUser(updatedUser);
     } catch (e) {

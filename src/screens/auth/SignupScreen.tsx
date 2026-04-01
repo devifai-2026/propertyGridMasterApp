@@ -22,6 +22,7 @@ import { useNavigation } from '../../context/NavigationContext';
 import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
 import { getHeaders } from '../../../helpers/api/headers';
 import { BASE_URL } from '../../../helpers/environments';
+import { decodeResponseData } from '../../../helpers/api/decoder';
 import { COLORS } from '../../constants/theme';
 
 const SPECIALIZATION_OPTIONS = ['MNC Client', 'Industrial', 'Residential', 'Commercial', 'Office Lease'];
@@ -245,18 +246,38 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               try {
                 const headers = await getHeaders();
                 delete (headers as any)['Content-Type'];
-                const formData = new FormData();
-                formData.append('profilePhoto', profilePhotoFile);
+                const fd = new FormData();
+                fd.append('profilePhoto', profilePhotoFile);
+                fd.append('locality', formData.locality.trim());
+                fd.append('specializations', JSON.stringify(specializations));
+                fd.append('dealsClosed', String(parseInt(formData.dealsClosed) || 0));
                 const res = await fetch(`${BASE_URL}/v1/brokers/profile`, {
                   method: 'POST',
                   headers: headers as any,
-                  body: formData,
+                  body: fd,
                 });
                 const photoData = await res.json();
-                if (photoData.success && photoData.data?.profilePhoto) {
-                  await updateUser({ profilePhoto: photoData.data.profilePhoto });
+                if (photoData.success) {
+                  // data is an encoded string — fetch the profile to get the actual URL
+                  const profileHeaders = await getHeaders();
+                  const profileRes = await fetch(`${BASE_URL}/v1/brokers/profile`, {
+                    method: 'GET',
+                    headers: profileHeaders as any,
+                  });
+                  const profileData = await profileRes.json();
+                  if (profileData.success && profileData.data) {
+                    const decoded = decodeResponseData(profileData.data);
+                    console.log(decoded)
+                    if (decoded?.profilePhoto) {
+                      await updateUser({ profilePhoto: decoded.profilePhoto });
+                    }
+                  }
+                } else {
+                  console.warn('[Photo upload failed]', photoData.message);
                 }
-              } catch (_) {}
+              } catch (err) {
+                console.error('[Photo upload error]', err);
+              }
             }
             navigate('/investors');
           } else {

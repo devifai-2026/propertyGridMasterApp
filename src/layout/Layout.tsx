@@ -105,16 +105,23 @@ const SideMenu: React.FC<SideMenuProps> = ({
                   }}
                 >
                   <View style={[styles.profileCircle, styles.menuAvatar]}>
-                    <Text style={styles.menuAvatarText}>
-                      {user?.name
-                        ? user.name
-                            .split(' ')
-                            .map((n: string) => n[0])
-                            .join('')
-                            .toUpperCase()
-                            .slice(0, 2)
-                        : 'U'}
-                    </Text>
+                    {(user?.profilePhoto || user?.profileImage) ? (
+                      <Image
+                        source={{ uri: (user.profilePhoto || user.profileImage) as string }}
+                        style={{ width: '100%', height: '100%', borderRadius: 22 }}
+                      />
+                    ) : (
+                      <Text style={styles.menuAvatarText}>
+                        {user?.name
+                          ? user.name
+                              .split(' ')
+                              .map((n: string) => n[0])
+                              .join('')
+                              .toUpperCase()
+                              .slice(0, 2)
+                          : 'U'}
+                      </Text>
+                    )}
                   </View>
                   <View style={styles.menuUserDetails}>
                     <Text style={styles.menuUserName}>
@@ -412,10 +419,10 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
               onPress={() => navigate('/investors')}
             >
               <View style={styles.profileCircle}>
-                {user?.profileImage ? (
+                {(user?.profilePhoto || user?.profileImage) ? (
                   <Image
-                    source={{ uri: user.profileImage }}
-                    style={{ width: '100%', height: '100%' }}
+                    source={{ uri: (user.profilePhoto || user.profileImage) as string }}
+                    style={{ width: '100%', height: '100%', borderRadius: 17 }}
                   />
                 ) : (
                   <Text style={styles.profileInitials}>

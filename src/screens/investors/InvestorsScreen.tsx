@@ -47,6 +47,7 @@ const InvestorsScreen = () => {
     },
     { label: 'INVESTED PROPERTIES', inr: '', value: '4', color: '#767676' },
   ];
+  console.log(user)
 
   return (
     <Layout>
@@ -57,16 +58,21 @@ const InvestorsScreen = () => {
             {/* Profile Card */}
             <View style={styles.card}>
               <View style={styles.profileHeader}>
-                <Image
-                  source={require('../../assets/Dashboard/img.jpg')}
-                  style={styles.avatar}
-                  resizeMode="cover"
-                />
+                {user?.profilePhoto || user?.profileImage ? (
+                  <Image
+                    source={{ uri: (user.profilePhoto || user.profileImage) as string }}
+                    style={styles.avatar}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Image
+                    source={require('../../assets/Dashboard/img.jpg')}
+                    style={styles.avatar}
+                    resizeMode="cover"
+                  />
+                )}
                 <View style={styles.profileInfo}>
                   <Text style={styles.userName}>{userData.name}</Text>
-                  <View style={styles.roleBadge}>
-                    <Text style={styles.roleText}>{userData.role}</Text>
-                  </View>
                 </View>
               </View>
 
