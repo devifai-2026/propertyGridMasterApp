@@ -183,24 +183,6 @@ const InvestorsScreen = () => {
               </TouchableOpacity>
             </View>
 
-            {/* Summary Cards */}
-            {activeTab === 'portfolio' && 
-            <View style={styles.summaryRow}>
-              {summaryData.map((item, index) => (
-                <View key={index} style={styles.summaryCard}>
-                  <View style={styles.summaryLabelContainer}>
-                    <Text style={styles.summaryLabel}>{item.label}</Text>
-                    {item.inr ? (
-                      <Text style={styles.summaryLabel}>{item.inr}</Text>
-                    ) : null}
-                  </View>
-                  <Text style={[styles.summaryValue, { color: item.color }]}>
-                    {item.value}
-                  </Text>
-                </View>
-              ))}
-            </View>
-            }
 
             {/* Tab Content */}
             <View style={styles.tabContent}>
