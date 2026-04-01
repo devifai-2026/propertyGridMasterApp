@@ -317,8 +317,9 @@ const SideMenu: React.FC<SideMenuProps> = ({
 const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
   const { width } = useWindowDimensions();
   const { navigate, currentPath, openLoginModal } = useNavigation();
-  const { isLoggedIn, user } = useAuth();
+  const { isLoggedIn, user, logout } = useAuth();
   const [isHovered, setIsHovered] = useState(false);
+  const [isLogoutMenuVisible, setIsLogoutMenuVisible] = useState(false);
   const isMobile = width < 768;
 
   const headerActiveStyle = isHovered && !isMobile ? styles.headerContainerHover : {};
@@ -416,7 +417,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
           {isLoggedIn ? (
             <TouchableOpacity
               style={[styles.profileBtn, isMobile && styles.profileBtnMobile]}
-              onPress={() => navigate('/investors')}
+              onPress={() => setIsLogoutMenuVisible(!isLogoutMenuVisible)}
             >
               <View style={styles.profileCircle}>
                 {(user?.profilePhoto || user?.profileImage) ? (
@@ -452,6 +453,49 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* Logout Popover */}
+      <Modal
+        visible={isLogoutMenuVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsLogoutMenuVisible(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setIsLogoutMenuVisible(false)}>
+          <View style={styles.popoverOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[
+                  styles.logoutPopover, 
+                  { right: isMobile ? '5%' : '5%', top: 75 }
+                ]}>
+                <TouchableOpacity 
+                   style={styles.popoverItem}
+                   onPress={() => {
+                     setIsLogoutMenuVisible(false);
+                     navigate('/investors');
+                   }}
+                >
+                  <UserIcon size={18} color="#666" />
+                  <Text style={styles.popoverText}>My Profile</Text>
+                </TouchableOpacity>
+                
+                <View style={styles.popoverDivider} />
+                
+                <TouchableOpacity 
+                  style={styles.popoverItem}
+                  onPress={() => {
+                    setIsLogoutMenuVisible(false);
+                    logout();
+                  }}
+                >
+                  <LogOut size={18} color={COLORS.primary} />
+                  <Text style={[styles.popoverText, { color: COLORS.primary }]}>Logout</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 };
@@ -882,6 +926,41 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.primary,
     textTransform: 'uppercase',
+  },
+  popoverOverlay: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  logoutPopover: {
+    position: 'absolute',
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    width: 180,
+    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 15,
+    elevation: 10,
+    borderWidth: 1,
+    borderColor: '#eee',
+  },
+  popoverItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    gap: 12,
+    borderRadius: 8,
+  },
+  popoverText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#444',
+  },
+  popoverDivider: {
+    height: 1,
+    backgroundColor: '#eee',
+    marginVertical: 4,
   },
 });
 
