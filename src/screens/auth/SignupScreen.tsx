@@ -40,6 +40,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
   });
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
+  const [checkboxError, setCheckboxError] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
@@ -85,7 +86,10 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
   };
 
   const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    let sanitized = value;
+    if (field === 'phone') sanitized = value.replace(/[^0-9]/g, '');
+    if (field === 'email') sanitized = value.replace(/[^a-zA-Z0-9._%+\-@]/g, '');
+    setFormData(prev => ({ ...prev, [field]: sanitized }));
     if (fieldErrors[field]) setFieldErrors(prev => ({ ...prev, [field]: '' }));
   };
 
@@ -95,7 +99,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
     if (!formData.firstName.trim()) errors.firstName = 'Required';
     if (!formData.lastName.trim()) errors.lastName = 'Required';
     if (formData.phone.length !== 10) errors.phone = 'Enter a valid mobile number';
-    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       errors.email = 'Enter a valid Email ID';
     }
     setFieldErrors(errors);
@@ -111,6 +115,11 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
   // ── Screen 2 → 3 (send OTP)
   const handleDetailsContinue = () => {
     if (!validateDetails()) return;
+    if (!termsAccepted || !privacyAccepted) {
+      setCheckboxError(true);
+      return;
+    }
+    setCheckboxError(false);
     sendOtp(
       { mobileNumber: formData.phone },
       (response: any) => {
@@ -219,13 +228,16 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
   // ── SCREEN 1: Role selection
   const renderRoleScreen = () => (
-    <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
-      <Text style={styles.screenHeading}>
-        <Text style={styles.signUpBold}>Sign UP.</Text>
-        {' '}To live in our space.
-      </Text>
+    <Animated.View style={[styles.roleScreenContent, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+      <View style={styles.headingBanner}>
+        <Text style={styles.screenHeading}>
+          <Text style={styles.signUpBold}>Sign UP.</Text>
+          {' '}To live in our space.
+        </Text>
+      </View>
       <Text style={styles.screenSub}>Tell us who you are to personalize your experience</Text>
 
+      <View style={styles.roleCenter}>
       <View style={styles.roleRow}>
         {/* Owner / Investor */}
         <TouchableOpacity
@@ -244,6 +256,12 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
             <Text style={styles.roleTitle}>Owner/{'\n'}Investor</Text>
             <Text style={styles.roleDesc}>Find profitable{'\n'}opportunities</Text>
           </LinearGradient>
+          {selectedRole === 'owner_investor' && (
+            <>
+              <View style={[styles.cornerAccent, styles.cornerBL]} />
+              <View style={[styles.cornerAccent, styles.cornerBR]} />
+            </>
+          )}
         </TouchableOpacity>
 
         {/* Broker */}
@@ -253,8 +271,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
           activeOpacity={0.8}
         >
           <LinearGradient
-            
-             colors={['#FDEDEE', '#FFFFFF']}
+            colors={['#FDEDEE', '#FFFFFF']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             locations={[0.0761, 0.7484]}
@@ -264,7 +281,14 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
             <Text style={styles.roleTitle}>Broker</Text>
             <Text style={styles.roleDesc}>Connect buyers{'\n'}and sellers</Text>
           </LinearGradient>
+          {selectedRole === 'broker' && (
+            <>
+              <View style={[styles.cornerAccent, styles.cornerBL]} />
+              <View style={[styles.cornerAccent, styles.cornerBR]} />
+            </>
+          )}
         </TouchableOpacity>
+      </View>
       </View>
 
       <View style={styles.buttonRow}>
@@ -295,7 +319,9 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
   // ── SCREEN 2: Account details
   const renderDetailsScreen = () => (
     <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
-      <Text style={styles.screenHeading}>Create your account</Text>
+      <View style={styles.headingBanner}>
+        <Text style={styles.screenHeading}>Create your account</Text>
+      </View>
       <Text style={styles.screenSub}>Just a few details to get you started</Text>
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ width: '100%' }}>
@@ -382,7 +408,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
         {/* Email */}
         <View style={styles.inputGroup}>
-          <Text style={styles.inputLabel}>Email</Text>
+          <Text style={styles.inputLabel}>Email <Text style={styles.required}>*</Text></Text>
           <TextInput
             style={[
               styles.textInput,
@@ -407,8 +433,8 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
         </View>
 
         {/* Checkboxes */}
-        <TouchableOpacity style={styles.checkRow} onPress={() => setTermsAccepted(p => !p)}>
-          <View style={[styles.checkbox, termsAccepted && styles.checkboxChecked]}>
+        <TouchableOpacity style={styles.checkRow} onPress={() => { setTermsAccepted(p => !p); setCheckboxError(false); }}>
+          <View style={[styles.checkbox, termsAccepted && styles.checkboxChecked, checkboxError && !termsAccepted && styles.checkboxError]}>
             {termsAccepted && <Text style={styles.checkmark}>✓</Text>}
           </View>
           <Text style={styles.checkLabel}>
@@ -416,14 +442,21 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.checkRow} onPress={() => setPrivacyAccepted(p => !p)}>
-          <View style={[styles.checkbox, privacyAccepted && styles.checkboxChecked]}>
+        <TouchableOpacity style={styles.checkRow} onPress={() => { setPrivacyAccepted(p => !p); setCheckboxError(false); }}>
+          <View style={[styles.checkbox, privacyAccepted && styles.checkboxChecked, checkboxError && !privacyAccepted && styles.checkboxError]}>
             {privacyAccepted && <Text style={styles.checkmark}>✓</Text>}
           </View>
           <Text style={styles.checkLabel}>
             I agree to the <Text style={styles.checkLink}>Privacy Policy</Text>
           </Text>
         </TouchableOpacity>
+
+        {checkboxError && (
+          <View style={styles.errorRow}>
+            <Text style={styles.errorIcon}>▲</Text>
+            <Text style={styles.errorText}>Please agree to the Terms & Conditions and Privacy Policy</Text>
+          </View>
+        )}
       </KeyboardAvoidingView>
 
       <View style={styles.buttonRow}>
@@ -451,7 +484,9 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
   // ── SCREEN 3: OTP verification
   const renderOtpScreen = () => (
     <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
-      <Text style={styles.screenHeading}>Verify your Contact Number</Text>
+      <View style={styles.headingBanner}>
+        <Text style={styles.screenHeading}>Verify your Contact Number</Text>
+      </View>
       <Text style={styles.screenSub}>
         We sent a verification code to{' '}
         <Text style={styles.phoneHighlight}>+91 ........</Text>
@@ -493,7 +528,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
         <TouchableOpacity
           style={styles.btnPrimary}
           onPress={handleVerifyAndSignup}
-          disabled={!otpFilled || apiLoading}
+          // disabled={!otpFilled || apiLoading}
         >
           <LinearGradient
             colors={['#EE2529', '#C73834']}
@@ -517,10 +552,11 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
             <View style={styles.card}>
-              <ScrollView 
-                showsVerticalScrollIndicator={false} 
+              <ScrollView
+                showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
-                scrollEnabled={false}
+                scrollEnabled={currentScreen !== 'role'}
+                contentContainerStyle={currentScreen === 'role' ? styles.roleScrollContent : undefined}
               >
                 {renderHeader()}
                 {currentScreen === 'role'    && renderRoleScreen()}
@@ -546,11 +582,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   card: {
-    width: '90%',
-    maxWidth: 460,
+    width: 673,
+    height: 745,
     backgroundColor: COLORS.white,
     borderRadius: 24,
-    paddingHorizontal: 24,
+    overflow: 'hidden',
+    paddingHorizontal: 48,
     paddingTop: 24,
     paddingBottom: 32,
     shadowColor: '#000',
@@ -558,7 +595,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 24,
     elevation: 12,
-    maxHeight: '92%',
   },
 
   /* ── Header ── */
@@ -572,13 +608,21 @@ const styles = StyleSheet.create({
   logoImage: { width: 120, height: 40 },
   closeButton:     { width: 28, height: 28, justifyContent: 'center', alignItems: 'center' },
   closeButtonText: { fontSize: 16, color: '#EE2529', fontWeight: '600', lineHeight: 18 },
-  divider: { height: 1, backgroundColor: '#E5E7EB', marginBottom: 20, marginHorizontal: -24 },
+  divider: { height: 1, backgroundColor: '#E5E7EB', marginBottom: 20, marginHorizontal: -48 },
 
   /* ── Shared headings ── */
-  screenHeading: {
-    fontSize: 18, fontWeight: '600', color: '#1F2937',
-    textAlign: 'center',lineHeight: 24,backgroundColor:"#FFFCF4",paddingTop: 10,
+  headingBanner: {
+    backgroundColor: '#FFFCF4',
+    marginHorizontal: -48,
+    paddingVertical: 16,
+    paddingHorizontal: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 6,
+  },
+  screenHeading: {
+    fontSize: 20, fontWeight: '700', color: '#1A1A1A',
+    textAlign: 'center', lineHeight: 24,
   },
   signUpBold: { fontWeight: '700' },
   screenSub: {
@@ -587,13 +631,32 @@ const styles = StyleSheet.create({
   },
 
   /* ── Role cards ── */
+  roleCenter: { flex: 1, justifyContent: 'center' },
   roleRow: { flexDirection: 'row', gap: 16, marginBottom: 36 },
   roleCardWrapper: {
     flex: 1, borderRadius: 16,
-    borderWidth: 2.5, borderColor: 'transparent',
-    overflow: 'hidden',
   },
-  roleCardActive: { borderColor: '#EE2529' },
+  roleCardActive: {
+    shadowColor: '#EE2529',
+    shadowOffset: { width: 1.17, height: 4.69 },
+    shadowOpacity: 1,
+    shadowRadius: 2.35,
+    elevation: 6,
+  },
+  cornerAccent: {
+    position: 'absolute', width: 18, height: 18,
+    // borderColor: '#EE2529', borderWidth: 2.5,
+  },
+  cornerBL: {
+    bottom: 0, left: 0,
+    borderTopWidth: 0, borderRightWidth: 0,
+    borderBottomLeftRadius: 16,
+  },
+  cornerBR: {
+    bottom: 0, right: 0,
+    borderTopWidth: 0, borderLeftWidth: 0,
+    borderBottomRightRadius: 16,
+  },
   roleCard: { padding: 20, alignItems: 'center', borderRadius: 14 },
   roleIcon:  { width: 48, height: 48, marginBottom: 12 },
   roleTitle: { fontSize: 15, fontWeight: '700', color: '#1F2937', textAlign: 'center', marginBottom: 6, lineHeight: 18 },
@@ -616,9 +679,9 @@ const styles = StyleSheet.create({
   buttonDisabled: { opacity: 0.5 },
 
   /* ── Form inputs ── */
-  nameRow:   { flexDirection: 'row', gap: 12, marginBottom: 18 },
+  nameRow:   { flexDirection: 'row', gap: 16, marginBottom: 20 },
   nameField: { flex: 1 },
-  inputGroup:  { marginBottom: 18 },
+  inputGroup:  { marginBottom: 20 },
   inputLabel:  { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 8, lineHeight: 16 },
   required:    { color: '#EE2529' },
   textInput: {
@@ -634,12 +697,13 @@ const styles = StyleSheet.create({
   errorText: { color: '#EE2529', fontSize: 12, lineHeight: 14 },
 
   /* ── Checkboxes ── */
-  checkRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 12 },
+  checkRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 14 },
   checkbox: {
     width: 18, height: 18, borderWidth: 1.5, borderColor: '#D1D5DB',
     borderRadius: 4, alignItems: 'center', justifyContent: 'center', marginTop: 2,
   },
   checkboxChecked: { backgroundColor: '#EE2529', borderColor: '#EE2529' },
+  checkboxError: { borderColor: '#EE2529' },
   checkmark:  { color: COLORS.white, fontSize: 11, fontWeight: '700' },
   checkLabel: { fontSize: 13, color: '#374151', lineHeight: 16, flex: 1 },
   checkLink:  { color: '#3B82F6', textDecorationLine: 'underline' },
@@ -668,6 +732,8 @@ const styles = StyleSheet.create({
   otpResendLink: {
     color: '#1F2937', fontWeight: '500', textDecorationLine: 'underline',
   },
+  roleScrollContent: { flex: 1 },
+  roleScreenContent: { flex: 1, justifyContent: 'space-between' },
 });
 
 export default SignupScreen;

@@ -106,7 +106,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
     const newOtp = otp.split('');
     newOtp[index] = digit;
     setOtp(newOtp.join(''));
-    if (digit && index < 3) otpInputRefs.current[index + 1]?.focus();
+    if (digit && index < 5) otpInputRefs.current[index + 1]?.focus();
     setErrorMsg('');
     setOtpError(false);
   };
@@ -144,7 +144,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
   const handleVerifyOtp = async () => {
     setErrorMsg('');
     setOtpError(false);
-    if (otp.length === 4) {
+    if (otp.length === 6) {
       authenticate(
         { mobileNumber: phone, otp, verificationId },
         async (response: any) => {
@@ -181,7 +181,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
       );
     } else {
       setOtpError(true);
-      setErrorMsg('Please enter the complete 4-digit OTP');
+      setErrorMsg('Please enter the complete 6-digit OTP');
     }
   };
 
@@ -299,7 +299,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
             <>
               {/* OTP Boxes */}
               <View style={styles.otpInputGroup}>
-                {[0, 1, 2, 3].map(index => (
+                {[0, 1, 2, 3, 4, 5].map(index => (
                   <TextInput
                     key={index}
                     ref={ref => {
@@ -612,7 +612,7 @@ const styles = StyleSheet.create({
 
   /* ── Error ── */
   errorContainer: {
-    // backgroundColor: '#FEF2F2',
+    backgroundColor: '#FEF2F2',
     padding: 12,
     borderRadius: 8,
     marginTop: 4,
