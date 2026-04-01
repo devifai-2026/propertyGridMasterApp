@@ -93,7 +93,7 @@ const ListPropertyScreen = () => {
             lastName: data.Owner?.lastName || '',
             email: data.Owner?.email || '',
             mobile: data.Owner?.mobileNumber || '',
-            listUnder: data.ownerType?.toLowerCase() || 'owner',
+            listUnder: data.brokerId ? 'broker' : 'owner',
             agreeTerms: true,
             agreePrivacy: true,
 
@@ -415,10 +415,10 @@ const ListPropertyScreen = () => {
           `Failed to ${
             isEditMode ? 'update' : 'list'
           } property. Please try again.`;
-        
+
         setErrorMessage(message);
         scrollRef.current?.scrollTo({ y: 0, animated: true });
-        
+
         Alert.alert('Error', message);
         console.error(
           `Property ${isEditMode ? 'update' : 'creation'} error:`,
@@ -656,9 +656,9 @@ const ListPropertyScreen = () => {
             <View style={styles.errorBanner}>
               <AlertTriangle size={16} color="#EE2529" strokeWidth={3} />
               <Text style={styles.errorBannerText}>{errorMessage}</Text>
-              {(errorMessage.includes('broker profile') || 
+              {(errorMessage.includes('broker profile') ||
                 errorMessage.includes('complete your profile')) && (
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.errorActionBtn}
                   onPress={() => navigate('/investors')}
                 >

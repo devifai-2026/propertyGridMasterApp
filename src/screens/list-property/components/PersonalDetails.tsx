@@ -42,20 +42,38 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
     const userRoleLower = user?.role?.toLowerCase();
 
     const [formData, setFormData] = useState({
-      firstName: userFirstName || initialData?.firstName || '',
-      lastName: userLastName || initialData?.lastName || '',
-      email: user?.email || initialData?.email || '',
-      mobile: user?.mobileNumber || initialData?.mobile || '',
+      firstName: initialData?.firstName || userFirstName || '',
+      lastName: initialData?.lastName || userLastName || '',
+      email: initialData?.email || user?.email || '',
+      mobile: initialData?.mobile || user?.mobileNumber || '',
       listUnder:
+        initialData?.listUnder ||
         (userRoleLower === 'broker' || userRoleLower === 'owner'
           ? userRoleLower
           : '') ||
-        initialData?.listUnder ||
         '',
       otp: initialData?.otp || '',
       agreeTerms: initialData?.agreeTerms || false,
       agreePrivacy: initialData?.agreePrivacy || false,
     });
+
+    useEffect(() => {
+      if (initialData && Object.keys(initialData).length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          firstName: initialData.firstName || prev.firstName,
+          lastName: initialData.lastName || prev.lastName,
+          email: initialData.email || prev.email,
+          mobile: initialData.mobile || prev.mobile,
+          listUnder: initialData.listUnder || prev.listUnder,
+          agreeTerms: initialData.agreeTerms ?? prev.agreeTerms,
+          agreePrivacy: initialData.agreePrivacy ?? prev.agreePrivacy,
+        }));
+        if (initialData.mobile) {
+          setIsOtpVerified(true);
+        }
+      }
+    }, [initialData]);
 
     const [otpSent, setOtpSent] = useState(false);
     const [isOtpVerified, setIsOtpVerified] = useState(!!initialData?.mobile);
@@ -313,7 +331,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
             />
             {touched.firstName && errors.firstName && (
               <View style={styles.errorRow}>
-              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
                 <Text style={styles.errorText}>{errors.firstName}</Text>
               </View>
             )}
@@ -334,7 +352,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
             />
             {touched.lastName && errors.lastName && (
               <View style={styles.errorRow}>
-              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
                 <Text style={styles.errorText}>{errors.lastName}</Text>
               </View>
             )}
@@ -512,7 +530,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
             )}
             {touched.otp && errors.otp && !isOtpVerified && (
               <View style={styles.errorRow}>
-              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
                 <Text style={styles.errorText}>{errors.otp}</Text>
               </View>
             )}
@@ -540,7 +558,9 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
           {isSubmitted && !formData.agreeTerms && (
             <View style={styles.errorRow}>
               <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
-              <Text style={styles.errorText}>Please agree to terms & conditions</Text>
+              <Text style={styles.errorText}>
+                Please agree to terms & conditions
+              </Text>
             </View>
           )}
 
@@ -563,7 +583,9 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
           {isSubmitted && !formData.agreePrivacy && (
             <View style={styles.errorRow}>
               <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
-              <Text style={styles.errorText}>Please agree to Privacy Policy</Text>
+              <Text style={styles.errorText}>
+                Please agree to Privacy Policy
+              </Text>
             </View>
           )}
         </View>
