@@ -23,6 +23,7 @@ const FEATURED_PROPERTIES: Property[] = [
     type: 'Residential',
     images: [
       'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1000',
     ],
     badges: ['MNC Client'],
     isVerified: 'completed',
@@ -40,6 +41,7 @@ const FEATURED_PROPERTIES: Property[] = [
     type: 'Commercial',
     images: [
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&q=80&w=1000',
     ],
     badges: ['MNC Client'],
     isVerified: 'completed',
@@ -57,6 +59,8 @@ const FEATURED_PROPERTIES: Property[] = [
     type: 'Industrial',
     images: [
       'https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=1000',
+      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1000',
     ],
     badges: ['MNC Client'],
     isVerified: 'completed',
@@ -71,13 +75,13 @@ const FeaturedSection = ({ properties }: { properties: any[] }) => {
   const [selectedProperties, setSelectedProperties] = useState<Property[]>([]);
   const isMobile = width < 768;
 
-  const containerPadding = width < 768 ? 20 : width < 1100 ? 60 : 120;
+  const containerPadding = width < 768 ? 9 : 10;
   const availableWidth = width - containerPadding * 2;
   const gap = 20;
-
+  
   let cols = 3;
   if (width < 768) cols = 1;
-  else if (width < 1100) cols = 2;
+  else if (width < 900) cols = 2;
 
   const cardWidth = ((availableWidth - gap * (cols - 1)) / cols) as number;
 
@@ -180,10 +184,11 @@ const styles = StyleSheet.create({
     marginTop: 60,
   },
   sectionTitle: {
-    fontWeight: '200',
-    color: COLORS.textDark,
+    fontWeight: '400',
+    color: '#262626',
     marginBottom: 40,
     textAlign: 'center',
+    fontSize: 42,
   },
   stickyBannerWrapper: {
     position: 'absolute',
@@ -197,7 +202,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     width: '100%',
-    maxWidth: 1440,
+    maxWidth: '100%',
     justifyContent: 'center',
   },
 });

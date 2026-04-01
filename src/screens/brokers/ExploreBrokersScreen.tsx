@@ -41,7 +41,7 @@ const ExploreBrokersScreen = () => {
       error => {
         console.error('Error fetching brokers:', error);
       },
-      `page=${page}&limit=4&sortBy=${sort}`,
+      `page=${page}&limit=8&sortBy=${sort}`,
     );
   };
 
@@ -85,8 +85,8 @@ const ExploreBrokersScreen = () => {
             style={[
               styles.gridContainer,
               {
-                flexDirection: isDesktop ? 'row' : 'column',
-                flexWrap: isDesktop ? 'wrap' : 'nowrap',
+                flexDirection: 'row',
+                flexWrap: 'wrap',
                 justifyContent: 'space-between',
               },
             ]}
@@ -122,9 +122,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     minHeight: '100%',
     padding: 20,
+    width: '90%',
+    maxWidth: 1600,
+    alignSelf: 'center',
   },
   gridContainer: {
-    paddingBottom: 60,
+    paddingBottom: 20,
   },
   centerContainer: {
     padding: 100,
