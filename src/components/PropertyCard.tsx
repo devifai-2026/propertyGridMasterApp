@@ -290,6 +290,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderWidth: 1,
     borderColor: '#f0f0f0',
+    maxWidth: 500,
   },
   propHeader: {
     paddingHorizontal: 20,

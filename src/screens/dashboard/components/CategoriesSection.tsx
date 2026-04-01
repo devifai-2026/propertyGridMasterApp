@@ -186,6 +186,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#f5f5f5',
     marginBottom: 5,
+    maxWidth: 370,
   },
   imageContainer: {
     height: 180,

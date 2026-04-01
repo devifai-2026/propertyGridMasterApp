@@ -21,16 +21,14 @@ const BrokerHeader: React.FC<BrokerHeaderProps> = ({
             <Text style={{ color: '#EE2529', fontWeight: '800' }}>
               {totalCount}
             </Text>{' '}
-            Professional Agents
+            <Text style={{ color: '#EE2529' }}>Agents</Text> available for you
           </Text>
-          <Text style={styles.headerSubtitle}>
-            Verified property experts at your service
-          </Text>
+        
         </View>
         <TouchableOpacity style={styles.sortContainer} onPress={onToggleSort}>
           <Text style={styles.sortLabel}>
             Sort by:{' '}
-            <Text style={{ color: '#EE2529', fontWeight: 'bold' }}>
+            <Text style={{ color: '#EE2529', fontWeight: '600' }}>
               {sortBy === 'name_asc' ? 'A-Z' : 'Most Listed'}
             </Text>
           </Text>
@@ -65,8 +63,8 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   headerTitle: {
-    fontSize: 22,
-    fontWeight: '300',
+    fontSize: 18,
+    fontWeight: '700',
     color: '#1a1a1a',
     letterSpacing: -0.5,
   },
@@ -80,17 +78,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingHorizontal: 18,
     paddingVertical: 10,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#e5e5e5',
+   
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
   },
   sortLabel: {
-    fontSize: 13,
-    color: '#666',
-    fontWeight: '500',
+    fontSize: 16,
+    color: '#767676',
+    fontWeight: '400',
   },
 });
 

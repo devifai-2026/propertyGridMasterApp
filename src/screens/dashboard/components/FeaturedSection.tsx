@@ -75,7 +75,7 @@ const FeaturedSection = ({ properties }: { properties: any[] }) => {
   const [selectedProperties, setSelectedProperties] = useState<Property[]>([]);
   const isMobile = width < 768;
 
-  const containerPadding = width < 768 ? 20 : 60;
+  const containerPadding = width < 768 ? 9 : 10;
   const availableWidth = width - containerPadding * 2;
   const gap = 20;
   
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     width: '100%',
-    maxWidth: 1440,
+    maxWidth: '100%',
     justifyContent: 'center',
   },
 });

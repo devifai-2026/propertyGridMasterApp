@@ -28,7 +28,7 @@ interface Step {
 }
 
 const STEPS: Step[] = [
-  { id: '1', label: 'Cities', Icon: CitiesIcon },
+  { id: '1', label: 'City', Icon: CitiesIcon },
   { id: '2', label: 'Annual\nReturns', Icon: AnnualReturnsIcon },
   { id: '3', label: 'Property\nType', Icon: PropertyTypeIcon },
   { id: '4', label: 'Budget', Icon: BudgetIcon },
@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   wizardContentCard: {
-    width: '60%',
+    width: '40%',
     maxWidth: 900,
     backgroundColor: '#FFF',
     borderRadius: 20,

@@ -307,12 +307,21 @@ const SideMenu: React.FC<SideMenuProps> = ({
 
 const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
   const { width } = useWindowDimensions();
-  const { navigate } = useNavigation();
+  const { navigate, currentPath } = useNavigation();
   const { isLoggedIn, user } = useAuth();
+  const [isHovered, setIsHovered] = useState(false);
   const isMobile = width < 768;
 
+  const headerActiveStyle = isHovered && !isMobile ? styles.headerContainerHover : {};
+
   return (
-    <View style={styles.headerContainer}>
+    <View 
+      style={[styles.headerContainer, headerActiveStyle]}
+      {...(Platform.OS === 'web' ? {
+        onMouseEnter: () => setIsHovered(true),
+        onMouseLeave: () => setIsHovered(false),
+      } : {})}
+    >
       <View
         style={[
           styles.headerContent,
@@ -333,19 +342,35 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
         {!isMobile && (
           <View style={styles.navLinks}>
             <TouchableOpacity onPress={() => navigate('/explore-properties')}>
-              <Text style={styles.navLinkText}>Explore Properties</Text>
+              <Text
+                style={[
+                  styles.navLinkText,
+                  currentPath === '/explore-properties' && styles.navLinkActive,
+                ]}
+              >
+                Explore Properties
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigate('/calculators')}>
-              <Text style={styles.navLinkText}>Calculators</Text>
+              <Text
+                style={[
+                  styles.navLinkText,
+                  currentPath === '/calculators' && styles.navLinkActive,
+                ]}
+              >
+                Calculators
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => navigate('/explore-brokers')}>
-              <Text style={styles.navLinkText}>Explore Brokers</Text>
+              <Text
+                style={[
+                  styles.navLinkText,
+                  currentPath === '/explore-brokers' && styles.navLinkActive,
+                ]}
+              >
+                Explore Brokers
+              </Text>
             </TouchableOpacity>
-            {/* {user?.role && 
-              <TouchableOpacity onPress={() => navigate('/investors')}>
-                <Text style={styles.navLinkText}>{user?.role || 'Investors'}</Text>
-              </TouchableOpacity>
-            } */}
           </View>
         )}
 
@@ -372,9 +397,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
               ]}
               onPress={() => navigate('/list-property')}
             >
-              <View style={[isMobile ? { marginRight: 0 } : { marginRight: 8 }]}>
-                <ListPropertyIcon />
-              </View>
+              <ListPropertyIcon />
               {!isMobile && (
                 <Text style={styles.listPropertyText}>List Property</Text>
               )}
@@ -490,9 +513,23 @@ const styles = StyleSheet.create({
     elevation: 5,
     ...Platform.select({
       web: {
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-      },
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
+        transition: 'all 0.3s ease',
+      } as any,
+    }),
+  },
+  headerContainerHover: {
+    backgroundColor: 'rgba(255, 255, 255, 0.35)',
+    borderColor: 'rgba(230, 230, 230, 0.6)',
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+    ...Platform.select({
+      web: {
+        backdropFilter: 'blur(25px)',
+        WebkitBackdropFilter: 'blur(25px)',
+        transform: 'translateY(-2px)',
+      } as any,
     }),
   },
   headerContent: {
@@ -500,7 +537,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     width: '100%',
-    maxWidth: 1440,
+    maxWidth: 1800,
     alignSelf: 'center',
     paddingHorizontal: 20,
   },
@@ -521,6 +558,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#262626',
   },
+  navLinkActive: {
+    color: '#EE2529',
+  },
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -537,13 +577,14 @@ const styles = StyleSheet.create({
   listPropertyBtn: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
     borderColor: '#262626',
     borderRadius: 30,
-    paddingLeft: 3.5,
-    paddingRight: 16,
+    paddingHorizontal: 15,
     paddingVertical: 3.5,
-    height: 40,
+    height: 44,
+    gap: 8,
   },
   listPropertyText: {
     fontWeight: '400',

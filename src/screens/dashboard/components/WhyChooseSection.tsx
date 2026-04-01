@@ -94,7 +94,7 @@ const WhyChooseSection = () => {
                 styles.illustration,
                 isMobile && styles.illustrationMobile,
               ]}
-              resizeMode={isMobile ? "contain" : "cover"}
+              resizeMode="contain"
             />
           </View>
         )}
@@ -172,15 +172,18 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     width: '100%',
-    maxWidth: 1200,
-    justifyContent: 'space-between',
+    maxWidth: '90%',
+    justifyContent: 'center',
     alignItems: 'stretch',
+    gap: 80,
   },
   illustrationContainer: {
-    flex: 1,
+    flex: 1.2,
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    maxWidth: 850,
+    maxHeight: 650,
   },
   illustrationContainerMobile: {
     flex: 0,
