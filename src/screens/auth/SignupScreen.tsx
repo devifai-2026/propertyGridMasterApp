@@ -146,8 +146,8 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
     const newOtp = arr.join('');
     setOtp(newOtp);
     setOtpError('');
-    if (digit && index < 3) otpInputRefs.current[index + 1]?.focus();
-    setOtpFilled(newOtp.length === 4 && !newOtp.includes(''));
+    if (digit && index < 5) otpInputRefs.current[index + 1]?.focus();
+    setOtpFilled(newOtp.length === 6 && !newOtp.includes(''));
   };
 
   const handleOtpKeyPress = (e: any, index: number) => {
@@ -178,7 +178,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
   // ── Screen 3 → Submit
   const handleVerifyAndSignup = async () => {
-    if (otp.length < 4) { setOtpError('Please enter the complete OTP'); return; }
+    if (otp.length < 6) { setOtpError('Please enter the complete OTP'); return; }
     register(
       {
         mobileNumber: formData.phone,
@@ -483,17 +483,17 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
   // ── SCREEN 3: OTP verification
   const renderOtpScreen = () => (
-    <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+    <Animated.View style={[styles.otpScreenContent, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
       <View style={styles.headingBanner}>
         <Text style={styles.screenHeading}>Verify your Contact Number</Text>
       </View>
-      <Text style={styles.screenSub}>
+      <Text style={[styles.screenSub, styles.otpScreenSub]}>
         We sent a verification code to{' '}
         <Text style={styles.phoneHighlight}>+91 ........</Text>
       </Text>
 
       <View style={styles.otpRow}>
-        {[0, 1, 2, 3].map(index => (
+        {[0, 1, 2, 3, 4, 5].map(index => (
           <TextInput
             key={index}
             ref={ref => { otpInputRefs.current[index] = ref; }}
@@ -512,14 +512,16 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
         ))}
       </View>
 
-      {otpError ? (
-        <Text style={styles.otpErrorText}>{otpError}</Text>
-      ) : null}
+      <View style={styles.otpErrorContainer}>
+        {otpError ? (
+          <Text style={styles.otpErrorText}>{otpError}</Text>
+        ) : null}
+      </View>
 
-      <Text style={styles.otpResendText}>
-        Didn't received OTP?{' '}
-        <Text style={styles.otpResendLink} onPress={handleResendOtp}>Click to resend OTP.</Text>
-      </Text>
+      <View style={styles.otpResendRow}>
+        <Text style={styles.otpResendLink} onPress={handleResendOtp}>Resend OTP</Text>
+        <Text style={styles.otpResendLink}>Contact Support</Text>
+      </View>
 
       <View style={styles.buttonRow}>
         <TouchableOpacity style={styles.btnOutline} onPress={() => resetAnim(() => setCurrentScreen('details'))}>
@@ -551,7 +553,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
-            <View style={styles.card}>
+            <View style={[styles.card, currentScreen === 'otp' && styles.cardOtp]}>
               <ScrollView
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
@@ -618,7 +620,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 48,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 6,
+    marginBottom: 20,
   },
   screenHeading: {
     fontSize: 20, fontWeight: '700', color: '#1A1A1A',
@@ -663,7 +665,7 @@ const styles = StyleSheet.create({
   roleDesc:  { fontSize: 12, color: '#6B7280', textAlign: 'center', lineHeight: 16 },
 
   /* ── Buttons ── */
-  buttonRow:   { flexDirection: 'row', gap: 12, marginTop: 24 },
+  buttonRow:   { flexDirection: 'row', gap: 12, marginTop: 48 },
   btnOutline: {
     flex: 1, borderWidth: 1.5, borderColor: '#D1D5DB', borderRadius: 12,
     paddingVertical: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.white,
@@ -679,9 +681,9 @@ const styles = StyleSheet.create({
   buttonDisabled: { opacity: 0.5 },
 
   /* ── Form inputs ── */
-  nameRow:   { flexDirection: 'row', gap: 16, marginBottom: 20 },
+  nameRow:   { flexDirection: 'row', gap: 16, marginBottom: 32 },
   nameField: { flex: 1 },
-  inputGroup:  { marginBottom: 20 },
+  inputGroup:  { marginBottom: 32 },
   inputLabel:  { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 8, lineHeight: 16 },
   required:    { color: '#EE2529' },
   textInput: {
@@ -712,7 +714,7 @@ const styles = StyleSheet.create({
   phoneHighlight: { fontWeight: '700', color: '#1F2937' },
   otpRow: {
     flexDirection: 'row', justifyContent: 'center',
-    gap: 12, marginBottom: 20, marginTop: 12,
+    gap: 12, marginBottom: 32, marginTop: 12,
   },
   otpInput: {
     width: 64, height: 64, borderWidth: 1.5, borderColor: '#E5E7EB',
@@ -734,6 +736,20 @@ const styles = StyleSheet.create({
   },
   roleScrollContent: { flex: 1 },
   roleScreenContent: { flex: 1, justifyContent: 'space-between' },
+  otpScreenContent: { flex: 1, justifyContent: 'space-between' },
+  otpScreenSub: { marginBottom: 12 },
+  otpErrorContainer: { minHeight: 54, justifyContent: 'center' },
+  otpResendRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 48,
+    marginBottom: 20,
+  },
+  cardOtp: {
+    width: 673,
+    height: 510,
+    borderRadius: 15,
+  },
 });
 
 export default SignupScreen;
