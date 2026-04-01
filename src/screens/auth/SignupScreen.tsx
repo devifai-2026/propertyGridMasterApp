@@ -747,7 +747,7 @@ const styles = StyleSheet.create({
   },
   cardOtp: {
     width: 673,
-    height: 510,
+    height: 580,
     borderRadius: 15,
   },
 });
