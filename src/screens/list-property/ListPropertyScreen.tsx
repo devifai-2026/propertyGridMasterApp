@@ -66,6 +66,7 @@ const ListPropertyScreen = () => {
   const [isFormValid, setIsFormValid] = useState(false);
   const [formData, setFormData] = useState<any>({});
   const [initialLoading, setInitialLoading] = useState(isEditMode);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const personalDetailsRef = useRef<any>(null);
   const basicDetailsRef = useRef<any>(null);
@@ -200,9 +201,15 @@ const ListPropertyScreen = () => {
 
   const submitProperty = async (finalData: any) => {
     try {
+      setErrorMessage(null);
       console.log('Submitting Property Data:', finalData);
 
       const apiFormData = new FormData();
+
+      // --- Identification ---
+      if (finalData.listUnder) {
+        apiFormData.append('createdAs', finalData.listUnder);
+      }
 
       // --- Basic Details ---
       if (finalData.propertyType)
@@ -407,6 +414,10 @@ const ListPropertyScreen = () => {
           `Failed to ${
             isEditMode ? 'update' : 'list'
           } property. Please try again.`;
+        
+        setErrorMessage(message);
+        scrollRef.current?.scrollTo({ y: 0, animated: true });
+        
         Alert.alert('Error', message);
         console.error(
           `Property ${isEditMode ? 'update' : 'creation'} error:`,
@@ -432,6 +443,7 @@ const ListPropertyScreen = () => {
       currentFormData = { ...formData, ...stepData };
       setFormData(currentFormData);
     }
+    setErrorMessage(null);
 
     if (currentStep < 6) {
       setCurrentStep(currentStep + 1);
@@ -446,6 +458,7 @@ const ListPropertyScreen = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
       setIsFormValid(true);
+      setErrorMessage(null);
     }
   };
 
@@ -638,6 +651,20 @@ const ListPropertyScreen = () => {
 
         {/* Form Area */}
         <View style={styles.formCardWrapper}>
+          {errorMessage && (
+            <View style={styles.errorBanner}>
+              <Text style={styles.errorBannerText}>{errorMessage}</Text>
+              {(errorMessage.includes('broker profile') || 
+                errorMessage.includes('complete your profile')) && (
+                <TouchableOpacity 
+                  style={styles.errorActionBtn}
+                  onPress={() => navigate('/investors')}
+                >
+                  <Text style={styles.errorActionText}>Go to Profile</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
           <View style={[styles.formCard, isMobile && styles.formCardMobile]}>
             {initialLoading ? (
               <View style={styles.loadingContainer}>
@@ -953,6 +980,37 @@ const styles = StyleSheet.create({
   },
   btnHidden: {
     opacity: 0,
+  },
+  errorBanner: {
+    backgroundColor: '#FFEBEE',
+    width: '80%',
+    maxWidth: 1200,
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 12,
+    borderLeftWidth: 5,
+    borderLeftColor: '#EE2529',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  errorBannerText: {
+    color: '#B71C1C',
+    fontSize: 14,
+    fontWeight: '600',
+    flex: 1,
+  },
+  errorActionBtn: {
+    backgroundColor: '#EE2529',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+    marginLeft: 12,
+  },
+  errorActionText: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: '700',
   },
 });
 

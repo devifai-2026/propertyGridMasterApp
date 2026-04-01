@@ -20,7 +20,7 @@ const PortfolioTab = () => {
   useEffect(() => {
     if (user?.userId) {
       // Fetch properties added by the current user
-      const query = `addedBy=${user.userId}`;
+      const query = `ownerId=${user.userId}`;
 
       getProperties((data: any[]) => {
         if (Array.isArray(data)) {

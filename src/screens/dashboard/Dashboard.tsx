@@ -31,7 +31,7 @@ const Dashboard = () => {
     getProperties(
       r => setProperties(r),
       r => console.log(r),
-      'isVerified=completedOrPartial',
+      'isVerified=completed',
     );
   }, []);
   return (

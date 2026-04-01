@@ -25,6 +25,7 @@ import { useNavigation } from '../context/NavigationContext';
 import { useAuth } from '../context/AuthContext';
 import VerifiedSvg from './VerifiedSvg';
 import ShareIcon from './ShareIcon';
+import { usePropertyAPIs } from '../../helpers/hooks/propertyAPIs/usePropertyApis';
 
 export interface Property {
   id: string;
@@ -69,8 +70,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 }) => {
   const { navigate } = useNavigation();
   const { user } = useAuth();
+  const { toggleLikeProperty, checkIfLiked } = usePropertyAPIs();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLocationExpanded, setIsLocationExpanded] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
 
   const hasImages = item.images && item.images.length > 0;
   const imageCount = hasImages ? item.images!.length : 0;
@@ -85,6 +88,16 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     }
     return () => clearInterval(interval);
   }, [imageCount]);
+
+  useEffect(() => {
+    if (user && item.id) {
+      checkIfLiked(item.id, (data: any) => {
+        if (data) {
+          setIsLiked(!!data.isLiked);
+        }
+      });
+    }
+  }, [user, item.id]);
 
   const handlePrevImage = () => {
     setCurrentImageIndex(prev => (prev - 1 + imageCount) % imageCount);
@@ -104,19 +117,31 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     if (onEnquire) onEnquire(item.id);
   };
 
+  const handleToggleLike = () => {
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    toggleLikeProperty(item.id, (res: any) => {
+      if (res.success) {
+        setIsLiked(!isLiked);
+      }
+    });
+  };
+
   return (
     <View style={[styles.propertyCard, { width }, style]}>
       {/* Header Section */}
       <View style={styles.propHeader}>
         <View style={styles.headerTextGroup}>
           <Text style={styles.propCategory}>{item.title}</Text>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.locationRow}
             onPress={() => setIsLocationExpanded(!isLocationExpanded)}
             activeOpacity={0.7}
           >
             <MapPin size={16} color="#EF4444" style={{ marginRight: 4 }} />
-            <Text 
+            <Text
               style={styles.propLocationText}
               numberOfLines={isLocationExpanded ? undefined : 1}
               ellipsizeMode="tail"
@@ -125,7 +150,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             </Text>
           </TouchableOpacity>
         </View>
-        
+
         {/* Verified Badge */}
         {(item.isVerified === 'partial' || item.isVerified === 'completed') && (
           <View style={styles.verifiedBadgeContainer}>
@@ -173,8 +198,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           <TouchableOpacity style={styles.iconButton}>
             <ShareIcon size={15} color={COLORS.white} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
-            <Heart size={15} color={COLORS.white} />
+          <TouchableOpacity style={styles.iconButton} onPress={handleToggleLike}>
+            <Heart
+              size={15}
+              color={isLiked ? COLORS.primary : COLORS.white}
+              fill={isLiked ? COLORS.primary : 'transparent'}
+            />
           </TouchableOpacity>
         </View>
 

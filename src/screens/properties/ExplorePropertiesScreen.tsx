@@ -109,7 +109,7 @@ const ExplorePropertiesScreen = () => {
     }
 
     if (hasParams) {
-      setFilters(initialFilters);
+      setFilters(initialFilters as any);
       fetchProperties(initialFilters);
     } else {
       fetchProperties();
@@ -121,7 +121,7 @@ const ExplorePropertiesScreen = () => {
     const activeFilters = overrideFilters || filters;
 
     queryParams.push(`page=${page}`);
-    queryParams.push(`isVerified=completedOrPartial`);
+    queryParams.push(`isVerified=completed`);
     queryParams.push(`limit=12`);
 
     // City
@@ -294,15 +294,17 @@ const ExplorePropertiesScreen = () => {
 
   const onSliderLayout = () => {
     if (isWeb && sliderRef.current) {
-       // @ts-ignore
-       const rect = sliderRef.current.getBoundingClientRect?.() || sliderRef.current.measure?.((x,y,w,h,px,py)=> {
+      // @ts-ignore
+      const rect =
+        sliderRef.current.getBoundingClientRect?.() ||
+        sliderRef.current.measure?.((x, y, w, h, px, py) => {
           setSliderWidth(w);
           sliderPageX.current = px;
-       });
-       if(rect) {
-          setSliderWidth(rect.width);
-          sliderPageX.current = rect.left;
-       }
+        });
+      if (rect) {
+        setSliderWidth(rect.width);
+        sliderPageX.current = rect.left;
+      }
     }
   };
 
@@ -510,57 +512,59 @@ const ExplorePropertiesScreen = () => {
         return (
           <View style={styles.filterSection}>
             <Text style={styles.filterLabel}>Purchase Price</Text>
-            
+
             <View style={styles.sliderContainer}>
               <Text style={styles.sliderEndpoint}>₹0 Lakhs</Text>
-                <View
-                  ref={sliderRef}
-                  style={styles.sliderTrackContainer}
-                  onLayout={onSliderLayout}
-                  {...panResponder.panHandlers}
-                >
-                  {/* Background Track */}
-                  <View style={styles.sliderBackgroundTrack} />
-                  
-                  {/* Active Track Overlay */}
-                  <View
-                    style={[
-                      styles.sliderActiveTrack,
-                      { width: `${sliderPercent * 100}%` },
-                    ]}
-                  />
+              <View
+                ref={sliderRef}
+                style={styles.sliderTrackContainer}
+                onLayout={onSliderLayout}
+                {...panResponder.panHandlers}
+              >
+                {/* Background Track */}
+                <View style={styles.sliderBackgroundTrack} />
 
-                  {/* Thumb */}
-                  <View
-                    style={[
-                      styles.sliderThumb,
-                      { left: `${sliderPercent * 100}%` },
-                    ]}
+                {/* Active Track Overlay */}
+                <View
+                  style={[
+                    styles.sliderActiveTrack,
+                    { width: `${sliderPercent * 100}%` },
+                  ]}
+                />
+
+                {/* Thumb */}
+                <View
+                  style={[
+                    styles.sliderThumb,
+                    { left: `${sliderPercent * 100}%` },
+                  ]}
+                />
+
+                {isWeb && (
+                  <input
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="1"
+                    value={sliderPercent * 50}
+                    onChange={handleWebSliderChange}
+                    style={{
+                      position: 'absolute',
+                      width: '100%',
+                      height: 40,
+                      opacity: 0,
+                      cursor: 'pointer',
+                      zIndex: 1000,
+                    }}
                   />
-                  
-                  {isWeb && (
-                    <input
-                      type="range"
-                      min="0"
-                      max="50"
-                      step="1"
-                      value={sliderPercent * 50}
-                      onChange={handleWebSliderChange}
-                      style={{
-                        position: 'absolute',
-                        width: '100%',
-                        height: 40,
-                        opacity: 0,
-                        cursor: 'pointer',
-                        zIndex: 1000,
-                      }}
-                    />
-                  )}
-                </View>
+                )}
+              </View>
               <Text style={styles.sliderEndpoint}>₹50 Lakhs</Text>
             </View>
 
-            <Text style={styles.filterSeparator}>Or enter specific values:</Text>
+            <Text style={styles.filterSeparator}>
+              Or enter specific values:
+            </Text>
 
             <View style={styles.priceInputGrid}>
               <View style={styles.priceInputCol}>
@@ -597,7 +601,9 @@ const ExplorePropertiesScreen = () => {
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.stepperBtn}
-                        onPress={() => incrementValue('pricing', 'min', -500000)}
+                        onPress={() =>
+                          incrementValue('pricing', 'min', -500000)
+                        }
                       >
                         <ChevronDown size={12} color="#262626" />
                       </TouchableOpacity>
@@ -640,7 +646,9 @@ const ExplorePropertiesScreen = () => {
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.stepperBtn}
-                        onPress={() => incrementValue('pricing', 'max', -500000)}
+                        onPress={() =>
+                          incrementValue('pricing', 'max', -500000)
+                        }
                       >
                         <ChevronDown size={12} color="#262626" />
                       </TouchableOpacity>
@@ -726,7 +734,7 @@ const ExplorePropertiesScreen = () => {
         return (
           <View style={styles.filterSection}>
             <Text style={styles.filterLabel}>Annual Rent Range</Text>
-            
+
             <View style={styles.sliderContainer}>
               <Text style={styles.sliderEndpoint}>₹0 Lakhs</Text>
               <View
@@ -770,11 +778,15 @@ const ExplorePropertiesScreen = () => {
               <Text style={styles.sliderEndpoint}>₹50 Lakhs</Text>
             </View>
 
-            <Text style={styles.filterSeparator}>Or enter specific values:</Text>
+            <Text style={styles.filterSeparator}>
+              Or enter specific values:
+            </Text>
 
             <View style={styles.priceInputGrid}>
               <View style={styles.priceInputCol}>
-                <Text style={styles.priceInputLabel}>Minimum Annual Rent (₹)</Text>
+                <Text style={styles.priceInputLabel}>
+                  Minimum Annual Rent (₹)
+                </Text>
                 <View
                   style={styles.inputWrapper}
                   {...(isWeb
@@ -817,7 +829,9 @@ const ExplorePropertiesScreen = () => {
               </View>
 
               <View style={styles.priceInputCol}>
-                <Text style={styles.priceInputLabel}>Maximum Annual Rent (₹)</Text>
+                <Text style={styles.priceInputLabel}>
+                  Maximum Annual Rent (₹)
+                </Text>
                 <View
                   style={styles.inputWrapper}
                   {...(isWeb
@@ -864,8 +878,10 @@ const ExplorePropertiesScreen = () => {
       case 'roi':
         return (
           <View style={styles.filterSection}>
-            <Text style={styles.filterLabel}>Return on Investment (ROI) Range</Text>
-            
+            <Text style={styles.filterLabel}>
+              Return on Investment (ROI) Range
+            </Text>
+
             <View style={styles.sliderContainer}>
               <Text style={styles.sliderEndpoint}>5%</Text>
               <View
@@ -912,7 +928,8 @@ const ExplorePropertiesScreen = () => {
 
             <View style={styles.descInfoBox}>
               <Text style={styles.descInfoText}>
-                Filter properties based on their expected return on investment. Higher ROI indicates better potential returns.
+                Filter properties based on their expected return on investment.
+                Higher ROI indicates better potential returns.
               </Text>
             </View>
           </View>
@@ -921,7 +938,7 @@ const ExplorePropertiesScreen = () => {
         return (
           <View style={styles.filterSection}>
             <Text style={styles.filterLabel}>Tenure Left (yrs)</Text>
-            
+
             <View style={styles.sliderContainer}>
               <Text style={styles.sliderEndpoint}>1 yrs</Text>
               <View
@@ -968,7 +985,8 @@ const ExplorePropertiesScreen = () => {
 
             <View style={styles.descInfoBox}>
               <Text style={styles.descInfoText}>
-                Remaining duration of the lease agreement. Longer tenure provides more stability and predictable income.
+                Remaining duration of the lease agreement. Longer tenure
+                provides more stability and predictable income.
               </Text>
             </View>
           </View>
@@ -1071,42 +1089,37 @@ const ExplorePropertiesScreen = () => {
               </View>
 
               <View style={styles.filterTabs}>
-                {[
-                  'location',
-                  'pricing',
-                  'unit',
-                  'rent',
-                  'roi',
-                  'tenure',
-                ].map(tab => (
-                  <TouchableOpacity
-                    key={tab}
-                    style={[
-                      styles.filterTabItem,
-                      activeTab === tab && styles.activeFilterTab,
-                    ]}
-                    onPress={() => setActiveTab(tab as any)}
-                  >
-                    <Text
+                {['location', 'pricing', 'unit', 'rent', 'roi', 'tenure'].map(
+                  tab => (
+                    <TouchableOpacity
+                      key={tab}
                       style={[
-                        styles.filterTabText,
-                        activeTab === tab && styles.activeFilterTabText,
+                        styles.filterTabItem,
+                        activeTab === tab && styles.activeFilterTab,
                       ]}
+                      onPress={() => setActiveTab(tab as any)}
                     >
-                      {tab === 'location'
-                        ? 'Location\nProximity'
-                        : tab === 'pricing'
-                        ? 'Pricing'
-                        : tab === 'unit'
-                        ? 'Type of Unit'
-                        : tab === 'rent'
-                        ? 'Annual Rent\nAchieved'
-                        : tab === 'roi'
-                        ? 'ROI'
-                        : 'Tenure Left'}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                      <Text
+                        style={[
+                          styles.filterTabText,
+                          activeTab === tab && styles.activeFilterTabText,
+                        ]}
+                      >
+                        {tab === 'location'
+                          ? 'Location\nProximity'
+                          : tab === 'pricing'
+                          ? 'Pricing'
+                          : tab === 'unit'
+                          ? 'Type of Unit'
+                          : tab === 'rent'
+                          ? 'Annual Rent\nAchieved'
+                          : tab === 'roi'
+                          ? 'ROI'
+                          : 'Tenure Left'}
+                      </Text>
+                    </TouchableOpacity>
+                  ),
+                )}
               </View>
 
               <View style={styles.infoBox}>
@@ -1173,14 +1186,8 @@ const ExplorePropertiesScreen = () => {
 
                 <View style={styles.mobileFilterBody}>
                   {/* Sidebar Tabs */}
-                    {[
-                      'location',
-                      'pricing',
-                      'unit',
-                      'rent',
-                      'roi',
-                      'tenure',
-                    ].map(tab => (
+                  {['location', 'pricing', 'unit', 'rent', 'roi', 'tenure'].map(
+                    tab => (
                       <TouchableOpacity
                         key={tab}
                         style={[
@@ -1208,7 +1215,8 @@ const ExplorePropertiesScreen = () => {
                             : 'Tenure Left'}
                         </Text>
                       </TouchableOpacity>
-                    ))}
+                    ),
+                  )}
 
                   {/* Content */}
                   <ScrollView style={styles.mobileFilterContent}>
@@ -1278,12 +1286,7 @@ const ExplorePropertiesScreen = () => {
             </View>
           )}
 
-          <View
-            style={[
-              styles.gridContainer,
-              { justifyContent: 'center' },
-            ]}
-          >
+          <View style={[styles.gridContainer, { justifyContent: 'center' }]}>
             {properties.map((property, index) => {
               // Special Card Logic (Index 7)
               if (index === 7) {

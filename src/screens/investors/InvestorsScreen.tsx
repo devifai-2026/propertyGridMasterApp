@@ -114,7 +114,7 @@ const InvestorsScreen = () => {
   const { getAvailableRoles } = useAuthAPIs();
   const [activeTab, setActiveTab] = useState<
     'Broker' | 'Investor' | 'Owner' | 'Wishlist'
-  >('Investor');
+  >('Broker');
   const [roleStatuses, setRoleStatuses] = useState<any[]>([]);
   const [loadingRoles, setLoadingRoles] = useState(true);
 
@@ -154,7 +154,7 @@ const InvestorsScreen = () => {
     if (isLocked(activeTab)) {
       return (
         <View style={styles.lockedContainer}>
-          <Lock size={48} color="#ccc" />
+          <Lock size={48} color="#EE2529" />
           <Text style={styles.lockedTitle}>{activeTab} Access Locked</Text>
           <Text style={styles.lockedText}>
             You haven't acquired the {activeTab} role yet. 
@@ -210,9 +210,6 @@ const InvestorsScreen = () => {
                 )}
                 <View style={styles.profileInfo}>
                   <Text style={styles.userName}>{userData.name}</Text>
-                  <View style={styles.roleBadge}>
-                    <Text style={styles.roleText}>{user?.role || 'Guest'}</Text>
-                  </View>
                 </View>
               </View>
 
@@ -281,7 +278,7 @@ const InvestorsScreen = () => {
                   </Text>
                   {isLocked(tab) && (
                     <View style={styles.lockIconContainer}>
-                      <Lock size={12} color="#ccc" />
+                      <Lock size={12} color="#EE2529" />
                     </View>
                   )}
                   {activeTab === tab && <View style={styles.activeIndicator} />}
@@ -521,7 +518,8 @@ const styles = StyleSheet.create({
   },
   lockedContainer: {
     backgroundColor: '#fff',
-    padding: 40,
+    padding: 60,
+    minHeight: 350,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
