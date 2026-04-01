@@ -296,6 +296,22 @@ export const usePropertyAPIs = () => {
     });
   };
  
+  const getBrokerStats = (
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: '/v1/brokers/stats',
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data.data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   return {
     getProperties,
     getPropertyById,
@@ -314,6 +330,7 @@ export const usePropertyAPIs = () => {
     checkIfLiked,
     getMyInquiries,
     getInquiryById,
+    getBrokerStats,
     loading,
   };
 };

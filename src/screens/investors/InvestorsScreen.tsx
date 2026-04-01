@@ -7,47 +7,182 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import Layout from '../../layout/Layout';
-import { Mail, Phone, Edit, ArrowRight, User } from 'lucide-react-native';
+import { Mail, Phone, Edit, ArrowRight, User, Lock } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
 import { COLORS } from '../../constants/theme';
 import PortfolioTab from './components/PortfolioTab';
 import EnquiriesTab from './components/EnquiriesTab';
 import WishlistTab from './components/WishlistTab';
 import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
+import { decodeResponseData } from '../../../helpers/api/decoder';
+import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
+import PropertyCard, { Property } from '../../components/PropertyCard';
+
+const BrokerTabView = () => {
+  const { user } = useAuth();
+  const { getProperties, getBrokerStats, loading: propertyLoading } = usePropertyAPIs();
+  const [brokerProperties, setBrokerProperties] = useState<Property[]>([]);
+  const [stats, setStats] = useState<any>({
+    activeDeals: 0,
+    conversionRate: '0%',
+    activeListings: 0,
+  });
+
+  useEffect(() => {
+    if (user?.userId) {
+      getBrokerStats((data: any) => {
+        if (data) setStats(data);
+      });
+
+      getProperties((data: any[]) => {
+        if (Array.isArray(data)) {
+          const formattedProps: Property[] = data.map((item: any) => ({
+            id: item.propertyId,
+            title: item.propertyType || 'Property',
+            location: `${item.microMarket || ''}, ${item.city || ''}`.trim() || 'N/A',
+            price: item.sellingPrice ? `₹${item.sellingPrice}` : 'N/A',
+            rent: item.annualGrossRent ? `₹${item.annualGrossRent}` : 'N/A',
+            tenure: item.leaseEndDate ? `${new Date(item.leaseEndDate).toLocaleDateString()}` : 'N/A',
+            roi: item.grossRentalYield ? `${item.grossRentalYield}%` : 'N/A',
+            type: item.propertyType || 'N/A',
+            images: item.media && item.media.length > 0 
+              ? item.media.map((m: any) => m.fileUrl) 
+              : null,
+            isVerified: item.isVerified,
+            verified: item.isVerified === 'completed',
+            badges: item.ownershipType ? [item.ownershipType] : [],
+            raw: item
+          }));
+          setBrokerProperties(formattedProps);
+        }
+      }, undefined, `brokerId=${user.userId}`);
+    }
+  }, [user?.userId]);
+
+  return (
+    <View style={styles.tabContentContainer}>
+      <View style={styles.brokerStatsRow}>
+        <View style={styles.brokerStatCard}>
+          <Text style={styles.brokerStatLabel}>Active Deals</Text>
+          <Text style={styles.brokerStatValue}>{stats.activeDeals}</Text>
+        </View>
+        <View style={styles.brokerStatCard}>
+          <Text style={styles.brokerStatLabel}>Conversion Rate</Text>
+          <Text style={styles.brokerStatValue}>{stats.conversionRate}</Text>
+        </View>
+        <View style={styles.brokerStatCard}>
+          <Text style={styles.brokerStatLabel}>Active Listings</Text>
+          <Text style={styles.brokerStatValue}>{stats.activeListings}</Text>
+        </View>
+      </View>
+
+      <View style={styles.listHeader}>
+        <Text style={styles.listTitle}>Properties Listed</Text>
+      </View>
+
+      {propertyLoading ? (
+        <ActivityIndicator color={COLORS.primary} size="large" />
+      ) : brokerProperties.length > 0 ? (
+        <View style={styles.propertiesGrid}>
+          {brokerProperties.map(p => (
+            <PropertyCard
+              key={p.id}
+              item={p}
+              width={isDesktop ? '48%' : '100%'}
+              noView={false}
+            />
+          ))}
+        </View>
+      ) : (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyText}>No properties listed as a broker.</Text>
+        </View>
+      )}
+    </View>
+  );
+};
+
+const OwnerTabView = () => {
+  return <PortfolioTab />; 
+};
 
 const InvestorsScreen = () => {
   const { user } = useAuth();
+  const { getAvailableRoles } = useAuthAPIs();
   const [activeTab, setActiveTab] = useState<
-    'portfolio' | 'enquiries' | 'wishlist'
-  >('portfolio');
+    'Broker' | 'Investor' | 'Owner' | 'Wishlist'
+  >('Investor');
+  const [roleStatuses, setRoleStatuses] = useState<any[]>([]);
+  const [loadingRoles, setLoadingRoles] = useState(true);
+
+  useEffect(() => {
+    getAvailableRoles(
+      (res: any) => {
+        if (res.success && res.data) {
+          const decoded = decodeResponseData(res.data);
+          setRoleStatuses(decoded || []);
+        }
+        setLoadingRoles(false);
+      },
+      () => {
+        setLoadingRoles(false);
+      },
+    );
+  }, []);
+
   // Mock User if not available
   const userData = user || {
     name: 'Rohit Sharma',
     role: 'Investor',
     email: 'rohit.sharma@example.com',
     mobileNumber: '+91 98765 43210',
+    mobile: '+91 98765 43210',
     joined: '26 Aug 2025',
     lastLogin: '13 Aug 2025',
   };
 
-  const summaryData = [
-    {
-      label: 'TOTAL INVESTMENT',
-      inr: '(INR)',
-      value: '₹3,660,000',
-      color: '#EE2529',
-    },
-    {
-      label: 'Total Net Cash Flow',
-      inr: '(INR)',
-      value: '₹2,90,000',
-      color: '#EE2529',
-    },
-    { label: 'INVESTED PROPERTIES', inr: '', value: '4', color: '#767676' },
-  ];
-  console.log(user)
+  const isLocked = (roleName: string) => {
+    if (roleName === 'Wishlist') return false;
+    const status = roleStatuses.find(r => r.roleName === roleName);
+    return status ? !status.isAcquired : false;
+  };
+
+  const renderTabContent = () => {
+    if (isLocked(activeTab)) {
+      return (
+        <View style={styles.lockedContainer}>
+          <Lock size={48} color="#ccc" />
+          <Text style={styles.lockedTitle}>{activeTab} Access Locked</Text>
+          <Text style={styles.lockedText}>
+            You haven't acquired the {activeTab} role yet. 
+            {activeTab === 'Owner' && ' List a property to become an owner!'}
+            {activeTab === 'Broker' && ' Complete your broker profile to start listing!'}
+            {activeTab === 'Investor' && ' Make an inquiry to become an investor!'}
+          </Text>
+        </View>
+      );
+    }
+
+    switch (activeTab) {
+      case 'Broker':
+        return <BrokerTabView />;
+      case 'Investor':
+        return (
+          <View>
+             <EnquiriesTab />
+          </View>
+        );
+      case 'Owner':
+        return <OwnerTabView />;
+      case 'Wishlist':
+        return <WishlistTab />;
+      default:
+        return <PortfolioTab />;
+    }
+  };
 
   return (
     <Layout>
@@ -60,7 +195,9 @@ const InvestorsScreen = () => {
               <View style={styles.profileHeader}>
                 {user?.profilePhoto || user?.profileImage ? (
                   <Image
-                    source={{ uri: (user.profilePhoto || user.profileImage) as string }}
+                    source={{
+                      uri: (user.profilePhoto || user.profileImage) as string,
+                    }}
                     style={styles.avatar}
                     resizeMode="cover"
                   />
@@ -73,6 +210,9 @@ const InvestorsScreen = () => {
                 )}
                 <View style={styles.profileInfo}>
                   <Text style={styles.userName}>{userData.name}</Text>
+                  <View style={styles.roleBadge}>
+                    <Text style={styles.roleText}>{user?.role || 'Guest'}</Text>
+                  </View>
                 </View>
               </View>
 
@@ -101,20 +241,11 @@ const InvestorsScreen = () => {
                   <View>
                     <Text style={styles.contactLabel}>MOBILE NO.</Text>
                     <Text style={styles.contactValue}>
-                      {userData.mobileNumber || 'N/A'}
+                      {userData.mobileNumber || userData.mobile || 'N/A'}
                     </Text>
                   </View>
                 </View>
               </View>
-
-              {/* <TouchableOpacity style={styles.editBtn}>
-                <Text style={styles.editBtnText}>Edit</Text>
-              </TouchableOpacity>
-
-              <Text style={styles.metaText}>
-                Joined on: {userData.joined || 'N/A'} {'\n'} Last log in:{' '}
-                {userData.lastLogin || 'N/A'}
-              </Text> */}
             </View>
             {/* Assistance */}
             <View style={styles.assistanceCard}>
@@ -133,63 +264,33 @@ const InvestorsScreen = () => {
           <View style={styles.rightColumn}>
             {/* Tabs */}
             <View style={styles.tabsContainer}>
-              <TouchableOpacity
-                style={styles.tabItem}
-                onPress={() => setActiveTab('portfolio')}
-              >
-                <Text
-                  style={[
-                    styles.tabText,
-                    activeTab === 'portfolio' && styles.activeTabText,
-                  ]}
+              {['Broker', 'Investor', 'Owner', 'Wishlist'].map(tab => (
+                <TouchableOpacity
+                  key={tab}
+                  style={styles.tabItem}
+                  onPress={() => setActiveTab(tab as any)}
                 >
-                  My Portfolio
-                </Text>
-                {activeTab === 'portfolio' && (
-                  <View style={styles.activeIndicator} />
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.tabItem}
-                onPress={() => setActiveTab('enquiries')}
-              >
-                <Text
-                  style={[
-                    styles.tabText,
-                    activeTab === 'enquiries' && styles.activeTabText,
-                  ]}
-                >
-                  Enquiries
-                </Text>
-                {activeTab === 'enquiries' && (
-                  <View style={styles.activeIndicator} />
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.tabItem}
-                onPress={() => setActiveTab('wishlist')}
-              >
-                <Text
-                  style={[
-                    styles.tabText,
-                    activeTab === 'wishlist' && styles.activeTabText,
-                  ]}
-                >
-                  Wishlist
-                </Text>
-                {activeTab === 'wishlist' && (
-                  <View style={styles.activeIndicator} />
-                )}
-              </TouchableOpacity>
+                  <Text
+                    style={[
+                      styles.tabText,
+                      activeTab === tab && styles.activeTabText,
+                      isLocked(tab) && styles.lockedTabText,
+                    ]}
+                  >
+                    {tab}
+                  </Text>
+                  {isLocked(tab) && (
+                    <View style={styles.lockIconContainer}>
+                      <Lock size={12} color="#ccc" />
+                    </View>
+                  )}
+                  {activeTab === tab && <View style={styles.activeIndicator} />}
+                </TouchableOpacity>
+              ))}
             </View>
-
 
             {/* Tab Content */}
-            <View style={styles.tabContent}>
-              {activeTab === 'portfolio' && <PortfolioTab />}
-              {activeTab === 'enquiries' && <EnquiriesTab />}
-              {activeTab === 'wishlist' && <WishlistTab />}
-            </View>
+            <View style={styles.tabContent}>{renderTabContent()}</View>
           </View>
         </View>
       </View>
@@ -303,94 +404,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
   },
-  editBtn: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    paddingVertical: 8,
-    alignItems: 'center',
-    borderRadius: 6,
-    marginTop: 10,
-  },
-  editBtnText: {
-    color: '#767676',
-    fontSize: 14,
-  },
-  metaText: {
-    fontSize: 12,
-    color: '#999',
-    textAlign: 'center',
-    marginTop: 15,
-    lineHeight: 18,
-  },
-  switchSection: {
-    marginBottom: 20,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 10,
-    color: '#333',
-  },
-  accountCard: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  accountInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  smallAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 5,
-  },
-  smallAvatarPlaceholder: {
-    width: 40,
-    height: 40,
-    borderRadius: 5,
-    backgroundColor: '#FDF2F2',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  accountName: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#EE2529',
-  },
-  roleBadgeSmall: {
-    backgroundColor: '#FFF3CA',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 10,
-    marginTop: 2,
-    alignSelf: 'flex-start',
-  },
-  roleTextSmall: {
-    fontSize: 10,
-    color: '#EE2529',
-    fontWeight: 'bold',
-  },
-  switchBtn: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  switchBtnText: {
-    fontSize: 12,
-    color: '#767676',
-  },
   assistanceCard: {
     backgroundColor: '#fff',
     alignItems: 'center',
@@ -441,6 +454,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     position: 'relative',
     alignItems: 'center',
+    flexDirection: 'row',
+    gap: 5,
   },
   tabText: {
     fontSize: 16,
@@ -450,6 +465,9 @@ const styles = StyleSheet.create({
     color: '#EE2529',
     fontWeight: 'bold',
   },
+  lockedTabText: {
+    color: '#ccc',
+  },
   activeIndicator: {
     position: 'absolute',
     bottom: 0,
@@ -457,44 +475,81 @@ const styles = StyleSheet.create({
     height: 3,
     backgroundColor: '#EE2529',
   },
-  summaryRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 15,
-    marginBottom: 20,
-  },
-  summaryCard: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 8,
-    flex: 1,
-    minWidth: 150,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-    justifyContent: 'center',
-  },
-  summaryLabelContainer: {
-    marginBottom: 5,
-  },
-  summaryLabel: {
-    fontSize: 12,
-    color: '#767676',
-    textAlign: 'center',
-  },
-  summaryValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
   tabContent: {
     borderRadius: 8,
   },
-  emptyState: {
+  tabContentContainer: {
+    flex: 1,
+  },
+  brokerStatsRow: {
+    flexDirection: 'row',
+    gap: 15,
+    marginBottom: 25,
+  },
+  brokerStatCard: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  brokerStatLabel: {
+    fontSize: 14,
+    color: '#767676',
+    marginBottom: 10,
+  },
+  brokerStatValue: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#EE2529',
+  },
+  listHeader: {
+    marginBottom: 20,
+  },
+  listTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#EE2529',
+  },
+  propertiesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 20,
+  },
+  lockedContainer: {
+    backgroundColor: '#fff',
+    padding: 40,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 200,
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  lockedTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginTop: 15,
+    marginBottom: 10,
+  },
+  lockedText: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 20,
+    maxWidth: 300,
+  },
+  lockIconContainer: {
+    marginLeft: 2,
+  },
+  emptyState: {
+    padding: 40,
+    alignItems: 'center',
   },
   emptyText: {
     color: '#999',

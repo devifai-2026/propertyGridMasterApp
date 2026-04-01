@@ -502,15 +502,15 @@ const EnquiriesScreen = () => {
               <TouchableOpacity
                 style={[
                   styles.submitButton,
-                  user?.role !== 'Broker' &&
-                    user?.role !== 'Investor' && {
-                      backgroundColor: '#CCC',
-                    },
+                  // user?.role !== 'Broker' &&
+                  //   user?.role !== 'Investor' && {
+                  //     backgroundColor: '#CCC',
+                  //   },
                 ]}
                 onPress={handleSubmit}
                 disabled={
-                  loading ||
-                  (user?.role !== 'Broker' && user?.role !== 'Investor')
+                  loading 
+                  // ||(user?.role !== 'Broker' && user?.role !== 'Investor')
                 }
               >
                 {loading ? (
@@ -543,11 +543,11 @@ const EnquiriesScreen = () => {
                   </Text>
                 )}
               </TouchableOpacity>
-              {user?.role !== 'Broker' && user?.role !== 'Investor' && (
+              {/* {user?.role !== 'Broker' && user?.role !== 'Investor' && (
                 <Text style={styles.roleWarningText}>
                   * Only Brokers and Investors can assign property.
                 </Text>
-              )}
+              )} */}
             </View>
           </View>
         </View>

@@ -14,7 +14,10 @@ interface User {
   name: string;
   firstName?: string;
   lastName?: string;
-  role: string;
+  role: string; // primary role for backward compatibility
+  roles?: string[]; // all acquired roles
+  isGuest?: boolean;
+  joinType?: string;
   email: string;
   mobileNumber?: string;
   mobile?: string;
