@@ -13,7 +13,7 @@ import {
   ScrollView,
   useWindowDimensions,
 } from 'react-native';
-import { ChevronDown, Info } from 'lucide-react-native';
+import { ChevronDown, Info, AlertTriangle } from 'lucide-react-native';
 import CustomDropdown from './CustomDropdown';
 import CustomDatePicker from './CustomDatePicker';
 
@@ -202,7 +202,10 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
             error={touched.tenantType && !!errors.tenantType}
           />
           {touched.tenantType && errors.tenantType && (
-            <Text style={styles.errorText}>{errors.tenantType}</Text>
+            <View style={styles.errorRow}>
+              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+              <Text style={styles.errorText}>{errors.tenantType}</Text>
+            </View>
           )}
         </View>
 
@@ -218,7 +221,10 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
               error={touched.leaseStartDate && !!errors.leaseStartDate}
             />
             {touched.leaseStartDate && errors.leaseStartDate && (
-              <Text style={styles.errorText}>{errors.leaseStartDate}</Text>
+              <View style={styles.errorRow}>
+                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.leaseStartDate}</Text>
+              </View>
             )}
           </View>
           <View style={styles.fieldContainer}>
@@ -231,7 +237,10 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
               error={touched.leaseExpiryDate && !!errors.leaseExpiryDate}
             />
             {touched.leaseExpiryDate && errors.leaseExpiryDate && (
-              <Text style={styles.errorText}>{errors.leaseExpiryDate}</Text>
+              <View style={styles.errorRow}>
+                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.leaseExpiryDate}</Text>
+              </View>
             )}
           </View>
         </View>
@@ -274,7 +283,10 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
               }
             />
             {touched.leaseDuration && errors.leaseDuration && (
-              <Text style={styles.errorText}>{errors.leaseDuration}</Text>
+              <View style={styles.errorRow}>
+                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.leaseDuration}</Text>
+              </View>
             )}
           </View>
         </View>
@@ -384,7 +396,10 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                 }
               />
               {touched.rentPerSqFt && errors.rentPerSqFt && (
-                <Text style={styles.errorText}>{errors.rentPerSqFt}</Text>
+                <View style={styles.errorRow}>
+                  <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                  <Text style={styles.errorText}>{errors.rentPerSqFt}</Text>
+                </View>
               )}
             </View>
           ) : (
@@ -405,8 +420,11 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                   handleBlur('totalMonthlyRent', e.nativeEvent.text)
                 }
               />
-              {touched.totalMonthlyRent && errors.totalMonthlyRent && (
-                <Text style={styles.errorText}>{errors.totalMonthlyRent}</Text>
+               {touched.totalMonthlyRent && errors.totalMonthlyRent && (
+                <View style={styles.errorRow}>
+                  <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                  <Text style={styles.errorText}>{errors.totalMonthlyRent}</Text>
+                </View>
               )}
             </View>
           )}
@@ -433,9 +451,12 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
               />
               {touched.securityDepositMonths &&
                 errors.securityDepositMonths && (
-                  <Text style={styles.errorText}>
-                    {errors.securityDepositMonths}
-                  </Text>
+                  <View style={styles.errorRow}>
+                    <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                    <Text style={styles.errorText}>
+                      {errors.securityDepositMonths}
+                    </Text>
+                  </View>
                 )}
             </View>
           ) : (
@@ -460,9 +481,12 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
               />
               {touched.securityDepositAmount &&
                 errors.securityDepositAmount && (
-                  <Text style={styles.errorText}>
-                    {errors.securityDepositAmount}
-                  </Text>
+                  <View style={styles.errorRow}>
+                    <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                    <Text style={styles.errorText}>
+                      {errors.securityDepositAmount}
+                    </Text>
+                  </View>
                 )}
             </View>
           )}
@@ -488,7 +512,10 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
               }
             />
             {touched.escalationFrequency && errors.escalationFrequency && (
-              <Text style={styles.errorText}>{errors.escalationFrequency}</Text>
+              <View style={styles.errorRow}>
+                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.escalationFrequency}</Text>
+              </View>
             )}
           </View>
           <View style={styles.fieldContainer}>
@@ -509,9 +536,12 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
               }
             />
             {touched.escalationPercentage && errors.escalationPercentage && (
-              <Text style={styles.errorText}>
-                {errors.escalationPercentage}
-              </Text>
+              <View style={styles.errorRow}>
+                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>
+                  {errors.escalationPercentage}
+                </Text>
+              </View>
             )}
           </View>
         </View>
@@ -530,7 +560,10 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
             error={touched.maintenanceScope && !!errors.maintenanceScope}
           />
           {touched.maintenanceScope && errors.maintenanceScope && (
-            <Text style={styles.errorText}>{errors.maintenanceScope}</Text>
+            <View style={styles.errorRow}>
+              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+              <Text style={styles.errorText}>{errors.maintenanceScope}</Text>
+            </View>
           )}
         </View>
 
@@ -616,10 +649,22 @@ const styles = StyleSheet.create({
     color: '#444',
     marginBottom: 6,
   },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+    paddingLeft: 12,
+  },
+  errorIcon: {
+    color: '#EE2529',
+    fontSize: 10,
+    fontWeight: '700',
+  },
   errorText: {
     color: '#EE2529',
-    fontSize: 11,
-    marginTop: 4,
+    fontSize: 13,
+    fontWeight: '500',
   },
   inputWrapper: {
     position: 'relative',
@@ -633,7 +678,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     borderWidth: 1,
-    borderColor: 'transparent',
+    borderColor: '#eee', // subtle border by default or transparent
   },
   inputError: {
     borderColor: '#EE2529',

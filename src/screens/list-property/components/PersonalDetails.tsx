@@ -16,6 +16,7 @@ import {
   useWindowDimensions,
   Alert,
 } from 'react-native';
+import { AlertTriangle } from 'lucide-react-native';
 
 import { useAuth } from '../../../context/AuthContext';
 import { useAuthAPIs } from '../../../../helpers/hooks/authAPIs/useAuthAPIs';
@@ -311,7 +312,10 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
               onBlur={(e: any) => handleBlur('firstName', e.nativeEvent.text)}
             />
             {touched.firstName && errors.firstName && (
-              <Text style={styles.errorText}>{errors.firstName}</Text>
+              <View style={styles.errorRow}>
+              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.firstName}</Text>
+              </View>
             )}
           </View>
 
@@ -329,7 +333,10 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
               onBlur={(e: any) => handleBlur('lastName', e.nativeEvent.text)}
             />
             {touched.lastName && errors.lastName && (
-              <Text style={styles.errorText}>{errors.lastName}</Text>
+              <View style={styles.errorRow}>
+              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.lastName}</Text>
+              </View>
             )}
           </View>
         </View>
@@ -349,7 +356,10 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
             onBlur={(e: any) => handleBlur('email', e.nativeEvent.text)}
           />
           {touched.email && errors.email && (
-            <Text style={styles.errorText}>{errors.email}</Text>
+            <View style={styles.errorRow}>
+              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
+              <Text style={styles.errorText}>{errors.email}</Text>
+            </View>
           )}
         </View>
 
@@ -391,7 +401,10 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
             </TouchableOpacity>
           </View>
           {touched.listUnder && errors.listUnder && (
-            <Text style={styles.errorText}>{errors.listUnder}</Text>
+            <View style={styles.errorRow}>
+              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
+              <Text style={styles.errorText}>{errors.listUnder}</Text>
+            </View>
           )}
         </View>
 
@@ -445,7 +458,10 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
             </TouchableOpacity>
           </View>
           {touched.mobile && errors.mobile && (
-            <Text style={styles.errorText}>{errors.mobile}</Text>
+            <View style={styles.errorRow}>
+              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
+              <Text style={styles.errorText}>{errors.mobile}</Text>
+            </View>
           )}
         </View>
 
@@ -495,7 +511,10 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
               <Text style={styles.verifiedText}>✓ Verified</Text>
             )}
             {touched.otp && errors.otp && !isOtpVerified && (
-              <Text style={styles.errorText}>{errors.otp}</Text>
+              <View style={styles.errorRow}>
+              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.otp}</Text>
+              </View>
             )}
           </View>
         )}
@@ -519,9 +538,10 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
             </Text>
           </TouchableOpacity>
           {isSubmitted && !formData.agreeTerms && (
-            <Text style={styles.errorText}>
-              Please agree to terms & conditions
-            </Text>
+            <View style={styles.errorRow}>
+              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
+              <Text style={styles.errorText}>Please agree to terms & conditions</Text>
+            </View>
           )}
 
           <TouchableOpacity
@@ -541,7 +561,10 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
             </Text>
           </TouchableOpacity>
           {isSubmitted && !formData.agreePrivacy && (
-            <Text style={styles.errorText}>Please agree to Privacy Policy</Text>
+            <View style={styles.errorRow}>
+              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
+              <Text style={styles.errorText}>Please agree to Privacy Policy</Text>
+            </View>
           )}
         </View>
       </View>
@@ -596,10 +619,22 @@ const styles = StyleSheet.create({
   inputError: {
     borderColor: '#EE2529',
   },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+    paddingLeft: 12,
+  },
+  errorIcon: {
+    color: '#EE2529',
+    fontSize: 10,
+    fontWeight: '700',
+  },
   errorText: {
     color: '#EE2529',
-    fontSize: 11,
-    marginTop: 4,
+    fontSize: 13,
+    fontWeight: '500',
   },
   radioGroup: {
     flexDirection: 'row',

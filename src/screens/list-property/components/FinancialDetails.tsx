@@ -13,7 +13,7 @@ import {
   ScrollView,
   useWindowDimensions,
 } from 'react-native';
-import { Info } from 'lucide-react-native';
+import { Info, AlertTriangle } from 'lucide-react-native';
 
 interface FinancialDetailsProps {
   onNext: (data: any) => void;
@@ -154,7 +154,10 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
             onBlur={() => handleBlur('sellingPrice')}
           />
           {touched.sellingPrice && errors.sellingPrice && (
-            <Text style={styles.errorText}>{errors.sellingPrice}</Text>
+            <View style={styles.errorRow}>
+              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
+              <Text style={styles.errorText}>{errors.sellingPrice}</Text>
+            </View>
           )}
         </View>
 
@@ -174,7 +177,10 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
               onBlur={() => handleBlur('propertyTax')}
             />
             {touched.propertyTax && errors.propertyTax && (
-              <Text style={styles.errorText}>{errors.propertyTax}</Text>
+              <View style={styles.errorRow}>
+                <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
+                <Text style={styles.errorText}>{errors.propertyTax}</Text>
+              </View>
             )}
           </View>
           <View style={styles.fieldContainer}>
@@ -191,7 +197,10 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
               onBlur={() => handleBlur('insurance')}
             />
             {touched.insurance && errors.insurance && (
-              <Text style={styles.errorText}>{errors.insurance}</Text>
+              <View style={styles.errorRow}>
+              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.insurance}</Text>
+              </View>
             )}
           </View>
         </View>
@@ -309,10 +318,22 @@ const styles = StyleSheet.create({
     color: '#444',
     marginBottom: 6,
   },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+    paddingLeft: 12,
+  },
+  errorIcon: {
+    color: '#EE2529',
+    fontSize: 10,
+    fontWeight: '700',
+  },
   errorText: {
     color: '#EE2529',
-    fontSize: 11,
-    marginTop: 4,
+    fontSize: 13,
+    fontWeight: '500',
   },
   input: {
     backgroundColor: '#F2F2F2',
@@ -322,7 +343,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     borderWidth: 1,
-    borderColor: 'transparent',
+    borderColor: '#eee', // subtle border by default or transparent
   },
   inputError: {
     borderColor: '#EE2529',

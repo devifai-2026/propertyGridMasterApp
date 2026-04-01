@@ -14,7 +14,7 @@ import {
   Platform,
   useWindowDimensions,
 } from 'react-native';
-import { Upload } from 'lucide-react-native';
+import { Upload, AlertTriangle } from 'lucide-react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import CustomDropdown from './CustomDropdown';
 import CustomMultiSelect from './CustomMultiSelect';
@@ -245,7 +245,10 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
             error={touched.propertyType && !!errors.propertyType}
           />
           {touched.propertyType && errors.propertyType && (
-            <Text style={styles.errorText}>{errors.propertyType}</Text>
+            <View style={styles.errorRow}>
+              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+              <Text style={styles.errorText}>{errors.propertyType}</Text>
+            </View>
           )}
         </View>
 
@@ -272,7 +275,10 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
               </View>
             </View>
             {touched.carpetArea && errors.carpetArea && (
-              <Text style={styles.errorText}>{errors.carpetArea}</Text>
+              <View style={styles.errorRow}>
+                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.carpetArea}</Text>
+              </View>
             )}
           </View>
 
@@ -290,7 +296,10 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
               onBlur={(e: any) => handleBlur('builtYear', e.nativeEvent.text)}
             />
             {touched.builtYear && errors.builtYear && (
-              <Text style={styles.errorText}>{errors.builtYear}</Text>
+              <View style={styles.errorRow}>
+                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.builtYear}</Text>
+              </View>
             )}
           </View>
         </View>
@@ -310,7 +319,10 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
               error={touched.buildingGrade && !!errors.buildingGrade}
             />
             {touched.buildingGrade && errors.buildingGrade && (
-              <Text style={styles.errorText}>{errors.buildingGrade}</Text>
+              <View style={styles.errorRow}>
+                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.buildingGrade}</Text>
+              </View>
             )}
           </View>
 
@@ -328,7 +340,10 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
               error={touched.ownership && !!errors.ownership}
             />
             {touched.ownership && errors.ownership && (
-              <Text style={styles.errorText}>{errors.ownership}</Text>
+              <View style={styles.errorRow}>
+                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.ownership}</Text>
+              </View>
             )}
           </View>
         </View>
@@ -353,7 +368,10 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
               }
             />
             {touched.fourWheelerParkings && errors.fourWheelerParkings && (
-              <Text style={styles.errorText}>{errors.fourWheelerParkings}</Text>
+              <View style={styles.errorRow}>
+                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.fourWheelerParkings}</Text>
+              </View>
             )}
           </View>
           <View style={styles.fieldContainer}>
@@ -374,7 +392,10 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
               }
             />
             {touched.twoWheelerParkings && errors.twoWheelerParkings && (
-              <Text style={styles.errorText}>{errors.twoWheelerParkings}</Text>
+              <View style={styles.errorRow}>
+                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.twoWheelerParkings}</Text>
+              </View>
             )}
           </View>
         </View>
@@ -395,7 +416,10 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
               error={touched.furnishingStatus && !!errors.furnishingStatus}
             />
             {touched.furnishingStatus && errors.furnishingStatus && (
-              <Text style={styles.errorText}>{errors.furnishingStatus}</Text>
+              <View style={styles.errorRow}>
+                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.furnishingStatus}</Text>
+              </View>
             )}
           </View>
           <View style={styles.fieldContainer}>
@@ -595,10 +619,22 @@ const styles = StyleSheet.create({
     color: '#444',
     marginBottom: 6,
   },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+    paddingLeft: 12,
+  },
+  errorIcon: {
+    color: '#EE2529',
+    fontSize: 10,
+    fontWeight: '700',
+  },
   errorText: {
     color: '#EE2529',
-    fontSize: 11,
-    marginTop: 4,
+    fontSize: 13,
+    fontWeight: '500',
   },
   inputWrapper: {
     position: 'relative',
@@ -612,7 +648,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     borderWidth: 1,
-    borderColor: 'transparent',
+    borderColor: '#eee', // subtle border by default or transparent
   },
   inputError: {
     borderColor: '#EE2529',

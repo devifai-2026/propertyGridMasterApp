@@ -16,6 +16,7 @@ import {
   Easing,
   Image,
 } from 'react-native';
+import { AlertTriangle } from 'lucide-react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
@@ -492,7 +493,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
           />
           {fieldErrors.phone ? (
             <View style={styles.errorRow}>
-              <Text style={styles.errorIcon}>▲</Text>
+              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
               <Text style={styles.errorText}>{fieldErrors.phone}</Text>
             </View>
           ) : null}
@@ -536,7 +537,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               />
               {fieldErrors.locality ? (
                 <View style={styles.errorRow}>
-                  <Text style={styles.errorIcon}>▲</Text>
+                  <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
                   <Text style={styles.errorText}>{fieldErrors.locality}</Text>
                 </View>
               ) : null}
@@ -559,7 +560,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               </View>
               {fieldErrors.specializations ? (
                 <View style={styles.errorRow}>
-                  <Text style={styles.errorIcon}>▲</Text>
+                  <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
                   <Text style={styles.errorText}>{fieldErrors.specializations}</Text>
                 </View>
               ) : null}
@@ -583,7 +584,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               />
               {fieldErrors.dealsClosed ? (
                 <View style={styles.errorRow}>
-                  <Text style={styles.errorIcon}>▲</Text>
+                  <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
                   <Text style={styles.errorText}>{fieldErrors.dealsClosed}</Text>
                 </View>
               ) : null}
@@ -611,7 +612,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
           />
           {fieldErrors.email ? (
             <View style={styles.errorRow}>
-              <Text style={styles.errorIcon}>▲</Text>
+              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
               <Text style={styles.errorText}>{fieldErrors.email}</Text>
             </View>
           ) : null}
@@ -638,7 +639,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
         {checkboxError && (
           <View style={styles.errorRow}>
-            <Text style={styles.errorIcon}>▲</Text>
+            <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
             <Text style={styles.errorText}>Please agree to the Terms & Conditions and Privacy Policy</Text>
           </View>
         )}
@@ -879,9 +880,23 @@ const styles = StyleSheet.create({
   textInputError:   { borderColor: '#EE2529' },
 
   /* ── Field errors ── */
-  errorRow:  { flexDirection: 'row', alignItems: 'center', marginTop: 6, gap: 5 },
-  errorIcon: { color: '#EE2529', fontSize: 10, fontWeight: '700' },
-  errorText: { color: '#EE2529', fontSize: 12, lineHeight: 14 },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+    paddingLeft: 12,
+  },
+  errorIcon: {
+    color: '#EE2529',
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  errorText: {
+    color: '#EE2529',
+    fontSize: 13,
+    fontWeight: '500',
+  },
 
   /* ── Checkboxes ── */
   checkRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 14 , paddingHorizontal: 48},

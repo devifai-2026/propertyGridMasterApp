@@ -129,6 +129,32 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     });
   };
 
+  if (!user) {
+    return (
+      <TouchableOpacity
+        activeOpacity={0.95}
+        onPress={() => navigate('/login')}
+        style={[styles.propertyCard, styles.lockedCard, { width }, style]}
+      >
+        <LinearGradient
+          colors={['#F9FAFB', '#FFFFFF']}
+          style={styles.lockedGradient}
+        >
+          <View style={styles.lockedIconCircle}>
+            <MapPin size={24} color="#ccc" style={{ marginBottom: 8 }} />
+          </View>
+          <Text style={styles.lockedTitle}>Exclusive Property Listing</Text>
+          <Text style={styles.lockedSub}>
+            Please sign in to view location, pricing, and ROI details of this premium space.
+          </Text>
+          <View style={styles.lockedLoginBtn}>
+            <Text style={styles.lockedLoginBtnText}>Sign In to Unlock</Text>
+          </View>
+        </LinearGradient>
+      </TouchableOpacity>
+    );
+  }
+
   return (
     <View style={[styles.propertyCard, { width }, style]}>
       {/* Header Section */}
@@ -594,6 +620,55 @@ const styles = StyleSheet.create({
     top: 5,
     left: 5,
     zIndex: 10,
+  },
+  lockedCard: {
+    height: 380,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderStyle: 'dashed',
+    borderColor: '#D1D5DB',
+  },
+  lockedGradient: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  lockedIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#F3F4F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  lockedTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#374151',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  lockedSub: {
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 24,
+    paddingHorizontal: 20,
+  },
+  lockedLoginBtn: {
+    backgroundColor: '#EE2529',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  lockedLoginBtnText: {
+    color: '#FFF',
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
 

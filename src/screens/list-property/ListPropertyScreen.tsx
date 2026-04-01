@@ -22,6 +22,7 @@ import {
   Percent,
   Home,
   Users,
+  AlertTriangle,
 } from 'lucide-react-native';
 import { Alert, ActivityIndicator } from 'react-native';
 
@@ -653,6 +654,7 @@ const ListPropertyScreen = () => {
         <View style={styles.formCardWrapper}>
           {errorMessage && (
             <View style={styles.errorBanner}>
+              <AlertTriangle size={16} color="#EE2529" strokeWidth={3} />
               <Text style={styles.errorBannerText}>{errorMessage}</Text>
               {(errorMessage.includes('broker profile') || 
                 errorMessage.includes('complete your profile')) && (
@@ -992,10 +994,10 @@ const styles = StyleSheet.create({
     borderLeftColor: '#EE2529',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: 12,
   },
   errorBannerText: {
-    color: '#B71C1C',
+    color: '#EE2529',
     fontSize: 14,
     fontWeight: '600',
     flex: 1,

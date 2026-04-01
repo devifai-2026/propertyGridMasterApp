@@ -13,7 +13,7 @@ import {
   ScrollView,
   useWindowDimensions,
 } from 'react-native';
-import { ChevronDown, Plus, X, Trash2 } from 'lucide-react-native';
+import { ChevronDown, Plus, X, Trash2, AlertTriangle } from 'lucide-react-native';
 import CustomDropdown from './CustomDropdown';
 
 const INDIAN_STATES = [
@@ -258,7 +258,10 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
             onBlur={(e: any) => handleBlur('microMarket', e.nativeEvent.text)}
           />
           {touched.microMarket && errors.microMarket && (
-            <Text style={styles.errorText}>{errors.microMarket}</Text>
+            <View style={styles.errorRow}>
+              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
+              <Text style={styles.errorText}>{errors.microMarket}</Text>
+            </View>
           )}
         </View>
 
@@ -280,7 +283,10 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
               searchable
             />
             {touched.state && errors.state && (
-              <Text style={styles.errorText}>{errors.state}</Text>
+              <View style={styles.errorRow}>
+                <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
+                <Text style={styles.errorText}>{errors.state}</Text>
+              </View>
             )}
           </View>
 
@@ -306,7 +312,10 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
               searchable
             />
             {touched.city && errors.city && (
-              <Text style={styles.errorText}>{errors.city}</Text>
+              <View style={styles.errorRow}>
+              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.city}</Text>
+              </View>
             )}
           </View>
         </View>
@@ -483,10 +492,22 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 4,
   },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+    paddingLeft: 12,
+  },
+  errorIcon: {
+    color: '#EE2529',
+    fontSize: 10,
+    fontWeight: '700',
+  },
   errorText: {
     color: '#EE2529',
-    fontSize: 11,
-    marginTop: 4,
+    fontSize: 13,
+    fontWeight: '500',
   },
   inputWrapper: {
     position: 'relative',
@@ -500,7 +521,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     borderWidth: 1,
-    borderColor: 'transparent',
+    borderColor: '#eee', // subtle border by default or transparent
   },
   inputError: {
     borderColor: '#EE2529',

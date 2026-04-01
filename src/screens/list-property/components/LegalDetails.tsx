@@ -13,7 +13,7 @@ import {
   ScrollView,
   useWindowDimensions,
 } from 'react-native';
-import { Plus, X } from 'lucide-react-native';
+import { Plus, X, AlertTriangle } from 'lucide-react-native';
 import CustomDropdown from './CustomDropdown';
 
 interface LegalDetailsProps {
@@ -188,7 +188,10 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
             error={touched.titleStatus && !!errors.titleStatus}
           />
           {touched.titleStatus && errors.titleStatus && (
-            <Text style={styles.errorText}>{errors.titleStatus}</Text>
+            <View style={styles.errorRow}>
+              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
+              <Text style={styles.errorText}>{errors.titleStatus}</Text>
+            </View>
           )}
         </View>
 
@@ -209,9 +212,12 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
               }
             />
             {touched.occupancyCertificate && errors.occupancyCertificate && (
-              <Text style={styles.errorText}>
-                {errors.occupancyCertificate}
-              </Text>
+              <View style={styles.errorRow}>
+              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>
+                  {errors.occupancyCertificate}
+                </Text>
+              </View>
             )}
           </View>
 
@@ -229,7 +235,10 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
               error={touched.leaseRegistration && !!errors.leaseRegistration}
             />
             {touched.leaseRegistration && errors.leaseRegistration && (
-              <Text style={styles.errorText}>{errors.leaseRegistration}</Text>
+              <View style={styles.errorRow}>
+              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.leaseRegistration}</Text>
+              </View>
             )}
           </View>
         </View>
@@ -278,7 +287,10 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
             </TouchableOpacity>
           </View>
           {touched.pendingLitigations && errors.pendingLitigations && (
-            <Text style={styles.errorText}>{errors.pendingLitigations}</Text>
+            <View style={styles.errorRow}>
+              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
+              <Text style={styles.errorText}>{errors.pendingLitigations}</Text>
+            </View>
           )}
         </View>
 
@@ -303,7 +315,10 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
               }
             />
             {touched.litigationNote && errors.litigationNote && (
-              <Text style={styles.errorText}>{errors.litigationNote}</Text>
+              <View style={styles.errorRow}>
+              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <Text style={styles.errorText}>{errors.litigationNote}</Text>
+              </View>
             )}
           </View>
         )}
@@ -408,10 +423,22 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 8,
   },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+    paddingLeft: 12,
+  },
+  errorIcon: {
+    color: '#EE2529',
+    fontSize: 10,
+    fontWeight: '700',
+  },
   errorText: {
     color: '#EE2529',
-    fontSize: 11,
-    marginTop: 4,
+    fontSize: 13,
+    fontWeight: '500',
   },
   inputWrapper: {
     position: 'relative',
@@ -425,7 +452,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     borderWidth: 1,
-    borderColor: 'transparent',
+    borderColor: '#eee', // subtle border by default or transparent
   },
   inputError: {
     borderColor: '#EE2529',
