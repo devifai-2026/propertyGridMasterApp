@@ -8,6 +8,9 @@ import {
   ScrollView,
   Dimensions,
   ActivityIndicator,
+  Modal,
+  TextInput,
+  Alert,
 } from 'react-native';
 import Layout from '../../layout/Layout';
 import { Mail, Phone, Edit, ArrowRight, User, Lock } from 'lucide-react-native';
@@ -110,13 +113,79 @@ const OwnerTabView = () => {
 };
 
 const InvestorsScreen = () => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { getAvailableRoles } = useAuthAPIs();
   const [activeTab, setActiveTab] = useState<
     'Broker' | 'Investor' | 'Owner' | 'Wishlist'
   >('Broker');
   const [roleStatuses, setRoleStatuses] = useState<any[]>([]);
   const [loadingRoles, setLoadingRoles] = useState(true);
+  const { sendOtp, changeMobile, loading: authLoading } = useAuthAPIs();
+  
+  // Change Mobile State
+  const [isMobileModalVisible, setIsMobileModalVisible] = useState(false);
+  const [newMobile, setNewMobile] = useState('');
+  const [otp, setOtp] = useState('');
+  const [verificationId, setVerificationId] = useState('');
+  const [step, setStep] = useState<'request' | 'verify'>('request');
+
+  const handleOpenMobileModal = () => {
+    setNewMobile('');
+    setOtp('');
+    setVerificationId('');
+    setStep('request');
+    setIsMobileModalVisible(true);
+  };
+
+  const handleSendOtp = () => {
+    if (!newMobile || newMobile.length < 10) {
+      Alert.alert('Error', 'Please enter a valid mobile number');
+      return;
+    }
+
+    sendOtp(
+      { mobileNumber: newMobile },
+      (res: any) => {
+        if (res.success && res.data) {
+          setVerificationId(res.data.verificationId);
+          setStep('verify');
+        } else {
+          Alert.alert('Error', res.message || 'Failed to send OTP');
+        }
+      },
+      (err: any) => {
+        Alert.alert('Error', err?.message || 'Failed to send OTP');
+      }
+    );
+  };
+
+  const handleChangeMobile = () => {
+    if (!otp || otp.length < 4) {
+      Alert.alert('Error', 'Please enter a valid OTP');
+      return;
+    }
+
+    changeMobile(
+      { 
+        newMobileNumber: newMobile, 
+        otp, 
+        verificationId 
+      },
+      (res: any) => {
+        if (res.success) {
+          Alert.alert('Success', 'Mobile number updated successfully');
+          setIsMobileModalVisible(false);
+          // Update global auth state
+          updateUser({ mobileNumber: newMobile, mobile: newMobile });
+        } else {
+          Alert.alert('Error', res.message || 'Failed to update mobile number');
+        }
+      },
+      (err: any) => {
+        Alert.alert('Error', err?.message || 'Failed to update mobile number');
+      }
+    );
+  };
 
   useEffect(() => {
     getAvailableRoles(
@@ -236,10 +305,17 @@ const InvestorsScreen = () => {
                 <View style={styles.contactRow}>
                   <Phone size={16} color="#EE2529" />
                   <View>
-                    <Text style={styles.contactLabel}>MOBILE NO.</Text>
-                    <Text style={styles.contactValue}>
-                      {userData.mobileNumber || userData.mobile || 'N/A'}
-                    </Text>
+                    <View style={styles.mobileValueRow}>
+                      <Text style={styles.contactValue}>
+                        {userData.mobileNumber || userData.mobile || 'N/A'}
+                      </Text>
+                      <TouchableOpacity 
+                        style={styles.editBtnSmall}
+                        onPress={handleOpenMobileModal}
+                      >
+                        <Edit size={14} color="#666" />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
               </View>
@@ -291,6 +367,87 @@ const InvestorsScreen = () => {
           </View>
         </View>
       </View>
+
+      {/* Change Mobile Modal */}
+      <Modal
+        visible={isMobileModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsMobileModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                {step === 'request' ? 'Change Mobile Number' : 'Verify OTP'}
+              </Text>
+              <TouchableOpacity onPress={() => setIsMobileModalVisible(false)}>
+                <Text style={styles.closeBtn}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalBody}>
+              {step === 'request' ? (
+                <>
+                  <Text style={styles.modalText}>
+                    Enter your new mobile number to receive a verification code.
+                  </Text>
+                  <TextInput
+                    style={styles.modalInput}
+                    placeholder="Enter New Mobile Number"
+                    keyboardType="phone-pad"
+                    value={newMobile}
+                    onChangeText={setNewMobile}
+                    maxLength={10}
+                  />
+                  <TouchableOpacity 
+                    style={styles.modalActionBtn}
+                    onPress={handleSendOtp}
+                    disabled={authLoading}
+                  >
+                    {authLoading ? (
+                      <ActivityIndicator color="#FFF" size="small" />
+                    ) : (
+                      <Text style={styles.modalActionBtnText}>Send OTP</Text>
+                    )}
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.modalText}>
+                    Enter the OTP sent to +91 {newMobile}
+                  </Text>
+                  <TextInput
+                    style={styles.modalInput}
+                    placeholder="Enter OTP"
+                    keyboardType="number-pad"
+                    value={otp}
+                    onChangeText={setOtp}
+                    maxLength={6}
+                  />
+                  <TouchableOpacity 
+                    style={styles.modalActionBtn}
+                    onPress={handleChangeMobile}
+                    disabled={authLoading}
+                  >
+                    {authLoading ? (
+                      <ActivityIndicator color="#FFF" size="small" />
+                    ) : (
+                      <Text style={styles.modalActionBtnText}>Verify & Change</Text>
+                    )}
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                    style={styles.resendBtn}
+                    onPress={() => setStep('request')}
+                  >
+                    <Text style={styles.resendBtnText}>Try different number</Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          </View>
+        </View>
+      </Modal>
     </Layout>
   );
 };
@@ -551,6 +708,88 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     color: '#999',
+  },
+  mobileValueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  editBtnSmall: {
+    padding: 4,
+    backgroundColor: '#f3f4f6',
+    borderRadius: 4,
+  },
+  
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    width: isDesktop ? 400 : '100%',
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1f2937',
+  },
+  closeBtn: {
+    fontSize: 20,
+    color: '#6b7280',
+    fontWeight: '300',
+  },
+  modalBody: {
+    gap: 16,
+  },
+  modalText: {
+    fontSize: 14,
+    color: '#4b5563',
+    lineHeight: 20,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: '#111827',
+  },
+  modalActionBtn: {
+    backgroundColor: '#EE2529',
+    borderRadius: 8,
+    padding: 14,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  modalActionBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  resendBtn: {
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  resendBtnText: {
+    color: '#6b7280',
+    fontSize: 14,
   },
 });
 
