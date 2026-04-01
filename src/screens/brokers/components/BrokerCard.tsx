@@ -1,6 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Platform } from 'react-native';
 import { MapPin, Phone, Mail, X } from 'lucide-react-native';
+import LinearGradient from 'react-native-linear-gradient';
+import bottom from "../../../assets/ExploreBrokers/bottom.png";
+import top from "../../../assets/ExploreBrokers/top.png";
 
 interface BrokerCardProps {
   item: any;
@@ -18,7 +21,22 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
   onToggleContact,
 }) => {
   return (
-    <View style={[styles.card, { width: isDesktop ? '48%' : '100%' }]}>
+    <View style={[styles.card, { width: isDesktop ? '49.3%' : '100%' }]}>
+      {!isMobile && (
+        <>
+          <Image 
+            source={bottom} 
+            style={styles.bottomOrnament} 
+            resizeMode="contain" 
+          />
+          <Image 
+            source={top} 
+            style={styles.topOrnament} 
+            resizeMode="stretch" 
+          />
+        </>
+      )}
+      
       <View
         style={[
           styles.cardContent,
@@ -30,63 +48,71 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
           style={[
             styles.leftSection,
             !isMobile
-              ? { flex: 1, alignItems: 'flex-start' }
+              ? { width: 220, alignItems: 'flex-start' }
               : { width: '100%', alignItems: 'center' },
           ]}
         >
           <View style={{ alignItems: isMobile ? 'center' : 'flex-start' }}>
+            <Text style={styles.brokerCompany}>{item.name || "APJ Realtors"}</Text>
             <Image
               source={require('../../../assets/ExploreBrokers/cardImg.png')}
               style={styles.brokerImage}
               resizeMode="cover"
             />
-            {!isMobile && <Text style={styles.brokerCompany}>{item.name}</Text>}
           </View>
 
           {isVisibleContact ? (
             <View style={styles.contactInfoContainer}>
               <View style={styles.contactItem}>
-                <Phone size={14} color="#666" />
+                <Phone size={12} color="#EE2529" />
                 <Text style={styles.contactInfoText}>{item.mobileNumber}</Text>
               </View>
               <View style={styles.contactItem}>
-                <Mail size={14} color="#666" />
+                <Mail size={12} color="#EE2529" />
                 <Text style={styles.contactInfoText}>{item.email}</Text>
               </View>
               <TouchableOpacity
                 onPress={onToggleContact}
                 style={styles.closeContactBtn}
               >
-                <X size={14} color="#EE2529" />
+                <X size={12} color="#EE2529" />
                 <Text style={styles.hideContactText}>Close</Text>
               </TouchableOpacity>
             </View>
           ) : (
             <TouchableOpacity
-              style={styles.contactBtn}
               onPress={onToggleContact}
+              activeOpacity={0.8}
             >
-              <Text style={styles.contactBtnText}>Contact Broker</Text>
+              <LinearGradient
+                colors={['#EE2529', '#C73834']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.contactBtn}
+              >
+                <Text style={styles.contactBtnText}>Contact Broker</Text>
+              </LinearGradient>
             </TouchableOpacity>
           )}
         </View>
+
 
         {/* Right Section */}
         <View
           style={[
             styles.rightSection,
             !isMobile
-              ? { flex: 1.5 }
-              : { width: '100%', marginTop: isVisibleContact ? 25 : 0 },
+              ? { flex: 1 }
+              : { width: '100%', marginTop: isVisibleContact ? 25 : 10 },
           ]}
         >
           <Text
             style={[
               styles.agentName,
-              { textAlign: !isMobile ? 'left' : 'center' },
+              { fontSize: isMobile ? 24 : 32, textAlign: !isMobile ? 'left' : 'center' },
             ]}
           >
-            {item.agentName}
+            {item.agentName || "Rajendra P"}
           </Text>
           <View
             style={[
@@ -94,17 +120,12 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
               { justifyContent: !isMobile ? 'flex-start' : 'center' },
             ]}
           >
-            <MapPin size={14} color="#EE2529" />
-            <Text style={styles.locationText}>{item.location}</Text>
-            <Text style={styles.reraText}>RERA: {item.rera}</Text>
+            <MapPin size={isMobile ? 14 : 18} color="#EE2529" />
+            <Text style={[styles.locationText, isMobile && { fontSize: 14 }]}>{item.location || "Pune"}</Text>
+            <Text style={[styles.reraText, isMobile && { fontSize: 14 }]}>RERA : {item.rera || "123456789"}</Text>
           </View>
 
-          <View
-            style={[
-              styles.divider,
-              { alignSelf: !isMobile ? 'flex-start' : 'center' },
-            ]}
-          />
+          <View style={styles.divider} />
 
           <View style={styles.specializationContainer}>
             <Text
@@ -113,44 +134,28 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
                 { textAlign: !isMobile ? 'left' : 'center' },
               ]}
             >
-              Expertise
+              Specializes In:
             </Text>
-            <View
-              style={[
-                styles.tagsRow,
-                { justifyContent: !isMobile ? 'flex-start' : 'center' },
-              ]}
-            >
-              {item.tags.map((tag: any, idx: number) => (
-                <View key={idx} style={styles.tag}>
-                  <Text style={styles.tagText}>{tag}</Text>
-                </View>
-              ))}
-            </View>
+            {(item.tags && item.tags.length > 0 ? item.tags : ['MNC Client', 'Industrial', 'Residential', 'Commercial', 'Office Lease']).map((tag: any, idx: number) => (
+              <View key={idx} style={styles.tag}>
+                <Text style={[styles.tagText, isMobile && { fontSize: 14 }]}>{tag}</Text>
+              </View>
+            ))}
           </View>
 
-          <View
-            style={[
-              styles.statsRow,
-              {
-                flexDirection: 'row',
-                justifyContent: !isMobile ? 'flex-start' : 'center',
-                gap: 25,
-              },
-            ]}
-          >
-            <View style={styles.statGroup}>
-              <Text style={styles.statHighlight}>{item.propertiesListed}</Text>
-              <Text style={styles.statLabel}>Properties</Text>
+          <View style={styles.statsColumn}>
+            <View style={styles.statLine}>
+              <Text style={[styles.statHighlight, isMobile && { fontSize: 16 }]}>{item.propertiesListed || 7}</Text>
+              <Text style={[styles.statLabel, isMobile && { fontSize: 14 }]}>Properties Listed</Text>
             </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statGroup}>
-              <Text style={styles.statHighlight}>{item.dealsClosed}</Text>
-              <Text style={styles.statLabel}>Deals</Text>
+            <View style={styles.statLine}>
+              <Text style={[styles.statHighlight, isMobile && { fontSize: 16 }]}>{item.dealsClosed || 45}</Text>
+              <Text style={[styles.statLabel, isMobile && { fontSize: 14 }]}>Deals Closed</Text>
             </View>
           </View>
         </View>
       </View>
+
     </View>
   );
 };
@@ -158,176 +163,184 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
-    borderRadius: 16,
+    borderRadius: 24,
     marginBottom: 30,
     shadowColor: '#000',
-    shadowOpacity: 0.04,
+    shadowOpacity: 0.08,
     shadowRadius: 20,
-    elevation: 4,
+    elevation: 8,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#f2f2f2',
+    borderColor: '#eee',
+    ...Platform.select({
+      web: {
+        cursor: 'default',
+      } as any,
+    }),
   },
   cardContent: {
-    padding: 15,
-    gap: 15,
+    padding: 30,
+    gap: 30,
+    zIndex: 2,
   },
   leftSection: {
     justifyContent: 'space-between',
   },
   brokerCompany: {
-    fontSize: 14,
+    fontSize: 24,
     fontWeight: '600',
-    color: '#888',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: 10,
+    color: '#EE2529',
+    marginBottom: 20,
   },
   brokerImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 12,
-    marginBottom: 15,
-    backgroundColor: '#f9f9f9',
+    width: 140,
+    height: 140,
+    borderRadius: 16,
+    marginBottom: 20,
+    backgroundColor: '#f5f5f5',
   },
   contactBtn: {
-    backgroundColor: '#EE2529',
     paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    minWidth: 160,
+    paddingHorizontal: 20,
+    borderRadius: 6,
     alignItems: 'center',
-    marginTop: 15,
+    width: 160,
+    marginTop: 10,
   },
   contactBtnText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontWeight: '600',
     fontSize: 14,
-    letterSpacing: 0.5,
   },
   contactInfoContainer: {
     backgroundColor: '#fff',
-    padding: 16,
+    padding: 15,
     borderRadius: 12,
-    marginTop: 15,
+    marginTop: 10,
     width: '100%',
     borderWidth: 1,
-    borderColor: '#f0f0f0',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
-    gap: 12,
+    borderColor: '#eee',
+    gap: 10,
   },
   contactItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
   },
   contactInfoText: {
-    fontSize: 14,
-    color: '#1a1a1a',
+    fontSize: 13,
+    color: '#333',
     fontWeight: '500',
-    letterSpacing: 0.2,
   },
   closeContactBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
-    marginTop: 4,
-    paddingTop: 12,
+    gap: 5,
+    marginTop: 5,
+    paddingTop: 10,
     borderTopWidth: 1,
     borderTopColor: '#f5f5f5',
   },
   hideContactText: {
     fontSize: 12,
     color: '#EE2529',
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
+    fontWeight: 'bold',
   },
   rightSection: {
-    // No fixed flex to avoid clashing in column layout
+    justifyContent: 'flex-start',
   },
   agentName: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 32,
+    fontWeight: '600',
     color: '#EE2529',
-    marginBottom: 4,
+    marginBottom: 8,
   },
   locationRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
-    gap: 10,
-    marginBottom: 10,
-  },
-  locationText: {
-    fontSize: 14,
-    color: '#666',
-  },
-  reraText: {
-    fontSize: 14,
-    color: '#666',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#EE2529',
-    marginVertical: 10,
-    width: 50,
-  },
-  specializationContainer: {
+    gap: 8,
     marginBottom: 15,
   },
-  specLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 8,
+  locationText: {
+    fontSize: 18,
+    color: '#666',
+    fontWeight: '400',
   },
-  tagsRow: {
+  reraText: {
+    fontSize: 18,
+    color: '#666',
+    fontWeight: '400',
+    marginLeft: 10,
+  },
+  divider: {
+    height: 2,
+    backgroundColor: '#EE2529',
+    marginBottom: 25,
+    width: '100%',
+    opacity: 0.8,
+  },
+  specializationContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    alignItems: 'center',
+    marginBottom: 25,
+    gap: 12,
+  },
+  specLabel: {
+    fontSize: 18,
+    fontWeight: '400',
+    color: '#666',
+    marginRight: 5,
   },
   tag: {
-    backgroundColor: '#f8f8f8',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#efefef',
+    backgroundColor: '#FFF8E1',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 15,
   },
   tagText: {
-    fontSize: 11,
-    color: '#555',
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    fontSize: 18,
+    color: '#333',
+    fontWeight: '400',
   },
-  statsRow: {
-    marginTop: 15,
-    paddingTop: 15,
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+  statsColumn: {
+    gap: 10,
+    marginTop: 10,
   },
-  statGroup: {
+  statLine: {
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  statDivider: {
-    width: 1,
-    height: '100%',
-    backgroundColor: '#f0f0f0',
-  },
-  statLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 2,
+    gap: 8,
   },
   statHighlight: {
-    color: '#1a1a1a',
-    fontWeight: '300',
-    fontSize: 22,
+    color: '#EE2529',
+    fontWeight: '600',
+    fontSize: 18,
+  },
+  statLabel: {
+    fontSize: 18,
+    color: '#767676',
+    fontWeight: '400',
+  },
+  topOrnament: {
+    position: 'absolute',
+    left: 30,
+    top: 0,
+    bottom: 0,
+    width: 250,
+    opacity: 1.0,
+    zIndex: -1,
+  },
+  bottomOrnament: {
+    position: 'absolute',
+    bottom: -28,
+    right: 0,
+    width: 200,
+    height: 200,
+    opacity: 1.0,
+    zIndex: -1,
   },
 });
 

@@ -8,6 +8,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { COLORS } from '../../../constants/theme';
+import LinearGradient from 'react-native-linear-gradient';
 
 const FEATURES = [
   {
@@ -109,9 +110,17 @@ const WhyChooseSection = () => {
             <FeatureItem key={feature.id} item={feature} />
           ))}
           <TouchableOpacity
-            style={[styles.exploreBtn, isMobile && styles.exploreBtnMobile]}
+            style={[isMobile && styles.exploreBtnMobile]}
+            activeOpacity={0.8}
           >
-            <Text style={styles.exploreBtnText}>Explore More</Text>
+            <LinearGradient
+              colors={['#EE2529', '#C73834']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.exploreBtn}
+            >
+              <Text style={styles.exploreBtnText}>Explore More</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       </View>
@@ -140,7 +149,7 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   title: {
-    fontSize: 36,
+    fontSize: 42,
     fontWeight: '400',
     color: COLORS.textDark,
     marginBottom: 10,
@@ -163,16 +172,18 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     width: '100%',
-    maxWidth: 1200,
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    maxWidth: '90%',
+    justifyContent: 'center',
+    alignItems: 'stretch',
+    gap: 80,
   },
   illustrationContainer: {
-    flex: 1,
-    height: 500,
+    flex: 1.2,
     width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+    maxWidth: 850,
+    maxHeight: 650,
   },
   illustrationContainerMobile: {
     flex: 0,
@@ -204,20 +215,18 @@ const styles = StyleSheet.create({
   featureItem: {
     flexDirection: 'row',
     marginBottom: 40,
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   iconWrapper: {
     width: 60,
     height: 60,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 20,
-    backgroundColor: COLORS.lightRed,
-    borderRadius: 30,
+    marginRight: 12,
   },
   featureIcon: {
-    width: 30,
-    height: 30,
+    width: 45,
+    height: 45,
   },
   featureContent: {
     flex: 1,
@@ -234,12 +243,13 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   exploreBtn: {
-    backgroundColor: COLORS.primary,
     paddingVertical: 14,
-    paddingHorizontal: 32,
+    paddingHorizontal: 40,
     borderRadius: 8,
-    alignSelf: 'flex-start',
+    alignSelf: 'center',
     marginTop: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   exploreBtnMobile: {
     alignSelf: 'center',

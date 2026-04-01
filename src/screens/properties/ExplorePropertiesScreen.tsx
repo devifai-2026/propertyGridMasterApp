@@ -12,6 +12,7 @@ import {
   TextInput,
   Modal,
   useWindowDimensions,
+  PanResponder,
 } from 'react-native';
 import { useNavigation } from '../../context/NavigationContext';
 import {
@@ -24,10 +25,12 @@ import {
   AlertTriangle,
   Filter,
   ChevronDown,
+  ChevronUp,
   Info,
   Sliders,
   CheckSquare,
 } from 'lucide-react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 import Layout from '../../layout/Layout';
 import PropertyCard, { Property } from '../../components/PropertyCard';
@@ -40,9 +43,12 @@ declare const window: any;
 const componentUnitTypes = [
   { id: 'Residential', label: 'Residential' },
   { id: 'Retail', label: 'Retail' },
-  { id: 'Offices', label: 'Offices' },
+  { id: 'Mixed-Use', label: 'Mixed-Use' },
+  { id: 'Commercial', label: 'Commercial' },
+  { id: 'Office Space', label: 'Office Space' },
+  { id: 'Hospitality', label: 'Hospitality' },
   { id: 'Industrial', label: 'Industrial' },
-  { id: 'Others', label: 'Others' },
+  { id: 'Warehouse', label: 'Warehouse' },
 ];
 
 const ExplorePropertiesScreen = () => {
@@ -218,16 +224,152 @@ const ExplorePropertiesScreen = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showDesktopFilters, setShowDesktopFilters] = useState(true);
   const [activeTab, setActiveTab] = useState<
-    'pricing' | 'unit' | 'rent' | 'roi' | 'tenure'
-  >('pricing');
+    'location' | 'pricing' | 'unit' | 'roi' | 'tenure' | 'rent'
+  >('location');
   const [filters, setFilters] = useState({
-    pricing: { min: '', max: '' },
+    proximity: [] as string[],
+    pricing: { min: '0', max: '5000000' },
     unit: [] as string[],
     rent: { min: '', max: '' },
     roi: '',
     tenure: '',
     city: '',
   });
+
+  const [sliderWidth, setSliderWidth] = useState(0);
+  const [sliderPercent, setSliderPercent] = useState(1);
+  const sliderRef = useRef<View>(null);
+  const sliderPageX = useRef(0);
+
+  const updateSliderValue = (pageX: number) => {
+    if (sliderWidth > 0) {
+      const offsetX = Math.max(
+        0,
+        Math.min(pageX - sliderPageX.current, sliderWidth),
+      );
+      const percent = offsetX / sliderWidth;
+      setSliderPercent(percent);
+
+      if (activeTab === 'pricing' || activeTab === 'rent') {
+        const maxValue = Math.round(percent * 50); // In Lakhs
+        const filterKey = activeTab === 'pricing' ? 'pricing' : 'rent';
+        setFilters(prev => ({
+          ...prev,
+          [filterKey]: {
+            ...prev[filterKey],
+            max: (maxValue * 100000).toString(),
+          },
+        }));
+      } else if (activeTab === 'roi') {
+        const val = 5 + Math.round(percent * 15); // 5% to 20%
+        setFilters(prev => ({ ...prev, roi: val.toString() }));
+      } else if (activeTab === 'tenure') {
+        const val = 1 + Math.round(percent * 19); // 1 to 20 yrs
+        setFilters(prev => ({ ...prev, tenure: val.toString() }));
+      }
+    }
+  };
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: evt => {
+        if (!isWeb) {
+          sliderRef.current?.measure((x, y, width, height, pageX, pageY) => {
+            sliderPageX.current = pageX;
+            setSliderWidth(width);
+            updateSliderValue(evt.nativeEvent.pageX);
+          });
+        }
+      },
+      onPanResponderMove: evt => {
+        if (!isWeb) updateSliderValue(evt.nativeEvent.pageX);
+      },
+      onPanResponderRelease: () => {},
+    }),
+  ).current;
+
+  const isWeb = Platform.OS === 'web';
+
+  const onSliderLayout = () => {
+    if (isWeb && sliderRef.current) {
+       // @ts-ignore
+       const rect = sliderRef.current.getBoundingClientRect?.() || sliderRef.current.measure?.((x,y,w,h,px,py)=> {
+          setSliderWidth(w);
+          sliderPageX.current = px;
+       });
+       if(rect) {
+          setSliderWidth(rect.width);
+          sliderPageX.current = rect.left;
+       }
+    }
+  };
+
+  const [hoverMin, setHoverMin] = useState(false);
+  const [hoverMax, setHoverMax] = useState(false);
+
+  const incrementValue = (
+    category: 'pricing' | 'rent',
+    key: 'min' | 'max',
+    amount: number,
+  ) => {
+    setFilters(prev => {
+      const current = parseInt(prev[category][key] || '0', 10);
+      const next = Math.max(0, current + amount);
+      return {
+        ...prev,
+        [category]: { ...prev[category], [key]: next.toString() },
+      };
+    });
+  };
+
+  const handleWebSliderChange = (e: any) => {
+    const value = parseFloat(e.target.value);
+    const filterKey = activeTab === 'pricing' ? 'pricing' : 'rent';
+
+    if (activeTab === 'pricing' || activeTab === 'rent') {
+      const percent = value / 50;
+      setSliderPercent(percent);
+      setFilters(prev => ({
+        ...prev,
+        [filterKey]: { ...prev[filterKey], max: (value * 100000).toString() },
+      }));
+    } else if (activeTab === 'roi') {
+      const percent = (value - 5) / 15;
+      setSliderPercent(percent);
+      setFilters(prev => ({ ...prev, roi: value.toString() }));
+    } else if (activeTab === 'tenure') {
+      const percent = (value - 1) / 19;
+      setSliderPercent(percent);
+      setFilters(prev => ({ ...prev, tenure: value.toString() }));
+    }
+  };
+
+  useEffect(() => {
+    // Synchronize slider position when switching between range tabs
+    if (activeTab === 'pricing' || activeTab === 'rent') {
+      const currentMax =
+        activeTab === 'pricing' ? filters.pricing.max : filters.rent.max;
+      if (currentMax) {
+        const val = parseInt(currentMax, 10);
+        setSliderPercent(Math.min(Math.max(val / 5000000, 0), 1));
+      } else {
+        setSliderPercent(0);
+      }
+    } else if (activeTab === 'roi') {
+      const val = parseInt(filters.roi || '5', 10);
+      setSliderPercent(Math.min(Math.max((val - 5) / 15, 0), 1));
+    } else if (activeTab === 'tenure') {
+      const val = parseInt(filters.tenure || '1', 10);
+      setSliderPercent(Math.min(Math.max((val - 1) / 19, 0), 1));
+    }
+
+    // Web measurement update
+    if (isWeb) {
+      setTimeout(onSliderLayout, 100);
+    }
+  }, [activeTab]);
 
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -247,6 +389,7 @@ const ExplorePropertiesScreen = () => {
 
   const handleResetFilters = () => {
     const emptyFilters = {
+      proximity: [],
       pricing: { min: '', max: '' },
       unit: [],
       rent: { min: '', max: '' },
@@ -267,122 +410,567 @@ const ExplorePropertiesScreen = () => {
     });
   };
 
+  const handleProximityToggle = (id: string) => {
+    setFilters(prev => {
+      const proximity = prev.proximity.includes(id)
+        ? prev.proximity.filter(p => p !== id)
+        : [...prev.proximity, id];
+      return { ...prev, proximity };
+    });
+  };
+
   const renderFilterContent = () => {
     switch (activeTab) {
+      case 'location':
+        const proximityOptions = [
+          'Metro Station',
+          'Business District',
+          'Shopping Center',
+          'Major Highway',
+          'Industrial Zone',
+          'University',
+          'Airport',
+          'Port/Harbor',
+        ];
+
+        return (
+          <View style={styles.filterSection}>
+            <Text style={styles.filterLabel}>Proximity to</Text>
+            <View style={styles.proximityGrid}>
+              <View style={styles.proximityColumn}>
+                {proximityOptions.slice(0, 3).map(opt => (
+                  <TouchableOpacity
+                    key={opt}
+                    style={styles.checkboxItemWide}
+                    onPress={() => handleProximityToggle(opt)}
+                  >
+                    <View
+                      style={[
+                        styles.checkbox,
+                        filters.proximity.includes(opt) &&
+                          styles.checkboxActive,
+                      ]}
+                    >
+                      {filters.proximity.includes(opt) && (
+                        <Check size={12} color="#fff" />
+                      )}
+                    </View>
+                    <Text style={styles.checkboxLabel}>{opt}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <View style={styles.proximityColumn}>
+                {proximityOptions.slice(3, 6).map(opt => (
+                  <TouchableOpacity
+                    key={opt}
+                    style={styles.checkboxItemWide}
+                    onPress={() => handleProximityToggle(opt)}
+                  >
+                    <View
+                      style={[
+                        styles.checkbox,
+                        filters.proximity.includes(opt) &&
+                          styles.checkboxActive,
+                      ]}
+                    >
+                      {filters.proximity.includes(opt) && (
+                        <Check size={12} color="#fff" />
+                      )}
+                    </View>
+                    <Text style={styles.checkboxLabel}>{opt}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <View style={styles.proximityColumn}>
+                {proximityOptions.slice(6, 8).map(opt => (
+                  <TouchableOpacity
+                    key={opt}
+                    style={styles.checkboxItemWide}
+                    onPress={() => handleProximityToggle(opt)}
+                  >
+                    <View
+                      style={[
+                        styles.checkbox,
+                        filters.proximity.includes(opt) &&
+                          styles.checkboxActive,
+                      ]}
+                    >
+                      {filters.proximity.includes(opt) && (
+                        <Check size={12} color="#fff" />
+                      )}
+                    </View>
+                    <Text style={styles.checkboxLabel}>{opt}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          </View>
+        );
       case 'pricing':
         return (
           <View style={styles.filterSection}>
-            <Text style={styles.filterLabel}>Purchase Price (₹)</Text>
-            <View style={styles.filterInputRow}>
-              <TextInput
-                style={styles.filterInput}
-                placeholder="Min Price"
-                value={filters.pricing.min}
-                onChangeText={t =>
-                  setFilters({
-                    ...filters,
-                    pricing: { ...filters.pricing, min: t },
-                  })
-                }
-                keyboardType="numeric"
-                placeholderTextColor="#999"
-              />
-              <Text style={styles.filterDash}>-</Text>
-              <TextInput
-                style={styles.filterInput}
-                placeholder="Max Price"
-                value={filters.pricing.max}
-                onChangeText={t =>
-                  setFilters({
-                    ...filters,
-                    pricing: { ...filters.pricing, max: t },
-                  })
-                }
-                keyboardType="numeric"
-                placeholderTextColor="#999"
-              />
+            <Text style={styles.filterLabel}>Purchase Price</Text>
+            
+            <View style={styles.sliderContainer}>
+              <Text style={styles.sliderEndpoint}>₹0 Lakhs</Text>
+                <View
+                  ref={sliderRef}
+                  style={styles.sliderTrackContainer}
+                  onLayout={onSliderLayout}
+                  {...panResponder.panHandlers}
+                >
+                  {/* Background Track */}
+                  <View style={styles.sliderBackgroundTrack} />
+                  
+                  {/* Active Track Overlay */}
+                  <View
+                    style={[
+                      styles.sliderActiveTrack,
+                      { width: `${sliderPercent * 100}%` },
+                    ]}
+                  />
+
+                  {/* Thumb */}
+                  <View
+                    style={[
+                      styles.sliderThumb,
+                      { left: `${sliderPercent * 100}%` },
+                    ]}
+                  />
+                  
+                  {isWeb && (
+                    <input
+                      type="range"
+                      min="0"
+                      max="50"
+                      step="1"
+                      value={sliderPercent * 50}
+                      onChange={handleWebSliderChange}
+                      style={{
+                        position: 'absolute',
+                        width: '100%',
+                        height: 40,
+                        opacity: 0,
+                        cursor: 'pointer',
+                        zIndex: 1000,
+                      }}
+                    />
+                  )}
+                </View>
+              <Text style={styles.sliderEndpoint}>₹50 Lakhs</Text>
+            </View>
+
+            <Text style={styles.filterSeparator}>Or enter specific values:</Text>
+
+            <View style={styles.priceInputGrid}>
+              <View style={styles.priceInputCol}>
+                <Text style={styles.priceInputLabel}>Minimum Price (₹)</Text>
+                <View
+                  style={styles.inputWrapper}
+                  {...(isWeb
+                    ? {
+                        onMouseEnter: () => setHoverMin(true),
+                        onMouseLeave: () => setHoverMin(false),
+                      }
+                    : {})}
+                >
+                  <TextInput
+                    style={styles.priceInput}
+                    placeholder="5000000"
+                    value={filters.pricing.min}
+                    onChangeText={t =>
+                      setFilters({
+                        ...filters,
+                        pricing: { ...filters.pricing, min: t },
+                      })
+                    }
+                    keyboardType="numeric"
+                    placeholderTextColor="#333"
+                  />
+                  {(hoverMin || !isWeb) && (
+                    <View style={styles.stepperIcons}>
+                      <TouchableOpacity
+                        style={styles.stepperBtn}
+                        onPress={() => incrementValue('pricing', 'min', 500000)}
+                      >
+                        <ChevronUp size={12} color="#262626" />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.stepperBtn}
+                        onPress={() => incrementValue('pricing', 'min', -500000)}
+                      >
+                        <ChevronDown size={12} color="#262626" />
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              </View>
+
+              <View style={styles.priceInputCol}>
+                <Text style={styles.priceInputLabel}>Maximum Price (₹)</Text>
+                <View
+                  style={styles.inputWrapper}
+                  {...(isWeb
+                    ? {
+                        onMouseEnter: () => setHoverMax(true),
+                        onMouseLeave: () => setHoverMax(false),
+                      }
+                    : {})}
+                >
+                  <TextInput
+                    style={styles.priceInput}
+                    placeholder="5000000"
+                    value={filters.pricing.max}
+                    onChangeText={t =>
+                      setFilters({
+                        ...filters,
+                        pricing: { ...filters.pricing, max: t },
+                      })
+                    }
+                    keyboardType="numeric"
+                    placeholderTextColor="#333"
+                  />
+                  {(hoverMax || !isWeb) && (
+                    <View style={styles.stepperIcons}>
+                      <TouchableOpacity
+                        style={styles.stepperBtn}
+                        onPress={() => incrementValue('pricing', 'max', 500000)}
+                      >
+                        <ChevronUp size={12} color="#262626" />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.stepperBtn}
+                        onPress={() => incrementValue('pricing', 'max', -500000)}
+                      >
+                        <ChevronDown size={12} color="#262626" />
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              </View>
             </View>
           </View>
         );
       case 'unit':
         return (
-          <View style={styles.filterGrid}>
-            {componentUnitTypes.map(u => (
-              <TouchableOpacity
-                key={u.id}
-                style={styles.checkboxItem}
-                onPress={() => handleUnitToggle(u.id)}
-              >
-                <View
-                  style={[
-                    styles.checkbox,
-                    filters.unit.includes(u.id) && styles.checkboxActive,
-                  ]}
-                >
-                  {filters.unit.includes(u.id) && (
-                    <Check size={12} color="#fff" />
-                  )}
-                </View>
-                <Text style={styles.checkboxLabel}>{u.label}</Text>
-              </TouchableOpacity>
-            ))}
+          <View style={styles.filterSection}>
+            <Text style={styles.filterLabel}>Select Property Types</Text>
+            <View style={styles.proximityGrid}>
+              <View style={styles.proximityColumn}>
+                {componentUnitTypes.slice(0, 3).map(u => (
+                  <TouchableOpacity
+                    key={u.id}
+                    style={styles.checkboxItemWide}
+                    onPress={() => handleUnitToggle(u.id)}
+                  >
+                    <View
+                      style={[
+                        styles.checkbox,
+                        filters.unit.includes(u.id) && styles.checkboxActive,
+                      ]}
+                    >
+                      {filters.unit.includes(u.id) && (
+                        <Check size={12} color="#fff" />
+                      )}
+                    </View>
+                    <Text style={styles.checkboxLabel}>{u.label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <View style={styles.proximityColumn}>
+                {componentUnitTypes.slice(3, 6).map(u => (
+                  <TouchableOpacity
+                    key={u.id}
+                    style={styles.checkboxItemWide}
+                    onPress={() => handleUnitToggle(u.id)}
+                  >
+                    <View
+                      style={[
+                        styles.checkbox,
+                        filters.unit.includes(u.id) && styles.checkboxActive,
+                      ]}
+                    >
+                      {filters.unit.includes(u.id) && (
+                        <Check size={12} color="#fff" />
+                      )}
+                    </View>
+                    <Text style={styles.checkboxLabel}>{u.label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              <View style={styles.proximityColumn}>
+                {componentUnitTypes.slice(6, 8).map(u => (
+                  <TouchableOpacity
+                    key={u.id}
+                    style={styles.checkboxItemWide}
+                    onPress={() => handleUnitToggle(u.id)}
+                  >
+                    <View
+                      style={[
+                        styles.checkbox,
+                        filters.unit.includes(u.id) && styles.checkboxActive,
+                      ]}
+                    >
+                      {filters.unit.includes(u.id) && (
+                        <Check size={12} color="#fff" />
+                      )}
+                    </View>
+                    <Text style={styles.checkboxLabel}>{u.label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
           </View>
         );
       case 'rent':
         return (
           <View style={styles.filterSection}>
-            <Text style={styles.filterLabel}>Annual Rent (₹)</Text>
-            <View style={styles.filterInputRow}>
-              <TextInput
-                style={styles.filterInput}
-                placeholder="Min Rent"
-                value={filters.rent.min}
-                onChangeText={t =>
-                  setFilters({ ...filters, rent: { ...filters.rent, min: t } })
-                }
-                keyboardType="numeric"
-                placeholderTextColor="#999"
-              />
-              <Text style={styles.filterDash}>-</Text>
-              <TextInput
-                style={styles.filterInput}
-                placeholder="Max Rent"
-                value={filters.rent.max}
-                onChangeText={t =>
-                  setFilters({ ...filters, rent: { ...filters.rent, max: t } })
-                }
-                keyboardType="numeric"
-                placeholderTextColor="#999"
-              />
+            <Text style={styles.filterLabel}>Annual Rent Range</Text>
+            
+            <View style={styles.sliderContainer}>
+              <Text style={styles.sliderEndpoint}>₹0 Lakhs</Text>
+              <View
+                ref={sliderRef}
+                style={styles.sliderTrackContainer}
+                onLayout={onSliderLayout}
+                {...panResponder.panHandlers}
+              >
+                <View style={styles.sliderBackgroundTrack} />
+                <View
+                  style={[
+                    styles.sliderActiveTrack,
+                    { width: `${sliderPercent * 100}%` },
+                  ]}
+                />
+                <View
+                  style={[
+                    styles.sliderThumb,
+                    { left: `${sliderPercent * 100}%` },
+                  ]}
+                />
+                {isWeb && (
+                  <input
+                    type="range"
+                    min="0"
+                    max="50"
+                    step="1"
+                    value={sliderPercent * 50}
+                    onChange={handleWebSliderChange}
+                    style={{
+                      position: 'absolute',
+                      width: '100%',
+                      height: 40,
+                      opacity: 0,
+                      cursor: 'pointer',
+                      zIndex: 1000,
+                    }}
+                  />
+                )}
+              </View>
+              <Text style={styles.sliderEndpoint}>₹50 Lakhs</Text>
+            </View>
+
+            <Text style={styles.filterSeparator}>Or enter specific values:</Text>
+
+            <View style={styles.priceInputGrid}>
+              <View style={styles.priceInputCol}>
+                <Text style={styles.priceInputLabel}>Minimum Annual Rent (₹)</Text>
+                <View
+                  style={styles.inputWrapper}
+                  {...(isWeb
+                    ? {
+                        onMouseEnter: () => setHoverMin(true),
+                        onMouseLeave: () => setHoverMin(false),
+                      }
+                    : {})}
+                >
+                  <TextInput
+                    style={styles.priceInput}
+                    placeholder="5000000"
+                    value={filters.rent.min}
+                    onChangeText={t =>
+                      setFilters({
+                        ...filters,
+                        rent: { ...filters.rent, min: t },
+                      })
+                    }
+                    keyboardType="numeric"
+                    placeholderTextColor="#333"
+                  />
+                  {(hoverMin || !isWeb) && (
+                    <View style={styles.stepperIcons}>
+                      <TouchableOpacity
+                        style={styles.stepperBtn}
+                        onPress={() => incrementValue('rent', 'min', 500000)}
+                      >
+                        <ChevronUp size={12} color="#262626" />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.stepperBtn}
+                        onPress={() => incrementValue('rent', 'min', -500000)}
+                      >
+                        <ChevronDown size={12} color="#262626" />
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              </View>
+
+              <View style={styles.priceInputCol}>
+                <Text style={styles.priceInputLabel}>Maximum Annual Rent (₹)</Text>
+                <View
+                  style={styles.inputWrapper}
+                  {...(isWeb
+                    ? {
+                        onMouseEnter: () => setHoverMax(true),
+                        onMouseLeave: () => setHoverMax(false),
+                      }
+                    : {})}
+                >
+                  <TextInput
+                    style={styles.priceInput}
+                    placeholder="5000000"
+                    value={filters.rent.max}
+                    onChangeText={t =>
+                      setFilters({
+                        ...filters,
+                        rent: { ...filters.rent, max: t },
+                      })
+                    }
+                    keyboardType="numeric"
+                    placeholderTextColor="#333"
+                  />
+                  {(hoverMax || !isWeb) && (
+                    <View style={styles.stepperIcons}>
+                      <TouchableOpacity
+                        style={styles.stepperBtn}
+                        onPress={() => incrementValue('rent', 'max', 500000)}
+                      >
+                        <ChevronUp size={12} color="#262626" />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.stepperBtn}
+                        onPress={() => incrementValue('rent', 'max', -500000)}
+                      >
+                        <ChevronDown size={12} color="#262626" />
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </View>
+              </View>
             </View>
           </View>
         );
       case 'roi':
         return (
           <View style={styles.filterSection}>
-            <Text style={styles.filterLabel}>ROI (%)</Text>
-            <TextInput
-              style={styles.filterInput}
-              placeholder="Target ROI"
-              value={filters.roi}
-              onChangeText={t => setFilters({ ...filters, roi: t })}
-              keyboardType="numeric"
-              placeholderTextColor="#999"
-            />
+            <Text style={styles.filterLabel}>Return on Investment (ROI) Range</Text>
+            
+            <View style={styles.sliderContainer}>
+              <Text style={styles.sliderEndpoint}>5%</Text>
+              <View
+                ref={sliderRef}
+                style={styles.sliderTrackContainer}
+                onLayout={onSliderLayout}
+                {...panResponder.panHandlers}
+              >
+                <View style={styles.sliderBackgroundTrack} />
+                <View
+                  style={[
+                    styles.sliderActiveTrack,
+                    { width: `${sliderPercent * 100}%` },
+                  ]}
+                />
+                <View
+                  style={[
+                    styles.sliderThumb,
+                    { left: `${sliderPercent * 100}%` },
+                  ]}
+                />
+                {isWeb && (
+                  <input
+                    type="range"
+                    min="5"
+                    max="20"
+                    step="1"
+                    value={5 + sliderPercent * 15}
+                    onChange={handleWebSliderChange}
+                    style={{
+                      position: 'absolute',
+                      width: '100%',
+                      height: 40,
+                      top: -15,
+                      opacity: 0,
+                      cursor: 'pointer',
+                      zIndex: 1000,
+                    }}
+                  />
+                )}
+              </View>
+              <Text style={styles.sliderEndpoint}>20%</Text>
+            </View>
+
+            <View style={styles.descInfoBox}>
+              <Text style={styles.descInfoText}>
+                Filter properties based on their expected return on investment. Higher ROI indicates better potential returns.
+              </Text>
+            </View>
           </View>
         );
       case 'tenure':
         return (
           <View style={styles.filterSection}>
-            <Text style={styles.filterLabel}>Tenure Left (Years)</Text>
-            <TextInput
-              style={styles.filterInput}
-              placeholder="Min Tenure"
-              value={filters.tenure}
-              onChangeText={t => setFilters({ ...filters, tenure: t })}
-              keyboardType="numeric"
-              placeholderTextColor="#999"
-            />
+            <Text style={styles.filterLabel}>Tenure Left (yrs)</Text>
+            
+            <View style={styles.sliderContainer}>
+              <Text style={styles.sliderEndpoint}>1 yrs</Text>
+              <View
+                ref={sliderRef}
+                style={styles.sliderTrackContainer}
+                onLayout={onSliderLayout}
+                {...panResponder.panHandlers}
+              >
+                <View style={styles.sliderBackgroundTrack} />
+                <View
+                  style={[
+                    styles.sliderActiveTrack,
+                    { width: `${sliderPercent * 100}%` },
+                  ]}
+                />
+                <View
+                  style={[
+                    styles.sliderThumb,
+                    { left: `${sliderPercent * 100}%` },
+                  ]}
+                />
+                {isWeb && (
+                  <input
+                    type="range"
+                    min="1"
+                    max="20"
+                    step="1"
+                    value={1 + sliderPercent * 19}
+                    onChange={handleWebSliderChange}
+                    style={{
+                      position: 'absolute',
+                      width: '100%',
+                      height: 40,
+                      top: -15,
+                      opacity: 0,
+                      cursor: 'pointer',
+                      zIndex: 1000,
+                    }}
+                  />
+                )}
+              </View>
+              <Text style={styles.sliderEndpoint}>20 yrs</Text>
+            </View>
+
+            <View style={styles.descInfoBox}>
+              <Text style={styles.descInfoText}>
+                Remaining duration of the lease agreement. Longer tenure provides more stability and predictable income.
+              </Text>
+            </View>
           </View>
         );
       default:
@@ -482,12 +1070,15 @@ const ExplorePropertiesScreen = () => {
                 <Text style={styles.filterPanelTitle}>Advanced Filters</Text>
               </View>
 
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.filterTabs}
-              >
-                {['pricing', 'unit', 'rent', 'roi', 'tenure'].map(tab => (
+              <View style={styles.filterTabs}>
+                {[
+                  'location',
+                  'pricing',
+                  'unit',
+                  'rent',
+                  'roi',
+                  'tenure',
+                ].map(tab => (
                   <TouchableOpacity
                     key={tab}
                     style={[
@@ -502,7 +1093,9 @@ const ExplorePropertiesScreen = () => {
                         activeTab === tab && styles.activeFilterTabText,
                       ]}
                     >
-                      {tab === 'pricing'
+                      {tab === 'location'
+                        ? 'Location\nProximity'
+                        : tab === 'pricing'
                         ? 'Pricing'
                         : tab === 'unit'
                         ? 'Type of Unit'
@@ -514,10 +1107,10 @@ const ExplorePropertiesScreen = () => {
                     </Text>
                   </TouchableOpacity>
                 ))}
-              </ScrollView>
+              </View>
 
               <View style={styles.infoBox}>
-                <Info size={16} color="#EE2529" />
+                <Info size={12} color="#262626" />
                 <Text style={styles.infoText}>
                   This information is certified from the person listing the
                   property
@@ -539,11 +1132,18 @@ const ExplorePropertiesScreen = () => {
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={handleApplyFilters}
-                  style={styles.applyFilterBtn}
+                  activeOpacity={0.8}
                 >
-                  <Text style={[styles.btnText, { color: '#fff' }]}>
-                    Apply Filters
-                  </Text>
+                  <LinearGradient
+                    colors={['#EE2529', '#C73834']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.applyFilterBtn}
+                  >
+                    <Text style={[styles.btnText, { color: '#fff' }]}>
+                      Apply Filters
+                    </Text>
+                  </LinearGradient>
                 </TouchableOpacity>
               </View>
             </View>
@@ -573,8 +1173,14 @@ const ExplorePropertiesScreen = () => {
 
                 <View style={styles.mobileFilterBody}>
                   {/* Sidebar Tabs */}
-                  <ScrollView style={styles.mobileTabsSidebar}>
-                    {['pricing', 'unit', 'rent', 'roi', 'tenure'].map(tab => (
+                    {[
+                      'location',
+                      'pricing',
+                      'unit',
+                      'rent',
+                      'roi',
+                      'tenure',
+                    ].map(tab => (
                       <TouchableOpacity
                         key={tab}
                         style={[
@@ -589,19 +1195,20 @@ const ExplorePropertiesScreen = () => {
                             activeTab === tab && styles.mobileActiveTabText,
                           ]}
                         >
-                          {tab === 'pricing'
+                          {tab === 'location'
+                            ? 'Location Proximity'
+                            : tab === 'pricing'
                             ? 'Pricing'
                             : tab === 'unit'
                             ? 'Type of Unit'
                             : tab === 'rent'
-                            ? 'Annual Rent\nAchieved'
+                            ? 'Annual Rent achieved'
                             : tab === 'roi'
                             ? 'ROI'
                             : 'Tenure Left'}
                         </Text>
                       </TouchableOpacity>
                     ))}
-                  </ScrollView>
 
                   {/* Content */}
                   <ScrollView style={styles.mobileFilterContent}>
@@ -636,19 +1243,24 @@ const ExplorePropertiesScreen = () => {
                   </TouchableOpacity>
                   <TouchableOpacity
                     onPress={handleApplyFilters}
-                    style={[
-                      styles.applyFilterBtn,
-                      { flex: 1, paddingVertical: 8 },
-                    ]}
+                    style={{ flex: 1 }}
+                    activeOpacity={0.8}
                   >
-                    <Text
-                      style={[
-                        styles.btnText,
-                        { color: '#fff', textAlign: 'center' },
-                      ]}
+                    <LinearGradient
+                      colors={['#EE2529', '#C73834']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={[styles.applyFilterBtn, { paddingVertical: 8 }]}
                     >
-                      Apply
-                    </Text>
+                      <Text
+                        style={[
+                          styles.btnText,
+                          { color: '#fff', textAlign: 'center' },
+                        ]}
+                      >
+                        Apply
+                      </Text>
+                    </LinearGradient>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -669,7 +1281,7 @@ const ExplorePropertiesScreen = () => {
           <View
             style={[
               styles.gridContainer,
-              { justifyContent: width > 768 ? 'flex-start' : 'center' },
+              { justifyContent: 'center' },
             ]}
           >
             {properties.map((property, index) => {
@@ -680,7 +1292,7 @@ const ExplorePropertiesScreen = () => {
                     key="special"
                     style={[
                       styles.card,
-                      { width: width > 768 ? '31%' : '100%' },
+                      { width: width > 768 ? '31.8%' : '100%' },
                       styles.specialCard,
                     ]}
                   >
@@ -712,7 +1324,7 @@ const ExplorePropertiesScreen = () => {
                 <PropertyCard
                   key={property.id}
                   item={property}
-                  width={width > 768 ? '31%' : '100%'}
+                  width={width > 768 ? '31.8%' : '100%'}
                   isSelected={selectedProperties.some(
                     p => p.id === property.id,
                   )}
@@ -929,6 +1541,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 20,
+    justifyContent: 'flex-start',
   },
   card: {
     backgroundColor: '#fff',
@@ -1169,6 +1782,9 @@ const styles = StyleSheet.create({
     position: 'relative',
     minHeight: 80,
     justifyContent: 'center',
+    width: '90%',
+    maxWidth: 1540,
+    alignSelf: 'center',
   },
   filterBgImage: {
     ...StyleSheet.absoluteFillObject,
@@ -1237,6 +1853,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 10,
     elevation: 5,
+    width: '90%',
+    maxWidth: 1540,
+    alignSelf: 'center',
   },
   filterPanelHeader: {
     flexDirection: 'row',
@@ -1251,23 +1870,27 @@ const styles = StyleSheet.create({
   },
   filterTabs: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+    width: '100%',
   },
   filterTabItem: {
     paddingVertical: 10,
-    paddingHorizontal: 15,
     borderBottomWidth: 3,
     borderBottomColor: 'transparent',
+    flex: 1,
+    alignItems: 'center',
   },
   activeFilterTab: {
     borderBottomColor: '#EE2529',
   },
   filterTabText: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#333',
-    fontWeight: '600',
+    fontWeight: '700',
+    textAlign: 'center',
   },
   activeFilterTabText: {
     color: '#EE2529',
@@ -1275,15 +1898,15 @@ const styles = StyleSheet.create({
   infoBox: {
     backgroundColor: '#FDEDEE',
     padding: 10,
-    borderRadius: 8,
+    borderRadius: 15,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
     gap: 10,
   },
   infoText: {
-    fontSize: 12,
-    color: '#666',
+    fontSize: 14,
+    color: '#262626',
     flex: 1,
   },
   filterContentArea: {
@@ -1293,10 +1916,120 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   filterLabel: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#262626',
+    marginBottom: 20,
+  },
+  sliderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    marginBottom: 30,
+    gap: 15,
+  },
+  sliderEndpoint: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 10,
+    color: '#262626',
+  },
+  sliderTrackContainer: {
+    flex: 1,
+    height: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+    overflow: 'visible',
+    ...Platform.select({
+      web: {
+        cursor: 'pointer',
+        userSelect: 'none',
+      } as any,
+    }),
+  },
+  sliderBackgroundTrack: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: 6,
+    backgroundColor: '#FDEDEE',
+    borderRadius: 3,
+  },
+  sliderActiveTrack: {
+    position: 'absolute',
+    left: 0,
+    height: 6,
+    backgroundColor: '#EE2529',
+    borderRadius: 3,
+    zIndex: 1,
+  },
+  sliderThumb: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    borderWidth: 2,
+    borderColor: '#EE2529',
+    position: 'absolute',
+    left: '50%',
+    marginLeft: -12,
+    shadowColor: '#EE2529',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+    zIndex: 10,
+    ...Platform.select({
+      web: { cursor: 'pointer' } as any,
+    }),
+  },
+  filterSeparator: {
+    fontSize: 13,
+    color: '#999',
+    marginBottom: 15,
+    paddingLeft: 5,
+  },
+  priceInputGrid: {
+    flexDirection: 'row',
+    gap: 30,
+  },
+  priceInputCol: {
+    flex: 1,
+  },
+  priceInputLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#262626',
+    marginBottom: 8,
+  },
+  inputWrapper: {
+    position: 'relative',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  priceInput: {
+    flex: 1,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 15,
+    color: '#262626',
+    fontWeight: '500',
+  },
+  stepperIcons: {
+    position: 'absolute',
+    right: 15,
+    gap: 2,
+    alignItems: 'center',
+  },
+  stepperBtn: {
+    backgroundColor: '#E5E5E5',
+    width: 24,
+    height: 18,
+    borderRadius: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'visible',
   },
   filterInputRow: {
     flexDirection: 'row',
@@ -1334,19 +2067,35 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: '#6E6E6E',
     marginRight: 8,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#fff',
   },
   checkboxActive: {
-    backgroundColor: '#EE2529',
-    borderColor: '#EE2529',
+    backgroundColor: '#6E6E6E',
+    borderColor: '#6E6E6E',
   },
   checkboxLabel: {
-    fontSize: 14,
-    color: '#333',
+    fontSize: 18,
+    color: '#262626',
+    fontWeight: '400',
+  },
+  proximityGrid: {
+    flexDirection: 'row',
+    gap: 20,
+    marginTop: 10,
+  },
+  proximityColumn: {
+    flex: 1,
+    gap: 0,
+  },
+  checkboxItemWide: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    padding: 5,
   },
   filterFooter: {
     flexDirection: 'row',
@@ -1367,8 +2116,9 @@ const styles = StyleSheet.create({
   applyFilterBtn: {
     paddingVertical: 10,
     paddingHorizontal: 20,
-    backgroundColor: '#EE2529',
     borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   btnText: {
     fontWeight: '600',
@@ -1499,6 +2249,17 @@ const styles = StyleSheet.create({
     color: '#666',
     fontSize: 16,
     paddingHorizontal: 5,
+  },
+  descInfoBox: {
+    backgroundColor: '#F7F7F7',
+    padding: 15,
+    borderRadius: 8,
+    marginTop: 20,
+  },
+  descInfoText: {
+    fontSize: 13,
+    color: '#6E6E6E',
+    lineHeight: 18,
   },
 });
 

@@ -13,6 +13,12 @@ interface NavigationContextType {
   currentPath: string;
   navigate: (path: string) => void;
   goBack: () => void;
+  showLoginModal: boolean;
+  showSignupModal: boolean;
+  openLoginModal: () => void;
+  closeLoginModal: () => void;
+  openSignupModal: () => void;
+  closeSignupModal: () => void;
 }
 
 const NavigationContext = createContext<NavigationContextType | undefined>(
@@ -30,6 +36,14 @@ export const NavigationProvider = ({ children }: { children: ReactNode }) => {
     }
     return '/dashboard';
   });
+
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
+
+  const openLoginModal = () => setShowLoginModal(true);
+  const closeLoginModal = () => setShowLoginModal(false);
+  const openSignupModal = () => setShowSignupModal(true);
+  const closeSignupModal = () => setShowSignupModal(false);
 
   const navigate = (path: string) => {
     setCurrentPath(path);
@@ -57,7 +71,7 @@ export const NavigationProvider = ({ children }: { children: ReactNode }) => {
   }, [isWeb]);
 
   return (
-    <NavigationContext.Provider value={{ currentPath, navigate, goBack }}>
+    <NavigationContext.Provider value={{ currentPath, navigate, goBack, showLoginModal, showSignupModal, openLoginModal, closeLoginModal, openSignupModal, closeSignupModal }}>
       {children}
     </NavigationContext.Provider>
   );
