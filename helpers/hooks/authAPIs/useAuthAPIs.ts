@@ -38,6 +38,9 @@ export const useAuthAPIs = () => {
       otp: string;
       verificationId: string;
       reraNumber?: string;
+      locality?: string;
+      specializations?: string[];
+      dealsClosed?: number;
     },
     onSuccess?: (data: any) => void,
     onError?: (error: any) => void,
@@ -164,6 +167,22 @@ export const useAuthAPIs = () => {
     });
   };
 
+  const getBrokerProfile = (
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: '/v1/brokers/profile',
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   return {
     loading,
     login,
@@ -174,5 +193,6 @@ export const useAuthAPIs = () => {
     logout,
     changeMobile,
     getAvailableRoles,
+    getBrokerProfile,
   };
 };

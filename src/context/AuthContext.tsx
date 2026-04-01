@@ -5,7 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
-import { Alert, Platform } from 'react-native';
+import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface User {
@@ -22,6 +22,7 @@ interface User {
   accessToken: string;
   refreshToken: string;
   profileImage?: string;
+  profilePhoto?: string;
 }
 
 interface AuthContextType {
@@ -30,6 +31,7 @@ interface AuthContextType {
   login: (userData: any) => Promise<boolean>;
   logout: () => void;
   switchUserRole: (role: string) => Promise<boolean>;
+  updateUser: (updates: Partial<User>) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -43,7 +45,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const { switchRole: switchRoleApi, logout: logoutApi } = useAuthAPIs();
+  const { switchRole: switchRoleApi, logout: logoutApi, getBrokerProfile } = useAuthAPIs();
 
   useEffect(() => {
     const checkLogin = async () => {
@@ -75,6 +77,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       await AsyncStorage.setItem('user', JSON.stringify(userToStore));
       setIsLoggedIn(true);
       setUser(userToStore);
+
+      if (userToStore.role === 'Broker') {
+        getBrokerProfile(async (res: any) => {
+          if (res.success && res.data?.profilePhoto) {
+            const withPhoto = { ...userToStore, profilePhoto: res.data.profilePhoto };
+            await AsyncStorage.setItem('user', JSON.stringify(withPhoto));
+            setUser(withPhoto);
+          }
+        });
+      }
+
       return true;
     } catch (e) {
       console.error('Error saving auth state:', e);
@@ -119,6 +132,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(null);
     }
   };
+  const updateUser = async (updates: Partial<User>): Promise<void> => {
+    try {
+      const updatedUser = { ...user, ...updates } as User;
+      await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    } catch (e) {
+      console.error('Error updating user:', e);
+    }
+  };
+
   const switchUserRole = async (role: string): Promise<boolean> => {
     return new Promise(resolve => {
       switchRoleApi(
@@ -158,6 +181,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         logout,
         switchUserRole,
+        updateUser,
         isLoading,
       }}
     >

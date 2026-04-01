@@ -20,7 +20,11 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
+import { getHeaders } from '../../../helpers/api/headers';
+import { BASE_URL } from '../../../helpers/environments';
 import { COLORS } from '../../constants/theme';
+
+const SPECIALIZATION_OPTIONS = ['MNC Client', 'Industrial', 'Residential', 'Commercial', 'Office Lease'];
 
 type Role = 'owner_investor' | 'broker' | null;
 type Screen = 'role' | 'details' | 'otp';
@@ -37,7 +41,16 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
     phone: '',
     reraNumber: '',
     email: '',
+    locality: '',
+    dealsClosed: '',
   });
+  const [specializations, setSpecializations] = useState<string[]>([]);
+
+  const toggleSpecialization = (item: string) => {
+    setSpecializations(prev =>
+      prev.includes(item) ? prev.filter(s => s !== item) : [...prev, item],
+    );
+  };
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [checkboxError, setCheckboxError] = useState(false);
@@ -50,12 +63,35 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
   const [otpError, setOtpError] = useState('');
   const [otpFilled, setOtpFilled] = useState(false);
 
+  // ── Profile photo (broker only)
+  const [profilePhotoFile, setProfilePhotoFile] = useState<any>(null);
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<any>(null);
+
+  const handlePickPhoto = () => {
+    if (Platform.OS === 'web' && fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (e: any) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { Alert.alert('Invalid file', 'Please upload an image file'); return; }
+    if (file.size > 5 * 1024 * 1024) { Alert.alert('File too large', 'File size should be less than 5MB'); return; }
+    const reader = new FileReader();
+    reader.onloadend = () => setProfilePhotoPreview(reader.result as string);
+    reader.readAsDataURL(file);
+    setProfilePhotoFile(file);
+    e.target.value = '';
+  };
+
   // ── Modal
   const [modalVisible, setModalVisible] = useState(true);
 
-  const { login } = useAuth();
+  const { login, updateUser } = useAuth();
   const { signup: register, sendOtp, loading: apiLoading } = useAuthAPIs();
-  const { openLoginModal, closeSignupModal } = useNavigation();
+  const { navigate, openLoginModal, closeSignupModal } = useNavigation();
 
   const otpInputRefs = useRef<Array<TextInput | null>>([]);
 
@@ -101,6 +137,11 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
     if (formData.phone.length !== 10) errors.phone = 'Enter a valid mobile number';
     if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       errors.email = 'Enter a valid Email ID';
+    }
+    if (selectedRole === 'broker') {
+      if (!formData.locality.trim()) errors.locality = 'Required';
+      if (!formData.dealsClosed.trim()) errors.dealsClosed = 'Required';
+      if (specializations.length === 0) errors.specializations = 'Select at least one';
     }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -188,6 +229,9 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
         roleName: selectedRole === 'broker' ? 'Broker' : 'Investor',
         joinType: selectedRole === 'broker' ? 'broker' : 'investor',
         reraNumber: selectedRole === 'broker' ? formData.reraNumber : undefined,
+        locality: selectedRole === 'broker' ? formData.locality : undefined,
+        specializations: selectedRole === 'broker' ? specializations : undefined,
+        dealsClosed: selectedRole === 'broker' ? parseInt(formData.dealsClosed) || 0 : undefined,
         otp,
         verificationId,
       },
@@ -195,7 +239,29 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
         if (response.success) {
           setModalVisible(false);
           closeSignupModal();
-          openLoginModal();
+          if (selectedRole === 'broker') {
+            await login(response.data);
+            if (profilePhotoFile) {
+              try {
+                const headers = await getHeaders();
+                delete (headers as any)['Content-Type'];
+                const formData = new FormData();
+                formData.append('profilePhoto', profilePhotoFile);
+                const res = await fetch(`${BASE_URL}/v1/brokers/profile`, {
+                  method: 'POST',
+                  headers: headers as any,
+                  body: formData,
+                });
+                const photoData = await res.json();
+                if (photoData.success && photoData.data?.profilePhoto) {
+                  await updateUser({ profilePhoto: photoData.data.profilePhoto });
+                }
+              } catch (_) {}
+            }
+            navigate('/investors');
+          } else {
+            openLoginModal();
+          }
         } else {
           setOtpError(response.message || 'Verification failed. Double-check your OTP and try once more.');
         }
@@ -388,23 +454,117 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
           ) : null}
         </View>
 
-        {/* RERA Number — broker only, optional */}
+        {/* Broker-only fields */}
         {selectedRole === 'broker' && (
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>RERA Number</Text>
-            <TextInput
-              style={[
-                styles.textInput,
-                focusedField === 'reraNumber' && styles.textInputFocused,
-              ]}
-              placeholder="Enter your RERA number"
-              placeholderTextColor="#9CA3AF"
-              value={formData.reraNumber}
-              onChangeText={t => handleChange('reraNumber', t)}
-              onFocus={() => setFocusedField('reraNumber')}
-              onBlur={() => setFocusedField(null)}
-            />
-          </View>
+          <>
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Profile Photo</Text>
+              <TouchableOpacity style={styles.photoUploadBox} onPress={handlePickPhoto} activeOpacity={0.75}>
+                {profilePhotoPreview ? (
+                  <Image source={{ uri: profilePhotoPreview }} style={styles.photoPreview} />
+                ) : (
+                  <View style={styles.photoPlaceholder}>
+                    <Text style={styles.photoUploadIcon}>↑</Text>
+                    <Text style={styles.photoUploadText}>Upload Photo</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+              {profilePhotoPreview && (
+                <TouchableOpacity onPress={() => { setProfilePhotoFile(null); setProfilePhotoPreview(null); }} style={{ marginTop: 6 }}>
+                  <Text style={{ fontSize: 12, color: COLORS.primary, fontWeight: '600' }}>Remove photo</Text>
+                </TouchableOpacity>
+              )}
+              {Platform.OS === 'web' && (
+                <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} onChange={handleFileChange} />
+              )}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>RERA Number</Text>
+              <TextInput
+                style={[
+                  styles.textInput,
+                  focusedField === 'reraNumber' && styles.textInputFocused,
+                ]}
+                placeholder="Enter your RERA number"
+                placeholderTextColor="#9CA3AF"
+                value={formData.reraNumber}
+                onChangeText={t => handleChange('reraNumber', t)}
+                onFocus={() => setFocusedField('reraNumber')}
+                onBlur={() => setFocusedField(null)}
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Locality <Text style={styles.required}>*</Text></Text>
+              <TextInput
+                style={[
+                  styles.textInput,
+                  focusedField === 'locality' && styles.textInputFocused,
+                  fieldErrors.locality && styles.textInputError,
+                ]}
+                placeholder="Enter city of operation"
+                placeholderTextColor="#9CA3AF"
+                value={formData.locality}
+                onChangeText={t => handleChange('locality', t)}
+                onFocus={() => setFocusedField('locality')}
+                onBlur={() => setFocusedField(null)}
+              />
+              {fieldErrors.locality ? (
+                <View style={styles.errorRow}>
+                  <Text style={styles.errorIcon}>▲</Text>
+                  <Text style={styles.errorText}>{fieldErrors.locality}</Text>
+                </View>
+              ) : null}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Specializations <Text style={styles.required}>*</Text></Text>
+              <View style={styles.tagsRow}>
+                {SPECIALIZATION_OPTIONS.map(item => (
+                  <TouchableOpacity
+                    key={item}
+                    onPress={() => toggleSpecialization(item)}
+                    style={[styles.tag, specializations.includes(item) && styles.tagSelected]}
+                  >
+                    <Text style={[styles.tagText, specializations.includes(item) && styles.tagTextSelected]}>
+                      {item}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              {fieldErrors.specializations ? (
+                <View style={styles.errorRow}>
+                  <Text style={styles.errorIcon}>▲</Text>
+                  <Text style={styles.errorText}>{fieldErrors.specializations}</Text>
+                </View>
+              ) : null}
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.inputLabel}>Deals Closed <Text style={styles.required}>*</Text></Text>
+              <TextInput
+                style={[
+                  styles.textInput,
+                  focusedField === 'dealsClosed' && styles.textInputFocused,
+                  fieldErrors.dealsClosed && styles.textInputError,
+                ]}
+                placeholder="Enter number of deals closed"
+                placeholderTextColor="#9CA3AF"
+                keyboardType="numeric"
+                value={formData.dealsClosed}
+                onChangeText={t => handleChange('dealsClosed', t.replace(/[^0-9]/g, ''))}
+                onFocus={() => setFocusedField('dealsClosed')}
+                onBlur={() => setFocusedField(null)}
+              />
+              {fieldErrors.dealsClosed ? (
+                <View style={styles.errorRow}>
+                  <Text style={styles.errorIcon}>▲</Text>
+                  <Text style={styles.errorText}>{fieldErrors.dealsClosed}</Text>
+                </View>
+              ) : null}
+            </View>
+          </>
         )}
 
         {/* Email */}
@@ -750,6 +910,63 @@ const styles = StyleSheet.create({
     width: 673,
     height: 580,
     borderRadius: 15,
+  },
+  tagsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 4,
+  },
+  tag: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    borderColor: '#D1D5DB',
+    backgroundColor: '#F9FAFB',
+  },
+  tagSelected: {
+    backgroundColor: '#FFF3CA',
+    borderColor: '#D4A017',
+  },
+  tagText: {
+    fontSize: 13,
+    color: '#374151',
+    fontWeight: '500',
+  },
+  tagTextSelected: {
+    color: '#8B6914',
+    fontWeight: '700',
+  },
+  photoUploadBox: {
+    width: 110,
+    height: 110,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: '#D1D5DB',
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#F9FAFB',
+  },
+  photoPreview: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  photoPlaceholder: {
+    alignItems: 'center',
+  },
+  photoUploadIcon: {
+    fontSize: 24,
+    color: '#9CA3AF',
+    marginBottom: 4,
+  },
+  photoUploadText: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    textAlign: 'center',
   },
 });
 
