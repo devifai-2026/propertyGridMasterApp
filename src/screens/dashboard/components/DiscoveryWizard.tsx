@@ -102,25 +102,31 @@ const DiscoveryWizard = () => {
   const isMobile = width < 768;
 
   const OPTIONS: any = {
-    '1': ['Pune', 'Mumbai', 'New Delhi', 'Gurgaon', 'Mumbai', 'New Delhi'],
+    '1': ['Pune', 'Mumbai', 'Kolkata', 'Gurgaon', 'Chennai', 'New Delhi'],
     '2': [
       { label: '5%+', value: '5' },
       { label: '8%+', value: '8' },
       { label: '10%+', value: '10' },
       { label: '12%+', value: '12' },
+      { label: '15%+', value: '15' },
+      { label: '20%+', value: '20' },
     ],
-    '3': ['Residential', 'Retail', 'Offices', 'Industrial', 'Others'],
+    '3': ['Residential', 'Retail', 'Offices', 'Industrial','Institutional' ,'Others'],
     '4': [
       { label: '< 1 Cr', value: { min: '0', max: '1' } },
-      { label: '1 - 5 Cr', value: { min: '1', max: '5' } },
-      { label: '5 - 10 Cr', value: { min: '5', max: '10' } },
+      { label: '1 - 2.5 Cr', value: { min: '1', max: '2.5' } },
+      { label: '2.5 - 5 Cr', value: { min: '2.5', max: '5' } },
+      { label: '5 - 7.5 Cr', value: { min: '5', max: '7.5' } },
+      { label: '7.5 - 10 Cr', value: { min: '7.5', max: '10' } },
       { label: '> 10 Cr', value: { min: '10', max: '1000' } },
     ],
-    '5': ['Banks', 'IT/Tech', 'Retail', 'Logistics', 'Others'],
+    '5': ['Banks', 'IT/Tech', 'Retail', 'Logistics','Co-working', 'Others'],
     '6': [
-      { label: '< 3 Yrs', value: '1' },
-      { label: '3 - 6 Yrs', value: '3' },
-      { label: '6 - 9 Yrs', value: '6' },
+      { label: '< 1 Yrs', value: '1' },
+      { label: '2 - 4 Yrs', value: '2' },
+      { label: '4 - 6 Yrs', value: '4' },
+      { label: '6 - 7 Yrs', value: '6' },
+      { label: '7 - 9 Yrs', value: '7' },
       { label: '9+ Yrs', value: '9' },
     ],
   };
