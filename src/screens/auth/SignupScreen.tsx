@@ -16,7 +16,6 @@ import {
   Easing,
   Image,
 } from 'react-native';
-import { AlertTriangle } from 'lucide-react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
@@ -134,8 +133,8 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
   // ── Validation
   const validateDetails = () => {
     const errors: Record<string, string> = {};
-    if (!formData.firstName.trim()) errors.firstName = 'Required';
-    if (!formData.lastName.trim()) errors.lastName = 'Required';
+    if (!formData.firstName.trim()) errors.firstName = 'Enter a valid first name';
+    if (!formData.lastName.trim()) errors.lastName = 'Enter a valid last name';
     if (formData.phone.length !== 10) errors.phone = 'Enter a valid mobile number';
     if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       errors.email = 'Enter a valid Email ID';
@@ -448,12 +447,18 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
                 fieldErrors.firstName && styles.textInputError,
               ]}
               placeholder="Enter your first name"
-              placeholderTextColor="#9CA3AF"
+              // placeholderTextColor="#9CA3AF"
               value={formData.firstName}
               onChangeText={t => handleChange('firstName', t)}
               onFocus={() => setFocusedField('firstName')}
               onBlur={() => setFocusedField(null)}
             />
+            {fieldErrors.firstName ? (
+              <View style={styles.errorRow}>
+                <Image source={require('../../assets/SignUp/errorIcon.png')}  style={styles.errorIcon} />
+                <Text style={styles.errorText}>{fieldErrors.firstName}</Text>
+              </View>
+            ) : null}
           </View>
           <View style={styles.nameField}>
             <Text style={styles.inputLabel}>Last Name <Text style={styles.required}>*</Text></Text>
@@ -464,12 +469,18 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
                 fieldErrors.lastName && styles.textInputError,
               ]}
               placeholder="Enter your last name"
-              placeholderTextColor="#9CA3AF"
+              // placeholderTextColor="#9CA3AF"
               value={formData.lastName}
               onChangeText={t => handleChange('lastName', t)}
               onFocus={() => setFocusedField('lastName')}
               onBlur={() => setFocusedField(null)}
             />
+            {fieldErrors.lastName ? (
+              <View style={styles.errorRow}>
+                <Image source={require('../../assets/SignUp/errorIcon.png')}  style={styles.errorIcon} />
+                <Text style={styles.errorText}>{fieldErrors.lastName}</Text>
+              </View>
+            ) : null}
           </View>
         </View>
 
@@ -483,7 +494,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               fieldErrors.phone && styles.textInputError,
             ]}
             placeholder="Enter your contact number"
-            placeholderTextColor="#9CA3AF"
+            // placeholderTextColor="#9CA3AF"
             keyboardType="numeric"
             maxLength={10}
             value={formData.phone}
@@ -493,7 +504,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
           />
           {fieldErrors.phone ? (
             <View style={styles.errorRow}>
-              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+              <Image source={require('../../assets/SignUp/errorIcon.png')}  style={styles.errorIcon} />
               <Text style={styles.errorText}>{fieldErrors.phone}</Text>
             </View>
           ) : null}
@@ -512,7 +523,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
                   focusedField === 'reraNumber' && styles.textInputFocused,
                 ]}
                 placeholder="Enter your RERA number"
-                placeholderTextColor="#9CA3AF"
+                // placeholderTextColor="#9CA3AF"
                 value={formData.reraNumber}
                 onChangeText={t => handleChange('reraNumber', t)}
                 onFocus={() => setFocusedField('reraNumber')}
@@ -529,7 +540,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
                   fieldErrors.locality && styles.textInputError,
                 ]}
                 placeholder="Enter city of operation"
-                placeholderTextColor="#9CA3AF"
+                // placeholderTextColor="#9CA3AF"
                 value={formData.locality}
                 onChangeText={t => handleChange('locality', t)}
                 onFocus={() => setFocusedField('locality')}
@@ -537,7 +548,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               />
               {fieldErrors.locality ? (
                 <View style={styles.errorRow}>
-                  <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                  <Image source={require('../../assets/SignUp/errorIcon.png')}  style={styles.errorIcon} />
                   <Text style={styles.errorText}>{fieldErrors.locality}</Text>
                 </View>
               ) : null}
@@ -560,7 +571,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               </View>
               {fieldErrors.specializations ? (
                 <View style={styles.errorRow}>
-                  <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                  <Image source={require('../../assets/SignUp/errorIcon.png')}  style={styles.errorIcon} />
                   <Text style={styles.errorText}>{fieldErrors.specializations}</Text>
                 </View>
               ) : null}
@@ -575,7 +586,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
                   fieldErrors.dealsClosed && styles.textInputError,
                 ]}
                 placeholder="Enter number of deals closed"
-                placeholderTextColor="#9CA3AF"
+                // placeholderTextColor="#9CA3AF"
                 keyboardType="numeric"
                 value={formData.dealsClosed}
                 onChangeText={t => handleChange('dealsClosed', t.replace(/[^0-9]/g, ''))}
@@ -584,7 +595,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               />
               {fieldErrors.dealsClosed ? (
                 <View style={styles.errorRow}>
-                  <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                  <Image source={require('../../assets/SignUp/errorIcon.png')}  style={styles.errorIcon} />
                   <Text style={styles.errorText}>{fieldErrors.dealsClosed}</Text>
                 </View>
               ) : null}
@@ -602,7 +613,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               fieldErrors.email && styles.textInputError,
             ]}
             placeholder="Enter your Email"
-            placeholderTextColor="#9CA3AF"
+            // placeholderTextColor="#9CA3AF"
             keyboardType="email-address"
             autoCapitalize="none"
             value={formData.email}
@@ -612,34 +623,64 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
           />
           {fieldErrors.email ? (
             <View style={styles.errorRow}>
-              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+              <Image source={require('../../assets/SignUp/errorIcon.png')}  style={styles.errorIcon} />
               <Text style={styles.errorText}>{fieldErrors.email}</Text>
             </View>
           ) : null}
         </View>
 
         {/* Checkboxes */}
-        <TouchableOpacity style={styles.checkRow} onPress={() => { setTermsAccepted(p => !p); setCheckboxError(false); }}>
-          <View style={[styles.checkbox, termsAccepted && styles.checkboxChecked, checkboxError && !termsAccepted && styles.checkboxError]}>
+        <View style={styles.checkRow}>
+          <TouchableOpacity 
+            style={[styles.checkbox, termsAccepted && styles.checkboxChecked, checkboxError && !termsAccepted && styles.checkboxError]}
+            onPress={() => { setTermsAccepted(p => !p); setCheckboxError(false); }}
+          >
             {termsAccepted && <Text style={styles.checkmark}>✓</Text>}
-          </View>
+          </TouchableOpacity>
           <Text style={styles.checkLabel}>
-            I agree to the <Text style={styles.checkLink}>terms & conditions</Text>
+            I agree to the{' '}
+            <Text 
+              style={styles.checkLink}
+              onPress={() => {
+                if (Platform.OS === 'web') {
+                  (window as any).open('/terms-of-service', '_blank');
+                } else {
+                  navigate('/terms-of-service');
+                }
+              }}
+            >
+              terms & conditions
+            </Text>
           </Text>
-        </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity style={styles.checkRow} onPress={() => { setPrivacyAccepted(p => !p); setCheckboxError(false); }}>
-          <View style={[styles.checkbox, privacyAccepted && styles.checkboxChecked, checkboxError && !privacyAccepted && styles.checkboxError]}>
+        <View style={styles.checkRow}>
+          <TouchableOpacity 
+            style={[styles.checkbox, privacyAccepted && styles.checkboxChecked, checkboxError && !privacyAccepted && styles.checkboxError]}
+            onPress={() => { setPrivacyAccepted(p => !p); setCheckboxError(false); }}
+          >
             {privacyAccepted && <Text style={styles.checkmark}>✓</Text>}
-          </View>
+          </TouchableOpacity>
           <Text style={styles.checkLabel}>
-            I agree to the <Text style={styles.checkLink}>Privacy Policy</Text>
+            I agree to the{' '}
+            <Text 
+              style={styles.checkLink}
+              onPress={() => {
+                if (Platform.OS === 'web') {
+                  (window as any).open('/privacy-policy', '_blank');
+                } else {
+                  navigate('/privacy-policy');
+                }
+              }}
+            >
+              Privacy Policy
+            </Text>
           </Text>
-        </TouchableOpacity>
+        </View>
 
         {checkboxError && (
-          <View style={styles.errorRow}>
-            <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+          <View style={styles.errorRow_privacy}>
+            <Image source={require('../../assets/SignUp/errorIcon.png')}  style={styles.errorIcon} />
             <Text style={styles.errorText}>Please agree to the Terms & Conditions and Privacy Policy</Text>
           </View>
         )}
@@ -874,7 +915,7 @@ const styles = StyleSheet.create({
   required:    { color: '#EE2529' },
   textInput: {
     borderWidth: 1.5, borderColor: '#E5E7EB', borderRadius: 10,
-    paddingHorizontal: 14, paddingVertical: 13, fontSize: 15, color: '#1F2937', backgroundColor: '#F9FAFB', lineHeight: 18,
+    paddingHorizontal: 14, paddingVertical: 13, fontSize: 15, color: '#1F2937', backgroundColor: COLORS.white, lineHeight: 18,
   },
   textInputFocused: { borderColor: '#3B82F6', backgroundColor: COLORS.white },
   textInputError:   { borderColor: '#EE2529' },
@@ -887,10 +928,17 @@ const styles = StyleSheet.create({
     marginTop: 6,
     paddingLeft: 12,
   },
+   errorRow_privacy: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+    paddingLeft: 50,
+  },
   errorIcon: {
-    color: '#EE2529',
-    fontSize: 10,
-    fontWeight: '700',
+    width: 16,
+    height: 16,
+    resizeMode: 'contain',
   },
   errorText: {
     color: '#EE2529',

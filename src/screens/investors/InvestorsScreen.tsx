@@ -277,26 +277,7 @@ const InvestorsScreen = () => {
           <View style={styles.leftColumn}>
             {/* Profile Card */}
             <View style={styles.card}>
-              <View style={styles.profileHeader}>
-                {user?.profilePhoto || user?.profileImage ? (
-                  <Image
-                    source={{
-                      uri: (user.profilePhoto || user.profileImage) as string,
-                    }}
-                    style={styles.avatar}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <Image
-                    source={require('../../assets/Dashboard/img.jpg')}
-                    style={styles.avatar}
-                    resizeMode="cover"
-                  />
-                )}
-                <View style={styles.profileInfo}>
-                  <Text style={styles.userName}>{userData.name}</Text>
-                </View>
-              </View>
+              <Text style={styles.userName}>{userData.name}</Text>
 
               <View style={styles.statsDivider}>
                 <View style={styles.statItem}>
@@ -312,15 +293,16 @@ const InvestorsScreen = () => {
 
               <View style={styles.contactInfo}>
                 <View style={styles.contactRow}>
-                  <Mail size={16} color="#EE2529" />
-                  <View>
+                  <Mail size={18} color="#EE2529" />
+                  <View style={styles.contactDetails}>
                     <Text style={styles.contactLabel}>EMAIL</Text>
                     <Text style={styles.contactValue}>{userData.email}</Text>
                   </View>
                 </View>
                 <View style={styles.contactRow}>
-                  <Phone size={16} color="#EE2529" />
-                  <View>
+                  <Phone size={18} color="#EE2529" />
+                  <View style={styles.contactDetails}>
+                    <Text style={styles.contactLabel}>MOBILE NO.</Text>
                     <View style={styles.mobileValueRow}>
                       <Text style={styles.contactValue}>
                         {userData.mobileNumber || userData.mobile || 'N/A'}
@@ -329,11 +311,17 @@ const InvestorsScreen = () => {
                         style={styles.editBtnSmall}
                         onPress={handleOpenMobileModal}
                       >
-                        <Edit size={14} color="#666" />
+                        <Text style={styles.editBtnText}>Edit</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
                 </View>
+              </View>
+
+              <View style={styles.cardFooter}>
+                <Text style={styles.footerText}>
+                  Joined on: {userData.joined} Last log in: {userData.lastLogin}
+                </Text>
               </View>
             </View>
             {/* Assistance */}
@@ -495,17 +483,20 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
     borderRadius: 8,
-    padding: 20,
+    padding: 40,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 3,
     marginBottom: 20,
+    alignItems: 'center',
   },
   profileHeader: {
     flexDirection: 'row',
     gap: 15,
     alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
   },
   avatar: {
     width: 80,
@@ -514,12 +505,14 @@ const styles = StyleSheet.create({
   },
   profileInfo: {
     justifyContent: 'center',
+    alignItems: 'center',
   },
   userName: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#EE2529',
-    marginBottom: 5,
+    marginBottom: 20,
+    textAlign: 'center',
   },
   roleBadge: {
     backgroundColor: '#FFF3CA',
@@ -535,11 +528,12 @@ const styles = StyleSheet.create({
   },
   statsDivider: {
     flexDirection: 'row',
-    paddingVertical: 15,
+    paddingVertical: 20,
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: '#eee',
-    marginTop: 15,
+    marginVertical: 15,
+    width: '100%',
   },
   statItem: {
     flex: 1,
@@ -551,32 +545,42 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 12,
-    color: '#767676',
-    marginBottom: 5,
+    color: '#999',
+    marginBottom: 8,
     textAlign: 'center',
+    fontWeight: '600',
   },
   statNumber: {
-    fontSize: 18,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#EE2529',
   },
   contactInfo: {
     marginVertical: 15,
-    gap: 15,
+    gap: 20,
+    width: '100%',
+    alignItems: 'flex-start',
   },
   contactRow: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 15,
     alignItems: 'flex-start',
+    width: '100%',
+  },
+  contactDetails: {
+    flex: 1,
   },
   contactLabel: {
-    fontSize: 12,
-    color: '#767676',
-    fontWeight: '600',
+    fontSize: 11,
+    color: '#999',
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    marginBottom: 4,
   },
   contactValue: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#333',
+    fontWeight: '500',
   },
   assistanceCard: {
     backgroundColor: '#fff',
@@ -657,26 +661,30 @@ const styles = StyleSheet.create({
   },
   brokerStatsRow: {
     flexDirection: 'row',
-    gap: 15,
+    gap: 20,
     marginBottom: 25,
   },
   brokerStatCard: {
-    flex: 1,
+    width: 350,
     backgroundColor: '#fff',
     padding: 20,
-    borderRadius: 12,
+    borderRadius: 8,
     shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
     elevation: 2,
+    alignItems: 'center',
   },
   brokerStatLabel: {
-    fontSize: 14,
-    color: '#767676',
-    marginBottom: 10,
+    fontSize: 13,
+    color: '#999',
+    marginBottom: 12,
+    textAlign: 'center',
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
   brokerStatValue: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     color: '#EE2529',
   },
@@ -732,12 +740,32 @@ const styles = StyleSheet.create({
   mobileValueRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
   },
   editBtnSmall: {
-    padding: 4,
-    backgroundColor: '#f3f4f6',
-    borderRadius: 4,
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    backgroundColor: '#f9f9f9',
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  editBtnText: {
+    color: '#666',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  cardFooter: {
+    marginTop: 20,
+    paddingTop: 15,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+    width: '100%',
+  },
+  footerText: {
+    fontSize: 12,
+    color: '#bbb',
+    textAlign: 'center',
   },
 
   // Modal Styles
