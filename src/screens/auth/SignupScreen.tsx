@@ -26,7 +26,13 @@ import { BASE_URL } from '../../../helpers/environments';
 import { decodeResponseData } from '../../../helpers/api/decoder';
 import { COLORS } from '../../constants/theme';
 
-const SPECIALIZATION_OPTIONS = ['MNC Client', 'Industrial', 'Residential', 'Commercial', 'Office Lease'];
+const SPECIALIZATION_OPTIONS = [
+  'MNC Client',
+  'Industrial',
+  'Residential',
+  'Commercial',
+  'Office Lease',
+];
 
 type Role = 'owner_investor' | 'broker' | null;
 type Screen = 'role' | 'details' | 'otp';
@@ -67,7 +73,9 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
   // ── Profile photo (broker only)
   const [profilePhotoFile, setProfilePhotoFile] = useState<any>(null);
-  const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(null);
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(
+    null,
+  );
   const fileInputRef = useRef<any>(null);
 
   const handlePickPhoto = () => {
@@ -79,8 +87,14 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
   const handleFileChange = (e: any) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) { Alert.alert('Invalid file', 'Please upload an image file'); return; }
-    if (file.size > 5 * 1024 * 1024) { Alert.alert('File too large', 'File size should be less than 5MB'); return; }
+    if (!file.type.startsWith('image/')) {
+      Alert.alert('Invalid file', 'Please upload an image file');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      Alert.alert('File too large', 'File size should be less than 5MB');
+      return;
+    }
     const reader = new FileReader();
     reader.onloadend = () => setProfilePhotoPreview(reader.result as string);
     reader.readAsDataURL(file);
@@ -103,8 +117,18 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, { toValue: 1, duration: 300, useNativeDriver: true, easing: Easing.out(Easing.ease) }),
-      Animated.timing(slideAnim, { toValue: 0, duration: 300, useNativeDriver: true, easing: Easing.out(Easing.ease) }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+        easing: Easing.out(Easing.ease),
+      }),
     ]).start();
   }, [currentScreen]);
 
@@ -126,7 +150,8 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
   const handleChange = (field: string, value: string) => {
     let sanitized = value;
     if (field === 'phone') sanitized = value.replace(/[^0-9]/g, '');
-    if (field === 'email') sanitized = value.replace(/[^a-zA-Z0-9._%+\-@]/g, '');
+    if (field === 'email')
+      sanitized = value.replace(/[^a-zA-Z0-9._%+\-@]/g, '');
     setFormData(prev => ({ ...prev, [field]: sanitized }));
     if (fieldErrors[field]) setFieldErrors(prev => ({ ...prev, [field]: '' }));
   };
@@ -134,16 +159,22 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
   // ── Validation
   const validateDetails = () => {
     const errors: Record<string, string> = {};
-    if (!formData.firstName.trim()) errors.firstName = 'Enter a valid first name';
+    if (!formData.firstName.trim())
+      errors.firstName = 'Enter a valid first name';
     if (!formData.lastName.trim()) errors.lastName = 'Enter a valid last name';
-    if (formData.phone.length !== 10) errors.phone = 'Enter a valid mobile number';
-    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    if (formData.phone.length !== 10)
+      errors.phone = 'Enter a valid mobile number';
+    if (
+      !formData.email.trim() ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
+    ) {
       errors.email = 'Enter a valid Email ID';
     }
     if (selectedRole === 'broker') {
       if (!formData.locality.trim()) errors.locality = 'Required';
       if (!formData.dealsClosed.trim()) errors.dealsClosed = 'Required';
-      if (specializations.length === 0) errors.specializations = 'Select at least one';
+      if (specializations.length === 0)
+        errors.specializations = 'Select at least one';
     }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
@@ -176,7 +207,10 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
         }
       },
       (error: any) => {
-        Alert.alert('Error', error?.response?.data?.message || 'Failed to send OTP');
+        Alert.alert(
+          'Error',
+          error?.response?.data?.message || 'Failed to send OTP',
+        );
       },
     );
   };
@@ -221,7 +255,10 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
   // ── Screen 3 → Submit
   const handleVerifyAndSignup = async () => {
-    if (otp.length < 6) { setOtpError('Please enter the complete OTP'); return; }
+    if (otp.length < 6) {
+      setOtpError('Please enter the complete OTP');
+      return;
+    }
     register(
       {
         mobileNumber: formData.phone,
@@ -232,8 +269,12 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
         joinType: selectedRole === 'broker' ? 'broker' : 'investor',
         reraNumber: selectedRole === 'broker' ? formData.reraNumber : undefined,
         locality: selectedRole === 'broker' ? formData.locality : undefined,
-        specializations: selectedRole === 'broker' ? specializations : undefined,
-        dealsClosed: selectedRole === 'broker' ? parseInt(formData.dealsClosed) || 0 : undefined,
+        specializations:
+          selectedRole === 'broker' ? specializations : undefined,
+        dealsClosed:
+          selectedRole === 'broker'
+            ? parseInt(formData.dealsClosed) || 0
+            : undefined,
         otp,
         verificationId,
       },
@@ -251,7 +292,10 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
                 fd.append('profilePhoto', profilePhotoFile);
                 fd.append('locality', formData.locality.trim());
                 fd.append('specializations', JSON.stringify(specializations));
-                fd.append('dealsClosed', String(parseInt(formData.dealsClosed) || 0));
+                fd.append(
+                  'dealsClosed',
+                  String(parseInt(formData.dealsClosed) || 0),
+                );
                 const res = await fetch(`${BASE_URL}/v1/brokers/profile`, {
                   method: 'POST',
                   headers: headers as any,
@@ -261,14 +305,17 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
                 if (photoData.success) {
                   // data is an encoded string — fetch the profile to get the actual URL
                   const profileHeaders = await getHeaders();
-                  const profileRes = await fetch(`${BASE_URL}/v1/brokers/profile`, {
-                    method: 'GET',
-                    headers: profileHeaders as any,
-                  });
+                  const profileRes = await fetch(
+                    `${BASE_URL}/v1/brokers/profile`,
+                    {
+                      method: 'GET',
+                      headers: profileHeaders as any,
+                    },
+                  );
                   const profileData = await profileRes.json();
                   if (profileData.success && profileData.data) {
                     const decoded = decodeResponseData(profileData.data);
-                    console.log(decoded)
+                    console.log(decoded);
                     if (decoded?.profilePhoto) {
                       await updateUser({ profilePhoto: decoded.profilePhoto });
                     }
@@ -280,16 +327,22 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
                 console.error('[Photo upload error]', err);
               }
             }
-            navigate('/investors');
+            navigate('/my-prifile');
           } else {
             openLoginModal();
           }
         } else {
-          setOtpError(response.message || 'Verification failed. Double-check your OTP and try once more.');
+          setOtpError(
+            response.message ||
+              'Verification failed. Double-check your OTP and try once more.',
+          );
         }
       },
       (error: any) => {
-        setOtpError(error?.response?.data?.message || "That doesn't seem right. Double-check your OTP and try once more.");
+        setOtpError(
+          error?.response?.data?.message ||
+            "That doesn't seem right. Double-check your OTP and try once more.",
+        );
       },
     );
   };
@@ -308,7 +361,11 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
             resizeMode="contain"
           />
         </View>
-        <TouchableOpacity onPress={handleClose} style={styles.closeButton} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+        <TouchableOpacity
+          onPress={handleClose}
+          style={styles.closeButton}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
           <Text style={styles.closeButtonText}>✕</Text>
         </TouchableOpacity>
       </View>
@@ -317,75 +374,102 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
   // ── SCREEN 1: Role selection
   const renderRoleScreen = () => (
-    <Animated.View style={[styles.roleScreenContent, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+    <Animated.View
+      style={[
+        styles.roleScreenContent,
+        { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
+      ]}
+    >
       <View style={styles.headingBanner}>
         <Text style={styles.screenHeading}>
-          <Text style={styles.signUpBold}>Sign UP.</Text>
-          {' '}To live in our space.
+          <Text style={styles.signUpBold}>Sign UP.</Text> To live in our space.
         </Text>
       </View>
-      <Text style={styles.screenSub}>Tell us who you are to personalize your experience</Text>
+      <Text style={styles.screenSub}>
+        Tell us who you are to personalize your experience
+      </Text>
 
       <View style={styles.roleCenter}>
-      <View style={styles.roleRow}>
-        {/* Owner / Investor */}
-        <TouchableOpacity
-          style={[styles.roleCardWrapper, selectedRole === 'owner_investor' && styles.roleCardActive]}
-          onPress={() => setSelectedRole('owner_investor')}
-          activeOpacity={0.8}
-        >
-          <LinearGradient
-            colors={['#D7EFF7', '#FFFFFF']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            locations={[0.0761, 0.7484]}
-            style={styles.roleCard}
+        <View style={styles.roleRow}>
+          {/* Owner / Investor */}
+          <TouchableOpacity
+            style={[
+              styles.roleCardWrapper,
+              selectedRole === 'owner_investor' && styles.roleCardActive,
+            ]}
+            onPress={() => setSelectedRole('owner_investor')}
+            activeOpacity={0.8}
           >
-            <Image source={require('../../assets/SignUp/Owner.png')} style={styles.roleIcon} resizeMode="contain" />
-            <Text style={styles.roleTitle}>Owner/{'\n'}Investor</Text>
-            <Text style={styles.roleDesc}>Find profitable{'\n'}opportunities</Text>
-          </LinearGradient>
-          {selectedRole === 'owner_investor' && (
-            <>
-              <View style={[styles.cornerAccent, styles.cornerBL]} />
-              <View style={[styles.cornerAccent, styles.cornerBR]} />
-            </>
-          )}
-        </TouchableOpacity>
+            <LinearGradient
+              colors={['#D7EFF7', '#FFFFFF']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              locations={[0.0761, 0.7484]}
+              style={styles.roleCard}
+            >
+              <Image
+                source={require('../../assets/SignUp/Owner.png')}
+                style={styles.roleIcon}
+                resizeMode="contain"
+              />
+              <Text style={styles.roleTitle}>Owner/{'\n'}Investor</Text>
+              <Text style={styles.roleDesc}>
+                Find profitable{'\n'}opportunities
+              </Text>
+            </LinearGradient>
+            {selectedRole === 'owner_investor' && (
+              <>
+                <View style={[styles.cornerAccent, styles.cornerBL]} />
+                <View style={[styles.cornerAccent, styles.cornerBR]} />
+              </>
+            )}
+          </TouchableOpacity>
 
-        {/* Broker */}
-        <TouchableOpacity
-          style={[styles.roleCardWrapper, selectedRole === 'broker' && styles.roleCardActive]}
-          onPress={() => setSelectedRole('broker')}
-          activeOpacity={0.8}
-        >
-          <LinearGradient
-            colors={['#FDEDEE', '#FFFFFF']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            locations={[0.0761, 0.7484]}
-            style={styles.roleCard}
+          {/* Broker */}
+          <TouchableOpacity
+            style={[
+              styles.roleCardWrapper,
+              selectedRole === 'broker' && styles.roleCardActive,
+            ]}
+            onPress={() => setSelectedRole('broker')}
+            activeOpacity={0.8}
           >
-            <Image source={require('../../assets/SignUp/broker.png')} style={styles.roleIcon} resizeMode="contain" />
-            <Text style={styles.roleTitle}>Broker</Text>
-            <Text style={styles.roleDesc}>Connect buyers{'\n'}and sellers</Text>
-          </LinearGradient>
-          {selectedRole === 'broker' && (
-            <>
-              <View style={[styles.cornerAccent, styles.cornerBL]} />
-              <View style={[styles.cornerAccent, styles.cornerBR]} />
-            </>
-          )}
-        </TouchableOpacity>
-      </View>
+            <LinearGradient
+              colors={['#FDEDEE', '#FFFFFF']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              locations={[0.0761, 0.7484]}
+              style={styles.roleCard}
+            >
+              <Image
+                source={require('../../assets/SignUp/broker.png')}
+                style={styles.roleIcon}
+                resizeMode="contain"
+              />
+              <Text style={styles.roleTitle}>Broker</Text>
+              <Text style={styles.roleDesc}>
+                Connect buyers{'\n'}and sellers
+              </Text>
+            </LinearGradient>
+            {selectedRole === 'broker' && (
+              <>
+                <View style={[styles.cornerAccent, styles.cornerBL]} />
+                <View style={[styles.cornerAccent, styles.cornerBR]} />
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.btnOutline} onPress={() => {
-          setModalVisible(false);
-          closeSignupModal();
-          openLoginModal();
-        }}>
+        <TouchableOpacity
+          style={styles.btnOutline}
+          onPress={() => {
+            setModalVisible(false);
+            closeSignupModal();
+            openLoginModal();
+          }}
+        >
           <Text style={styles.btnOutlineText}>Back to Sign In</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -407,40 +491,76 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
   // ── SCREEN 2: Account details
   const renderDetailsScreen = () => (
-    <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+    <Animated.View
+      style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}
+    >
       <View style={styles.headingBanner}>
         <Text style={styles.screenHeading}>Create your account</Text>
       </View>
-      <Text style={styles.screenSub}>Just a few details to get you started</Text>
+      <Text style={styles.screenSub}>
+        Just a few details to get you started
+      </Text>
 
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ width: '100%' }}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={{ width: '100%' }}
+      >
         {selectedRole === 'broker' && (
           <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Profile Photo</Text>
-              <TouchableOpacity style={styles.photoUploadBox} onPress={handlePickPhoto} activeOpacity={0.75}>
-                {profilePhotoPreview ? (
-                  <Image source={{ uri: profilePhotoPreview }} style={styles.photoPreview} />
-                ) : (
-                  <View style={styles.photoPlaceholder}>
-                    <Text style={styles.photoUploadIcon}>↑</Text>
-                    <Text style={styles.photoUploadText}>Upload Photo</Text>
-                  </View>
-                )}
+            <Text style={styles.inputLabel}>Profile Photo</Text>
+            <TouchableOpacity
+              style={styles.photoUploadBox}
+              onPress={handlePickPhoto}
+              activeOpacity={0.75}
+            >
+              {profilePhotoPreview ? (
+                <Image
+                  source={{ uri: profilePhotoPreview }}
+                  style={styles.photoPreview}
+                />
+              ) : (
+                <View style={styles.photoPlaceholder}>
+                  <Text style={styles.photoUploadIcon}>↑</Text>
+                  <Text style={styles.photoUploadText}>Upload Photo</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+            {profilePhotoPreview && (
+              <TouchableOpacity
+                onPress={() => {
+                  setProfilePhotoFile(null);
+                  setProfilePhotoPreview(null);
+                }}
+                style={{ marginTop: 6 }}
+              >
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: COLORS.primary,
+                    fontWeight: '600',
+                  }}
+                >
+                  Remove photo
+                </Text>
               </TouchableOpacity>
-              {profilePhotoPreview && (
-                <TouchableOpacity onPress={() => { setProfilePhotoFile(null); setProfilePhotoPreview(null); }} style={{ marginTop: 6 }}>
-                  <Text style={{ fontSize: 12, color: COLORS.primary, fontWeight: '600' }}>Remove photo</Text>
-                </TouchableOpacity>
-              )}
-              {Platform.OS === 'web' && (
-                <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp" style={{ display: 'none' }} onChange={handleFileChange} />
-              )}
-            </View>)
-          }
+            )}
+            {Platform.OS === 'web' && (
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+            )}
+          </View>
+        )}
         {/* First + Last Name row */}
         <View style={styles.nameRow}>
           <View style={styles.nameField}>
-            <Text style={styles.inputLabel}>First Name <Text style={styles.required}>*</Text></Text>
+            <Text style={styles.inputLabel}>
+              First Name <Text style={styles.required}>*</Text>
+            </Text>
             <TextInput
               style={[
                 styles.textInput,
@@ -456,13 +576,18 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
             />
             {fieldErrors.firstName ? (
               <View style={styles.errorRow}>
-                <Image source={require('../../assets/SignUp/errorIcon.png')}  style={styles.errorIcon} />
+                <Image
+                  source={require('../../assets/SignUp/errorIcon.png')}
+                  style={styles.errorIcon}
+                />
                 <Text style={styles.errorText}>{fieldErrors.firstName}</Text>
               </View>
             ) : null}
           </View>
           <View style={styles.nameField}>
-            <Text style={styles.inputLabel}>Last Name <Text style={styles.required}>*</Text></Text>
+            <Text style={styles.inputLabel}>
+              Last Name <Text style={styles.required}>*</Text>
+            </Text>
             <TextInput
               style={[
                 styles.textInput,
@@ -478,7 +603,10 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
             />
             {fieldErrors.lastName ? (
               <View style={styles.errorRow}>
-                <Image source={require('../../assets/SignUp/errorIcon.png')}  style={styles.errorIcon} />
+                <Image
+                  source={require('../../assets/SignUp/errorIcon.png')}
+                  style={styles.errorIcon}
+                />
                 <Text style={styles.errorText}>{fieldErrors.lastName}</Text>
               </View>
             ) : null}
@@ -487,7 +615,9 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
         {/* Mobile Number */}
         <View style={styles.inputGroup}>
-          <Text style={styles.inputLabel}>Mobile Number <Text style={styles.required}>*</Text></Text>
+          <Text style={styles.inputLabel}>
+            Mobile Number <Text style={styles.required}>*</Text>
+          </Text>
           <TextInput
             style={[
               styles.textInput,
@@ -505,7 +635,10 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
           />
           {fieldErrors.phone ? (
             <View style={styles.errorRow}>
-              <Image source={require('../../assets/SignUp/errorIcon.png')}  style={styles.errorIcon} />
+              <Image
+                source={require('../../assets/SignUp/errorIcon.png')}
+                style={styles.errorIcon}
+              />
               <Text style={styles.errorText}>{fieldErrors.phone}</Text>
             </View>
           ) : null}
@@ -514,8 +647,6 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
         {/* Broker-only fields */}
         {selectedRole === 'broker' && (
           <>
-            
-
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>RERA Number</Text>
               <TextInput
@@ -533,7 +664,9 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Locality <Text style={styles.required}>*</Text></Text>
+              <Text style={styles.inputLabel}>
+                Locality <Text style={styles.required}>*</Text>
+              </Text>
               <TextInput
                 style={[
                   styles.textInput,
@@ -549,22 +682,36 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               />
               {fieldErrors.locality ? (
                 <View style={styles.errorRow}>
-                  <Image source={require('../../assets/SignUp/errorIcon.png')}  style={styles.errorIcon} />
+                  <Image
+                    source={require('../../assets/SignUp/errorIcon.png')}
+                    style={styles.errorIcon}
+                  />
                   <Text style={styles.errorText}>{fieldErrors.locality}</Text>
                 </View>
               ) : null}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Specializations <Text style={styles.required}>*</Text></Text>
+              <Text style={styles.inputLabel}>
+                Specializations <Text style={styles.required}>*</Text>
+              </Text>
               <View style={styles.tagsRow}>
                 {SPECIALIZATION_OPTIONS.map(item => (
                   <TouchableOpacity
                     key={item}
                     onPress={() => toggleSpecialization(item)}
-                    style={[styles.tag, specializations.includes(item) && styles.tagSelected]}
+                    style={[
+                      styles.tag,
+                      specializations.includes(item) && styles.tagSelected,
+                    ]}
                   >
-                    <Text style={[styles.tagText, specializations.includes(item) && styles.tagTextSelected]}>
+                    <Text
+                      style={[
+                        styles.tagText,
+                        specializations.includes(item) &&
+                          styles.tagTextSelected,
+                      ]}
+                    >
                       {item}
                     </Text>
                   </TouchableOpacity>
@@ -572,14 +719,21 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               </View>
               {fieldErrors.specializations ? (
                 <View style={styles.errorRow}>
-                  <Image source={require('../../assets/SignUp/errorIcon.png')}  style={styles.errorIcon} />
-                  <Text style={styles.errorText}>{fieldErrors.specializations}</Text>
+                  <Image
+                    source={require('../../assets/SignUp/errorIcon.png')}
+                    style={styles.errorIcon}
+                  />
+                  <Text style={styles.errorText}>
+                    {fieldErrors.specializations}
+                  </Text>
                 </View>
               ) : null}
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Deals Closed <Text style={styles.required}>*</Text></Text>
+              <Text style={styles.inputLabel}>
+                Deals Closed <Text style={styles.required}>*</Text>
+              </Text>
               <TextInput
                 style={[
                   styles.textInput,
@@ -590,14 +744,21 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
                 // placeholderTextColor="#9CA3AF"
                 keyboardType="numeric"
                 value={formData.dealsClosed}
-                onChangeText={t => handleChange('dealsClosed', t.replace(/[^0-9]/g, ''))}
+                onChangeText={t =>
+                  handleChange('dealsClosed', t.replace(/[^0-9]/g, ''))
+                }
                 onFocus={() => setFocusedField('dealsClosed')}
                 onBlur={() => setFocusedField(null)}
               />
               {fieldErrors.dealsClosed ? (
                 <View style={styles.errorRow}>
-                  <Image source={require('../../assets/SignUp/errorIcon.png')}  style={styles.errorIcon} />
-                  <Text style={styles.errorText}>{fieldErrors.dealsClosed}</Text>
+                  <Image
+                    source={require('../../assets/SignUp/errorIcon.png')}
+                    style={styles.errorIcon}
+                  />
+                  <Text style={styles.errorText}>
+                    {fieldErrors.dealsClosed}
+                  </Text>
                 </View>
               ) : null}
             </View>
@@ -606,7 +767,9 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
         {/* Email */}
         <View style={styles.inputGroup}>
-          <Text style={styles.inputLabel}>Email <Text style={styles.required}>*</Text></Text>
+          <Text style={styles.inputLabel}>
+            Email <Text style={styles.required}>*</Text>
+          </Text>
           <TextInput
             style={[
               styles.textInput,
@@ -624,7 +787,10 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
           />
           {fieldErrors.email ? (
             <View style={styles.errorRow}>
-              <Image source={require('../../assets/SignUp/errorIcon.png')}  style={styles.errorIcon} />
+              <Image
+                source={require('../../assets/SignUp/errorIcon.png')}
+                style={styles.errorIcon}
+              />
               <Text style={styles.errorText}>{fieldErrors.email}</Text>
             </View>
           ) : null}
@@ -632,15 +798,22 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
         {/* Checkboxes */}
         <View style={styles.checkRow}>
-          <TouchableOpacity 
-            style={[styles.checkbox, termsAccepted && styles.checkboxChecked, checkboxError && !termsAccepted && styles.checkboxError]}
-            onPress={() => { setTermsAccepted(p => !p); setCheckboxError(false); }}
+          <TouchableOpacity
+            style={[
+              styles.checkbox,
+              termsAccepted && styles.checkboxChecked,
+              checkboxError && !termsAccepted && styles.checkboxError,
+            ]}
+            onPress={() => {
+              setTermsAccepted(p => !p);
+              setCheckboxError(false);
+            }}
           >
             {termsAccepted && <Text style={styles.checkmark}>✓</Text>}
           </TouchableOpacity>
           <Text style={styles.checkLabel}>
             I agree to the{' '}
-            <Text 
+            <Text
               style={styles.checkLink}
               onPress={() => {
                 if (Platform.OS === 'web') {
@@ -656,15 +829,22 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
         </View>
 
         <View style={styles.checkRow}>
-          <TouchableOpacity 
-            style={[styles.checkbox, privacyAccepted && styles.checkboxChecked, checkboxError && !privacyAccepted && styles.checkboxError]}
-            onPress={() => { setPrivacyAccepted(p => !p); setCheckboxError(false); }}
+          <TouchableOpacity
+            style={[
+              styles.checkbox,
+              privacyAccepted && styles.checkboxChecked,
+              checkboxError && !privacyAccepted && styles.checkboxError,
+            ]}
+            onPress={() => {
+              setPrivacyAccepted(p => !p);
+              setCheckboxError(false);
+            }}
           >
             {privacyAccepted && <Text style={styles.checkmark}>✓</Text>}
           </TouchableOpacity>
           <Text style={styles.checkLabel}>
             I agree to the{' '}
-            <Text 
+            <Text
               style={styles.checkLink}
               onPress={() => {
                 if (Platform.OS === 'web') {
@@ -681,14 +861,22 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
         {checkboxError && (
           <View style={styles.errorRow_privacy}>
-            <Image source={require('../../assets/SignUp/errorIcon.png')}  style={styles.errorIcon} />
-            <Text style={styles.errorText}>Please agree to the Terms & Conditions and Privacy Policy</Text>
+            <Image
+              source={require('../../assets/SignUp/errorIcon.png')}
+              style={styles.errorIcon}
+            />
+            <Text style={styles.errorText}>
+              Please agree to the Terms & Conditions and Privacy Policy
+            </Text>
           </View>
         )}
       </KeyboardAvoidingView>
 
       <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.btnOutline} onPress={() => resetAnim(() => setCurrentScreen('role'))}>
+        <TouchableOpacity
+          style={styles.btnOutline}
+          onPress={() => resetAnim(() => setCurrentScreen('role'))}
+        >
           <Text style={styles.btnOutlineText}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -702,7 +890,9 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
             end={{ x: 1, y: 0.5 }}
             style={styles.btnGradient}
           >
-            <Text style={styles.btnPrimaryText}>{apiLoading ? 'Sending...' : 'Continue'}</Text>
+            <Text style={styles.btnPrimaryText}>
+              {apiLoading ? 'Sending...' : 'Continue'}
+            </Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
@@ -711,7 +901,12 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
   // ── SCREEN 3: OTP verification
   const renderOtpScreen = () => (
-    <Animated.View style={[styles.otpScreenContent, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+    <Animated.View
+      style={[
+        styles.otpScreenContent,
+        { opacity: fadeAnim, transform: [{ translateY: slideAnim }] },
+      ]}
+    >
       <View style={styles.headingBanner}>
         <Text style={styles.screenHeading}>Verify your Contact Number</Text>
       </View>
@@ -724,7 +919,9 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
         {[0, 1, 2, 3, 4, 5].map(index => (
           <TextInput
             key={index}
-            ref={ref => { otpInputRefs.current[index] = ref; }}
+            ref={ref => {
+              otpInputRefs.current[index] = ref;
+            }}
             style={[
               styles.otpInput,
               otpError ? styles.otpInputError : null,
@@ -741,18 +938,21 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
       </View>
 
       <View style={styles.otpErrorContainer}>
-        {otpError ? (
-          <Text style={styles.otpErrorText}>{otpError}</Text>
-        ) : null}
+        {otpError ? <Text style={styles.otpErrorText}>{otpError}</Text> : null}
       </View>
 
       <View style={styles.otpResendRow}>
-        <Text style={styles.otpResendLink} onPress={handleResendOtp}>Resend OTP</Text>
+        <Text style={styles.otpResendLink} onPress={handleResendOtp}>
+          Resend OTP
+        </Text>
         <Text style={styles.otpResendLink}>Contact Support</Text>
       </View>
 
       <View style={styles.buttonRow}>
-        <TouchableOpacity style={styles.btnOutline} onPress={() => resetAnim(() => setCurrentScreen('details'))}>
+        <TouchableOpacity
+          style={styles.btnOutline}
+          onPress={() => resetAnim(() => setCurrentScreen('details'))}
+        >
           <Text style={styles.btnOutlineText}>Back</Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -766,7 +966,9 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
             end={{ x: 1, y: 0.5 }}
             style={styles.btnGradient}
           >
-            <Text style={styles.btnPrimaryText}>{apiLoading ? 'Verifying...' : 'Verify & Continue'}</Text>
+            <Text style={styles.btnPrimaryText}>
+              {apiLoading ? 'Verifying...' : 'Verify & Continue'}
+            </Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
@@ -777,21 +979,32 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
   // MAIN RENDER
   // ──────────────────────────────────────────
   return (
-    <Modal animationType="none" transparent visible={modalVisible} onRequestClose={handleClose}>
+    <Modal
+      animationType="none"
+      transparent
+      visible={modalVisible}
+      onRequestClose={handleClose}
+    >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
-            <View style={[styles.card, currentScreen === 'otp' && styles.cardOtp]}>
+            <View
+              style={[styles.card, currentScreen === 'otp' && styles.cardOtp]}
+            >
               <ScrollView
                 showsVerticalScrollIndicator={false}
                 keyboardShouldPersistTaps="handled"
                 scrollEnabled={currentScreen !== 'role'}
-                contentContainerStyle={currentScreen === 'role' ? styles.roleScrollContent : undefined}
+                contentContainerStyle={
+                  currentScreen === 'role'
+                    ? styles.roleScrollContent
+                    : undefined
+                }
               >
                 {renderHeader()}
-                {currentScreen === 'role'    && renderRoleScreen()}
+                {currentScreen === 'role' && renderRoleScreen()}
                 {currentScreen === 'details' && renderDetailsScreen()}
-                {currentScreen === 'otp'     && renderOtpScreen()}
+                {currentScreen === 'otp' && renderOtpScreen()}
               </ScrollView>
             </View>
           </TouchableWithoutFeedback>
@@ -836,9 +1049,24 @@ const styles = StyleSheet.create({
   },
   logoContainer: { flexDirection: 'row', alignItems: 'center', height: 40 },
   logoImage: { width: 120, height: 40 },
-  closeButton:     { width: 28, height: 28, justifyContent: 'center', alignItems: 'center' },
-  closeButtonText: { fontSize: 16, color: '#EE2529', fontWeight: '600', lineHeight: 18 },
-  divider: { height: 1, backgroundColor: '#E5E7EB', marginBottom: 20, marginHorizontal: -48 },
+  closeButton: {
+    width: 28,
+    height: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButtonText: {
+    fontSize: 16,
+    color: '#EE2529',
+    fontWeight: '600',
+    lineHeight: 18,
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginBottom: 20,
+    marginHorizontal: -48,
+  },
 
   /* ── Shared headings ── */
   headingBanner: {
@@ -851,20 +1079,32 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   screenHeading: {
-    fontSize: 20, fontWeight: '700', color: '#1A1A1A',
-    textAlign: 'center', lineHeight: 24,
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1A1A1A',
+    textAlign: 'center',
+    lineHeight: 24,
   },
   signUpBold: { fontWeight: '700' },
   screenSub: {
-    fontSize: 13, color: '#6B7280', lineHeight: 18,
-    textAlign: 'center', marginBottom: 32,
+    fontSize: 13,
+    color: '#6B7280',
+    lineHeight: 18,
+    textAlign: 'center',
+    marginBottom: 32,
   },
 
   /* ── Role cards ── */
   roleCenter: { flex: 1, justifyContent: 'center' },
-  roleRow: { flexDirection: 'row', gap: 16, marginBottom: 36 , paddingHorizontal: 48,},
+  roleRow: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 36,
+    paddingHorizontal: 48,
+  },
   roleCardWrapper: {
-    flex: 1, borderRadius: 16,
+    flex: 1,
+    borderRadius: 16,
   },
   roleCardActive: {
     shadowColor: '#EE2529',
@@ -874,52 +1114,113 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   cornerAccent: {
-    position: 'absolute', width: 18, height: 18,
+    position: 'absolute',
+    width: 18,
+    height: 18,
     // borderColor: '#EE2529', borderWidth: 2.5,
   },
   cornerBL: {
-    bottom: 0, left: 0,
-    borderTopWidth: 0, borderRightWidth: 0,
+    bottom: 0,
+    left: 0,
+    borderTopWidth: 0,
+    borderRightWidth: 0,
     borderBottomLeftRadius: 16,
   },
   cornerBR: {
-    bottom: 0, right: 0,
-    borderTopWidth: 0, borderLeftWidth: 0,
+    bottom: 0,
+    right: 0,
+    borderTopWidth: 0,
+    borderLeftWidth: 0,
     borderBottomRightRadius: 16,
   },
   roleCard: { padding: 20, alignItems: 'center', borderRadius: 14 },
-  roleIcon:  { width: 48, height: 48, marginBottom: 12 },
-  roleTitle: { fontSize: 15, fontWeight: '700', color: '#1F2937', textAlign: 'center', marginBottom: 6, lineHeight: 18 },
-  roleDesc:  { fontSize: 12, color: '#6B7280', textAlign: 'center', lineHeight: 16 },
+  roleIcon: { width: 48, height: 48, marginBottom: 12 },
+  roleTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1F2937',
+    textAlign: 'center',
+    marginBottom: 6,
+    lineHeight: 18,
+  },
+  roleDesc: {
+    fontSize: 12,
+    color: '#6B7280',
+    textAlign: 'center',
+    lineHeight: 16,
+  },
 
   /* ── Buttons ── */
-  buttonRow:   { flexDirection: 'row', gap: 12, marginTop: 48 ,paddingHorizontal: 48, },
-  btnOutline: {
-    flex: 1, borderWidth: 1.5, borderColor: '#D1D5DB', borderRadius: 12,
-    paddingVertical: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.white,
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 48,
+    paddingHorizontal: 48,
   },
-  btnOutlineText: { fontSize: 15, fontWeight: '600', color: '#374151', lineHeight: 18 },
+  btnOutline: {
+    flex: 1,
+    borderWidth: 1.5,
+    borderColor: '#D1D5DB',
+    borderRadius: 12,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.white,
+  },
+  btnOutlineText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#374151',
+    lineHeight: 18,
+  },
   btnPrimary: {
-    flex: 1, borderRadius: 5, overflow: 'hidden',
+    flex: 1,
+    borderRadius: 5,
+    overflow: 'hidden',
   },
   btnGradient: {
-    paddingVertical: 14, alignItems: 'center', justifyContent: 'center',
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  btnPrimaryText: { fontSize: 15, fontWeight: '600', color: COLORS.white, lineHeight: 18 },
+  btnPrimaryText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: COLORS.white,
+    lineHeight: 18,
+  },
   buttonDisabled: { opacity: 0.5 },
 
   /* ── Form inputs ── */
-  nameRow:   { flexDirection: 'row', gap: 16, marginBottom: 32 ,paddingHorizontal: 48 },
+  nameRow: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 32,
+    paddingHorizontal: 48,
+  },
   nameField: { flex: 1 },
-  inputGroup:  { marginBottom: 32 , paddingHorizontal: 48, },
-  inputLabel:  { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 8, lineHeight: 16 },
-  required:    { color: '#000000ff' },
+  inputGroup: { marginBottom: 32, paddingHorizontal: 48 },
+  inputLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: 8,
+    lineHeight: 16,
+  },
+  required: { color: '#000000ff' },
   textInput: {
-    borderWidth: 1.5, borderColor: '#E5E7EB', borderRadius: 10,
-    paddingHorizontal: 14, paddingVertical: 13, fontSize: 15, color: '#1F2937', backgroundColor: COLORS.white, lineHeight: 18,
+    borderWidth: 1.5,
+    borderColor: '#E5E7EB',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+    fontSize: 15,
+    color: '#1F2937',
+    backgroundColor: COLORS.white,
+    lineHeight: 18,
   },
   textInputFocused: { borderColor: '#3B82F6', backgroundColor: COLORS.white },
-  textInputError:   { borderColor: '#EE2529' },
+  textInputError: { borderColor: '#EE2529' },
 
   /* ── Field errors ── */
   errorRow: {
@@ -929,7 +1230,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
     paddingLeft: 12,
   },
-   errorRow_privacy: {
+  errorRow_privacy: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
@@ -948,40 +1249,71 @@ const styles = StyleSheet.create({
   },
 
   /* ── Checkboxes ── */
-  checkRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginBottom: 14 , paddingHorizontal: 48},
+  checkRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginBottom: 14,
+    paddingHorizontal: 48,
+  },
   checkbox: {
-    width: 18, height: 18, borderWidth: 1.5, borderColor: '#D1D5DB',
-    borderRadius: 4, alignItems: 'center', justifyContent: 'center', marginTop: 2,
+    width: 18,
+    height: 18,
+    borderWidth: 1.5,
+    borderColor: '#D1D5DB',
+    borderRadius: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 2,
   },
   checkboxChecked: { backgroundColor: '#EE2529', borderColor: '#EE2529' },
   checkboxError: { borderColor: '#EE2529' },
-  checkmark:  { color: COLORS.white, fontSize: 11, fontWeight: '700' },
+  checkmark: { color: COLORS.white, fontSize: 11, fontWeight: '700' },
   checkLabel: { fontSize: 13, color: '#374151', lineHeight: 16, flex: 1 },
-  checkLink:  { color: '#3B82F6', textDecorationLine: 'underline' },
+  checkLink: { color: '#3B82F6', textDecorationLine: 'underline' },
 
   /* ── OTP ── */
   phoneHighlight: { fontWeight: '700', color: '#1F2937' },
   otpRow: {
-    flexDirection: 'row', justifyContent: 'center',
-    gap: 12, marginBottom: 32, marginTop: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 12,
+    marginBottom: 32,
+    marginTop: 12,
   },
   otpInput: {
-    width: 64, height: 64, borderWidth: 1.5, borderColor: '#E5E7EB',
-    borderRadius: 12, textAlign: 'center', fontSize: 26, fontWeight: '700',
-    color: '#1F2937', backgroundColor: '#F9FAFB',
+    width: 64,
+    height: 64,
+    borderWidth: 1.5,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    textAlign: 'center',
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#1F2937',
+    backgroundColor: '#F9FAFB',
   },
-  otpInputError:       { borderColor: '#EE2529' },
+  otpInputError: { borderColor: '#EE2529' },
   otpInputErrorFilled: { borderColor: '#EE2529', color: '#EE2529' },
   otpErrorText: {
-    color: '#EE2529', fontSize: 13, textAlign: 'center',
-    marginBottom: 16, lineHeight: 18, paddingHorizontal: 8,
+    color: '#EE2529',
+    fontSize: 13,
+    textAlign: 'center',
+    marginBottom: 16,
+    lineHeight: 18,
+    paddingHorizontal: 8,
   },
   otpResendText: {
-    fontSize: 13, color: '#6B7280', textAlign: 'center',
-    marginBottom: 8, lineHeight: 18,
+    fontSize: 13,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 8,
+    lineHeight: 18,
   },
   otpResendLink: {
-    color: '#1F2937', fontWeight: '500', textDecorationLine: 'underline',
+    color: '#1F2937',
+    fontWeight: '500',
+    textDecorationLine: 'underline',
   },
   roleScrollContent: { flex: 1 },
   roleScreenContent: { flex: 1, justifyContent: 'space-between' },

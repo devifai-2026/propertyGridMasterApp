@@ -661,7 +661,7 @@ const ListPropertyScreen = () => {
                 errorMessage.includes('complete your profile')) && (
                 <TouchableOpacity
                   style={styles.errorActionBtn}
-                  onPress={() => navigate('/investors')}
+                  onPress={() => navigate('/my-prifile')}
                 >
                   <Text style={styles.errorActionText}>Go to Profile</Text>
                 </TouchableOpacity>

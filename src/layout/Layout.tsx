@@ -56,11 +56,11 @@ import Svg, { Circle, Path } from 'react-native-svg';
 
 const ListPropertyIcon = () => (
   <Svg width="32" height="32" viewBox="0 0 38 38" fill="none">
-    <Circle cx="19" cy="19" r="19" fill="#EE2529"/>
-    <Path 
-      d="M18.9985 11V19.808M18.9985 28.41V19.808M18.9985 19.808H27.41M18.9985 19.808H10" 
-      stroke="white" 
-      strokeWidth="2.5" 
+    <Circle cx="19" cy="19" r="19" fill="#EE2529" />
+    <Path
+      d="M18.9985 11V19.808M18.9985 28.41V19.808M18.9985 19.808H27.41M18.9985 19.808H10"
+      stroke="white"
+      strokeWidth="2.5"
       strokeLinecap="round"
     />
   </Svg>
@@ -100,15 +100,22 @@ const SideMenu: React.FC<SideMenuProps> = ({
                 <TouchableOpacity
                   style={styles.menuUserInfo}
                   onPress={() => {
-                    navigate('/investors');
+                    navigate('/my-prifile');
                     onClose();
                   }}
                 >
                   <View style={[styles.profileCircle, styles.menuAvatar]}>
-                    {(user?.profilePhoto || user?.profileImage) ? (
+                    {user?.profilePhoto || user?.profileImage ? (
                       <Image
-                        source={{ uri: (user.profilePhoto || user.profileImage) as string }}
-                        style={{ width: '100%', height: '100%', borderRadius: 22 }}
+                        source={{
+                          uri: (user.profilePhoto ||
+                            user.profileImage) as string,
+                        }}
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          borderRadius: 22,
+                        }}
                       />
                     ) : (
                       <Text style={styles.menuAvatarText}>
@@ -191,7 +198,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
               <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => {
-                  navigate('/investors');
+                  navigate('/my-prifile');
                   onClose();
                 }}
               >
@@ -322,15 +329,18 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
   const [isLogoutMenuVisible, setIsLogoutMenuVisible] = useState(false);
   const isMobile = width < 768;
 
-  const headerActiveStyle = isHovered && !isMobile ? styles.headerContainerHover : {};
+  const headerActiveStyle =
+    isHovered && !isMobile ? styles.headerContainerHover : {};
 
   return (
-    <View 
+    <View
       style={[styles.headerContainer, headerActiveStyle]}
-      {...(Platform.OS === 'web' ? {
-        onMouseEnter: () => setIsHovered(true),
-        onMouseLeave: () => setIsHovered(false),
-      } : {})}
+      {...(Platform.OS === 'web'
+        ? {
+            onMouseEnter: () => setIsHovered(true),
+            onMouseLeave: () => setIsHovered(false),
+          }
+        : {})}
     >
       <View
         style={[
@@ -420,9 +430,11 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
               onPress={() => setIsLogoutMenuVisible(!isLogoutMenuVisible)}
             >
               <View style={styles.profileCircle}>
-                {(user?.profilePhoto || user?.profileImage) ? (
+                {user?.profilePhoto || user?.profileImage ? (
                   <Image
-                    source={{ uri: (user.profilePhoto || user.profileImage) as string }}
+                    source={{
+                      uri: (user.profilePhoto || user.profileImage) as string,
+                    }}
                     style={{ width: '100%', height: '100%', borderRadius: 17 }}
                   />
                 ) : (
@@ -441,10 +453,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
               <ChevronDown size={18} color={COLORS.primary} strokeWidth={3} />
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity
-              style={styles.signInBtn}
-              onPress={openLoginModal}
-            >
+            <TouchableOpacity style={styles.signInBtn} onPress={openLoginModal}>
               <Text style={styles.signInText}>Sign In</Text>
             </TouchableOpacity>
           )}
@@ -464,24 +473,26 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
         <TouchableWithoutFeedback onPress={() => setIsLogoutMenuVisible(false)}>
           <View style={styles.popoverOverlay}>
             <TouchableWithoutFeedback>
-              <View style={[
-                  styles.logoutPopover, 
-                  { right: isMobile ? '5%' : '5%', top: 75 }
-                ]}>
-                <TouchableOpacity 
-                   style={styles.popoverItem}
-                   onPress={() => {
-                     setIsLogoutMenuVisible(false);
-                     navigate('/investors');
-                   }}
+              <View
+                style={[
+                  styles.logoutPopover,
+                  { right: isMobile ? '5%' : '5%', top: 75 },
+                ]}
+              >
+                <TouchableOpacity
+                  style={styles.popoverItem}
+                  onPress={() => {
+                    setIsLogoutMenuVisible(false);
+                    navigate('/my-prifile');
+                  }}
                 >
                   <UserIcon size={18} color="#666" />
                   <Text style={styles.popoverText}>My Profile</Text>
                 </TouchableOpacity>
-                
+
                 <View style={styles.popoverDivider} />
-                
-                <TouchableOpacity 
+
+                <TouchableOpacity
                   style={styles.popoverItem}
                   onPress={() => {
                     setIsLogoutMenuVisible(false);
@@ -489,7 +500,9 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
                   }}
                 >
                   <LogOut size={18} color={COLORS.primary} />
-                  <Text style={[styles.popoverText, { color: COLORS.primary }]}>Logout</Text>
+                  <Text style={[styles.popoverText, { color: COLORS.primary }]}>
+                    Logout
+                  </Text>
                 </TouchableOpacity>
               </View>
             </TouchableWithoutFeedback>

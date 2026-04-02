@@ -29,11 +29,18 @@ import NotesScreen from './src/screens/notes/NotesScreen';
 import EnquiryDetailsScreen from './src/screens/enquiries/EnquiryDetailsScreen';
 
 const AppContent = () => {
-  const { currentPath, navigate, showLoginModal, showSignupModal, closeLoginModal, closeSignupModal } = useNavigation();
+  const {
+    currentPath,
+    navigate,
+    showLoginModal,
+    showSignupModal,
+    closeLoginModal,
+    closeSignupModal,
+  } = useNavigation();
   const { isLoggedIn, isLoading } = useAuth();
 
   // Redirect to login if accessing private pages while not logged in
-  const privatePages = ['/investors', '/my-profile'];
+  const privatePages = ['/my-prifile', '/my-profile'];
   const isPrivate = privatePages.some(page => currentPath.startsWith(page));
 
   React.useEffect(() => {
@@ -69,7 +76,7 @@ const AppContent = () => {
       case currentPath === '/explore-brokers':
       case currentPath.startsWith('/contact-brokers'):
         return <ExploreBrokersScreen />;
-      case currentPath === '/investors':
+      case currentPath === '/my-prifile':
         return isLoggedIn ? <InvestorsScreen /> : <LoginScreen />;
       case currentPath === '/list-property':
       case currentPath.startsWith('/list-property/'):
@@ -106,12 +113,8 @@ const AppContent = () => {
   return (
     <View style={{ flex: 1 }}>
       {renderScreen()}
-      {showLoginModal && (
-        <LoginScreen onClose={closeLoginModal} />
-      )}
-      {showSignupModal && (
-        <SignupScreen onClose={closeSignupModal} />
-      )}
+      {showLoginModal && <LoginScreen onClose={closeLoginModal} />}
+      {showSignupModal && <SignupScreen onClose={closeSignupModal} />}
     </View>
   );
 };
