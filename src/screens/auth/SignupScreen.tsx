@@ -15,6 +15,7 @@ import {
   Animated,
   Easing,
   Image,
+  Linking,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useAuth } from '../../context/AuthContext';
@@ -643,7 +644,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               style={styles.checkLink}
               onPress={() => {
                 if (Platform.OS === 'web') {
-                  (window as any).open('/terms-of-service', '_blank');
+                  Linking.openURL('/terms-of-service');
                 } else {
                   navigate('/terms-of-service');
                 }
@@ -667,7 +668,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               style={styles.checkLink}
               onPress={() => {
                 if (Platform.OS === 'web') {
-                  (window as any).open('/privacy-policy', '_blank');
+                  Linking.openURL('/privacy-policy');
                 } else {
                   navigate('/privacy-policy');
                 }
@@ -912,7 +913,7 @@ const styles = StyleSheet.create({
   nameField: { flex: 1 },
   inputGroup:  { marginBottom: 32 , paddingHorizontal: 48, },
   inputLabel:  { fontSize: 13, fontWeight: '600', color: '#374151', marginBottom: 8, lineHeight: 16 },
-  required:    { color: '#EE2529' },
+  required:    { color: '#000000ff' },
   textInput: {
     borderWidth: 1.5, borderColor: '#E5E7EB', borderRadius: 10,
     paddingHorizontal: 14, paddingVertical: 13, fontSize: 15, color: '#1F2937', backgroundColor: COLORS.white, lineHeight: 18,

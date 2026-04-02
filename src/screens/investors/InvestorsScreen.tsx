@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  ScrollView,
   Dimensions,
   ActivityIndicator,
   Modal,
@@ -13,7 +12,7 @@ import {
   Alert,
 } from 'react-native';
 import Layout from '../../layout/Layout';
-import { Mail, Phone, Edit, ArrowRight, User, Lock } from 'lucide-react-native';
+import { Mail, Smartphone, Edit, ArrowRight, User, Lock } from 'lucide-react-native';
 import { useAuth } from '../../context/AuthContext';
 import { COLORS } from '../../constants/theme';
 import PortfolioTab from './components/PortfolioTab';
@@ -268,7 +267,6 @@ const InvestorsScreen = () => {
         return <PortfolioTab />;
     }
   };
-
   return (
     <Layout>
       <View style={styles.container}>
@@ -277,16 +275,38 @@ const InvestorsScreen = () => {
           <View style={styles.leftColumn}>
             {/* Profile Card */}
             <View style={styles.card}>
-              <Text style={styles.userName}>{userData.name}</Text>
+              {/* Avatar + Name Row */}
+              <View style={styles.profileHeader}>
+                {(userData as any).profilePhoto || (userData as any).avatar ? (
+                  <Image
+                    source={{ uri: (userData as any).profilePhoto || (userData as any).avatar }}
+                    style={styles.avatar}
+                  />
+                ) : (
+                  <View style={styles.avatarPlaceholder}>
+                    <Text style={styles.avatarInitials}>
+                      {userData.name
+                        ? userData.name
+                            .split(' ')
+                            .slice(0, 2)
+                            .map((n: string) => n[0])
+                            .join('')
+                            .toUpperCase()
+                        : 'U'}
+                    </Text>
+                  </View>
+                )}
+                <Text style={styles.userName}>{userData.name}</Text>
+              </View>
 
               <View style={styles.statsDivider}>
                 <View style={styles.statItem}>
-                  <Text style={styles.statLabel}>PROPERTIES INVESTED</Text>
+                  <Text style={styles.statLabel}>{"PROPERTIES\nINVESTED"}</Text>
                   <Text style={styles.statNumber}>4</Text>
                 </View>
                 <View style={styles.verticalLine} />
                 <View style={styles.statItem}>
-                  <Text style={styles.statLabel}>PROPERTIES ENQUIRED</Text>
+                  <Text style={styles.statLabel}>{"PROPERTIES\nENQUIRED"}</Text>
                   <Text style={styles.statNumber}>2</Text>
                 </View>
               </View>
@@ -300,20 +320,18 @@ const InvestorsScreen = () => {
                   </View>
                 </View>
                 <View style={styles.contactRow}>
-                  <Phone size={18} color="#EE2529" />
+                  <Smartphone size={18} color="#EE2529" />
                   <View style={styles.contactDetails}>
                     <Text style={styles.contactLabel}>MOBILE NO.</Text>
-                    <View style={styles.mobileValueRow}>
-                      <Text style={styles.contactValue}>
-                        {userData.mobileNumber || userData.mobile || 'N/A'}
-                      </Text>
-                      <TouchableOpacity
-                        style={styles.editBtnSmall}
-                        onPress={handleOpenMobileModal}
-                      >
-                        <Text style={styles.editBtnText}>Edit</Text>
-                      </TouchableOpacity>
-                    </View>
+                    <Text style={styles.contactValue}>
+                      {userData.mobileNumber || userData.mobile || 'N/A'}
+                    </Text>
+                    <TouchableOpacity
+                      style={styles.editBtnSmall}
+                      onPress={handleOpenMobileModal}
+                    >
+                      <Text style={styles.editBtnText}>Edit</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
@@ -329,7 +347,8 @@ const InvestorsScreen = () => {
               <Text style={styles.assistanceTitle}>Need Assistance?</Text>
               <Text style={styles.assistanceText}>
                 Have questions about returns, tenants, or documents? Our team is
-                here to guide you each step.
+                here to guide you each step. Get clear answers on rental yields,
+                ROI, and compliance directly from our property advisors.
               </Text>
               <TouchableOpacity style={styles.supportBtn}>
                 <Text style={styles.supportBtnText}>Get Support</Text>
@@ -493,15 +512,29 @@ const styles = StyleSheet.create({
   },
   profileHeader: {
     flexDirection: 'row',
-    gap: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
+    gap: 20,
+    alignItems: 'flex-end',
     width: '100%',
+    marginBottom: 2,
+    paddingBottom: 4,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
+    width: 90,
+    height: 90,
+    borderRadius: 16,
+  },
+  avatarPlaceholder: {
+    width: 90,
+    height: 90,
+    borderRadius: 16,
+    backgroundColor: '#C8C8C8',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarInitials: {
+    fontSize: 33,
+    fontWeight: 'bold',
+    color: '#fff',
   },
   profileInfo: {
     justifyContent: 'center',
@@ -511,8 +544,8 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     color: '#EE2529',
-    marginBottom: 20,
-    textAlign: 'center',
+    flex: 1,
+    // paddingBottom: 2
   },
   roleBadge: {
     backgroundColor: '#FFF3CA',
@@ -544,14 +577,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#eee',
   },
   statLabel: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#999',
     marginBottom: 8,
     textAlign: 'center',
     fontWeight: '600',
   },
   statNumber: {
-    fontSize: 28,
+    fontSize: 25,
     fontWeight: 'bold',
     color: '#EE2529',
   },
@@ -743,17 +776,19 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   editBtnSmall: {
-    paddingVertical: 6,
-    paddingHorizontal: 16,
-    backgroundColor: '#f9f9f9',
+    marginTop: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 30,
+    backgroundColor: '#fff',
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#ccc',
+    alignSelf: 'center',
   },
   editBtnText: {
-    color: '#666',
-    fontSize: 13,
-    fontWeight: '600',
+    color: '#444',
+    fontSize: 14,
+    fontWeight: '500',
   },
   cardFooter: {
     marginTop: 20,
