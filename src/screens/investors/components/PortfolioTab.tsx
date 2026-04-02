@@ -178,7 +178,7 @@ const PortfolioTab = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: 'transparent',
   },
   propertiesSection: {
     marginTop: 20,
