@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   Image,
+  ImageBackground,
   TouchableOpacity,
   Dimensions,
   ActivityIndicator,
@@ -445,6 +446,11 @@ const InvestorsScreen = () => {
 
           {/* Right Column (Tabs & Content) */}
           <View style={styles.rightColumn}>
+            <ImageBackground
+              source={require('../../assets/Banner/bannerBg.png')}
+              style={styles.rightColumnBg}
+              resizeMode="cover"
+            />
             {/* Tabs */}
             <View style={styles.tabsContainer}>
               {['Broker', 'Investor', 'Owner', 'Wishlist'].map(tab => (
@@ -585,6 +591,16 @@ const styles = StyleSheet.create({
   },
   rightColumn: {
     flex: isDesktop ? 2 : undefined,
+    position: 'relative',
+  },
+  rightColumnBg: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    width: '100%',
+    height: 320,
+    zIndex: 0,
+    opacity: 2,
   },
   card: {
     backgroundColor: '#fff',
