@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.main,
     fontSize: 24,
     fontWeight: '400',
-    color: '#333',
+    color: '#262626',
     marginBottom: 2,
   },
   locationRow: {
@@ -385,8 +385,8 @@ const styles = StyleSheet.create({
   },
   propLocationText: {
     fontSize: 16,
-    color: '#666',
-    fontWeight: '400',
+    color: '#262626',
+    fontWeight: '200',
   },
   verifiedBadgeContainer: {
     position: 'absolute',
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
   },
   dotsContainer: {
     position: 'absolute',
-    bottom: 48,
+    bottom: 72,
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'center',
@@ -502,12 +502,15 @@ const styles = StyleSheet.create({
   compareBtnInternal: {
     backgroundColor: COLORS.white,
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    // paddingVertical: 8,
     borderRadius: 8,
     shadowColor: '#000',
     shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
+    // shadowOffset: { width: 0, height: 2 },
+    height: 40,
     elevation: 3,
+    paddingTop: 10,
+    paddingBottom: 8
   },
   compareBtnContent: {
     flexDirection: 'row',
@@ -535,16 +538,17 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   detailLabel: {
-    fontFamily: FONTS.main,
+    fontFamily: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
     fontSize: 16,
-    color: '#666',
-    fontWeight: '400',
+    color: '#767676',
+    fontWeight: '200',
   },
   detailValue: {
-    fontFamily: FONTS.main,
-    color: '#000000',
+    fontFamily: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
+    color: '#262626',
     fontWeight: '600',
     fontSize: 18,
+    textAlign: 'center',
   },
   roiCardContainer: {
     borderRadius: 15,
@@ -565,10 +569,10 @@ const styles = StyleSheet.create({
     minHeight: 80,
   },
   roiLabel: {
-    fontFamily: FONTS.main,
-    fontSize: 16,
-    color: '#000000',
-    fontWeight: '700',
+    fontFamily: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
+    fontSize: 24,
+    color: '#262626',
+    fontWeight: '600',
     marginBottom: 2,
     letterSpacing: 0.5,
   },
@@ -577,10 +581,10 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   roiValueText: {
-    fontFamily: FONTS.main,
-    fontSize: 20,
-    color: '#E63946',
-    fontWeight: '700',
+    fontFamily: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
+    fontSize: 16,
+    color: '#EE2529',
+    fontWeight: '600',
   },
   percentageSymbol: {
     fontFamily: FONTS.main,
@@ -607,10 +611,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   viewBtnText: {
-    fontFamily: FONTS.main,
-    color: '#666',
-    fontWeight: '600',
-    fontSize: 15,
+    fontFamily: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
+    color: '#767676',
+    fontWeight: '500',
+    fontSize: 14,
   },
   enquireBtnWrapper: {
     flex: 1,
