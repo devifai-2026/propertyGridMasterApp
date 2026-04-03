@@ -544,11 +544,10 @@ const styles = StyleSheet.create({
     fontWeight: '200',
   },
   detailValue: {
-    fontFamily: "Montserrat-Regular",
-      color: '#262626',
+    fontFamily: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
+    color: '#262626',
     fontWeight: '600',
     fontSize: 18,
-    lineHeight: 18,
     textAlign: 'center',
   },
   roiCardContainer: {
