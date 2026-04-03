@@ -948,7 +948,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
         <Text style={styles.otpResendLink}>Contact Support</Text>
       </View>
 
-      <View style={styles.buttonRow}>
+      <View style={styles.buttonRow_OTP}>
         <TouchableOpacity
           style={styles.btnOutline}
           onPress={() => resetAnim(() => setCurrentScreen('details'))}
@@ -1157,6 +1157,12 @@ const styles = StyleSheet.create({
     marginTop: 48,
     paddingHorizontal: 48,
   },
+  buttonRow_OTP:{
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 48,
+    paddingHorizontal: 48,
+  },
   btnOutline: {
     flex: 1,
     borderWidth: 1.5,
@@ -1282,8 +1288,8 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   otpInput: {
-    width: 64,
-    height: 64,
+    width: 80,
+    height: 80,
     borderWidth: 1.5,
     borderColor: '#E5E7EB',
     borderRadius: 12,
@@ -1318,7 +1324,7 @@ const styles = StyleSheet.create({
   roleScrollContent: { flex: 1 },
   roleScreenContent: { flex: 1, justifyContent: 'space-between' },
   otpScreenContent: { flex: 1, justifyContent: 'space-between' },
-  otpScreenSub: { marginBottom: 12 },
+  otpScreenSub: { marginBottom: 56 },
   otpErrorContainer: { minHeight: 54, justifyContent: 'center' },
   otpResendRow: {
     flexDirection: 'row',

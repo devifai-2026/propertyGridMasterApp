@@ -349,7 +349,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 const styles = StyleSheet.create({
   propertyCard: {
     backgroundColor: COLORS.white,
-    borderRadius: 12, // Increased rounding
+    borderRadius: 15, // Increased rounding
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderWidth: 1,
     borderColor: '#f0f0f0',
-    maxWidth: 500,
+    maxWidth: 420,
   },
   propHeader: {
     paddingHorizontal: 20,
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   propImageContainer: {
-    height: 280,
+    height: 277,
     width: '100%',
     position: 'relative',
     backgroundColor: '#f9f9f9',
@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
   },
   dotsContainer: {
     position: 'absolute',
-    bottom: 55, // Positioned above the blurred bar
+    bottom: 48,
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'center',
@@ -466,13 +466,13 @@ const styles = StyleSheet.create({
   },
   blurContainer: {
     position: 'absolute',
-    bottom: -6,
+    bottom: 0,
     left: 0,
     right: 0,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     paddingVertical: 10,
     paddingHorizontal: 16,
     borderWidth: 1,
@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 3,
+    borderRadius: 8,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
@@ -559,17 +559,17 @@ const styles = StyleSheet.create({
   },
   roiCardGradient: {
     paddingHorizontal: 14,
-    paddingVertical: 4,
+    paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 65,
+    minHeight: 80,
   },
   roiLabel: {
     fontFamily: FONTS.main,
-    fontSize: 18,
+    fontSize: 16,
     color: '#000000',
-    fontWeight: '600',
-    marginBottom: 0,
+    fontWeight: '700',
+    marginBottom: 2,
     letterSpacing: 0.5,
   },
   roiValueContainer: {
@@ -578,28 +578,28 @@ const styles = StyleSheet.create({
   },
   roiValueText: {
     fontFamily: FONTS.main,
-    fontSize: 16,
+    fontSize: 20,
     color: '#E63946',
-    fontWeight: '600',
+    fontWeight: '700',
   },
   percentageSymbol: {
     fontFamily: FONTS.main,
-    fontSize: 14,
+    fontSize: 15,
     color: '#E63946',
-    fontWeight: '600',
+    fontWeight: '700',
     marginLeft: 1,
   },
   propActions: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
-    marginTop: 12,
+    gap: 16,
+    marginTop: 16,
   },
   viewBtn: {
     flex: 1,
     maxWidth: 80,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderWidth: 1.2,
     borderColor: '#888',
     borderRadius: 5,
@@ -610,7 +610,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.main,
     color: '#666',
     fontWeight: '600',
-    fontSize: 14,
+    fontSize: 15,
   },
   enquireBtnWrapper: {
     flex: 1,
@@ -619,7 +619,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   enquireBtnGradient: {
-    paddingVertical: 10,
+    paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -627,7 +627,7 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.main,
     color: COLORS.white,
     fontWeight: '600',
-    fontSize: 14,
+    fontSize: 15,
   },
   removeBtn: {
     position: 'absolute',
