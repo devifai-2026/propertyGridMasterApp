@@ -417,7 +417,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
               ]}
               onPress={() => navigate('/list-property')}
             >
-              <ListPropertyIcon />
+              <ListPropertyIcon  />
               {!isMobile && (
                 <Text style={styles.listPropertyText}>List Property</Text>
               )}
@@ -648,10 +648,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#262626',
     borderRadius: 30,
-    paddingHorizontal: 15,
-    paddingVertical: 3.5,
-    height: 44,
-    gap: 8,
+    paddingHorizontal: 5,
+    paddingVertical: 2.5,
+    height: 40,
+    paddingRight: 15
   },
   listPropertyText: {
     fontWeight: '400',

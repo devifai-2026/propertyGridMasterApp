@@ -15,8 +15,8 @@ export const COLORS = {
 
 export const FONTS = {
   main: Platform.select({
-    ios: 'Avenir Next',
-    android: 'Avenir Next LT Pro',
-    web: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
-  }) || 'Avenir Next',
+    ios: 'Montserrat',
+    android: 'Montserrat',
+    web: '"Montserrat", system-ui, -apple-system, sans-serif',
+  }) || 'Montserrat',
 };

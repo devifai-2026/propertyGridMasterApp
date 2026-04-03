@@ -248,7 +248,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
           {!otpSent ? (
             /* ══════ SCREEN 1: Phone entry ══════ */
             <>
-              <View style={styles.inputGroup}>
+              <View style={styles.inputGroup_phone}>
                 <Text style={styles.inputLabel}>
                   Mobile Number <Text style={styles.required}>*</Text>
                 </Text>
@@ -266,7 +266,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
                 />
               </View>
 
-              <View style={styles.buttonRow}>
+              <View style={styles.buttonRowMain}>
                 <TouchableOpacity
                   style={styles.btnOutline}
                   onPress={() => {
@@ -500,6 +500,11 @@ const styles = StyleSheet.create({
   inputGroup: {
     marginBottom: 28,
   },
+  inputGroup_phone:{
+    width:541,
+    paddingLeft:44,
+    marginBottom: 28
+  },
   inputLabel: {
     fontSize: 14,
     fontWeight: '500',
@@ -525,6 +530,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     marginTop: 8,
+  },
+  buttonRowMain:{
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+    width:560,
+    paddingLeft:20
   },
 
   /* Sign Up button */
