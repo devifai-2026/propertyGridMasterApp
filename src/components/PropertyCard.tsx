@@ -433,7 +433,7 @@ const styles = StyleSheet.create({
   },
   dotsContainer: {
     position: 'absolute',
-    bottom: 48,
+    bottom: 72,
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'center',
