@@ -666,7 +666,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF0F0',
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 10,
+    // marginLeft: 10,
   },
   menuIcon: {
     color: '#D32F2F',
