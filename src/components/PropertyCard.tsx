@@ -538,14 +538,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   detailLabel: {
-    fontFamily: FONTS.main,
+    fontFamily: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
     fontSize: 16,
     color: '#767676',
-    fontWeight: '400',
+    fontWeight: '200',
   },
   detailValue: {
-    fontFamily: 'Montserrat-SemiBold',
-    color: '#262626',
+    fontFamily: "Montserrat-Regular",
+      color: '#262626',
     fontWeight: '600',
     fontSize: 18,
     lineHeight: 18,
@@ -570,7 +570,7 @@ const styles = StyleSheet.create({
     minHeight: 80,
   },
   roiLabel: {
-    fontFamily: 'Montserrat-SemiBold',
+    fontFamily: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
     fontSize: 24,
     color: '#262626',
     fontWeight: '600',
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   roiValueText: {
-    fontFamily: 'Montserrat-SemiBold',
+    fontFamily: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
     fontSize: 16,
     color: '#EE2529',
     fontWeight: '600',
@@ -612,7 +612,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   viewBtnText: {
-    fontFamily: 'Montserrat-SemiBold',
+    fontFamily: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
     color: '#767676',
     fontWeight: '500',
     fontSize: 14,
