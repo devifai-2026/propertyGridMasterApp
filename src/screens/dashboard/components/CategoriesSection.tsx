@@ -122,7 +122,7 @@ const CategoriesSection = () => {
       <View style={[styles.container, { paddingHorizontal: containerPadding }]}>
         <View style={styles.headerRow}>
           <Text style={[styles.sectionTitle, { fontSize: isMobile ? 28 : 42 }]}>
-            Explore all <Text style={styles.highlightText}>Categories</Text>
+            EXPLORE BY <Text style={styles.highlightText}>PROPERTY TYPE</Text> 
           </Text>
           {loading && <ActivityIndicator color={COLORS.primary} size="small" />}
         </View>
@@ -218,10 +218,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   countBadge: {
-    backgroundColor: '#FFF9E6',
+    backgroundColor: '#FFF3CA',
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: 15,
   },
   countText: {
     fontSize: 12,

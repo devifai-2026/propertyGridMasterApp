@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,24 @@ import {
   useWindowDimensions,
   Linking,
 } from 'react-native';
+import { ChevronDown } from 'lucide-react-native';
 import { useNavigation } from '../context/NavigationContext';
-import { Linkedin, Facebook, Instagram, Youtube } from 'lucide-react-native';
+import instagram from '../assets/Footer/Instagram.png';
+import linkedin from '../assets/Footer/linkedin.png';
+import youtube from '../assets/Footer/youtube.png';
+
+
+const errorPages = [
+  { code: '404', title: 'Page Not Found' },
+  { code: '500', title: 'Internal Server Error' },
+  { code: '503', title: 'Service Unavailable' },
+  { code: '403', title: 'Forbidden' },
+];
 
 const Footer = () => {
   const { width } = useWindowDimensions();
   const { navigate } = useNavigation();
+  const [errorPagesOpen, setErrorPagesOpen] = useState(false);
 
   // Hide on mobile (breakpoint 768px for example)
   if (width < 768) {
@@ -100,6 +112,36 @@ const Footer = () => {
             >
               <Text style={styles.linkText}>Terms of Service</Text>
             </TouchableOpacity>
+            <View style={styles.dropdownWrapper}>
+              <TouchableOpacity
+                onPress={() => setErrorPagesOpen(!errorPagesOpen)}
+                style={styles.dropdownTrigger}
+              >
+                <Text style={styles.linkText}>Error Pages</Text>
+                <ChevronDown
+                  size={16}
+                  color="#9CA3AF"
+                  style={{
+                    transform: [{ rotate: errorPagesOpen ? '180deg' : '0deg' }],
+                  }}
+                />
+              </TouchableOpacity>
+              {errorPagesOpen && (
+                <View style={styles.dropdownMenu}>
+                  {errorPages.map((page) => (
+                    <TouchableOpacity
+                      key={page.code}
+                      onPress={() => handleNavigate('/error-pages')}
+                      style={styles.dropdownItem}
+                    >
+                      <Text style={styles.dropdownItemText}>
+                        {page.code} – {page.title}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+            </View>
           </View>
         </View>
 
@@ -124,16 +166,25 @@ const Footer = () => {
             </Text>
             <View style={styles.socialIcons}>
               <TouchableOpacity style={styles.iconContainer}>
-                <Linkedin size={24} color="#9CA3AF" />
+                <Image
+                  source={instagram}
+                  style={styles.socialIcon}
+                  resizeMode="contain"
+                />
               </TouchableOpacity>
               <TouchableOpacity style={styles.iconContainer}>
-                <Instagram size={24} color="#9CA3AF" />
+                <Image
+                  source={linkedin}
+                  style={styles.socialIcon}
+                  resizeMode="contain"
+                />
               </TouchableOpacity>
               <TouchableOpacity style={styles.iconContainer}>
-                <Youtube size={24} color="#9CA3AF" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.iconContainer}>
-                <Facebook size={24} color="#9CA3AF" />
+                <Image
+                  source={youtube}
+                  style={styles.socialIcon}
+                  resizeMode="contain"
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -159,7 +210,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     flexWrap: 'wrap',
-    marginBottom: 40,
   },
   logoColumn: {
     flex: 1,
@@ -167,8 +217,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   logo: {
-    height: 60, // approximate 4rem
-    width: 200, // adjust based on aspect ratio
+    height: 90, // approximate 4rem
+    width: 350, // adjust based on aspect ratio
   },
   linksColumn: {
     flex: 1,
@@ -180,6 +230,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 16,
+    fontFamily: 'Montserrat',
   },
   linkItem: {
     marginBottom: 12,
@@ -187,11 +238,12 @@ const styles = StyleSheet.create({
   linkText: {
     color: '#9CA3AF', // gray-400
     fontSize: 14,
+    fontFamily: 'Montserrat',
   },
   divider: {
     height: 1,
     backgroundColor: '#374151', // gray-700
-    marginVertical: 24,
+    marginVertical: 5,
   },
   bottomSection: {
     //
@@ -218,6 +270,41 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     padding: 4,
+  },
+  socialIcon: {
+    width: 24,
+    height: 24,
+  },
+  dropdownWrapper: {
+    marginBottom: 12,
+  },
+  dropdownTrigger: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#4B5563',
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    width:150,
+    backgroundColor:'#ffffff'
+  },
+  dropdownMenu: {
+    marginTop: 4,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#ffffff',
+    borderRadius: 6,
+    paddingVertical: 4,
+  },
+  dropdownItem: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  dropdownItemText: {
+    color: '#9CA3AF',
+    fontSize: 13,
   },
 });
 

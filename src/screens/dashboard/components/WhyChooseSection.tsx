@@ -119,7 +119,7 @@ const WhyChooseSection = () => {
               end={{ x: 1, y: 0 }}
               style={styles.exploreBtn}
             >
-              <Text style={styles.exploreBtnText}>Explore More</Text>
+              <Text style={styles.exploreBtnText}>Explore more</Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 42,
     fontWeight: '400',
-    color: COLORS.textDark,
+    color: '#262626',
     marginBottom: 10,
     textAlign: 'center',
   },
@@ -234,13 +234,16 @@ const styles = StyleSheet.create({
   featureTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: COLORS.textDark,
+    color: '#262626',
     marginBottom: 8,
+    fontFamily: 'Montserrat',
   },
   featureDescription: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: '#262626',
     lineHeight: 22,
+    fontFamily:'Montserrat',
+    fontWeight: '400',
   },
   exploreBtn: {
     paddingVertical: 14,
@@ -258,7 +261,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   exploreBtnText: {
-    color: COLORS.white,
+    color: '#F2F2F2',
     fontWeight: '600',
     fontSize: 16,
   },
