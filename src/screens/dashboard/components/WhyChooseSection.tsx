@@ -45,11 +45,7 @@ const FeatureItem = ({ item }: { item: (typeof FEATURES)[0] }) => {
   return (
     <View style={styles.featureItem}>
       <View style={styles.iconWrapper}>
-        <Image
-          source={item.image}
-          style={styles.featureIcon}
-          resizeMode="contain"
-        />
+        <Image source={item.image} style={styles.featureIcon} resizeMode="contain" />
       </View>
       <View style={styles.featureContent}>
         <Text style={styles.featureTitle}>{item.title}</Text>
@@ -63,6 +59,11 @@ const WhyChooseSection = () => {
   const { width } = useWindowDimensions();
   const isMobile = width < 900;
 
+  const handleExplorePress = () => {
+    // Add your navigation logic here
+    console.log('Explore more pressed');
+  };
+
   return (
     <View style={[styles.container, isMobile && styles.containerMobile]}>
       <View style={[styles.header, isMobile && styles.headerMobile]}>
@@ -70,7 +71,7 @@ const WhyChooseSection = () => {
           Why choose PreLeaseGrid
         </Text>
         <Text style={[styles.subtitle, isMobile && styles.subtitleMobile]}>
-          The most trusted platform for premium real estate Property
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat.
         </Text>
       </View>
 
@@ -78,22 +79,26 @@ const WhyChooseSection = () => {
         style={[
           styles.contentContainer,
           { flexDirection: isMobile ? 'column' : 'row' },
+          isMobile && styles.contentContainerMobile,
         ]}
       >
         {/* Left Side Illustration */}
         {!isMobile && (
-          <View
-            style={[
-              styles.illustrationContainer,
-              isMobile && styles.illustrationContainerMobile,
-            ]}
-          >
+          <View style={styles.illustrationContainer}>
             <Image
               source={require('../../../assets/WhyChoose/img.png')}
-              style={[
-                styles.illustration,
-                isMobile && styles.illustrationMobile,
-              ]}
+              style={styles.illustration}
+              resizeMode="contain"
+            />
+          </View>
+        )}
+
+        {/* Mobile Illustration - Optional */}
+        {isMobile && (
+          <View style={styles.illustrationContainerMobile}>
+            <Image
+              source={require('../../../assets/WhyChoose/img.png')}
+              style={styles.illustrationMobile}
               resizeMode="contain"
             />
           </View>
@@ -106,12 +111,18 @@ const WhyChooseSection = () => {
             isMobile && styles.featuresContainerMobile,
           ]}
         >
-          {FEATURES.map(feature => (
-            <FeatureItem key={feature.id} item={feature} />
+          {FEATURES.map((feature, index) => (
+            <React.Fragment key={feature.id}>
+              <FeatureItem item={feature} />
+              {index < FEATURES.length - 1 && (
+                <View style={styles.divider} />
+              )}
+            </React.Fragment>
           ))}
           <TouchableOpacity
-            style={[isMobile && styles.exploreBtnMobile]}
-            activeOpacity={0.8}
+            style={[styles.exploreBtnWrapper, isMobile && styles.exploreBtnMobile]}
+            activeOpacity={0.7}
+            onPress={handleExplorePress}
           >
             <LinearGradient
               colors={['#EE2529', '#C73834']}
@@ -137,7 +148,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   containerMobile: {
-    paddingVertical: 40,
+    paddingVertical: 50,
     paddingHorizontal: 16,
   },
   header: {
@@ -150,56 +161,62 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 42,
-    fontWeight: '400',
+    fontWeight: '700',
     color: '#262626',
-    marginBottom: 10,
+    marginBottom: 16,
     textAlign: 'center',
+    fontFamily: 'Montserrat',
   },
   titleMobile: {
-    fontSize: 28,
-    lineHeight: 36,
+    fontSize: 32,
+    lineHeight: 40,
   },
   subtitle: {
-    fontSize: 16,
-    color: COLORS.textSecondary,
+    fontSize: 18,
+    color: '#666666',
     textAlign: 'center',
-    maxWidth: 600,
+    maxWidth: 1190,
+    lineHeight: 28,
+    fontFamily: 'Montserrat',
+    fontWeight: '400',
   },
   subtitleMobile: {
     fontSize: 15,
-    lineHeight: 22,
+    lineHeight: 24,
+    paddingHorizontal: 20,
     maxWidth: '100%',
   },
   contentContainer: {
     width: '100%',
-    maxWidth: '90%',
+    maxWidth: 1200,
     justifyContent: 'center',
     alignItems: 'stretch',
     gap: 80,
   },
+  contentContainerMobile: {
+    gap: 40,
+    maxWidth: '100%',
+  },
   illustrationContainer: {
     flex: 1.2,
-    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    maxWidth: 850,
-    maxHeight: 650,
+    maxWidth: 550,
   },
   illustrationContainerMobile: {
-    flex: 0,
-    height: 'auto', // Allow container to size to content
-    marginBottom: 40,
     width: '100%',
-    alignItems: 'center', // Center the image
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
   },
   illustration: {
     width: '100%',
-    height: '100%',
+    height: 500,
   },
   illustrationMobile: {
-    height: 300, // Explicit height on the image itself
     width: '100%',
-    maxWidth: 400, // Prevent it from being too huge on tablets
+    height: 300,
+    maxWidth: 400,
   },
   featuresContainer: {
     flex: 1,
@@ -209,24 +226,27 @@ const styles = StyleSheet.create({
   featuresContainerMobile: {
     paddingLeft: 0,
     width: '100%',
-    flex: 0, // Ensure it doesn't try to fill undefined height
-    marginTop: 20,
   },
   featureItem: {
     flexDirection: 'row',
-    marginBottom: 40,
-    alignItems: 'center',
+    // marginBottom: 40,
+    alignItems: 'flex-start',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 8,
   },
   iconWrapper: {
     width: 60,
     height: 60,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 16,
+    backgroundColor: '#FFF5F5',
+    borderRadius: 12,
   },
   featureIcon: {
-    width: 45,
-    height: 45,
+    width: 40,
+    height: 40,
   },
   featureContent: {
     flex: 1,
@@ -237,34 +257,44 @@ const styles = StyleSheet.create({
     color: '#262626',
     marginBottom: 8,
     fontFamily: 'Montserrat',
+    lineHeight: 24,
   },
   featureDescription: {
     fontSize: 14,
-    color: '#262626',
+    color: '#666666',
     lineHeight: 22,
-    fontFamily:'Montserrat',
+    fontFamily: 'Montserrat',
     fontWeight: '400',
+  },
+  exploreBtnWrapper: {
+    alignSelf: 'center',
+    marginTop: 20,
+  },
+  exploreBtnMobile: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 10,
   },
   exploreBtn: {
     paddingVertical: 14,
     paddingHorizontal: 40,
     borderRadius: 8,
-    alignSelf: 'center',
-    marginTop: 20,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  exploreBtnMobile: {
-    alignSelf: 'center',
-    width: '100%',
-    alignItems: 'center',
-    marginTop: 10,
+    minWidth: 200,
   },
   exploreBtnText: {
-    color: '#F2F2F2',
+    color: '#FFFFFF',
     fontWeight: '600',
     fontSize: 16,
+    fontFamily: 'Montserrat',
   },
+  divider: {
+  height: 1,
+  backgroundColor: '#767676',
+  marginVertical: 10,
+  marginLeft: 76,  // 👈 iconWrapper width (60) + marginRight (16)
+},
 });
 
 export default WhyChooseSection;

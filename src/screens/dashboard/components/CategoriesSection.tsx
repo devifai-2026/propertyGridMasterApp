@@ -122,7 +122,7 @@ const CategoriesSection = () => {
       <View style={[styles.container, { paddingHorizontal: containerPadding }]}>
         <View style={styles.headerRow}>
           <Text style={[styles.sectionTitle, { fontSize: isMobile ? 28 : 42 }]}>
-            EXPLORE BY <Text style={styles.highlightText}>PROPERTY TYPE</Text> 
+            Explore By <Text style={styles.highlightText}>Property Type</Text> 
           </Text>
           {loading && <ActivityIndicator color={COLORS.primary} size="small" />}
         </View>
@@ -160,18 +160,17 @@ const styles = StyleSheet.create({
     marginBottom: 40,
   },
   sectionTitle: {
-    fontWeight: '400',
+    fontWeight: '300',
     color: '#262626',
     textAlign: 'center',
-    letterSpacing: -0.5,
   },
   highlightText: {
-    fontWeight: '400',
+    fontWeight: '300',
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     width: '100%',
   },
   card: {
