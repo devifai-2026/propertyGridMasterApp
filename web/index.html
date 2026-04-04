@@ -26,6 +26,28 @@
         font-weight: 400;
         font-style: normal;
       } */
+
+      /* Display numeric input arrows (spin buttons) on hover */
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      
+      input[type="number"]:hover::-webkit-inner-spin-button,
+      input[type="number"]:hover::-webkit-outer-spin-button {
+        -webkit-appearance: inner-spin-button !important;
+        opacity: 1 !important;
+        cursor: pointer;
+      }
+      
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+      
+      input[type="number"]:hover {
+        -moz-appearance: number-input;
+      }
     </style>
   </head>
   <body>

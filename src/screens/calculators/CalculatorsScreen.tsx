@@ -9,6 +9,7 @@ import {
   TextInput,
   Switch,
   useWindowDimensions,
+  Platform,
 } from 'react-native';
 import Layout from '../../layout/Layout';
 import { TrendingUp, Calculator, ChevronDown } from 'lucide-react-native';
@@ -262,50 +263,58 @@ const Dropdown = ({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <View style={[styles.dropdownContainer, row && styles.dropdownRow]}>
+    <View 
+      style={[
+        styles.dropdownContainer, 
+        row && styles.dropdownRow, 
+        { zIndex: isOpen ? 10000 : 1 }
+      ]}
+    >
       <Text style={[styles.label, row ? styles.dropdownLabel : { width: 'auto' }]}>
         {label}
       </Text>
-      <TouchableOpacity
-        style={[styles.dropdownHeader, row && styles.dropdownHeaderRow]}
-        onPress={() => setIsOpen(!isOpen)}
-        activeOpacity={0.7}
-      >
-        <Text style={styles.dropdownHeaderText}>{selected || 'Select'}</Text>
-        <ChevronDown
-          size={18}
-          color="#EE2529"
-          style={{ transform: [{ rotate: isOpen ? '180deg' : '0deg' }] }}
-        />
-      </TouchableOpacity>
+      <View style={{ flex: 1, position: 'relative', zIndex: isOpen ? 10000 : 1 }}>
+        <TouchableOpacity
+          style={[styles.dropdownHeader, row && styles.dropdownHeaderRow]}
+          onPress={() => setIsOpen(!isOpen)}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.dropdownHeaderText}>{selected || 'Select'}</Text>
+          <ChevronDown
+            size={18}
+            color="#EE2529"
+            style={{ transform: [{ rotate: isOpen ? '180deg' : '0deg' }] }}
+          />
+        </TouchableOpacity>
 
-      {isOpen && (
-        <View style={styles.dropdownList}>
-          {options.map((option, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.dropdownItem,
-                selected === option && styles.dropdownItemSelected,
-                index === options.length - 1 && { borderBottomWidth: 0 },
-              ]}
-              onPress={() => {
-                onSelect(option);
-                setIsOpen(false);
-              }}
-            >
-              <Text
+        {isOpen && (
+          <View style={styles.dropdownList}>
+            {options.map((option, index) => (
+              <TouchableOpacity
+                key={index}
                 style={[
-                  styles.dropdownItemText,
-                  selected === option && styles.activeDropdownItemText,
+                  styles.dropdownItem,
+                  selected === option && styles.dropdownItemSelected,
+                  index === options.length - 1 && { borderBottomWidth: 0 },
                 ]}
+                onPress={() => {
+                  onSelect(option);
+                  setIsOpen(false);
+                }}
               >
-                {option}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
+                <Text
+                  style={[
+                    styles.dropdownItemText,
+                    selected === option && styles.activeDropdownItemText,
+                  ]}
+                >
+                  {option}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </View>
     </View>
   );
 };
@@ -440,7 +449,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
       <View style={styles.sectionCard}>
         <Text style={styles.sectionTitle}>Property Details</Text>
 
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 10 }]}>
           <View style={styles.inputCol}>
             <Dropdown
               row
@@ -455,7 +464,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             <TextInput
               style={styles.input}
               placeholder="5000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.carpetArea}
               onChangeText={v => handleInputChange('carpetArea', v)}
               placeholderTextColor="#999"
@@ -468,7 +477,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             <TextInput
               style={styles.input}
               placeholder="45,00,000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.purchasePrice}
               onChangeText={v => handleInputChange('purchasePrice', v)}
               placeholderTextColor="#999"
@@ -505,7 +514,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
                 <TextInput
                   style={styles.input}
                   placeholder="31,50,000"
-                  keyboardType="numeric"
+                  keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
                   value={formData.loanAmount}
                   onChangeText={v => handleInputChange('loanAmount', v)}
                   placeholderTextColor="#999"
@@ -516,7 +525,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
                 <TextInput
                   style={styles.input}
                   placeholder="13,50,000"
-                  keyboardType="numeric"
+                  keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
                   value={formData.downPayment}
                   onChangeText={v => handleInputChange('downPayment', v)}
                   placeholderTextColor="#999"
@@ -529,7 +538,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
                 <TextInput
                   style={styles.input}
                   placeholder="8.5"
-                  keyboardType="numeric"
+                  keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
                   value={formData.interestRate}
                   onChangeText={v => handleInputChange('interestRate', v)}
                   placeholderTextColor="#999"
@@ -540,7 +549,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
                 <TextInput
                   style={styles.input}
                   placeholder="20"
-                  keyboardType="numeric"
+                  keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
                   value={formData.loanTenure}
                   onChangeText={v => handleInputChange('loanTenure', v)}
                   placeholderTextColor="#999"
@@ -560,7 +569,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             <TextInput
               style={styles.input}
               placeholder="50,000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.monthlyRent}
               onChangeText={v => handleInputChange('monthlyRent', v)}
               placeholderTextColor="#999"
@@ -571,7 +580,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             <TextInput
               style={styles.input}
               placeholder="3,00,000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.securityDeposit}
               onChangeText={v => handleInputChange('securityDeposit', v)}
               placeholderTextColor="#999"
@@ -584,7 +593,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             <TextInput
               style={styles.input}
               placeholder="3"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.rentEscalationEvery}
               onChangeText={v => handleInputChange('rentEscalationEvery', v)}
               placeholderTextColor="#999"
@@ -595,7 +604,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             <TextInput
               style={styles.input}
               placeholder="8"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.rentEscalationPercent}
               onChangeText={v => handleInputChange('rentEscalationPercent', v)}
               placeholderTextColor="#999"
@@ -618,7 +627,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             <TextInput
               style={styles.input}
               placeholder="10"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.leaseTerm}
               onChangeText={v => handleInputChange('leaseTerm', v)}
               placeholderTextColor="#999"
@@ -638,7 +647,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             <TextInput
               style={styles.input}
               placeholder="15,000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.propertyTax}
               onChangeText={v => handleInputChange('propertyTax', v)}
               placeholderTextColor="#999"
@@ -649,7 +658,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             <TextInput
               style={styles.input}
               placeholder="30"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.maintenancePerSqft}
               onChangeText={v => handleInputChange('maintenancePerSqft', v)}
               placeholderTextColor="#999"
@@ -662,7 +671,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             <TextInput
               style={styles.input}
               placeholder="8,000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.insurance}
               onChangeText={v => handleInputChange('insurance', v)}
               placeholderTextColor="#999"
@@ -673,7 +682,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             <TextInput
               style={styles.input}
               placeholder="15,000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.maintenanceLumpSum}
               onChangeText={v => handleInputChange('maintenanceLumpSum', v)}
               placeholderTextColor="#999"
@@ -691,7 +700,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             <TextInput
               style={styles.input}
               placeholder="12"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.stampDuty}
               onChangeText={v => handleInputChange('stampDuty', v)}
               placeholderTextColor="#999"
@@ -702,7 +711,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             <TextInput
               style={styles.input}
               placeholder="30,000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.legalFees}
               onChangeText={v => handleInputChange('legalFees', v)}
               placeholderTextColor="#999"
@@ -715,7 +724,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             <TextInput
               style={styles.input}
               placeholder="67,500"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.brokerage}
               onChangeText={v => handleInputChange('brokerage', v)}
               placeholderTextColor="#999"
@@ -726,7 +735,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             <TextInput
               style={styles.input}
               placeholder="25,000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.otherCosts}
               onChangeText={v => handleInputChange('otherCosts', v)}
               placeholderTextColor="#999"
@@ -837,7 +846,7 @@ const EMICalculatorView = () => {
       {/* Property Details */}
       <View style={styles.sectionCard}>
         <Text style={styles.sectionTitle}>Property Details</Text>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 10 }]}>
           <View style={styles.inputCol}>
             <Dropdown
               row
@@ -852,7 +861,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={styles.input}
               placeholder="5600"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.carpetArea}
               onChangeText={v => handleInputChange('carpetArea', v)}
               placeholderTextColor="#999"
@@ -865,7 +874,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={styles.input}
               placeholder="400000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.purchasePrice}
               onChangeText={v => handleInputChange('purchasePrice', v)}
               placeholderTextColor="#999"
@@ -899,7 +908,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={[styles.input, !includeLoan && styles.inputDisabled]}
               placeholder="310000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.loanAmount}
               onChangeText={v => handleInputChange('loanAmount', v)}
               editable={includeLoan}
@@ -911,7 +920,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={[styles.input, !includeLoan && styles.inputDisabled]}
               placeholder="130000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.downPayment}
               onChangeText={v => handleInputChange('downPayment', v)}
               editable={includeLoan}
@@ -925,7 +934,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={[styles.input, !includeLoan && styles.inputDisabled]}
               placeholder="9.5"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.interestRate}
               onChangeText={v => handleInputChange('interestRate', v)}
               editable={includeLoan}
@@ -937,7 +946,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={[styles.input, !includeLoan && styles.inputDisabled]}
               placeholder="20"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.loanTenure}
               onChangeText={v => handleInputChange('loanTenure', v)}
               editable={includeLoan}
@@ -956,7 +965,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={styles.input}
               placeholder="30000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.monthlyRent}
               onChangeText={v => handleInputChange('monthlyRent', v)}
               placeholderTextColor="#999"
@@ -967,7 +976,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={styles.input}
               placeholder="300000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.securityDeposit}
               onChangeText={v => handleInputChange('securityDeposit', v)}
               placeholderTextColor="#999"
@@ -980,7 +989,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={styles.input}
               placeholder="3"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.daysCalculation}
               onChangeText={v => handleInputChange('daysCalculation', v)}
               placeholderTextColor="#999"
@@ -991,7 +1000,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={styles.input}
               placeholder="8"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.rentEscalation}
               onChangeText={v => handleInputChange('rentEscalation', v)}
               placeholderTextColor="#999"
@@ -1014,7 +1023,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={styles.input}
               placeholder="10"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.leaseTerm}
               onChangeText={v => handleInputChange('leaseTerm', v)}
               placeholderTextColor="#999"
@@ -1034,7 +1043,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={styles.input}
               placeholder="12000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.propertyTax}
               onChangeText={v => handleInputChange('propertyTax', v)}
               placeholderTextColor="#999"
@@ -1045,7 +1054,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={styles.input}
               placeholder="30000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.maintenance}
               onChangeText={v => handleInputChange('maintenance', v)}
               placeholderTextColor="#999"
@@ -1058,7 +1067,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={styles.input}
               placeholder="8000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.insurance}
               onChangeText={v => handleInputChange('insurance', v)}
               placeholderTextColor="#999"
@@ -1069,7 +1078,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={styles.input}
               placeholder="58000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.maintenanceLumpsum}
               onChangeText={v => handleInputChange('maintenanceLumpsum', v)}
               placeholderTextColor="#999"
@@ -1087,7 +1096,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={styles.input}
               placeholder="12"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.stampDuty}
               onChangeText={v => handleInputChange('stampDuty', v)}
               placeholderTextColor="#999"
@@ -1098,7 +1107,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={styles.input}
               placeholder="38000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.legalFees}
               onChangeText={v => handleInputChange('legalFees', v)}
               placeholderTextColor="#999"
@@ -1111,7 +1120,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={styles.input}
               placeholder="67500"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.brokerage}
               onChangeText={v => handleInputChange('brokerage', v)}
               placeholderTextColor="#999"
@@ -1122,7 +1131,7 @@ const EMICalculatorView = () => {
             <TextInput
               style={styles.input}
               placeholder="25000"
-              keyboardType="numeric"
+              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
               value={formData.otherCosts}
               onChangeText={v => handleInputChange('otherCosts', v)}
               placeholderTextColor="#999"
@@ -1396,7 +1405,7 @@ const styles = StyleSheet.create({
   },
   gridRow: {
     flexDirection: 'row',
-    gap: 24,
+    gap: 48,
     marginBottom: 16,
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
@@ -1431,12 +1440,12 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   label: {
-    fontSize: 16,
+    fontSize: 18,
     marginBottom: 0,
     color: '#555',
-    fontWeight: '600',
-    width: '40%',
-    textAlign: 'center',
+    fontWeight: '400',
+    width: '35%',
+    textAlign: 'left',
   },
   input: {
     flex: 1,
@@ -1448,8 +1457,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     fontSize: 18,
     color: '#111827',
-    fontWeight: '700',
+    fontWeight: '600',
     minHeight: 56,
+    textAlign: 'right',
+    ...Platform.select({
+      web: {
+        outlineStyle: 'none',
+        appearance: 'auto',
+      } as any,
+    }),
   },
   inputDisabled: {
     opacity: 0.5,
@@ -1500,17 +1516,19 @@ const styles = StyleSheet.create({
   },
   dropdownContainer: {
     marginBottom: 20,
-    zIndex: 1000,
+    zIndex: 9999,
     width: '100%',
   },
   dropdownRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 16,
   },
   dropdownLabel: {
-    width: '40%',
+    width: '35%',
     marginBottom: 0,
+    fontSize: 18,
+    fontWeight: '400',
   },
   dropdownHeader: {
     flexDirection: 'row',
@@ -1520,21 +1538,23 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E7EB',
     borderRadius: 16,
-    padding: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    minHeight: 56,
   },
   dropdownHeaderRow: {
     flex: 1,
   },
   dropdownHeaderText: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#111827',
-    fontWeight: '700',
+    fontWeight: '600',
   },
   dropdownList: {
     position: 'absolute',
     top: '100%',
     left: 0,
-    right: 0,
+    width: '100%',
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#E0E0E0',
@@ -1543,8 +1563,8 @@ const styles = StyleSheet.create({
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 10,
-    elevation: 5,
-    zIndex: 2000,
+    elevation: 10,
+    zIndex: 10000,
   },
   dropdownItem: {
     padding: 12,

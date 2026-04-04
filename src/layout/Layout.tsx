@@ -325,23 +325,11 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
   const { width } = useWindowDimensions();
   const { navigate, currentPath, openLoginModal } = useNavigation();
   const { isLoggedIn, user, logout } = useAuth();
-  const [isHovered, setIsHovered] = useState(false);
   const [isLogoutMenuVisible, setIsLogoutMenuVisible] = useState(false);
   const isMobile = width < 768;
 
-  const headerActiveStyle =
-    isHovered && !isMobile ? styles.headerContainerHover : {};
-
   return (
-    <View
-      style={[styles.headerContainer, headerActiveStyle]}
-      {...(Platform.OS === 'web'
-        ? {
-            onMouseEnter: () => setIsHovered(true),
-            onMouseLeave: () => setIsHovered(false),
-          }
-        : {})}
-    >
+    <View style={styles.headerContainer}>
       <View
         style={[
           styles.headerContent,
@@ -404,26 +392,6 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
             </TouchableOpacity>
           )} */}
 
-          {isLoggedIn && (
-            <TouchableOpacity
-              style={[
-                styles.listPropertyBtn,
-                isMobile && {
-                  borderWidth: 0,
-                  paddingRight: 0,
-                  paddingLeft: 0,
-                  paddingVertical: 0,
-                },
-              ]}
-              onPress={() => navigate('/list-property')}
-            >
-              <ListPropertyIcon  />
-              {!isMobile && (
-                <Text style={styles.listPropertyText}>List Property</Text>
-              )}
-            </TouchableOpacity>
-          )}
-
           {isLoggedIn ? (
             <TouchableOpacity
               style={[styles.profileBtn, isMobile && styles.profileBtnMobile]}
@@ -457,6 +425,24 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
               <Text style={styles.signInText}>Sign In</Text>
             </TouchableOpacity>
           )}
+
+          <TouchableOpacity
+            style={[
+              styles.listPropertyBtn,
+              isMobile && {
+                borderWidth: 0,
+                paddingRight: 0,
+                paddingLeft: 0,
+                paddingVertical: 0,
+              },
+            ]}
+            onPress={() => navigate('/list-property')}
+          >
+            <ListPropertyIcon  />
+            {!isMobile && (
+              <Text style={styles.listPropertyText}>List Property</Text>
+            )}
+          </TouchableOpacity>
           <TouchableOpacity style={styles.menuBtn} onPress={onMenuPress}>
             <Menu size={24} color={COLORS.primary} />
           </TouchableOpacity>
