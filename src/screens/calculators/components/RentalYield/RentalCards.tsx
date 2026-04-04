@@ -136,12 +136,12 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '600',
   },
 
   subText: {
-    fontSize: 13,
+    fontSize: 14,
     color: '#6B7280',
     marginTop: 4,
   },
@@ -162,28 +162,28 @@ const styles = StyleSheet.create({
   },
 
   redValue: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: '700',
     color: '#C73834',
     marginTop: 4,
   },
 
   blueValue: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: '700',
     color: '#26BFCC',
     marginTop: 4,
   },
 
   greenValue: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: '700',
     color: '#429482',
     marginTop: 4,
   },
 
   yellowValue: {
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: '700',
     color: '#F7C952',
     marginTop: 4,

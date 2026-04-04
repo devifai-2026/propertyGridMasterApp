@@ -8,9 +8,11 @@ import {
   Image,
   TextInput,
   Switch,
+  useWindowDimensions,
 } from 'react-native';
 import Layout from '../../layout/Layout';
 import { TrendingUp, Calculator, ChevronDown } from 'lucide-react-native';
+import bg from "../../assets/Calculator/bg.png"
 
 // RentalYield Components
 import RentalCards from './components/RentalYield/RentalCards';
@@ -28,6 +30,8 @@ import CoverageAnalysis from './components/EMI/CoverageAnalysis';
 
 const CalculatorsScreen = () => {
   const [activeTab, setActiveTab] = useState<'roi' | 'emi'>('roi');
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
 
   return (
     <Layout>
@@ -35,82 +39,122 @@ const CalculatorsScreen = () => {
         {/* Header/Hero Section */}
         <View style={styles.heroSection}>
           <Image
-            source={require('../../assets/propertyDetails/squaresbg.png')}
+            source={bg}
             style={styles.heroBg}
             resizeMode="cover"
           />
-          <View style={styles.heroContent}>
-            <View style={styles.heroTextContainer}>
-              <View style={styles.badgeContainer}>
-                <Text style={styles.badgeText}>
-                  Professional Investment Tools
-                </Text>
+          <View
+            style={[
+              styles.heroContent,
+              !isDesktop && { flexDirection: 'column-reverse' },
+            ]}
+          >
+            <View
+              style={[
+                styles.heroTextContainer,
+                !isDesktop && { marginRight: 0, marginTop: 40 },
+              ]}
+            >
+              <View style={isDesktop ? { flexDirection: 'row', gap: 20, alignItems: 'center', marginBottom: 20 } : {}}>
+                <View style={styles.redIconBox}>
+                  <Calculator size={isDesktop ? 62 : 30} color="#fff" />
+                </View>
+                <View>
+                  <View style={styles.badgeContainer}>
+                    <Text style={styles.badgeText}>
+                      Professional Investment Tools
+                    </Text>
+                  </View>
+                  <Text style={[styles.heroTitle, isDesktop && { fontSize: 36, marginBottom: 0 }]}>
+                    Property Investment Platform
+                  </Text>
+                </View>
               </View>
-              <Text style={styles.heroTitle}>Property Investment Platform</Text>
+
               <Text style={styles.heroSubtitle}>
                 Make data-driven decisions with comprehensive ROI analysis, loan
-                coverage insights, and detailed cash flow projections.
+                coverage insights, and detailed cash flow projections for your
+                real estate investments
               </Text>
 
-              <View style={styles.statsRow}>
-                <View style={styles.statCard}>
-                  <Text style={styles.statLabel}>Yield Analysis</Text>
-                  <Text style={styles.statValue}>Gross & Net Returns</Text>
+              <View style={styles.heroStatsRow}>
+                <View style={styles.heroStatCard}>
+                  <Text style={styles.heroStatLabel}>Yield Analysis</Text>
+                  <Text style={styles.heroStatValue}>Gross & Net<br /> Returns</Text>
                 </View>
-                <View style={styles.statCard}>
-                  <Text style={styles.statLabel}>Loan Planning</Text>
-                  <Text style={styles.statValue}>EMI & Coverage Ratio</Text>
+                <View style={styles.heroStatCard}>
+                  <Text style={styles.heroStatLabel}>Loan Planning</Text>
+                  <Text style={styles.heroStatValue}>EMI & Coverage<br /> Ratio</Text>
                 </View>
-                <View style={styles.statCard}>
-                  <Text style={styles.statLabel}>Cash Flow</Text>
-                  <Text style={styles.statValue}>10-Year Projections</Text>
+                <View style={styles.heroStatCard}>
+                  <Text style={styles.heroStatLabel}>Cash Flow</Text>
+                  <Text style={styles.heroStatValue}>10-Year<br /> Projections</Text>
                 </View>
               </View>
             </View>
 
             <Image
               source={require('../../assets/Calculator/bannerImg.png')}
-              style={styles.heroImage}
-              resizeMode="contain"
-            />
+              style={[
+                styles.heroImage,
+                isDesktop
+                      ? {
+                          width: '58%',
+                          height: 620,
+                          position: 'absolute',
+                          right: -52,
+                          top: -120,
+                        }
+                      : { width: 350, height: 250 },
+                  ]}
+                  resizeMode="fill"
+                />
           </View>
         </View>
 
-        {/* Calculator Tabs */}
-        <View style={styles.tabsContainer}>
+        <View
+          style={[
+            styles.tabsContainer,
+            isDesktop && { width: '90%', maxWidth: 1600, alignSelf: 'center' },
+          ]}
+        >
           <TouchableOpacity
             style={styles.tabItem}
             onPress={() => setActiveTab('roi')}
           >
-            <TrendingUp
-              size={24}
-              color={activeTab === 'roi' ? '#EE2529' : '#767676'}
-            />
+            <View style={[styles.tabIconBox, activeTab === 'roi' && styles.activeTabIconBox]}>
+              <TrendingUp
+                size={20}
+                color={activeTab === 'roi' ? '#fff' : '#767676'}
+              />
+            </View>
             <Text
               style={[
                 styles.tabText,
                 activeTab === 'roi' && styles.activeTabText,
+                isDesktop && { fontSize: 24 },
               ]}
             >
-              ROI & Rental Yield
+              ROI & Rental Yield Calculator
             </Text>
             {activeTab === 'roi' && <View style={styles.activeIndicator} />}
           </TouchableOpacity>
-
-          <View style={styles.divider} />
 
           <TouchableOpacity
             style={styles.tabItem}
             onPress={() => setActiveTab('emi')}
           >
-            <Calculator
-              size={24}
-              color={activeTab === 'emi' ? '#EE2529' : '#767676'}
-            />
+            <View style={[styles.tabIconBox, activeTab === 'emi' && styles.activeTabIconBox]}>
+              <Calculator
+                size={20}
+                color={activeTab === 'emi' ? '#fff' : '#767676'}
+              />
+            </View>
             <Text
               style={[
                 styles.tabText,
                 activeTab === 'emi' && styles.activeTabText,
+                isDesktop && { fontSize: 24 },
               ]}
             >
               EMI Calculator
@@ -119,8 +163,12 @@ const CalculatorsScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Content Area */}
-        <View style={styles.contentArea}>
+        <View
+          style={[
+            styles.contentArea,
+            isDesktop && { maxWidth: '100%', alignSelf: 'center', width: '100%' },
+          ]}
+        >
           {activeTab === 'roi' ? (
             <RentalYieldCalculator activeTab={activeTab} />
           ) : (
@@ -132,25 +180,94 @@ const CalculatorsScreen = () => {
   );
 };
 
+// Helper Components
+const InfoCardsSummary = ({ type }: { type: 'roi' | 'emi' }) => {
+  const cards =
+    type === 'roi'
+      ? [
+          'Get clarity on your\nmonthly or annual yield.',
+          'Compare ROI across different properties or investments.',
+          'Adjust variables like rent,\npurchase price, and taxes to see\nimpact in real time',
+        ]
+      : [
+          'Understand your\nmonthly EMI with ease',
+          'Compare EMIs across different\nloan structures or interest rates',
+          'Adjust variables like loan\namount, tenure, and more to see\nimpacts in real time',
+        ];
+
+  return (
+    <View style={styles.infoCardsGrid}>
+      {cards.map((text, i) => (
+        <View key={i} style={styles.infoSummaryCard}>
+          <Text style={styles.infoSummaryText}>{text}</Text>
+        </View>
+      ))}
+    </View>
+  );
+};
+
+const CalculatorHeader = ({ type }: { type: 'roi' | 'emi' }) => {
+  const headerData =
+    type === 'roi'
+      ? {
+          icon: <Calculator size={32} color="#fff" />,
+          title: 'Property Investment ROI Calculator',
+          subtitle:
+            'Get clarity on your monthly or annual yield using rent,\n purchase price, and taxes.',
+        }
+      : {
+          icon: <Calculator size={32} color="#fff" />,
+          title: 'Property EMI Calculator',
+          subtitle:
+            'Estimate your monthly loan repayment instantly based on loan amount,\n tenure, interest rate, and other key factors.',
+        };
+
+  return (
+    <View style={styles.calcHeader}>
+      <View style={styles.calcHeaderIconBox}>{headerData.icon}</View>
+      <Text style={styles.calcTitle}>{headerData.title}</Text>
+      <Text style={styles.calcSubtitle}>{headerData.subtitle}</Text>
+    </View>
+  );
+};
+
+const BalanceLeaseTenureAlert = () => (
+  <View style={styles.alertBox}>
+    <Text style={styles.alertTitle}>
+      Balance Lease Tenure:{' '}
+      <Text style={styles.alertValue}>10 years 9 months 2 days</Text>
+    </Text>
+    <Text style={styles.alertSubtitle}>
+      Typically defined as the period from the expiry of the initial lease term
+      to the end of the lease agreement, or the lease period or expiry date,
+      whichever comes first.
+    </Text>
+  </View>
+);
+
 // Custom Dropdown Component
 const Dropdown = ({
   options,
   selected,
   onSelect,
   label,
+  row = false,
 }: {
   options: string[];
   selected: string;
   onSelect: (val: string) => void;
   label: string;
+  row?: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <View style={styles.dropdownContainer}>
-      <Text style={styles.label}>{label}</Text>
+    <View style={[styles.dropdownContainer, row && styles.dropdownRow]}>
+      <Text style={[styles.label, row ? styles.dropdownLabel : { width: 'auto' }]}>
+        {label}
+      </Text>
       <TouchableOpacity
-        style={styles.dropdownHeader}
+        style={[styles.dropdownHeader, row && styles.dropdownHeaderRow]}
         onPress={() => setIsOpen(!isOpen)}
         activeOpacity={0.7}
       >
@@ -220,15 +337,94 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
   });
 
   const [includeLoan, setIncludeLoan] = useState(false);
-  const [calculated, setCalculated] = useState(true);
+  const [results, setResults] = useState<any>(null);
+
+  const calculateROIValues = () => {
+    const purchasePrice = parseFloat(formData.purchasePrice.replace(/,/g, '')) || 0;
+    const carpetArea = parseFloat(formData.carpetArea) || 0;
+    const monthlyRent = parseFloat(formData.monthlyRent.replace(/,/g, '')) || 0;
+    const securityDeposit = parseFloat(formData.securityDeposit.replace(/,/g, '')) || 0;
+    
+    // Recurring Annual Expenses
+    const propertyTax = parseFloat(formData.propertyTax.replace(/,/g, '')) || 0;
+    const insurance = parseFloat(formData.insurance.replace(/,/g, '')) || 0;
+    const maintenancePerSqft = parseFloat(formData.maintenancePerSqft) || 0;
+    const maintenanceLumpSum = parseFloat(formData.maintenanceLumpSum.replace(/,/g, '')) || 0;
+    
+    const annualMaintenance = (maintenancePerSqft * carpetArea * 12) + maintenanceLumpSum;
+    const totalAnnualExpenses = propertyTax + insurance + annualMaintenance;
+    
+    // One-time Costs
+    const stampDutyPct = parseFloat(formData.stampDuty) || 0;
+    const stampDuty = (stampDutyPct * purchasePrice) / 100;
+    const legalFees = parseFloat(formData.legalFees.replace(/,/g, '')) || 0;
+    const brokerage = parseFloat(formData.brokerage.replace(/,/g, '')) || 0;
+    const otherCosts = parseFloat(formData.otherCosts.replace(/,/g, '')) || 0;
+    
+    const totalAcquisitionCosts = stampDuty + legalFees + brokerage + otherCosts;
+    const totalInvestment = purchasePrice + totalAcquisitionCosts;
+    
+    const annualGrossRent = monthlyRent * 12;
+    const annualNetIncome = annualGrossRent - totalAnnualExpenses;
+    
+    const grossYield = purchasePrice > 0 ? (annualGrossRent / purchasePrice) * 100 : 0;
+    const netYield = totalInvestment > 0 ? (annualNetIncome / totalInvestment) * 100 : 0;
+    
+    const paybackPeriod = annualNetIncome > 0 ? (totalInvestment / annualNetIncome) : 0;
+    
+    const securityDepositInterestPct = 5; // Assuming 5% annual interest on security deposit
+    const annualSecurityDepositInterest = (securityDeposit * securityDepositInterestPct) / 100;
+    const totalAnnualReturn = annualNetIncome + annualSecurityDepositInterest;
+
+    // Financing if included
+    let monthlyEMI = 0;
+    let totalLoanInterest = 0;
+    if (includeLoan) {
+      const loanAmount = parseFloat(formData.loanAmount.replace(/,/g, '')) || 0;
+      const rateMonth = (parseFloat(formData.interestRate) || 0) / 12 / 100;
+      const months = (parseFloat(formData.loanTenure) || 0) * 12;
+      if (rateMonth > 0 && months > 0) {
+        monthlyEMI = (loanAmount * rateMonth * Math.pow(1 + rateMonth, months)) / (Math.pow(1 + rateMonth, months) - 1);
+        totalLoanInterest = (monthlyEMI * months) - loanAmount;
+      }
+    }
+
+    setResults({
+      grossYield: grossYield.toFixed(2) + '%',
+      netYield: netYield.toFixed(2) + '%',
+      annualGrossRent: annualGrossRent,
+      totalAnnualExpenses: totalAnnualExpenses,
+      totalAcquisitionCosts: totalAcquisitionCosts,
+      totalInvestment: totalInvestment,
+      annualNetIncome: annualNetIncome,
+      securityDepositInterest: annualSecurityDepositInterest,
+      totalAnnualReturn: totalAnnualReturn,
+      paybackPeriod: paybackPeriod.toFixed(1) + ' years',
+      cashFlow: '₹' + (annualNetIncome / 100000).toFixed(2) + ' Lakhs',
+      monthlyEMI: monthlyEMI,
+      totalLoanInterest: totalLoanInterest,
+      loanAmount: parseFloat(formData.loanAmount.replace(/,/g, '')) || 0,
+      downPayment: parseFloat(formData.downPayment.replace(/,/g, '')) || 0,
+      propertyPrice: purchasePrice,
+      interestRate: formData.interestRate,
+      loanTenure: formData.loanTenure,
+      propertyTax,
+      insurance,
+      annualMaintenance,
+      otherExpenses: 0,
+    });
+  };
+
+  React.useEffect(() => {
+    calculateROIValues();
+  }, [formData, includeLoan]);
 
   const handleInputChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleCalculate = () => {
-    // TODO: Add validation
-    setCalculated(true);
+    calculateROIValues();
   };
 
   return (
@@ -236,22 +432,24 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
       style={styles.calcContainer}
       showsVerticalScrollIndicator={false}
     >
-      {/* Header */}
-      <Text style={styles.calcTitle}>Rental Yield Calculator</Text>
+      <CalculatorHeader type="roi" />
+
+      <InfoCardsSummary type="roi" />
 
       {/* Property Details */}
       <View style={styles.sectionCard}>
         <Text style={styles.sectionTitle}>Property Details</Text>
 
-        {/* Property Type Dropdown */}
-        <Dropdown
-          label="Property Type"
-          options={['Residential Space', 'Commercial Space', 'Mixed Use']}
-          selected={formData.propertyType}
-          onSelect={val => handleInputChange('propertyType', val)}
-        />
-
         <View style={styles.gridRow}>
+          <View style={styles.inputCol}>
+            <Dropdown
+              row
+              label="Property Type"
+              options={['Residential Space', 'Commercial Space', 'Mixed Use']}
+              selected={formData.propertyType}
+              onSelect={val => handleInputChange('propertyType', val)}
+            />
+          </View>
           <View style={styles.inputCol}>
             <Text style={styles.label}>Carpet Area (sq ft)</Text>
             <TextInput
@@ -263,6 +461,8 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
               placeholderTextColor="#999"
             />
           </View>
+        </View>
+        <View style={styles.gridRow}>
           <View style={styles.inputCol}>
             <Text style={styles.label}>Purchase Price (₹)</Text>
             <TextInput
@@ -293,6 +493,9 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             />
           </View>
         </View>
+        <Text style={styles.sectionNote}>
+          Note: Loan amount cannot exceed the property purchase price.
+        </Text>
 
         {includeLoan && (
           <>
@@ -377,7 +580,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
         </View>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Escalation Every (Yrs)</Text>
+            <Text style={styles.label}>Rent Escalation every(yrs)</Text>
             <TextInput
               style={styles.input}
               placeholder="3"
@@ -388,7 +591,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Escalation (% / yr)</Text>
+            <Text style={styles.label}>Rent Escalation(% per year)</Text>
             <TextInput
               style={styles.input}
               placeholder="8"
@@ -401,7 +604,17 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
         </View>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Lease Term (Months)</Text>
+            <Text style={styles.label}>Lease Start Date *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="DD/MM/YYYY"
+              value={formData.leaseStartDate}
+              onChangeText={v => handleInputChange('leaseStartDate', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Lease Term (Months) *</Text>
             <TextInput
               style={styles.input}
               placeholder="10"
@@ -412,6 +625,8 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             />
           </View>
         </View>
+
+        <BalanceLeaseTenureAlert />
       </View>
 
       {/* Recurring Expenses (Annual) */}
@@ -528,13 +743,14 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
       </TouchableOpacity>
 
       {/* Result Components */}
-      {calculated && (
+      {results && (
         <>
-          {activeTab === 'roi' ? <RentalCards /> : <SummaryCards />}
-          <FinancialDetails />
-          <PerformanceAnalytics />
-          <CashflowProjections />
-          <RentalDetailsCashflow />
+          <RentalCards data={results} />
+          <SummaryCards data={results} />
+          <FinancialDetails data={results} />
+          <PerformanceAnalytics data={results} />
+          <CashflowProjections data={results} />
+          <RentalDetailsCashflow data={results} />
         </>
       )}
     </ScrollView>
@@ -553,6 +769,7 @@ const EMICalculatorView = () => {
     loanTenure: '',
     monthlyRent: '',
     securityDeposit: '',
+    daysCalculation: '',
     rentEscalation: '',
     leaseStartDate: '',
     leaseTerm: '',
@@ -567,14 +784,45 @@ const EMICalculatorView = () => {
   });
 
   const [includeLoan, setIncludeLoan] = useState(true);
-  const [calculated, setCalculated] = useState(true);
+  const [results, setResults] = useState<any>(null);
+
+  const calculateEMIValues = () => {
+    const loanAmount = parseFloat(formData.loanAmount.replace(/,/g, '')) || 0;
+    const rateMonth = (parseFloat(formData.interestRate) || 0) / 12 / 100;
+    const months = (parseFloat(formData.loanTenure) || 0) * 12;
+    
+    let monthlyEMI = 0;
+    if (rateMonth > 0 && months > 0) {
+      monthlyEMI = (loanAmount * rateMonth * Math.pow(1 + rateMonth, months)) / (Math.pow(1 + rateMonth, months) - 1);
+    }
+    
+    const totalPayment = monthlyEMI * months;
+    const totalInterest = totalPayment - loanAmount;
+    
+    setResults({
+        monthlyEMI,
+        totalInterest,
+        totalPayment,
+        loanAmount,
+        interestRate: formData.interestRate,
+        loanTenure: formData.loanTenure,
+        downPayment: parseFloat(formData.downPayment.replace(/,/g, '')) || 0,
+        propertyPrice: parseFloat(formData.purchasePrice.replace(/,/g, '')) || 0,
+        principalPaid: loanAmount, // For charts
+        interestPaid: totalInterest,
+    });
+  };
+
+  React.useEffect(() => {
+    calculateEMIValues();
+  }, [formData, includeLoan]);
 
   const handleInputChange = (name: string, value: string) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleCalculate = () => {
-    setCalculated(true);
+    calculateEMIValues();
   };
 
   return (
@@ -582,19 +830,23 @@ const EMICalculatorView = () => {
       style={styles.calcContainer}
       showsVerticalScrollIndicator={false}
     >
-      <Text style={styles.calcTitle}>Property EMI Calculator</Text>
+      <CalculatorHeader type="emi" />
+
+      <InfoCardsSummary type="emi" />
 
       {/* Property Details */}
       <View style={styles.sectionCard}>
         <Text style={styles.sectionTitle}>Property Details</Text>
-        {/* Property Type Dropdown */}
-        <Dropdown
-          label="Property Type"
-          options={['Residential Space', 'Commercial Space']}
-          selected={formData.propertyType}
-          onSelect={val => handleInputChange('propertyType', val)}
-        />
         <View style={styles.gridRow}>
+          <View style={styles.inputCol}>
+            <Dropdown
+              row
+              label="Property Type"
+              options={['Residential Space', 'Commercial Space']}
+              selected={formData.propertyType}
+              onSelect={val => handleInputChange('propertyType', val)}
+            />
+          </View>
           <View style={styles.inputCol}>
             <Text style={styles.label}>Carpet Area (sq ft)</Text>
             <TextInput
@@ -606,6 +858,8 @@ const EMICalculatorView = () => {
               placeholderTextColor="#999"
             />
           </View>
+        </View>
+        <View style={styles.gridRow}>
           <View style={styles.inputCol}>
             <Text style={styles.label}>Purchase Price (₹)</Text>
             <TextInput
@@ -636,6 +890,9 @@ const EMICalculatorView = () => {
             />
           </View>
         </View>
+        <Text style={styles.sectionNote}>
+          Note: Loan amount cannot exceed the property purchase price.
+        </Text>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
             <Text style={styles.label}>Loan Amount (₹)</Text>
@@ -719,6 +976,17 @@ const EMICalculatorView = () => {
         </View>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
+            <Text style={styles.label}>Days Calculation Gregorian</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="3"
+              keyboardType="numeric"
+              value={formData.daysCalculation}
+              onChangeText={v => handleInputChange('daysCalculation', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
+          <View style={styles.inputCol}>
             <Text style={styles.label}>Rent Escalation (% per year)</Text>
             <TextInput
               style={styles.input}
@@ -729,8 +997,20 @@ const EMICalculatorView = () => {
               placeholderTextColor="#999"
             />
           </View>
+        </View>
+        <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Lease Term (Yrs)</Text>
+            <Text style={styles.label}>Lease Start Date *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="DD/MM/YYYY"
+              value={formData.leaseStartDate}
+              onChangeText={v => handleInputChange('leaseStartDate', v)}
+              placeholderTextColor="#999"
+            />
+          </View>
+          <View style={styles.inputCol}>
+            <Text style={styles.label}>Lease Term (Yrs) *</Text>
             <TextInput
               style={styles.input}
               placeholder="10"
@@ -741,6 +1021,8 @@ const EMICalculatorView = () => {
             />
           </View>
         </View>
+
+        <BalanceLeaseTenureAlert />
       </View>
 
       {/* Recurring Expenses */}
@@ -857,12 +1139,12 @@ const EMICalculatorView = () => {
       </TouchableOpacity>
 
       {/* Result Components */}
-      {calculated && (
+      {results && (
         <>
-          <EMISummaryCards />
-          <EMIAnalytics />
-          <PrincipleChart />
-          <CoverageAnalysis />
+          <EMISummaryCards data={results} />
+          <EMIAnalytics data={results} />
+          <PrincipleChart data={results} />
+          <CoverageAnalysis data={results} />
         </>
       )}
     </ScrollView>
@@ -885,45 +1167,93 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    height: 400,
+    bottom: 0, // Ensure full vertical coverage
     resizeMode: 'cover',
-    opacity: 0.1,
+    opacity: 1,
   },
   heroContent: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingLeft: '8%',
+    paddingRight: 0,
+    minHeight: 700, // Increased to accommodate the oversized banner
   },
   heroTextContainer: {
     flex: 1,
     minWidth: 300,
     marginRight: 20,
+    paddingTop: 20,
+  },
+  redIconBox: {
+    backgroundColor: '#EE2529',
+    padding: 4,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#EE2529',
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    elevation: 5,
+    height: 92,
+    width: 92,
+  },
+  heroStatsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 15,
+    marginTop: 30,
+  },
+  heroStatCard: {
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 12,
+    minWidth: 200,
+    shadowColor: '#000',
+    shadowOpacity: 0.10,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  heroStatLabel: {
+    fontSize: 18,
+    color: '#767676',
+    fontWeight: '600',
+    marginBottom: 5,
+    textAlign:'center',
+  },
+  heroStatValue: {
+    fontSize: 20,
+    color: '#EE2529',
+    fontWeight: 400,
+    textAlign:'center',
   },
   badgeContainer: {
     backgroundColor: '#FFF3CA',
-    paddingHorizontal: 10,
+    paddingHorizontal: 20,
     paddingVertical: 5,
     borderRadius: 20,
     alignSelf: 'flex-start',
     marginBottom: 10,
   },
   badgeText: {
-    fontSize: 12,
+    fontSize: 18,
     color: '#767676',
-    fontWeight: 'bold',
+    fontWeight: 400,
   },
   heroTitle: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: 'bold',
     color: '#262626',
-    marginBottom: 10,
+    marginBottom: 6,
   },
   heroSubtitle: {
-    fontSize: 14,
+    fontSize: 22,
     color: '#666',
     marginBottom: 20,
-    lineHeight: 20,
+    lineHeight: 32,
+    fontWeight: 400,
+    maxWidth: 800,
   },
   statsRow: {
     flexDirection: 'row',
@@ -963,27 +1293,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: 40,
     backgroundColor: '#fff',
-    borderRadius: 10,
+    borderRadius: 25,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
+    shadowOpacity: 0.15,
+    shadowRadius: 15,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 8,
     marginHorizontal: 20,
-    padding: 10,
+    padding: 0,
+    overflow: 'hidden',
   },
   tabItem: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 20,
     position: 'relative',
+    gap: 8,
+  },
+  tabIconBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f5f5f5',
+  },
+  activeTabIconBox: {
+    backgroundColor: '#EE2529',
   },
   tabText: {
-    marginTop: 5,
-    fontSize: 16,
+    fontSize: 26,
     color: '#767676',
-    fontWeight: '600',
+    fontWeight: '700',
   },
   activeTabText: {
     color: '#EE2529',
@@ -991,53 +1334,60 @@ const styles = StyleSheet.create({
   },
   activeIndicator: {
     position: 'absolute',
-    bottom: -10,
-    width: '80%',
-    height: 3,
+    bottom: 0,
+    width: '50%',
+    height: 6,
     backgroundColor: '#EE2529',
   },
   divider: {
-    width: 1,
-    height: 40,
-    backgroundColor: '#EE2529',
-    marginHorizontal: 10,
+    width: 0, // Removed for modern pill look
   },
   contentArea: {
     paddingHorizontal: 20,
   },
   calcContainer: {
     padding: 10,
+    maxWidth: '90%',
+    alignSelf: 'center',
+    width: '100%',
   },
   calcTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 30,
+    fontWeight: '700',
     marginBottom: 20,
     color: '#333',
     textAlign: 'center',
   },
   sectionCard: {
     backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 15,
+    borderRadius: 20,
+    padding: 22,
+    marginBottom: 18,
     shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 5,
-    elevation: 2,
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
     borderWidth: 1,
-    borderColor: '#f0f0f0',
+    borderColor: '#F3F4F6',
   },
   sectionHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 15,
+    marginBottom: 10,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#EE2529',
-    marginBottom: 15,
+    marginBottom: 10,
+  },
+  sectionNote: {
+    color: '#6B7280',
+    fontSize: 13,
+    lineHeight: 18,
+    marginBottom: 16,
   },
   toggleRow: {
     flexDirection: 'row',
@@ -1046,30 +1396,60 @@ const styles = StyleSheet.create({
   },
   gridRow: {
     flexDirection: 'row',
-    gap: 15,
-    marginBottom: 15,
+    gap: 24,
+    marginBottom: 16,
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
   },
   inputCol: {
-    flex: 1,
+    flexBasis: '48%',
+    maxWidth: '48%',
+    flexGrow: 1,
+    flexShrink: 1,
+    minWidth: 180,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
   },
   inputGroup: {
     marginBottom: 15,
   },
+  fieldRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  fieldLabel: {
+    fontSize: 15,
+    color: '#4B5563',
+    fontWeight: '600',
+    flex: 0.45,
+  },
+  inputRight: {
+    flex: 0.55,
+    textAlign: 'right',
+  },
   label: {
-    fontSize: 14,
-    marginBottom: 8,
+    fontSize: 16,
+    marginBottom: 0,
     color: '#555',
     fontWeight: '600',
+    width: '40%',
+    textAlign: 'center',
   },
   input: {
-    backgroundColor: '#F9F9F9',
+    flex: 1,
+    backgroundColor: '#F6F6F6',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 14,
-    color: '#333',
-    fontWeight: 'bold',
+    borderColor: '#E5E7EB',
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    fontSize: 18,
+    color: '#111827',
+    fontWeight: '700',
+    minHeight: 56,
   },
   inputDisabled: {
     opacity: 0.5,
@@ -1110,6 +1490,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 5,
+    maxWidth: 300,
+    alignSelf: 'center',
   },
   calculateBtnText: {
     color: '#fff',
@@ -1119,21 +1501,34 @@ const styles = StyleSheet.create({
   dropdownContainer: {
     marginBottom: 20,
     zIndex: 1000,
+    width: '100%',
+  },
+  dropdownRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  dropdownLabel: {
+    width: '40%',
+    marginBottom: 0,
   },
   dropdownHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#F9F9F9',
+    backgroundColor: '#F6F6F6',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    padding: 12,
+    borderColor: '#E5E7EB',
+    borderRadius: 16,
+    padding: 16,
+  },
+  dropdownHeaderRow: {
+    flex: 1,
   },
   dropdownHeaderText: {
-    fontSize: 14,
-    color: '#333',
-    fontWeight: 'bold',
+    fontSize: 16,
+    color: '#111827',
+    fontWeight: '700',
   },
   dropdownList: {
     position: 'absolute',
@@ -1166,6 +1561,85 @@ const styles = StyleSheet.create({
   activeDropdownItemText: {
     color: '#EE2529',
     fontWeight: 'bold',
+  },
+  infoCardsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 20,
+    marginBottom: 60,
+    marginTop: 10,
+    width: '100%',
+    maxWidth: '72%', 
+    alignSelf: 'center',
+  },
+  infoSummaryCard: {
+    flex: 1,
+    minWidth: 150,
+    padding: 15,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    borderBottomWidth: 3,
+    borderBottomColor: '#EE2529',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  infoSummaryText: {
+    fontSize: 22,
+    lineHeight: 28,
+    color: '#767676',
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  alertBox: {
+    marginTop: 15,
+    backgroundColor: '#FFFCF4',
+    borderWidth: 1,
+    borderColor: '#EE2529',
+    borderRadius: 8,
+    padding: 15,
+  },
+  alertTitle: {
+    fontSize: 16,
+    color: '#767676',
+    fontWeight: '600',
+    marginBottom: 5,
+  },
+  alertValue: {
+    color: '#EE2529',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  alertSubtitle: {
+    fontSize: 14,
+    color: '#767676',
+    lineHeight: 18,
+  },
+  calcHeader: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  calcHeaderIconBox: {
+    width: 70,
+    height: 70,
+    borderRadius: 18,
+    backgroundColor: '#EE2529',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+  },
+  calcSubtitle: {
+    fontSize: 24,
+    fontWeight: '400',
+    lineHeight: 28,
+    color: '#6B7280',
+    textAlign: 'center',
+    maxWidth: '85%',
+    marginBottom: 4,
   },
 });
 

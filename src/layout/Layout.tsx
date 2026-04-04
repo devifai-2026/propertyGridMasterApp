@@ -562,9 +562,9 @@ const styles = StyleSheet.create({
   },
   // Header Styles
   headerContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.75)',
+    backgroundColor: 'rgba(255, 255, 255, 0.10)', // Reduced opacity from 0.75
     borderWidth: 1,
-    borderColor: 'rgba(230, 230, 230, 0.4)',
+    borderColor: 'rgba(230, 230, 230, 0.2)',
     height: 70,
     justifyContent: 'center',
     zIndex: 1000,
@@ -587,8 +587,8 @@ const styles = StyleSheet.create({
     }),
   },
   headerContainerHover: {
-    backgroundColor: 'rgba(255, 255, 255, 0.35)',
-    borderColor: 'rgba(230, 230, 230, 0.6)',
+    backgroundColor: 'rgba(255, 255, 255, 0.25)', // Reduced opacity from 0.35
+    borderColor: 'rgba(230, 230, 230, 0.4)',
     shadowOpacity: 0.2,
     shadowRadius: 15,
     ...Platform.select({
