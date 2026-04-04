@@ -618,10 +618,10 @@ const styles = StyleSheet.create({
   },
   navLinks: {
     flexDirection: 'row',
-    gap: 30,
+    gap: 50,
   },
   navLinkText: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '600',
     color: '#262626',
   },

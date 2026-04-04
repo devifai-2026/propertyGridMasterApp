@@ -312,7 +312,9 @@ const DiscoveryWizard = () => {
 
 const styles = StyleSheet.create({
   wizardContainer: {
-    paddingVertical: 50,
+    // paddingVertical: 50,
+      paddingBottom: 0,
+      paddingTop: 50,
     alignItems: 'center',
     width: '100%',
     backgroundColor: '#FFFFFF',
@@ -399,7 +401,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     borderRadius: 20,
     paddingHorizontal: 30,
-    paddingVertical: 60,
+    paddingTop: 60,
+    paddingBottom: 6,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },

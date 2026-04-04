@@ -17,6 +17,6 @@ export const FONTS = {
   main: Platform.select({
     ios: 'Montserrat',
     android: 'Montserrat',
-    web: '"Montserrat", system-ui, -apple-system, sans-serif',
+    web: "Montserrat",
   }) || 'Montserrat',
 };
