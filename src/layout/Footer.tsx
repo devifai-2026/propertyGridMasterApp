@@ -196,29 +196,30 @@ const Footer = () => {
 
 const styles = StyleSheet.create({
   footerContainer: {
-    backgroundColor: '#000000',
+    backgroundColor: '#262626',
     width: '100%',
-    paddingVertical: 64,
+    paddingVertical: 60,
   },
   contentWrapper: {
     maxWidth: 1440,
     width: '95%',
     alignSelf: 'center',
-    paddingHorizontal: 24,
+    paddingHorizontal: 40,
   },
   topSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     flexWrap: 'wrap',
+    gap: 24,
   },
   logoColumn: {
-    flex: 1,
-    minWidth: 200,
+    flex: 2,
+    minWidth: 260,
     marginBottom: 20,
   },
   logo: {
-    height: 90, // approximate 4rem
-    width: 350, // adjust based on aspect ratio
+    height: 100,
+    width: 320,
   },
   linksColumn: {
     flex: 1,
@@ -229,11 +230,11 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 18,
     fontWeight: '600',
-    marginBottom: 16,
+    marginBottom: 20,
     fontFamily: 'Montserrat',
   },
   linkItem: {
-    marginBottom: 12,
+    marginBottom: 14,
   },
   linkText: {
     color: '#9CA3AF', // gray-400
@@ -243,7 +244,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: '#374151', // gray-700
-    marginVertical: 5,
+    marginVertical: 32,
   },
   bottomSection: {
     //
@@ -252,13 +253,13 @@ const styles = StyleSheet.create({
     color: '#9CA3AF', // gray-400
     fontSize: 14,
     lineHeight: 24,
-    marginBottom: 20,
+    marginBottom: 32,
   },
   footerBottomRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 16,
+    paddingTop: 8,
   },
   copyrightLabel: {
     color: '#6B7280', // gray-500
@@ -272,7 +273,7 @@ const styles = StyleSheet.create({
     padding: 4,
   },
   socialIcon: {
-    width: 24,
+    width: 40,
     height: 24,
   },
   dropdownWrapper: {
