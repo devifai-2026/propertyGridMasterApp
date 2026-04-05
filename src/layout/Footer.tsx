@@ -196,15 +196,15 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 36,
     flexWrap: 'wrap',
-    marginLeft: 30,          // ← negative margin to offset column padding
+    // marginLeft: 30,          // ← negative margin to offset column padding
   },
   topSectionMobile: {
     flexDirection: 'column',
     gap: 32,
   },
   logoColumn: {
-    width: '28%',            // ← slightly narrower to give links more room
-    paddingRight: 24,
+    width: '25%',            // ← slightly narrower to give links more room
+    paddingRight: 16,
   },
   logoColumnMobile: {
     width: '100%',
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   },
   linksColumn: {
     flex: 1,
-    paddingRight: 16,
+    paddingRight: 8,
   },
   linksColumnMobile: {
     width: '100%',
@@ -329,8 +329,8 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   socialIcon: {
-    width: 40,               // ← larger icons like image 2
-    height: 40,
+    width: 30,               // ← larger icons like image 2
+    height: 30,
   },
 });
 
