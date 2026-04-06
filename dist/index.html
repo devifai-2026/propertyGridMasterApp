@@ -1,0 +1,42 @@
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet"><title>PreLease Grid</title><style>#root {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Montserrat";
+      }
+      /* 
+         If you have the .woff or .ttf files locally, 
+         place them in /web/assets/fonts and uncomment below:
+      */
+      /* @font-face {
+        font-family: 'Avenir Next LT Pro';
+        src: url('/web/assets/fonts/AvenirNextLTPro-Regular.woff2') format('woff2');
+        font-weight: 400;
+        font-style: normal;
+      } */
+
+      /* Display numeric input arrows (spin buttons) on hover */
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      
+      input[type="number"]:hover::-webkit-inner-spin-button,
+      input[type="number"]:hover::-webkit-outer-spin-button {
+        -webkit-appearance: inner-spin-button !important;
+        opacity: 1 !important;
+        cursor: pointer;
+      }
+      
+      input[type="number"] {
+        -moz-appearance: textfield;
+      }
+      
+      input[type="number"]:hover {
+        -moz-appearance: number-input;
+      }</style><script defer="defer" src="/bundle.web.js"></script></head><body><div id="root"></div></body></html>
