@@ -185,7 +185,9 @@ const styles = StyleSheet.create({
   contentWrapper: {
     // maxWidth: 1280,
     width: '100%',           // ← was '90%', now full width
-    paddingHorizontal: 52,   // ← was 20, reduced side padding like image 2
+    // paddingHorizontal: 52,   // ← was 20, reduced side padding like image 2
+    paddingLeft: 188,
+    paddingRight: 80
   },
   contentWrapperMobile: {
     width: '100%',
@@ -203,8 +205,8 @@ const styles = StyleSheet.create({
     gap: 32,
   },
   logoColumn: {
-    width: '25%',            // ← slightly narrower to give links more room
-    paddingRight: 16,
+    // width: '25%',            // ← slightly narrower to give links more room
+    paddingRight: 125,
   },
   logoColumnMobile: {
     width: '100%',
@@ -212,7 +214,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   logo: {
-    width: 300,              // ← larger to match image 2
+    width: 550,              // ← larger to match image 2
     height: 120,             // ← taller to show full logo icon + text
   },
   linksColumn: {
