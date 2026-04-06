@@ -28,6 +28,7 @@ import EMISummaryCards from './components/EMI/EMISummaryCards';
 import EMIAnalytics from './components/EMI/EMIAnalytics';
 import PrincipleChart from './components/EMI/PrincipleChart';
 import CoverageAnalysis from './components/EMI/CoverageAnalysis';
+import LinearGradient from 'react-native-linear-gradient';
 
 const CalculatorsScreen = () => {
   const [activeTab, setActiveTab] = useState<'roi' | 'emi'>('roi');
@@ -80,16 +81,42 @@ const CalculatorsScreen = () => {
 
               <View style={styles.heroStatsRow}>
                 <View style={styles.heroStatCard}>
-                  <Text style={styles.heroStatLabel}>Yield Analysis</Text>
-                  <Text style={styles.heroStatValue}>Gross & Net<br /> Returns</Text>
+                  <LinearGradient
+                    colors={['rgba(242, 242, 242, 0.1)', 'rgba(255, 255, 255, 0.1)']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    locations={[0.0761, 0.7484]}
+                    style={styles.heroStatCardGradient}
+                  >
+                    <Text style={styles.heroStatLabel}>Yield Analysis</Text>
+                    <Text style={styles.heroStatValue}>Gross & Net{'\n'}Returns</Text>
+                  </LinearGradient>
                 </View>
+
                 <View style={styles.heroStatCard}>
-                  <Text style={styles.heroStatLabel}>Loan Planning</Text>
-                  <Text style={styles.heroStatValue}>EMI & Coverage<br /> Ratio</Text>
+                  <LinearGradient
+                    colors={['rgba(242, 242, 242, 0.1)', 'rgba(255, 255, 255, 0.1)']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    locations={[0.0761, 0.7484]}
+                    style={styles.heroStatCardGradient}
+                  >
+                    <Text style={styles.heroStatLabel}>Loan Planning</Text>
+                    <Text style={styles.heroStatValue}>EMI & Coverage{'\n'}Ratio</Text>
+                  </LinearGradient>
                 </View>
+
                 <View style={styles.heroStatCard}>
-                  <Text style={styles.heroStatLabel}>Cash Flow</Text>
-                  <Text style={styles.heroStatValue}>10-Year<br /> Projections</Text>
+                  <LinearGradient
+                    colors={['rgba(242, 242, 242, 0.1)', 'rgba(255, 255, 255, 0.1)']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    locations={[0.0761, 0.7484]}
+                    style={styles.heroStatCardGradient}
+                  >
+                    <Text style={styles.heroStatLabel}>Cash Flow</Text>
+                    <Text style={styles.heroStatValue}>10-Year{'\n'}Projections</Text>
+                  </LinearGradient>
                 </View>
               </View>
             </View>
@@ -100,15 +127,15 @@ const CalculatorsScreen = () => {
                 styles.heroImage,
                 isDesktop
                   ? {
-                    width: '44%',       // ← slightly narrower
-                    height: 688,        // ← reduced from 500
+                    width: '40%',       // ← slightly narrower
+                    height: 639,        // ← reduced from 500
                     position: 'absolute',
                     right: -20,
                     top: -119,
                   }
                   : { width: 350, height: 250 },
               ]}
-              resizeMode="fill"
+              resizeMode="cover"
             />
           </View>
         </View>
@@ -1164,8 +1191,8 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
     minHeight: '100%',
-    paddingBottom: 40,  
-},
+    paddingBottom: 40,
+  },
   heroSection: {
     padding: 20,
     position: 'relative',
@@ -1216,15 +1243,21 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   heroStatCard: {
-    backgroundColor: '#fff',
-    padding: 12,
-    borderRadius: 12,
-    minWidth: 160,
-    shadowColor: '#000',
-    shadowOpacity: 0.10,
-    shadowRadius: 10,
-    elevation: 3,
+   borderRadius: 12,
+  minWidth: 173,
+  overflow: 'hidden',      // ← critical for gradient to respect borderRadius
+  shadowColor: '#000',
+  shadowOpacity: 0.10,
+  shadowRadius: 10,
+  elevation: 3,
+  // backgroundColor: '#fff'
   },
+  heroStatCardGradient: {
+  padding: 26,
+  flex: 1,
+  alignItems: 'center',
+  justifyContent: 'center',
+},
   heroStatLabel: {
     fontSize: 15,
     color: '#767676',
@@ -1294,17 +1327,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   heroImage: {
-    width: 400,
-    height: 200,
-    alignSelf: 'center',
-    resizeMode: 'contain',
+    // width: 1000,
+    // height: 500,
+    // alignSelf: 'center',
+    // resizeMode: 'contain',
   },
   tabsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 0,
-    marginTop: 155,
+    marginTop: 100,
     backgroundColor: '#fff',
     borderRadius: 25,
     shadowColor: '#000',
