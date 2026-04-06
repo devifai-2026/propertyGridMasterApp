@@ -259,7 +259,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               onPress={() => onToggleCompare(item)}
             >
               <View style={styles.compareBtnContent}>
-                <Plus size={16} color={isSelected ? COLORS.white : '#EF4444'} />
+                <Plus size={14} color={isSelected ? COLORS.white : '#EF4444'} />
                 <Text
                   style={[
                     styles.compareText,
@@ -333,6 +333,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           )}
         </View>
       </View>
+      
 
       {onRemove && (
         <TouchableOpacity
@@ -342,7 +343,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           <XCircle size={20} color={COLORS.white} fill={COLORS.textSecondary} />
         </TouchableOpacity>
       )}
+      
     </View>
+    
   );
 };
 
@@ -375,7 +378,7 @@ const styles = StyleSheet.create({
   propCategory: {
     fontFamily: FONTS.main,
     fontSize: 24,
-    fontWeight: '400',
+    fontWeight: '300',
     color: '#262626',
     marginBottom: 2,
   },
@@ -396,7 +399,7 @@ const styles = StyleSheet.create({
   },
   verifiedTextOverlay: {
     position: 'absolute',
-    paddingLeft: 15,
+    paddingLeft: 2,
     top: 0,
     left: 0,
     right: 0,
@@ -405,11 +408,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   verifiedText: {
-    fontFamily: FONTS.main,
-    color: COLORS.white,
-    fontSize: 13,
-    fontWeight: '700',
-    backgroundColor: 'transparent',
+    fontFamily: "Montserrat",
+    color: '#F2F2F2',
+    fontSize: 14,
+    fontWeight: '400',
+    lineHeight: 16,
+    letterSpacing: 0,
   },
   propImageContainer: {
     height: 277,
@@ -433,7 +437,7 @@ const styles = StyleSheet.create({
   },
   dotsContainer: {
     position: 'absolute',
-    bottom: 72,
+    bottom: 74,
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'center',
@@ -457,7 +461,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   iconButton: {
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: '#2626268A',
     borderRadius: 100,
     width: 32,
     height: 32,
@@ -479,7 +483,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.3)',
     ...Platform.select({
       web: {
-        backdropFilter: 'blur(6px)',
+        backdropFilter: 'blur(2px)',
       },
     }),
   } as ViewStyle,
@@ -490,7 +494,7 @@ const styles = StyleSheet.create({
   mncBadge: {
     backgroundColor: '#FFF9C4',
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: 6,
     borderRadius: 100,
   },
   mncBadgeText: {
@@ -500,17 +504,18 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   compareBtnInternal: {
-    backgroundColor: COLORS.white,
-    paddingHorizontal: 16,
-    // paddingVertical: 8,
-    borderRadius: 8,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 5,
     shadowColor: '#000',
     shadowOpacity: 0.1,
     // shadowOffset: { width: 0, height: 2 },
-    height: 40,
-    elevation: 3,
-    paddingTop: 10,
-    paddingBottom: 8
+    // height: 30,
+
+    // elevation: 3,
+    // paddingTop: 10,
+    // paddingBottom: 8
   },
   compareBtnContent: {
     flexDirection: 'row',
@@ -521,10 +526,10 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.main,
     color: '#ED2B2B',
     fontWeight: '600',
-    fontSize: 14,
+    fontSize: 12,
   },
   propContent: {
-    paddingHorizontal: 24,
+    paddingHorizontal: 26,
     paddingVertical: 20,
   },
   propDetailsRow: {
@@ -538,29 +543,32 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   detailLabel: {
-    fontFamily: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
+    fontFamily: 'Montserrat',
     fontSize: 16,
     color: '#767676',
-    fontWeight: '200',
+    fontWeight: '400',
+    lineHeight: 22,
+    paddingBottom: 4
   },
   detailValue: {
-    fontFamily: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
+    fontFamily: 'Montserrat',
     color: '#262626',
     fontWeight: '600',
     fontSize: 18,
     textAlign: 'center',
   },
   roiCardContainer: {
-    borderRadius: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-    minWidth: 75,
-    overflow: 'hidden',
-    borderWidth: 0,
-  },
+  borderRadius: 15,
+  shadowColor: '#000',
+  shadowOffset: { width: 2, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 2,
+  elevation: 2, // Lower elevation for Android
+  width: 97,
+  height: 78,
+  overflow: 'hidden',
+  borderWidth: 0,
+},
   roiCardGradient: {
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -569,7 +577,7 @@ const styles = StyleSheet.create({
     minHeight: 80,
   },
   roiLabel: {
-    fontFamily: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
+    fontFamily: 'Montserrat',
     fontSize: 24,
     color: '#262626',
     fontWeight: '600',
@@ -581,16 +589,16 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
   },
   roiValueText: {
-    fontFamily: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
-    fontSize: 16,
+    fontFamily: 'Montserrat',
+    fontSize: 22,
     color: '#EE2529',
     fontWeight: '600',
   },
   percentageSymbol: {
-    fontFamily: FONTS.main,
-    fontSize: 15,
-    color: '#E63946',
-    fontWeight: '700',
+    fontFamily: 'Montserrat',
+    fontSize: 16,
+    color: '#EE2529',
+    fontWeight: '600',
     marginLeft: 1,
   },
   propActions: {
@@ -611,7 +619,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   viewBtnText: {
-    fontFamily: '"Avenir Next LT Pro", "Avenir Next", system-ui, -apple-system, sans-serif',
+    fontFamily: 'Montserrat',
     color: '#767676',
     fontWeight: '500',
     fontSize: 14,
@@ -622,7 +630,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     overflow: 'hidden',
   },
-  enquireBtnGradient: {
+ enquireBtnGradient : {
     paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
