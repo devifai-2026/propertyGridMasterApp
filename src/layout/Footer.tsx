@@ -13,7 +13,6 @@ import instagram from '../assets/Footer/Instagram.png';
 import linkedin from '../assets/Footer/linkedin.png';
 import youtube from '../assets/Footer/youtube.png';
 
-
 const errorPages = [
   { code: '404', title: 'Page Not Found' },
   { code: '500', title: 'Internal Server Error' },
@@ -25,11 +24,7 @@ const Footer = () => {
   const { width } = useWindowDimensions();
   const { navigate } = useNavigation();
   const [errorPagesOpen, setErrorPagesOpen] = useState(false);
-
-  // Hide on mobile (breakpoint 768px for example)
-  if (width < 768) {
-    return null;
-  }
+  const isMobile = width < 768;
 
   const handleNavigate = (path: string) => {
     navigate(path);
@@ -102,20 +97,23 @@ const Footer = () => {
             >
               <Text style={styles.linkText}>Terms of Service</Text>
             </TouchableOpacity>
+
+            {/* Error Pages Dropdown */}
             <View style={styles.dropdownWrapper}>
               <TouchableOpacity
                 onPress={() => setErrorPagesOpen(!errorPagesOpen)}
                 style={styles.dropdownTrigger}
               >
-                <Text style={styles.linkText}>Error Pages</Text>
+                <Text style={styles.dropdownTriggerText}>Error Pages</Text>
                 <ChevronDown
                   size={16}
-                  color="#9CA3AF"
+                  color="#6B7280"
                   style={{
                     transform: [{ rotate: errorPagesOpen ? '180deg' : '0deg' }],
                   }}
                 />
               </TouchableOpacity>
+
               {errorPagesOpen && (
                 <View style={styles.dropdownMenu}>
                   {errorPages.map((page) => (
@@ -161,25 +159,13 @@ const Footer = () => {
             </Text>
             <View style={styles.socialIcons}>
               <TouchableOpacity style={styles.iconContainer}>
-                <Image
-                  source={instagram}
-                  style={styles.socialIcon}
-                  resizeMode="contain"
-                />
+                <Image source={instagram} style={styles.socialIcon} resizeMode="contain" />
               </TouchableOpacity>
               <TouchableOpacity style={styles.iconContainer}>
-                <Image
-                  source={linkedin}
-                  style={styles.socialIcon}
-                  resizeMode="contain"
-                />
+                <Image source={linkedin} style={styles.socialIcon} resizeMode="contain" />
               </TouchableOpacity>
               <TouchableOpacity style={styles.iconContainer}>
-                <Image
-                  source={youtube}
-                  style={styles.socialIcon}
-                  resizeMode="contain"
-                />
+                <Image source={youtube} style={styles.socialIcon} resizeMode="contain" />
               </TouchableOpacity>
             </View>
           </View>
@@ -191,31 +177,45 @@ const Footer = () => {
 
 const styles = StyleSheet.create({
   footerContainer: {
-    backgroundColor: '#262626',
+    backgroundColor: '#1E1E1E',
     width: '100%',
-    paddingVertical: 60,
+    paddingTop: 52,
+    paddingBottom: 32,
   },
   contentWrapper: {
-    maxWidth: 1440,
-    width: '95%',
-    alignSelf: 'center',
-    paddingHorizontal: 40,
+    // maxWidth: 1280,
+    width: '100%',           // ← was '90%', now full width
+    // paddingHorizontal: 52,   // ← was 20, reduced side padding like image 2
+    paddingLeft: 188,
+    paddingRight: 80
+  },
+  contentWrapperMobile: {
+    width: '100%',
+    paddingHorizontal: 20,
   },
   topSection: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginBottom: 36,
     flexWrap: 'wrap',
-    gap: 24,
+    // marginLeft: 30,          // ← negative margin to offset column padding
+  },
+  topSectionMobile: {
+    flexDirection: 'column',
+    gap: 32,
   },
   logoColumn: {
-    flex: 2,
-    minWidth: 260,
-    marginBottom: 20,
+    // width: '25%',            // ← slightly narrower to give links more room
+    paddingRight: 125,
+  },
+  logoColumnMobile: {
+    width: '100%',
+    paddingRight: 0,
+    marginBottom: 8,
   },
   logo: {
-    height: 100,
-    width: 320,
+    width: 550,              // ← larger to match image 2
+    height: 120,             // ← taller to show full logo icon + text
   },
   linksColumn: {
     flex: 1,
@@ -227,14 +227,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   columnTitle: {
-    color: '#ffffff',
-    fontSize: 18,
-    fontWeight: '600',
+    color: '#FFFFFF',
+    fontSize: 18,            // ← slightly larger to match image 2
+    fontWeight: '700',
     marginBottom: 20,
     fontFamily: 'Montserrat',
   },
   linkItem: {
-    marginBottom: 14,
+    marginBottom: 14,        // ← slightly more spacing like image 2
   },
   linkText: {
     color: '#9CA3AF',
@@ -264,25 +264,58 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Montserrat',
   },
+  dropdownMenu: {
+    position: 'absolute',
+    top: 44,
+    left: 0,
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 6,
+    paddingVertical: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 6,
+    zIndex: 20,
+  },
+  dropdownItem: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  dropdownItemText: {
+    color: '#6B7280',
+    fontSize: 13,
+    fontFamily: 'Montserrat',
+  },
   divider: {
     height: 1,
-    backgroundColor: '#374151', // gray-700
-    marginVertical: 32,
+    backgroundColor: '#374151',
+    marginBottom: 28,
   },
   bottomSection: {
     width: '100%',
   },
-  copyrightText: {
-    color: '#9CA3AF', // gray-400
-    fontSize: 14,
-    lineHeight: 24,
-    marginBottom: 32,
+  descriptionText: {
+    color: '#9CA3AF',
+    fontSize: 14,            // ← slightly larger to match image 2
+    lineHeight: 26,          // ← more line height like image 2
+    marginBottom: 28,
+    fontFamily: 'Montserrat',
   },
   footerBottomRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 8,
+    paddingTop: 4,
+    flexWrap: 'wrap',
+    gap: 16,
+  },
+  footerBottomRowMobile: {
+    flexDirection: 'column',
+    alignItems: 'flex-start',
   },
   copyrightLabel: {
     color: '#9CA3AF',
@@ -300,41 +333,6 @@ const styles = StyleSheet.create({
   socialIcon: {
     width: 30,               // ← larger icons like image 2
     height: 30,
-  },
-  socialIcon: {
-    width: 40,
-    height: 24,
-  },
-  dropdownWrapper: {
-    marginBottom: 12,
-  },
-  dropdownTrigger: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-    borderColor: '#4B5563',
-    borderRadius: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    width:150,
-    backgroundColor:'#ffffff'
-  },
-  dropdownMenu: {
-    marginTop: 4,
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#ffffff',
-    borderRadius: 6,
-    paddingVertical: 4,
-  },
-  dropdownItem: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  dropdownItemText: {
-    color: '#9CA3AF',
-    fontSize: 13,
   },
 });
 
