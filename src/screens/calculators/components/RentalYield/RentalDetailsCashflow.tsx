@@ -19,9 +19,64 @@ type CashFlowRow = {
   netCashFlow: string;
 };
 
-const RentalDetailsCashflow: React.FC = () => {
+interface RentalDetailsCashflowProps {
+  data?: {
+    annualGrossRent?: number;
+    totalAnnualExpenses?: number;
+    totalInvestment?: number;
+    monthlyEMI?: number;
+    rentEscalationEvery?: number;
+    rentEscalationPercent?: number;
+    loanAmount?: number;
+    interestRate?: string;
+    totalLoanInterest?: number;
+  };
+}
+
+const RentalDetailsCashflow = ({ data }: RentalDetailsCashflowProps) => {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
+
+  const calculateDetailedCashflow = () => {
+    const details = [];
+    let currentRent = data?.annualGrossRent || 0;
+    const escalationEvery = 3;
+    const escalationPercent = 8;
+    const annualExpenses = data?.totalAnnualExpenses || 0;
+    const monthlyEMI = data?.monthlyEMI || 0;
+    const annualEMI = monthlyEMI * 12;
+    
+    // Very simplified principal/interest split for the table
+    // In a real app we'd use an amortization schedule
+    let remainingBalance = data?.loanAmount || 0;
+    const annualRate = parseFloat(data?.interestRate || '0') / 100;
+    
+    for (let year = 1; year <= 10; year++) {
+      if (year > 1 && (year - 1) % escalationEvery === 0) {
+        currentRent = currentRent * (1 + escalationPercent / 100);
+      }
+      
+      const interestPaid = remainingBalance * annualRate;
+      const principalPaid = Math.min(remainingBalance, Math.max(0, annualEMI - interestPaid));
+      remainingBalance -= principalPaid;
+      
+      const netCashFlow = currentRent - annualExpenses - (data?.loanAmount ? annualEMI : 0);
+      
+      details.push({
+        year: year.toString(),
+        annualRent: `₹${currentRent.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`,
+        emiPaid: data?.loanAmount ? `₹${annualEMI.toLocaleString('en-IN', { maximumFractionDigits: 0 })}` : '-',
+        principal: data?.loanAmount ? `₹${principalPaid.toLocaleString('en-IN', { maximumFractionDigits: 0 })}` : '-',
+        interest: data?.loanAmount ? `₹${interestPaid.toLocaleString('en-IN', { maximumFractionDigits: 0 })}` : '-',
+        balance: data?.loanAmount ? `₹${remainingBalance.toLocaleString('en-IN', { maximumFractionDigits: 0 })}` : '-',
+        annualExpenses: `₹${annualExpenses.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`,
+        netCashFlow: `₹${netCashFlow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`,
+      });
+    }
+    return details;
+  };
+
+  const cashFlowDetails = calculateDetailedCashflow();
 
   return (
     <View style={styles.container}>
@@ -31,7 +86,7 @@ const RentalDetailsCashflow: React.FC = () => {
         horizontal
         showsHorizontalScrollIndicator
         contentContainerStyle={{
-          minWidth: 1040, // 8 columns * 130px
+          minWidth: 1040, 
           width: isDesktop ? '100%' : undefined,
         }}
       >
@@ -95,11 +150,11 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     marginTop: 20,
-    marginBottom: 20,
+    marginBottom: 40,
   },
   heading: {
     textAlign: 'center',
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '600',
     marginBottom: 20,
     color: '#262626',
@@ -120,14 +175,14 @@ const styles = StyleSheet.create({
   cell: {
     flex: 1,
     minWidth: 130,
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 8,
-    fontSize: 14,
+    fontSize: 16,
     textAlign: 'center',
   },
   headerText: {
     fontWeight: '700',
-    fontSize: 15,
+    fontSize: 18,
   },
   red: {
     color: '#C73834',
@@ -144,115 +199,13 @@ const styles = StyleSheet.create({
   button: {
     borderWidth: 1,
     borderColor: '#767676',
-    paddingVertical: 10,
-    paddingHorizontal: 18,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
     borderRadius: 6,
   },
   buttonText: {
     color: '#767676',
     fontWeight: '600',
+    fontSize: 16,
   },
 });
-
-const cashFlowDetails: CashFlowRow[] = [
-  {
-    year: '1',
-    annualRent: '₹6,00,000',
-    emiPaid: '29,362.132',
-    principal: '₹5,35,000',
-    interest: '₹65,000',
-    balance: '₹5,35,000',
-    annualExpenses: '₹65,000',
-    netCashFlow: '₹5,35,000',
-  },
-  {
-    year: '2',
-    annualRent: '₹6,48,000',
-    emiPaid: '29,362.132',
-    principal: '₹5,81,050',
-    interest: '₹66,950',
-    balance: '₹5,81,050',
-    annualExpenses: '₹66,950',
-    netCashFlow: '₹5,81,050',
-  },
-  {
-    year: '3',
-    annualRent: '₹6,99,840',
-    emiPaid: '29,362.132',
-    principal: '₹6,30,881.5',
-    interest: '₹68,958.5',
-    balance: '₹6,30,881.5',
-    annualExpenses: '₹68,958.5',
-    netCashFlow: '₹6,30,881',
-  },
-  {
-    year: '4',
-    annualRent: '₹7,55,827.2',
-    emiPaid: '29,362.132',
-    principal: '₹6,84,799.945',
-    interest: '₹71,027.255',
-    balance: '₹6,84,799.945',
-    annualExpenses: '₹71,027.255',
-    netCashFlow: '₹6.84,799.94',
-  },
-  {
-    year: '5',
-    annualRent: '₹8,16,293.376',
-    emiPaid: '29,362.132',
-    principal: '₹7,43,135.303',
-    interest: '₹73,158.073',
-    balance: '₹7,43,135.303',
-    annualExpenses: '₹73,158.073',
-    netCashFlow: '₹7.43,135.33',
-  },
-  {
-    year: '6',
-    annualRent: '₹8,81,597.846',
-    emiPaid: '29,362.132',
-    principal: '₹8,06,244.031',
-    interest: '₹75,352.815',
-    balance: '₹8,06,244.031',
-    annualExpenses: '₹75,352.815',
-    netCashFlow: '₹8.06,244.0',
-  },
-  {
-    year: '7',
-    annualRent: '₹9,52,124.594',
-    emiPaid: '29,362.132',
-    principal: '₹8,74,511.194',
-    interest: '₹77,613.399',
-    balance: '₹8,74,511.194',
-    annualExpenses: '₹77,613.399',
-    netCashFlow: '₹8.74,511.19',
-  },
-  {
-    year: '8',
-    annualRent: '₹10,28,294.561',
-    emiPaid: '29,362.132',
-    principal: '₹9,48,352.76',
-    interest: '₹79,941.801',
-    balance: '₹9,48,352.76',
-    annualExpenses: '₹79,941.801',
-    netCashFlow: '₹9.48,352.7',
-  },
-  {
-    year: '9',
-    annualRent: '₹11,10,558.126',
-    emiPaid: '29,362.132',
-    principal: '₹10,28,218.071',
-    interest: '₹82,340.055',
-    balance: '₹10,28,218.071',
-    annualExpenses: '₹82,340.055',
-    netCashFlow: '₹10.28,218.0',
-  },
-  {
-    year: '10',
-    annualRent: '₹11,99,402.776',
-    emiPaid: '29,362.132',
-    principal: '₹11,14,592.519',
-    interest: '₹84,810.257',
-    balance: '₹11,14,592.519',
-    annualExpenses: '₹84,810.257',
-    netCashFlow: '₹11.14,592.5',
-  },
-];

@@ -548,9 +548,9 @@ const styles = StyleSheet.create({
   },
   // Header Styles
   headerContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.30)',
+    backgroundColor: 'rgba(255, 255, 255, 0.10)', // Reduced opacity from 0.75
     borderWidth: 1,
-    borderColor: 'rgba(230, 230, 230, 0.4)',
+    borderColor: 'rgba(230, 230, 230, 0.2)',
     height: 70,
     justifyContent: 'center',
     zIndex: 1000,
@@ -568,6 +568,20 @@ const styles = StyleSheet.create({
       web: {
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
+        transition: 'all 0.3s ease',
+      } as any,
+    }),
+  },
+  headerContainerHover: {
+    backgroundColor: 'rgba(255, 255, 255, 0.25)', // Reduced opacity from 0.35
+    borderColor: 'rgba(230, 230, 230, 0.4)',
+    shadowOpacity: 0.2,
+    shadowRadius: 15,
+    ...Platform.select({
+      web: {
+        backdropFilter: 'blur(25px)',
+        WebkitBackdropFilter: 'blur(25px)',
+        transform: 'translateY(-2px)',
       } as any,
     }),
   },

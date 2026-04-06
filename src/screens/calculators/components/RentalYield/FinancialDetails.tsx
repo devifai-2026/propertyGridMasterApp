@@ -7,56 +7,60 @@ import {
   ScrollView,
 } from "react-native";
 
-type FinancialItem = {
-  label: string;
-  value: string;
-  subtext?: string;
-  color: string;
-};
+interface FinancialDetailsProps {
+  data?: {
+    propertyPrice?: number;
+    downPayment?: number;
+    loanAmount?: number;
+    monthlyEMI?: number;
+    totalLoanInterest?: number;
+    interestRate?: string;
+    loanTenure?: string;
+  };
+}
 
-const financialData: FinancialItem[] = [
-  {
-    label: "Property Price",
-    value: "₹45,00,000",
-    color: "#C73834",
-  },
-  {
-    label: "Down Payment",
-    value: "₹13,50,000",
-    subtext: "30.0% of price",
-    color: "#767676",
-  },
-  {
-    label: "Loan Amount",
-    value: "₹31,50,000",
-    subtext: "70.0% financed",
-    color: "#26BFCC",
-  },
-  {
-    label: "Monthly EMI",
-    value: "₹29,362.132",
-    subtext: "@9.5% for 20 years",
-    color: "#429482",
-  },
-  {
-    label: "Total Interest",
-    value: "₹38,96,911.78",
-    subtext: "Over 20 years",
-    color: "#F7C952",
-  },
-];
-
-const FinancialDetails: React.FC = () => {
+const FinancialDetails = ({ data }: FinancialDetailsProps) => {
   const { width } = useWindowDimensions();
 
-  // Desktop breakpoint
   const isDesktop = width >= 1024;
   const isTablet = width >= 768;
 
+  const financialData = [
+    {
+      label: "Property Price",
+      value: `₹${data?.propertyPrice?.toLocaleString('en-IN') || '0'}`,
+      color: "#C73834",
+    },
+    {
+      label: "Down Payment",
+      value: `₹${data?.downPayment?.toLocaleString('en-IN') || '0'}`,
+      subtext: data?.propertyPrice ? `${((data.downPayment! / data.propertyPrice) * 100).toFixed(1)}% of price` : "0% of price",
+      color: "#767676",
+    },
+    {
+      label: "Loan Amount",
+      value: `₹${data?.loanAmount?.toLocaleString('en-IN') || '0'}`,
+      subtext: data?.propertyPrice ? `${((data.loanAmount! / data.propertyPrice) * 100).toFixed(1)}% financed` : "0% financed",
+      color: "#26BFCC",
+    },
+    {
+      label: "Monthly EMI",
+      value: `₹${data?.monthlyEMI?.toLocaleString('en-IN', { maximumFractionDigits: 2 }) || '0'}`,
+      subtext: `@${data?.interestRate || '0'}% for ${data?.loanTenure || '0'} years`,
+      color: "#429482",
+    },
+    {
+      label: "Total Interest",
+      value: `₹${data?.totalLoanInterest?.toLocaleString('en-IN', { maximumFractionDigits: 2 }) || '0'}`,
+      subtext: `Over ${data?.loanTenure || '0'} years`,
+      color: "#F7C952",
+    },
+  ];
+
   const getCardWidth = () => {
-    if (isDesktop) return "20%"; // 5 cards in row
-    if (isTablet) return "33.33%"; // 3 cards
-    return "50%"; // mobile 2 cards
+    if (isDesktop) return "19%";
+    if (isTablet) return "32%";
+    return "48%";
   };
 
   return (
@@ -98,12 +102,14 @@ const styles = StyleSheet.create({
   flexWrap: {
     flexDirection: "row",
     flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   card: {
     backgroundColor: "#fff",
     padding: 14,
     borderRadius: 10,
     marginBottom: 14,
+    marginRight: 10,
     elevation: 4, // android shadow
     shadowColor: "#000",
     shadowOpacity: 0.15,
@@ -112,17 +118,17 @@ const styles = StyleSheet.create({
   },
   label: {
     color: "#767676",
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "700",
     marginBottom: 6,
   },
   value: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: "800",
     marginBottom: 4,
   },
   subtext: {
     color: "#767676",
-    fontSize: 14,
+    fontSize: 16,
   },
 });
