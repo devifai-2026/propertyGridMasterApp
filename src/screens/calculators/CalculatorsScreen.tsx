@@ -99,17 +99,17 @@ const CalculatorsScreen = () => {
               style={[
                 styles.heroImage,
                 isDesktop
-                      ? {
-                          width: '58%',
-                          height: 620,
-                          position: 'absolute',
-                          right: -52,
-                          top: -120,
-                        }
-                      : { width: 350, height: 250 },
-                  ]}
-                  resizeMode="fill"
-                />
+                  ? {
+                    width: '44%',       // ← slightly narrower
+                    height: 688,        // ← reduced from 500
+                    position: 'absolute',
+                    right: -20,
+                    top: -119,
+                  }
+                  : { width: 350, height: 250 },
+              ]}
+              resizeMode="fill"
+            />
           </View>
         </View>
 
@@ -133,7 +133,7 @@ const CalculatorsScreen = () => {
               style={[
                 styles.tabText,
                 activeTab === 'roi' && styles.activeTabText,
-                isDesktop && { fontSize: 24 },
+                isDesktop && { fontSize: 16 },
               ]}
             >
               ROI & Rental Yield Calculator
@@ -155,7 +155,7 @@ const CalculatorsScreen = () => {
               style={[
                 styles.tabText,
                 activeTab === 'emi' && styles.activeTabText,
-                isDesktop && { fontSize: 24 },
+                isDesktop && { fontSize: 16 },
               ]}
             >
               EMI Calculator
@@ -186,15 +186,15 @@ const InfoCardsSummary = ({ type }: { type: 'roi' | 'emi' }) => {
   const cards =
     type === 'roi'
       ? [
-          'Get clarity on your\nmonthly or annual yield.',
-          'Compare ROI across different properties or investments.',
-          'Adjust variables like rent,\npurchase price, and taxes to see\nimpact in real time',
-        ]
+        'Get clarity on your\nmonthly or annual yield.',
+        'Compare ROI across different properties or investments.',
+        'Adjust variables like rent,\npurchase price, and taxes to see\nimpact in real time',
+      ]
       : [
-          'Understand your\nmonthly EMI with ease',
-          'Compare EMIs across different\nloan structures or interest rates',
-          'Adjust variables like loan\namount, tenure, and more to see\nimpacts in real time',
-        ];
+        'Understand your\nmonthly EMI with ease',
+        'Compare EMIs across different\nloan structures or interest rates',
+        'Adjust variables like loan\namount, tenure, and more to see\nimpacts in real time',
+      ];
 
   return (
     <View style={styles.infoCardsGrid}>
@@ -211,17 +211,17 @@ const CalculatorHeader = ({ type }: { type: 'roi' | 'emi' }) => {
   const headerData =
     type === 'roi'
       ? {
-          icon: <Calculator size={32} color="#fff" />,
-          title: 'Property Investment ROI Calculator',
-          subtitle:
-            'Get clarity on your monthly or annual yield using rent,\n purchase price, and taxes.',
-        }
+        icon: <Calculator size={32} color="#fff" />,
+        title: 'Property Investment ROI Calculator',
+        subtitle:
+          'Get clarity on your monthly or annual yield using rent,\n purchase price, and taxes.',
+      }
       : {
-          icon: <Calculator size={32} color="#fff" />,
-          title: 'Property EMI Calculator',
-          subtitle:
-            'Estimate your monthly loan repayment instantly based on loan amount,\n tenure, interest rate, and other key factors.',
-        };
+        icon: <Calculator size={32} color="#fff" />,
+        title: 'Property EMI Calculator',
+        subtitle:
+          'Estimate your monthly loan repayment instantly based on loan amount,\n tenure, interest rate, and other key factors.',
+      };
 
   return (
     <View style={styles.calcHeader}>
@@ -263,10 +263,10 @@ const Dropdown = ({
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <View 
+    <View
       style={[
-        styles.dropdownContainer, 
-        row && styles.dropdownRow, 
+        styles.dropdownContainer,
+        row && styles.dropdownRow,
         { zIndex: isOpen ? 10000 : 1 }
       ]}
     >
@@ -353,34 +353,34 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
     const carpetArea = parseFloat(formData.carpetArea) || 0;
     const monthlyRent = parseFloat(formData.monthlyRent.replace(/,/g, '')) || 0;
     const securityDeposit = parseFloat(formData.securityDeposit.replace(/,/g, '')) || 0;
-    
+
     // Recurring Annual Expenses
     const propertyTax = parseFloat(formData.propertyTax.replace(/,/g, '')) || 0;
     const insurance = parseFloat(formData.insurance.replace(/,/g, '')) || 0;
     const maintenancePerSqft = parseFloat(formData.maintenancePerSqft) || 0;
     const maintenanceLumpSum = parseFloat(formData.maintenanceLumpSum.replace(/,/g, '')) || 0;
-    
+
     const annualMaintenance = (maintenancePerSqft * carpetArea * 12) + maintenanceLumpSum;
     const totalAnnualExpenses = propertyTax + insurance + annualMaintenance;
-    
+
     // One-time Costs
     const stampDutyPct = parseFloat(formData.stampDuty) || 0;
     const stampDuty = (stampDutyPct * purchasePrice) / 100;
     const legalFees = parseFloat(formData.legalFees.replace(/,/g, '')) || 0;
     const brokerage = parseFloat(formData.brokerage.replace(/,/g, '')) || 0;
     const otherCosts = parseFloat(formData.otherCosts.replace(/,/g, '')) || 0;
-    
+
     const totalAcquisitionCosts = stampDuty + legalFees + brokerage + otherCosts;
     const totalInvestment = purchasePrice + totalAcquisitionCosts;
-    
+
     const annualGrossRent = monthlyRent * 12;
     const annualNetIncome = annualGrossRent - totalAnnualExpenses;
-    
+
     const grossYield = purchasePrice > 0 ? (annualGrossRent / purchasePrice) * 100 : 0;
     const netYield = totalInvestment > 0 ? (annualNetIncome / totalInvestment) * 100 : 0;
-    
+
     const paybackPeriod = annualNetIncome > 0 ? (totalInvestment / annualNetIncome) : 0;
-    
+
     const securityDepositInterestPct = 5; // Assuming 5% annual interest on security deposit
     const annualSecurityDepositInterest = (securityDeposit * securityDepositInterestPct) / 100;
     const totalAnnualReturn = annualNetIncome + annualSecurityDepositInterest;
@@ -799,26 +799,26 @@ const EMICalculatorView = () => {
     const loanAmount = parseFloat(formData.loanAmount.replace(/,/g, '')) || 0;
     const rateMonth = (parseFloat(formData.interestRate) || 0) / 12 / 100;
     const months = (parseFloat(formData.loanTenure) || 0) * 12;
-    
+
     let monthlyEMI = 0;
     if (rateMonth > 0 && months > 0) {
       monthlyEMI = (loanAmount * rateMonth * Math.pow(1 + rateMonth, months)) / (Math.pow(1 + rateMonth, months) - 1);
     }
-    
+
     const totalPayment = monthlyEMI * months;
     const totalInterest = totalPayment - loanAmount;
-    
+
     setResults({
-        monthlyEMI,
-        totalInterest,
-        totalPayment,
-        loanAmount,
-        interestRate: formData.interestRate,
-        loanTenure: formData.loanTenure,
-        downPayment: parseFloat(formData.downPayment.replace(/,/g, '')) || 0,
-        propertyPrice: parseFloat(formData.purchasePrice.replace(/,/g, '')) || 0,
-        principalPaid: loanAmount, // For charts
-        interestPaid: totalInterest,
+      monthlyEMI,
+      totalInterest,
+      totalPayment,
+      loanAmount,
+      interestRate: formData.interestRate,
+      loanTenure: formData.loanTenure,
+      downPayment: parseFloat(formData.downPayment.replace(/,/g, '')) || 0,
+      propertyPrice: parseFloat(formData.purchasePrice.replace(/,/g, '')) || 0,
+      principalPaid: loanAmount, // For charts
+      interestPaid: totalInterest,
     });
   };
 
@@ -1164,8 +1164,8 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
     minHeight: '100%',
-    paddingBottom: 40,
-  },
+    paddingBottom: 40,  
+},
   heroSection: {
     padding: 20,
     position: 'relative',
@@ -1179,6 +1179,7 @@ const styles = StyleSheet.create({
     bottom: 0, // Ensure full vertical coverage
     resizeMode: 'cover',
     opacity: 1,
+    minHeight: 593
   },
   heroContent: {
     flexDirection: 'row',
@@ -1187,7 +1188,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingLeft: '8%',
     paddingRight: 0,
-    minHeight: 700, // Increased to accommodate the oversized banner
+    minHeight: 380,
   },
   heroTextContainer: {
     flex: 1,
@@ -1205,62 +1206,62 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 5,
-    height: 92,
-    width: 92,
+    height: 70,
+    width: 70,
   },
   heroStatsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 15,
-    marginTop: 30,
+    gap: 10,
+    marginTop: 20,
   },
   heroStatCard: {
     backgroundColor: '#fff',
-    padding: 15,
+    padding: 12,
     borderRadius: 12,
-    minWidth: 200,
+    minWidth: 160,
     shadowColor: '#000',
     shadowOpacity: 0.10,
     shadowRadius: 10,
     elevation: 3,
   },
   heroStatLabel: {
-    fontSize: 18,
+    fontSize: 15,
     color: '#767676',
     fontWeight: '600',
-    marginBottom: 5,
-    textAlign:'center',
+    marginBottom: 3,
+    textAlign: 'center',
   },
   heroStatValue: {
-    fontSize: 20,
+    fontSize: 16,
     color: '#EE2529',
     fontWeight: 400,
-    textAlign:'center',
+    textAlign: 'center',
   },
   badgeContainer: {
     backgroundColor: '#FFF3CA',
-    paddingHorizontal: 20,
-    paddingVertical: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 3,
     borderRadius: 20,
     alignSelf: 'flex-start',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   badgeText: {
-    fontSize: 18,
+    fontSize: 15,
     color: '#767676',
     fontWeight: 400,
   },
   heroTitle: {
-    fontSize: 32,
+    fontSize: 25,
     fontWeight: 'bold',
     color: '#262626',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   heroSubtitle: {
-    fontSize: 22,
+    fontSize: 18,
     color: '#666',
-    marginBottom: 20,
-    lineHeight: 32,
+    marginBottom: 12,
+    lineHeight: 20,
     fontWeight: 400,
     maxWidth: 800,
   },
@@ -1293,7 +1294,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   heroImage: {
-    width: 300,
+    width: 400,
     height: 200,
     alignSelf: 'center',
     resizeMode: 'contain',
@@ -1302,7 +1303,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 40,
+    marginVertical: 0,
+    marginTop: 155,
     backgroundColor: '#fff',
     borderRadius: 25,
     shadowColor: '#000',
@@ -1313,13 +1315,15 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     padding: 0,
     overflow: 'hidden',
+    position: 'relative',
+    zIndex: 10,
   },
   tabItem: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: 12,
     position: 'relative',
-    gap: 8,
+    gap: 6,
   },
   tabIconBox: {
     width: 32,
@@ -1333,7 +1337,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#EE2529',
   },
   tabText: {
-    fontSize: 26,
+    fontSize: 14,
     color: '#767676',
     fontWeight: '700',
   },
@@ -1361,17 +1365,17 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   calcTitle: {
-    fontSize: 30,
+    fontSize: 20,
     fontWeight: '700',
-    marginBottom: 20,
+    marginBottom: 14,
     color: '#333',
     textAlign: 'center',
   },
   sectionCard: {
     backgroundColor: '#fff',
     borderRadius: 20,
-    padding: 22,
-    marginBottom: 18,
+    padding: 14,
+    marginBottom: 12,
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 12,
@@ -1387,10 +1391,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#EE2529',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   sectionNote: {
     color: '#6B7280',
@@ -1405,8 +1409,8 @@ const styles = StyleSheet.create({
   },
   gridRow: {
     flexDirection: 'row',
-    gap: 48,
-    marginBottom: 16,
+    gap: 20,
+    marginBottom: 10,
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
   },
@@ -1440,7 +1444,7 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   label: {
-    fontSize: 18,
+    fontSize: 13,
     marginBottom: 0,
     color: '#555',
     fontWeight: '400',
@@ -1452,13 +1456,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F6F6F6',
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 18,
-    fontSize: 18,
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    fontSize: 13,
     color: '#111827',
     fontWeight: '600',
-    minHeight: 56,
+    minHeight: 40,
     textAlign: 'right',
     ...Platform.select({
       web: {
@@ -1497,25 +1501,25 @@ const styles = StyleSheet.create({
   },
   calculateBtn: {
     backgroundColor: '#EE2529',
-    padding: 15,
+    padding: 10,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 30,
+    marginTop: 8,
+    marginBottom: 20,
     shadowColor: '#EE2529',
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 5,
-    maxWidth: 300,
+    maxWidth: 250,
     alignSelf: 'center',
   },
   calculateBtnText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: 'bold',
   },
   dropdownContainer: {
-    marginBottom: 20,
+    marginBottom: 12,
     zIndex: 9999,
     width: '100%',
   },
@@ -1537,16 +1541,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#F6F6F6',
     borderWidth: 1,
     borderColor: '#E5E7EB',
-    borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 18,
-    minHeight: 56,
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    minHeight: 40,
   },
   dropdownHeaderRow: {
     flex: 1,
   },
   dropdownHeaderText: {
-    fontSize: 18,
+    fontSize: 13,
     color: '#111827',
     fontWeight: '600',
   },
@@ -1586,17 +1590,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 20,
-    marginBottom: 60,
-    marginTop: 10,
+    gap: 12,
+    marginBottom: 30,
+    marginTop: 8,
     width: '100%',
-    maxWidth: '72%', 
+    maxWidth: '72%',
     alignSelf: 'center',
   },
   infoSummaryCard: {
     flex: 1,
-    minWidth: 150,
-    padding: 15,
+    minWidth: 120,
+    padding: 10,
     backgroundColor: '#fff',
     borderRadius: 8,
     borderBottomWidth: 3,
@@ -1609,8 +1613,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   infoSummaryText: {
-    fontSize: 22,
-    lineHeight: 28,
+    fontSize: 13,
+    lineHeight: 18,
     color: '#767676',
     fontWeight: '600',
     textAlign: 'center',
@@ -1644,18 +1648,18 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   calcHeaderIconBox: {
-    width: 70,
-    height: 70,
-    borderRadius: 18,
+    width: 50,
+    height: 50,
+    borderRadius: 12,
     backgroundColor: '#EE2529',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 14,
+    marginBottom: 10,
   },
   calcSubtitle: {
-    fontSize: 24,
+    fontSize: 13,
     fontWeight: '400',
-    lineHeight: 28,
+    lineHeight: 18,
     color: '#6B7280',
     textAlign: 'center',
     maxWidth: '85%',
