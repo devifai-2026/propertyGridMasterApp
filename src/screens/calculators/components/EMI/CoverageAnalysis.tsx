@@ -17,8 +17,9 @@ const CoverageAnalysis: React.FC = () => {
     <View style={styles.container}>
       <Text style={styles.heading}>Year-by-Year Loan Coverage Analysis</Text>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator>
-        <View>
+      <View style={styles.tableWrapper}>
+        <ScrollView horizontal showsHorizontalScrollIndicator>
+          <View style={styles.tableContainer}>
           {/* Header */}
           <View style={[styles.row, styles.headerRow]}>
             {[
@@ -68,8 +69,9 @@ const CoverageAnalysis: React.FC = () => {
               </Text>
             </View>
           ))}
-        </View>
-      </ScrollView>
+          </View>
+        </ScrollView>
+      </View>
 
       {/* Buttons */}
       <View style={[styles.buttonContainer, isDesktop && { marginTop: 30 }]}>
@@ -92,7 +94,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     backgroundColor: '#fff',
-    padding: 16,
+    padding: 0,
   },
   heading: {
     textAlign: 'center',
@@ -100,6 +102,18 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 20,
     color: '#262626',
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  tableWrapper: {
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tableContainer: {
+    alignSelf: 'center',
   },
   row: {
     flexDirection: 'row',
@@ -139,7 +153,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     gap: 12,
-    marginTop: 20,
+    marginTop: 30,
+    paddingHorizontal: 16,
+    paddingBottom: 20,
   },
   button: {
     borderWidth: 1,

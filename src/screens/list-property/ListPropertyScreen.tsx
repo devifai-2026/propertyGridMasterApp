@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   Platform,
   useWindowDimensions,
+  ImageBackground,
 } from 'react-native';
 import {
   User,
@@ -25,6 +26,7 @@ import {
   AlertTriangle,
 } from 'lucide-react-native';
 import { Alert, ActivityIndicator } from 'react-native';
+import bannerBg from "../../assets/listProperty/bannerBg.png"
 
 import Layout from '../../layout/Layout';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
@@ -35,6 +37,7 @@ import BasicDetails from './components/BasicDetails';
 import LegalDetails from './components/LegalDetails';
 import LeaseDetails from './components/LeaseDetails';
 import FinancialDetails from './components/FinancialDetails';
+import { FONTS } from '../../constants/theme';
 import LocationDetails from './components/LocationDetails';
 
 const STEPS = [
@@ -558,8 +561,10 @@ const ListPropertyScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         {/* Hero Section */}
-        <View
+        <ImageBackground
+          source={bannerBg}
           style={[styles.heroSection, isMobile && styles.heroSectionMobile]}
+          resizeMode="cover"
         >
           <Text style={[styles.heroTitle, isMobile && styles.heroTitleMobile]}>
             {isEditMode ? 'Edit Your Property' : 'List Your Property'}
@@ -569,7 +574,7 @@ const ListPropertyScreen = () => {
           >
             {isEditMode
               ? 'Update your property details to keep investors informed'
-              : 'Connect with serious investors looking for pre-leased commercial properties across India'}
+              : 'Connect with serious investors looking for pre-leased commercial\n properties across India'}
           </Text>
           <TouchableOpacity
             style={[
@@ -593,7 +598,7 @@ const ListPropertyScreen = () => {
               />
             </View>
           </TouchableOpacity>
-        </View>
+        </ImageBackground>
 
         {/* Dynamic Stepper Cards */}
         <View style={styles.stepperWrapper}>
@@ -669,6 +674,17 @@ const ListPropertyScreen = () => {
             </View>
           )}
           <View style={[styles.formCard, isMobile && styles.formCardMobile]}>
+            <View style={styles.badgeRow}>
+              <View style={styles.wizardStepBadge}>
+                <Text style={styles.wizardStepText}>Step {currentStep} of 6</Text>
+              </View>
+              <View style={styles.wizardProgressBadge}>
+                <Text style={styles.wizardStepText}>
+                  {Math.round((currentStep / 6) * 100)}% complete
+                </Text>
+              </View>
+            </View>
+
             {initialLoading ? (
               <View style={styles.loadingContainer}>
                 <ActivityIndicator size="large" color="#EE2529" />
@@ -677,7 +693,9 @@ const ListPropertyScreen = () => {
                 </Text>
               </View>
             ) : (
-              renderStep()
+              <View style={{ marginTop: 60 }}>
+                {renderStep()}
+              </View>
             )}
           </View>
         </View>
@@ -730,11 +748,9 @@ const ListPropertyScreen = () => {
                       ? isEditMode
                         ? 'Update Property'
                         : 'List Property'
-                      : 'Next Step'}
+                      : 'Next'}
                   </Text>
-                  {currentStep < 6 && (
-                    <ChevronRight size={isMobile ? 18 : 20} color="#FFF" />
-                  )}
+                 
                 </>
               )}
             </TouchableOpacity>
@@ -760,33 +776,37 @@ const styles = StyleSheet.create({
     marginTop: 16,
     color: '#666',
     fontWeight: '600',
+    fontFamily: FONTS.main,
   },
   heroSection: {
     alignItems: 'center',
-    paddingVertical: 40,
-    backgroundColor: '#FFF',
+    paddingVertical: 100,
+    width: '100%',
   },
   heroSectionMobile: {
     paddingVertical: 24,
   },
   heroTitle: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#000',
+    fontSize: 56,
+    fontWeight: '700',
+    color: '#262626',
     marginBottom: 10,
     textAlign: 'center',
+    lineHeight: 64,
+    fontFamily: FONTS.main,
   },
   heroTitleMobile: {
     fontSize: 22,
     marginBottom: 8,
   },
   heroSubtext: {
-    fontSize: 14,
+    fontSize: 20,
     color: '#767676',
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 32,
     paddingHorizontal: 20,
     marginBottom: 20,
+    fontFamily: FONTS.main,
   },
   heroSubtextMobile: {
     fontSize: 13,
@@ -799,8 +819,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#EE2529',
     paddingLeft: 20,
-    paddingRight: 6,
-    paddingVertical: 6,
+    paddingRight: 8,
+    paddingVertical: 12,
     borderRadius: 30,
     shadowColor: '#EE2529',
     shadowOffset: { width: 0, height: 4 },
@@ -815,9 +835,10 @@ const styles = StyleSheet.create({
   },
   bulkUploadText: {
     color: '#FFF',
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '600',
     marginRight: 10,
+    fontFamily: FONTS.main,
   },
   bulkUploadTextMobile: {
     fontSize: 12,
@@ -856,7 +877,7 @@ const styles = StyleSheet.create({
   stepCard: {
     backgroundColor: '#FFF',
     width: '100%',
-    height: 100,
+    height: 140,
     borderRadius: 12,
     borderTopWidth: 4,
     alignItems: 'center',
@@ -866,12 +887,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 12,
     elevation: 3,
-    padding: 10,
+    padding: 12,
   },
   stepCardMobile: {
-    height: 85,
+    height: 100,
     borderRadius: 10,
-    padding: 8,
+    padding: 10,
   },
   stepCardCurrent: {
     shadowOpacity: 0.15,
@@ -879,10 +900,11 @@ const styles = StyleSheet.create({
     transform: [{ scale: 1.02 }],
   },
   stepCardLabel: {
-    fontSize: 12,
+    fontSize: 18,
     fontWeight: '700',
     textAlign: 'center',
     marginTop: 8,
+    fontFamily: FONTS.main,
   },
   stepCardLabelMobile: {
     fontSize: 10,
@@ -958,6 +980,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontSize: 15,
     marginLeft: 4,
+    fontFamily: FONTS.main,
   },
   backBtnTextMobile: {
     fontSize: 13,
@@ -966,20 +989,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#EE2529',
     flex: 0,
     flexGrow: 1,
-    maxWidth: 300,
+    maxWidth: 150,
     marginLeft: 16,
   },
   nextBtnDisabled: {
     backgroundColor: '#FFCDD2',
   },
   nextBtnText: {
-    color: '#FFF',
-    fontWeight: '700',
-    fontSize: 15,
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 18,
     marginRight: 4,
+    fontFamily: 'Montserrat',
   },
   nextBtnTextMobile: {
-    fontSize: 13,
+    fontSize: 18,
   },
   btnHidden: {
     opacity: 0,
@@ -1002,6 +1026,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     flex: 1,
+    fontFamily: FONTS.main,
   },
   errorActionBtn: {
     backgroundColor: '#EE2529',
@@ -1014,6 +1039,34 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 12,
     fontWeight: '700',
+    fontFamily: FONTS.main,
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    position: 'absolute',
+    top: 25,
+    paddingHorizontal: 30,
+    zIndex: 10,
+  },
+  wizardStepBadge: {
+    backgroundColor: '#FFF3CA',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 100,
+  },
+  wizardProgressBadge: {
+    backgroundColor: '#FFF3CA',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 100,
+  },
+  wizardStepText: {
+    fontFamily: FONTS.main,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#8B7B3E',
   },
 });
 

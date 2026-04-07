@@ -182,9 +182,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF5F5',
   },
   dropdownText: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#333',
     flex: 1,
+    fontFamily: 'Montserrat',
   },
   placeholderText: {
     color: '#999',
@@ -221,9 +222,10 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 18,
     color: '#333',
     paddingVertical: 5,
+    fontFamily: 'Montserrat',
   },
   optionsList: {
     maxHeight: 250,
@@ -240,9 +242,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFEBEE',
   },
   optionText: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#333',
     flex: 1,
+    fontFamily: 'Montserrat',
   },
   optionTextSelected: {
     color: '#EE2529',

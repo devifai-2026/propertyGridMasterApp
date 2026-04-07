@@ -5,11 +5,13 @@ import {
   useWindowDimensions,
   StyleSheet,
   Alert,
+  TouchableOpacity,
 } from 'react-native';
 import { useNavigation } from '../../../context/NavigationContext';
 import { COLORS } from '../../../constants/theme';
 import PropertyCard, { Property } from '../../../components/PropertyCard';
 import CompareBanner from './CompareBanner';
+import LinearGradient from 'react-native-linear-gradient';
 
 const FEATURED_PROPERTIES: Property[] = [
   {
@@ -78,7 +80,7 @@ const FeaturedSection = ({ properties }: { properties: any[] }) => {
   const containerPadding = width < 768 ? 9 : 10;
   const availableWidth = width - containerPadding * 2;
   const gap = 20;
-  
+
   let cols = 3;
   if (width < 768) cols = 1;
   else if (width < 900) cols = 2;
@@ -88,30 +90,30 @@ const FeaturedSection = ({ properties }: { properties: any[] }) => {
   const displayProperties: Property[] =
     properties && properties.length > 0
       ? properties.slice(0, 3).map((p: any) => ({
-          id: p.propertyId,
-          title: p.propertyType || 'Property',
-          location: `${p.city || ''}, ${p.state || ''}`,
-          price: p.sellingPrice ? `₹${p.sellingPrice} Cr` : 'N/A',
-          rent:
-            parseFloat(p.totalMonthlyRent) > 0
-              ? `₹${p.totalMonthlyRent}`
-              : parseFloat(p.rentPerSqftMonthly) > 0
+        id: p.propertyId,
+        title: p.propertyType || 'Property',
+        location: `${p.city || ''}, ${p.state || ''}`,
+        price: p.sellingPrice ? `₹${p.sellingPrice} Cr` : 'N/A',
+        rent:
+          parseFloat(p.totalMonthlyRent) > 0
+            ? `₹${p.totalMonthlyRent}`
+            : parseFloat(p.rentPerSqftMonthly) > 0
               ? `₹${p.rentPerSqftMonthly} / sq ft`
               : 'N/A',
-          tenure: p.leaseDurationYears
-            ? `${parseFloat(p.leaseDurationYears).toFixed(1)} Yrs`
-            : 'N/A',
-          roi: p.grossRentalYield ? `${p.grossRentalYield}%` : 'N/A',
-          type: p.propertyType,
-          images:
-            p.media && p.media.length > 0
-              ? p.media.map((m: any) => m.fileUrl)
-              : null,
-          badges: p.tenantType ? [p.tenantType] : [],
-          isVerified: p.isVerified,
-          verified: p.isVerified === 'partial' || p.isVerified === 'completed',
-          raw: p,
-        }))
+        tenure: p.leaseDurationYears
+          ? `${parseFloat(p.leaseDurationYears).toFixed(1)} Yrs`
+          : 'N/A',
+        roi: p.grossRentalYield ? `${p.grossRentalYield}%` : 'N/A',
+        type: p.propertyType,
+        images:
+          p.media && p.media.length > 0
+            ? p.media.map((m: any) => m.fileUrl)
+            : null,
+        badges: p.tenantType ? [p.tenantType] : [],
+        isVerified: p.isVerified,
+        verified: p.isVerified === 'partial' || p.isVerified === 'completed',
+        raw: p,
+      }))
       : [];
 
   const handleToggleCompare = (property: Property) => {
@@ -138,6 +140,10 @@ const FeaturedSection = ({ properties }: { properties: any[] }) => {
     const ids = selectedProperties.map(p => p.id).join(',');
     // Navigate to compare screen with IDs
     navigate(`/compare/${ids}`);
+  };
+
+  const handleEnquire = () => {
+    navigate('/explore-properties');
   };
 
   return (
@@ -172,23 +178,39 @@ const FeaturedSection = ({ properties }: { properties: any[] }) => {
           />
         ))}
       </View>
+      <View style={styles.explorePropertyWrapper}>
+        <TouchableOpacity
+          onPress={handleEnquire}
+          style={styles.explorePropertyBtn}
+        >
+          <LinearGradient
+            colors={['#EE2529', '#C73834']}
+            start={{ x: 0.0159, y: 0.5 }}
+            end={{ x: 0.972, y: 0.5 }}
+            style={styles.explorePropertyGradient}
+          >
+            <Text style={styles.explorePropertyText}>Explore Properties</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   featuredSection: {
-    backgroundColor: COLORS.background,
+    backgroundColor: '#F2F2F2',
     paddingVertical: 60,
     alignItems: 'center',
     marginTop: 60,
   },
   sectionTitle: {
-    fontWeight: '400',
+    fontWeight: '300',
     color: '#262626',
     marginBottom: 40,
     textAlign: 'center',
     fontSize: 42,
+    // fontStyle: 'normal',
   },
   stickyBannerWrapper: {
     position: 'absolute',
@@ -204,6 +226,28 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: '100%',
     justifyContent: 'center',
+  },
+  explorePropertyWrapper: {
+    marginTop: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  explorePropertyBtn: {
+    borderRadius: 5,
+    overflow: 'hidden',
+  },
+  explorePropertyGradient: {
+    paddingVertical: 15,
+    paddingHorizontal: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 5,
+  },
+  explorePropertyText: {
+    fontFamily: 'Montserrat',
+    color: COLORS.white,
+    fontWeight: '600',
+    fontSize: 15,
   },
 });
 

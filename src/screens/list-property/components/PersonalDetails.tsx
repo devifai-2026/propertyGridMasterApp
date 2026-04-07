@@ -360,211 +360,236 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
           </View>
         </View>
 
-        <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={[
-              styles.input,
-              touched.email && errors.email && styles.inputError,
-            ]}
-            value={formData.email}
-            onChangeText={text => handleChange('email', text)}
-            placeholder="Enter Email Address"
-            placeholderTextColor="#999"
-            keyboardType="email-address"
-            onBlur={(e: any) => handleBlur('email', e.nativeEvent.text)}
-          />
-          {touched.email && errors.email && (
-            <View style={styles.errorRow}>
-              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
-              <Text style={styles.errorText}>{errors.email}</Text>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.fieldContainer}>
-          <Text style={styles.label}>List Property Under *</Text>
-          <View
-            style={[styles.radioGroup, isEditMode && styles.radioGroupDisabled]}
-          >
-            <TouchableOpacity
-              style={styles.radioButton}
-              onPress={() => !isEditMode && handleChange('listUnder', 'broker')}
-              disabled={isEditMode}
-            >
-              <View
-                style={[
-                  styles.radioCircle,
-                  formData.listUnder === 'broker' && styles.radioActive,
-                  isEditMode && styles.radioCircleDisabled,
-                ]}
-              >
-                {formData.listUnder === 'broker' && (
-                  <View
-                    style={[
-                      styles.radioInner,
-                      isEditMode && styles.radioInnerDisabled,
-                    ]}
-                  />
-                )}
-              </View>
-              <Text
-                style={[
-                  styles.radioLabel,
-                  isEditMode && styles.radioLabelDisabled,
-                ]}
-              >
-                Broker
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.radioButton}
-              onPress={() => !isEditMode && handleChange('listUnder', 'owner')}
-              disabled={isEditMode}
-            >
-              <View
-                style={[
-                  styles.radioCircle,
-                  formData.listUnder === 'owner' && styles.radioActive,
-                  isEditMode && styles.radioCircleDisabled,
-                ]}
-              >
-                {formData.listUnder === 'owner' && (
-                  <View
-                    style={[
-                      styles.radioInner,
-                      isEditMode && styles.radioInnerDisabled,
-                    ]}
-                  />
-                )}
-              </View>
-              <Text
-                style={[
-                  styles.radioLabel,
-                  isEditMode && styles.radioLabelDisabled,
-                ]}
-              >
-                Owner
-              </Text>
-            </TouchableOpacity>
-          </View>
-          {touched.listUnder && errors.listUnder && (
-            <View style={styles.errorRow}>
-              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
-              <Text style={styles.errorText}>{errors.listUnder}</Text>
-            </View>
-          )}
-        </View>
-
-        <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Mobile Number *</Text>
-          <View
-            style={[
-              styles.mobileInputContainer,
-              isMobile && styles.mobileInputContainerMobile,
-            ]}
-          >
+        <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>Email</Text>
             <TextInput
               style={[
                 styles.input,
-                styles.mobileInput,
-                touched.mobile && errors.mobile && styles.inputError,
+                touched.email && errors.email && styles.inputError,
               ]}
-              value={formData.mobile}
-              onChangeText={handleMobileChange}
-              placeholder="98765-43210"
+              value={formData.email}
+              onChangeText={text => handleChange('email', text)}
+              placeholder="Enter Email Address"
               placeholderTextColor="#999"
-              keyboardType="phone-pad"
-              maxLength={11}
-              onBlur={(e: any) => handleBlur('mobile', e.nativeEvent.text)}
-              editable={!isOtpVerified}
+              keyboardType="email-address"
+              onBlur={(e: any) => handleBlur('email', e.nativeEvent.text)}
             />
-            <TouchableOpacity
-              style={[
-                styles.otpBtn,
-                isMobile && styles.otpBtnMobile,
-                (mobileNumberRaw.length !== 10 || (otpSent && isOtpVerified)) &&
-                  styles.otpBtnDisabled,
-              ]}
-              onPress={handleSendOtp}
-              disabled={
-                mobileNumberRaw.length !== 10 || (otpSent && isOtpVerified)
-              }
-            >
-              <Text
-                style={[styles.otpBtnText, isMobile && styles.otpBtnTextMobile]}
-              >
-                {isOtpVerified
-                  ? 'Verified'
-                  : otpSent
-                  ? 'Resend OTP'
-                  : 'Send OTP'}
-              </Text>
-              {apiLoading && otpSent && !isOtpVerified && (
-                <View style={styles.loadingIndicator} />
-              )}
-            </TouchableOpacity>
+            {touched.email && errors.email && (
+              <View style={styles.errorRow}>
+                <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
+                <Text style={styles.errorText}>{errors.email}</Text>
+              </View>
+            )}
           </View>
-          {touched.mobile && errors.mobile && (
-            <View style={styles.errorRow}>
-              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
-              <Text style={styles.errorText}>{errors.mobile}</Text>
+
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>List Property Under *</Text>
+            <View
+              style={[
+                styles.radioGroup,
+                isEditMode && styles.radioGroupDisabled,
+              ]}
+            >
+              <TouchableOpacity
+                style={styles.radioButton}
+                onPress={() =>
+                  !isEditMode && handleChange('listUnder', 'broker')
+                }
+                disabled={isEditMode}
+              >
+                <View
+                  style={[
+                    styles.radioCircle,
+                    formData.listUnder === 'broker' && styles.radioActive,
+                    isEditMode && styles.radioCircleDisabled,
+                  ]}
+                >
+                  {formData.listUnder === 'broker' && (
+                    <View
+                      style={[
+                        styles.radioInner,
+                        isEditMode && styles.radioInnerDisabled,
+                      ]}
+                    />
+                  )}
+                </View>
+                <Text
+                  style={[
+                    styles.radioLabel,
+                    isEditMode && styles.radioLabelDisabled,
+                  ]}
+                >
+                  Broker
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.radioButton}
+                onPress={() =>
+                  !isEditMode && handleChange('listUnder', 'owner')
+                }
+                disabled={isEditMode}
+              >
+                <View
+                  style={[
+                    styles.radioCircle,
+                    formData.listUnder === 'owner' && styles.radioActive,
+                    isEditMode && styles.radioCircleDisabled,
+                  ]}
+                >
+                  {formData.listUnder === 'owner' && (
+                    <View
+                      style={[
+                        styles.radioInner,
+                        isEditMode && styles.radioInnerDisabled,
+                      ]}
+                    />
+                  )}
+                </View>
+                <Text
+                  style={[
+                    styles.radioLabel,
+                    isEditMode && styles.radioLabelDisabled,
+                  ]}
+                >
+                  Owner
+                </Text>
+              </TouchableOpacity>
             </View>
+            {touched.listUnder && errors.listUnder && (
+              <View style={styles.errorRow}>
+                <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
+                <Text style={styles.errorText}>{errors.listUnder}</Text>
+              </View>
+            )}
+          </View>
+        </View>
+
+        <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
+          <View style={styles.fieldContainer}>
+            <Text style={styles.label}>Mobile Number *</Text>
+            <View
+              style={[
+                styles.mobileInputContainer,
+                isMobile && styles.mobileInputContainerMobile,
+              ]}
+            >
+              <TextInput
+                style={[
+                  styles.input,
+                  styles.mobileInput,
+                  touched.mobile && errors.mobile && styles.inputError,
+                ]}
+                value={formData.mobile}
+                onChangeText={handleMobileChange}
+                placeholder="98765-43210"
+                placeholderTextColor="#999"
+                keyboardType="phone-pad"
+                maxLength={11}
+                onBlur={(e: any) => handleBlur('mobile', e.nativeEvent.text)}
+                editable={!isOtpVerified}
+              />
+              <TouchableOpacity
+                style={[
+                  styles.otpBtn,
+                  isMobile && styles.otpBtnMobile,
+                  (mobileNumberRaw.length !== 10 ||
+                    (otpSent && isOtpVerified)) &&
+                    styles.otpBtnDisabled,
+                ]}
+                onPress={handleSendOtp}
+                disabled={
+                  mobileNumberRaw.length !== 10 || (otpSent && isOtpVerified)
+                }
+              >
+                <Text
+                  style={[
+                    styles.otpBtnText,
+                    isMobile && styles.otpBtnTextMobile,
+                  ]}
+                >
+                  {isOtpVerified
+                    ? 'Verified'
+                    : otpSent
+                    ? 'Resend OTP'
+                    : 'Send OTP'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+            {touched.mobile && errors.mobile && (
+              <View style={styles.errorRow}>
+                <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
+                <Text style={styles.errorText}>{errors.mobile}</Text>
+              </View>
+            )}
+          </View>
+
+          {otpSent ? (
+            <View style={styles.fieldContainer}>
+              <Text style={styles.label}>OTP *</Text>
+              <View
+                style={[
+                  styles.otpInputGroup,
+                  isMobile && styles.otpInputGroupMobile,
+                ]}
+              >
+                {[0, 1, 2, 3, 4, 5].map(index => (
+                  <TextInput
+                    key={index}
+                    ref={ref => {
+                      otpInputRefs.current[index] = ref;
+                    }}
+                    style={[
+                      styles.otpInput,
+                      isMobile && styles.otpInputMobile,
+                      touched.otp && errors.otp && styles.inputError,
+                    ]}
+                    maxLength={1}
+                    keyboardType="number-pad"
+                    value={formData.otp[index] || ''}
+                    onChangeText={text => handleOtpChange(text, index)}
+                    onKeyPress={e => handleOtpKeyPress(e, index)}
+                    selectTextOnFocus
+                    autoComplete="one-time-code"
+                    editable={!isOtpVerified}
+                  />
+                ))}
+                {!isOtpVerified && formData.otp.length === 6 && (
+                  <TouchableOpacity
+                    style={styles.verifyBtn}
+                    onPress={handleVerifyOtp}
+                    disabled={apiLoading}
+                  >
+                    <Text style={styles.verifyBtnText}>
+                      {apiLoading ? '...' : 'Verify'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              {isOtpVerified && (
+                <Text style={styles.verifiedText}>✓ Verified</Text>
+              )}
+              {touched.otp && errors.otp && !isOtpVerified && (
+                <View style={styles.errorRow}>
+                  <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                  <Text style={styles.errorText}>{errors.otp}</Text>
+                </View>
+              )}
+            </View>
+          ) : (
+            <View style={styles.fieldContainer} />
           )}
         </View>
 
-        {otpSent && (
-          <View style={styles.fieldContainer}>
-            <Text style={styles.label}>OTP *</Text>
-            <View
-              style={[
-                styles.otpInputGroup,
-                isMobile && styles.otpInputGroupMobile,
-              ]}
-            >
-              {[0, 1, 2, 3, 4, 5].map(index => (
-                <TextInput
-                  key={index}
-                  ref={ref => {
-                    otpInputRefs.current[index] = ref;
-                  }}
-                  style={[
-                    styles.otpInput,
-                    isMobile && styles.otpInputMobile,
-                    touched.otp && errors.otp && styles.inputError,
-                  ]}
-                  maxLength={1}
-                  keyboardType="number-pad"
-                  value={formData.otp[index] || ''}
-                  onChangeText={text => handleOtpChange(text, index)}
-                  onKeyPress={e => handleOtpKeyPress(e, index)}
-                  selectTextOnFocus
-                  autoComplete="one-time-code"
-                  editable={!isOtpVerified}
-                />
-              ))}
-              {!isOtpVerified && formData.otp.length === 6 && (
-                <TouchableOpacity
-                  style={styles.verifyBtn}
-                  onPress={handleVerifyOtp}
-                  disabled={apiLoading}
-                >
-                  <Text style={styles.verifyBtnText}>
-                    {apiLoading ? '...' : 'Verify'}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            </View>
-            {isOtpVerified && (
-              <Text style={styles.verifiedText}>✓ Verified</Text>
-            )}
-            {touched.otp && errors.otp && !isOtpVerified && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.otp}</Text>
-              </View>
-            )}
+        {!isOtpVerified && (
+          <View style={styles.otpHelpWrapper}>
+            <Text style={styles.otpHelpText}>
+              Didn’t received OTP?{' '}
+              <Text style={styles.resendLink} onPress={handleSendOtp}>
+                Click to resend OTP.
+              </Text>
+            </Text>
           </View>
         )}
 
@@ -627,18 +652,20 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
 
 const styles = StyleSheet.create({
   container: {
-    padding: 16,
+    padding: 30,
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 32,
     fontWeight: '600',
     color: '#EE2529',
     textAlign: 'center',
     marginBottom: 24,
+    fontFamily: 'Montserrat',
   },
   sectionTitleMobile: {
-    fontSize: 18,
+    fontSize: 22,
     marginBottom: 16,
+    fontFamily: 'Montserrat',
   },
   row: {
     flexDirection: 'row',
@@ -654,20 +681,22 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   label: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '700',
     color: '#444',
     marginBottom: 8,
+    fontFamily: 'Montserrat',
   },
   input: {
     backgroundColor: '#F2F2F2',
     height: 48,
     borderRadius: 8,
     paddingHorizontal: 12,
-    fontSize: 14,
+    fontSize: 18,
     color: '#333',
     borderWidth: 1,
     borderColor: 'transparent',
+    fontFamily: 'Montserrat',
   },
   inputError: {
     borderColor: '#EE2529',
@@ -688,6 +717,7 @@ const styles = StyleSheet.create({
     color: '#EE2529',
     fontSize: 13,
     fontWeight: '500',
+    fontFamily: 'Montserrat',
   },
   radioGroup: {
     flexDirection: 'row',
@@ -719,38 +749,52 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
   },
   radioLabel: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#444',
+    fontFamily: 'Montserrat',
   },
   mobileInputContainer: {
     flexDirection: 'row',
-    gap: 10,
+    alignItems: 'center',
+    backgroundColor: '#FFF',
+    borderWidth: 1,
+    borderColor: '#CCC',
+    borderRadius: 8,
+    height: 48,
+    overflow: 'hidden',
   },
   mobileInputContainerMobile: {
-    flexDirection: 'column',
-    gap: 10,
+    flexDirection: 'row', // Keep it same for mobile to keep button inside
   },
   mobileInput: {
     flex: 1,
+    height: '100%',
+    borderWidth: 0,
+    backgroundColor: 'transparent',
+    paddingHorizontal: 12,
+    fontSize: 18,
+    fontFamily: 'Montserrat',
   },
   otpBtn: {
     backgroundColor: '#EE2529',
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    height: 38,
+    marginRight: 5,
+    paddingHorizontal: 12,
+    borderRadius: 6,
     justifyContent: 'center',
-    height: 48,
   },
   otpBtnMobile: {
-    paddingHorizontal: 12,
-    height: 44,
+    paddingHorizontal: 10,
+    height: 34,
   },
   otpBtnDisabled: {
     backgroundColor: '#CCC',
   },
   otpBtnText: {
     color: '#FFF',
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
   otpBtnTextMobile: {
     fontSize: 13,
@@ -764,7 +808,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   otpInput: {
-    width: 38,
+    width: 48,
     height: 48,
     backgroundColor: '#F2F2F2',
     borderRadius: 8,
@@ -773,6 +817,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     borderWidth: 1,
     borderColor: '#CCC',
+    fontFamily: 'Montserrat',
   },
   otpInputMobile: {
     width: 42,
@@ -803,6 +848,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 12,
     fontWeight: '700',
+    fontFamily: 'Montserrat',
   },
   checkboxSection: {
     gap: 12,
@@ -832,12 +878,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   checkboxLabel: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#444',
+    fontFamily: 'Montserrat',
   },
   linkText: {
     color: '#2196F3',
     textDecorationLine: 'underline',
+    fontFamily: 'Montserrat',
   },
   radioInnerDisabled: {
     backgroundColor: '#9ca3af',
@@ -850,6 +898,24 @@ const styles = StyleSheet.create({
   },
   radioLabelDisabled: {
     color: '#6b7280',
+  },
+  otpHelpWrapper: {
+    width: '100%',
+    alignItems: 'center',
+    paddingVertical: 12,
+    zIndex: 10,
+  },
+  otpHelpText: {
+    fontSize: 18,
+    color: '#333',
+    fontWeight: '500',
+    fontFamily: 'Montserrat',
+  },
+  resendLink: {
+    color: '#000',
+    fontWeight: '500',
+    textDecorationLine: 'underline',
+    fontFamily: 'Montserrat',
   },
 });
 

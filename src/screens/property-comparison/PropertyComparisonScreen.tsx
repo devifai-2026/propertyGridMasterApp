@@ -14,8 +14,6 @@ import { useNavigation } from '../../context/NavigationContext';
 import Layout from '../../layout/Layout';
 import { COLORS } from '../../constants/theme';
 import {
-  Download,
-  Share2,
   MapPin,
   ChevronLeft,
   X,
@@ -24,6 +22,8 @@ import {
 } from 'lucide-react-native';
 import { request } from '../../../helpers/api/request';
 import PropertyCard from '../../components/PropertyCard';
+import download from "../../assets/Compare/download.png"
+import share from "../../assets/Compare/share.png"
 
 const { width } = Dimensions.get('window');
 
@@ -60,6 +60,7 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
   const { goBack } = useNavigation();
   const [properties, setProperties] = useState<ComparisonProperty[]>([]);
   const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
     const fetchProperties = async () => {
       try {
@@ -291,9 +292,6 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
         </View>
 
         {/* Overview Section */}
-        {/* ... rest of the code */}
-
-        {/* Overview Section */}
         <SectionTitle title="Overview" subtitle="Property details & location" />
         <View style={styles.tableContainer}>
           <View style={styles.headerRow}>
@@ -353,14 +351,14 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
             label="Monthly Rent"
             keys={['rent']}
             isAlternate={true}
-            highlightIndex={1} // Example highlight
+            highlightIndex={1}
           />
           <ComparisonRow label="Maintenance Costs" keys={['maintenance']} />
           <ComparisonRow
             label="Gross Rental Yield"
             keys={['roi']}
             isAlternate={true}
-            highlightIndex={2} // Example highlight
+            highlightIndex={2}
           />
         </View>
 
@@ -426,11 +424,11 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
               /* Download */
             }}
           >
-            <Download size={16} color={COLORS.textSecondary} />
+            <Image source={download} style={{ width: 16, height: 16 }} />
             <Text style={styles.actionBtnText}>Download Report</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionBtn} onPress={handleShare}>
-            <Share2 size={16} color={COLORS.textSecondary} />
+            <Image source={share} style={{ width: 16, height: 16 }} />
             <Text style={styles.actionBtnText}>Share Report</Text>
           </TouchableOpacity>
         </View>
@@ -442,6 +440,7 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    paddingHorizontal: 120,
     backgroundColor: COLORS.white,
   },
   loadingContainer: {
@@ -462,7 +461,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   pageTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
     color: '#EE2529',
   },
@@ -478,16 +477,18 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   propertyHeaderLabel: {
-    width: '20%',
+    width: '10%',
     paddingTop: 20,
+    margin: 'auto',
+    textAlign: 'center',
   },
   propertyHeaderTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: COLORS.textSecondary,
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#EE2529',
   },
   propertyCard: {
-    width: '25%', // Adjust based on 3 columns + label
+    width: '25%',
     backgroundColor: COLORS.white,
     borderRadius: 12,
     shadowColor: '#000',
@@ -571,7 +572,7 @@ const styles = StyleSheet.create({
   roiBox: {
     width: 50,
     height: 50,
-    backgroundColor: 'white', // Gradient simulated or actual simplified
+    backgroundColor: 'white',
     borderWidth: 1,
     borderColor: '#EEEEEE',
     borderRadius: 8,
@@ -621,60 +622,64 @@ const styles = StyleSheet.create({
   },
   sectionHeaderContainer: {
     marginTop: 30,
-    marginBottom: 10,
+    marginBottom: 15, // Increased from 10
   },
   sectionHeaderTitle: {
-    fontSize: 18,
+    fontSize: 24, // Increased from 18
     fontWeight: '700',
     color: '#EE2529',
-    marginBottom: 2,
+    marginBottom: 4, // Increased from 2
   },
   sectionHeaderSubtitle: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
+    fontSize: 18, // Increased from 12
+    color:'#767676',
+    fontWeight: '500', // Added for better readability
   },
   tableContainer: {
     borderWidth: 0,
   },
   rowContainer: {
     flexDirection: 'row',
-    paddingVertical: 12,
-    alignItems: 'center',
+    alignItems: 'stretch',
   },
   headerRow: {
     flexDirection: 'row',
     backgroundColor: '#F2F2F2',
-    paddingVertical: 12,
-    alignItems: 'center',
+    alignItems: 'stretch',
   },
   rowLabelContainer: {
-    width: '25%', // First column
+    width: '25%',
     paddingLeft: 10,
+    paddingVertical: 15,
+    justifyContent: 'center',
   },
   rowLabelText: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '600',
     color: COLORS.textDark,
   },
   headerRowText: {
-    fontSize: 14,
+    fontSize: 20,
     fontWeight: '600',
     color: COLORS.textDark,
   },
   rowValueContainer: {
-    width: '25%', // Data columns
+    width: '25%',
     alignItems: 'center',
     paddingHorizontal: 5,
     justifyContent: 'center',
+    paddingVertical: 12,
+    borderLeftWidth: 2,
+    borderLeftColor: '#EDECEC',
   },
   rowValueText: {
-    fontSize: 14,
+    fontSize: 20,
     color: COLORS.textDark,
     textAlign: 'center',
   },
   headerRowValue: {
-    fontSize: 14,
-    fontWeight: '500', // Normal weight for headers per web
+    fontSize: 20,
+    fontWeight: '500',
     color: COLORS.textDark,
     textAlign: 'center',
   },
@@ -682,7 +687,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFCF4',
     borderLeftWidth: 4,
     borderLeftColor: '#EE2529',
-    paddingVertical: 8,
   },
   highlightText: {
     color: '#EE2529',
@@ -707,7 +711,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   actionBtnText: {
-    fontSize: 14,
+    fontSize: 16,
     color: COLORS.textSecondary,
     fontWeight: '600',
   },

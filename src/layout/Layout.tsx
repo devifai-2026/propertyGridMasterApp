@@ -325,23 +325,11 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
   const { width } = useWindowDimensions();
   const { navigate, currentPath, openLoginModal } = useNavigation();
   const { isLoggedIn, user, logout } = useAuth();
-  const [isHovered, setIsHovered] = useState(false);
   const [isLogoutMenuVisible, setIsLogoutMenuVisible] = useState(false);
   const isMobile = width < 768;
 
-  const headerActiveStyle =
-    isHovered && !isMobile ? styles.headerContainerHover : {};
-
   return (
-    <View
-      style={[styles.headerContainer, headerActiveStyle]}
-      {...(Platform.OS === 'web'
-        ? {
-            onMouseEnter: () => setIsHovered(true),
-            onMouseLeave: () => setIsHovered(false),
-          }
-        : {})}
-    >
+    <View style={styles.headerContainer}>
       <View
         style={[
           styles.headerContent,
@@ -404,26 +392,6 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
             </TouchableOpacity>
           )} */}
 
-          {isLoggedIn && (
-            <TouchableOpacity
-              style={[
-                styles.listPropertyBtn,
-                isMobile && {
-                  borderWidth: 0,
-                  paddingRight: 0,
-                  paddingLeft: 0,
-                  paddingVertical: 0,
-                },
-              ]}
-              onPress={() => navigate('/list-property')}
-            >
-              <ListPropertyIcon  />
-              {!isMobile && (
-                <Text style={styles.listPropertyText}>List Property</Text>
-              )}
-            </TouchableOpacity>
-          )}
-
           {isLoggedIn ? (
             <TouchableOpacity
               style={[styles.profileBtn, isMobile && styles.profileBtnMobile]}
@@ -457,6 +425,24 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
               <Text style={styles.signInText}>Sign In</Text>
             </TouchableOpacity>
           )}
+
+          <TouchableOpacity
+            style={[
+              styles.listPropertyBtn,
+              isMobile && {
+                borderWidth: 0,
+                paddingRight: 0,
+                paddingLeft: 0,
+                paddingVertical: 0,
+              },
+            ]}
+            onPress={() => navigate('/list-property')}
+          >
+            <ListPropertyIcon  />
+            {!isMobile && (
+              <Text style={styles.listPropertyText}>List Property</Text>
+            )}
+          </TouchableOpacity>
           <TouchableOpacity style={styles.menuBtn} onPress={onMenuPress}>
             <Menu size={24} color={COLORS.primary} />
           </TouchableOpacity>
@@ -562,9 +548,9 @@ const styles = StyleSheet.create({
   },
   // Header Styles
   headerContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.75)',
+    backgroundColor: 'rgba(255, 255, 255, 0.10)', // Reduced opacity from 0.75
     borderWidth: 1,
-    borderColor: 'rgba(230, 230, 230, 0.4)',
+    borderColor: 'rgba(230, 230, 230, 0.2)',
     height: 70,
     justifyContent: 'center',
     zIndex: 1000,
@@ -587,8 +573,8 @@ const styles = StyleSheet.create({
     }),
   },
   headerContainerHover: {
-    backgroundColor: 'rgba(255, 255, 255, 0.35)',
-    borderColor: 'rgba(230, 230, 230, 0.6)',
+    backgroundColor: 'rgba(255, 255, 255, 0.25)', // Reduced opacity from 0.35
+    borderColor: 'rgba(230, 230, 230, 0.4)',
     shadowOpacity: 0.2,
     shadowRadius: 15,
     ...Platform.select({
@@ -618,10 +604,10 @@ const styles = StyleSheet.create({
   },
   navLinks: {
     flexDirection: 'row',
-    gap: 30,
+    gap: 50,
   },
   navLinkText: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '600',
     color: '#262626',
   },

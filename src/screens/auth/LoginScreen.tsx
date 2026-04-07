@@ -404,7 +404,7 @@ const styles = StyleSheet.create({
 
   /* ── Card ── */
   modalContent: {
-    width: 673,
+    width: 665,
     backgroundColor: COLORS.white,
     borderRadius: 20,
     overflow: 'hidden',
@@ -512,7 +512,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   required: {
-    color: '#EE2529',
+    color: '#000000',
   },
   textInput: {
     borderWidth: 1,

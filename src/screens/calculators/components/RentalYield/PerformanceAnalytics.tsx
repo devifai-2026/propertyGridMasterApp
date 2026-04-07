@@ -8,36 +8,40 @@ import {
 } from 'react-native';
 import { PieChart, BarChart } from 'react-native-chart-kit';
 
-type ExpenseItem = {
-  name: string;
-  value: number;
-  color: string;
-};
+interface PerformanceAnalyticsProps {
+  data?: {
+    totalAnnualExpenses?: number;
+    annualMaintenance?: number;
+    propertyTax?: number;
+    insurance?: number;
+    otherExpenses?: number;
+    grossYield?: string;
+    netYield?: string;
+    monthlyEMI?: number;
+  };
+}
 
-type YieldItem = {
-  name: string;
-  value: number;
-  color: string;
-};
-
-const expenseData: ExpenseItem[] = [
-  { name: 'Annual Loan EMI', value: 84, color: '#4A4A4A' },
-  { name: 'Maintenance', value: 7, color: '#FFA500' },
-  { name: 'Property Tax', value: 3, color: '#20B2AA' },
-  { name: 'Insurance', value: 2, color: '#FF6B6B' },
-  { name: 'Other Expenses', value: 4, color: '#87CEEB' },
-];
-
-const yieldData: YieldItem[] = [
-  { name: 'Gross Yield', value: 13.33, color: '#C73834' },
-  { name: 'Net Yield', value: 12.11, color: '#26BFCC' },
-];
-
-const PerformanceAnalytics: React.FC = () => {
+const PerformanceAnalytics = ({ data }: PerformanceAnalyticsProps) => {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
 
   const chartWidth = isDesktop ? width / 2.5 : width - 64;
+
+  const annualLoanEMI = (data?.monthlyEMI || 0) * 12;
+  const totalExpenses = (data?.totalAnnualExpenses || 0) + annualLoanEMI;
+
+  const expenseData = [
+    { name: 'Annual Loan EMI', population: annualLoanEMI, color: '#4A4A4A' },
+    { name: 'Maintenance', population: data?.annualMaintenance || 0, color: '#FFA500' },
+    { name: 'Property Tax', population: data?.propertyTax || 0, color: '#20B2AA' },
+    { name: 'Insurance', population: data?.insurance || 0, color: '#FF6B6B' },
+    { name: 'Other Expenses', population: data?.otherExpenses || 0, color: '#87CEEB' },
+  ].filter(item => item.population > 0);
+
+  const yieldData = [
+    { name: 'Gross Yield', value: parseFloat(data?.grossYield || '0'), color: '#C73834' },
+    { name: 'Net Yield', value: parseFloat(data?.netYield || '0'), color: '#26BFCC' },
+  ];
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -48,24 +52,28 @@ const PerformanceAnalytics: React.FC = () => {
         <View style={[styles.card, isDesktop && styles.desktopCard]}>
           <Text style={styles.cardTitle}>Annual Expense Breakdown</Text>
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <PieChart
-              data={expenseData.map(item => ({
-                name: item.name,
-                population: item.value,
-                color: item.color,
-                legendFontColor: '#333',
-                legendFontSize: 12,
-              }))}
-              width={isDesktop ? chartWidth : Math.max(chartWidth, 300)} // Ensure minimum width for readability
-              height={260}
-              chartConfig={chartConfig}
-              accessor="population"
-              backgroundColor="transparent"
-              paddingLeft="10"
-              absolute
-            />
-          </ScrollView>
+          {expenseData.length > 0 ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <PieChart
+                data={expenseData.map(item => ({
+                  name: item.name,
+                  population: item.population,
+                  color: item.color,
+                  legendFontColor: '#333',
+                  legendFontSize: 14,
+                }))}
+                width={isDesktop ? chartWidth : Math.max(chartWidth, 300)}
+                height={260}
+                chartConfig={chartConfig}
+                accessor="population"
+                backgroundColor="transparent"
+                paddingLeft="10"
+                absolute
+              />
+            </ScrollView>
+          ) : (
+            <Text style={{ textAlign: 'center', color: '#999', marginVertical: 100 }}>No expense data available</Text>
+          )}
         </View>
 
         {/* Bar Chart */}
@@ -122,7 +130,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   heading: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: '600',
     color: '#EE2529',
     marginBottom: 20,
@@ -149,7 +157,7 @@ const styles = StyleSheet.create({
     width: '48%',
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 16,

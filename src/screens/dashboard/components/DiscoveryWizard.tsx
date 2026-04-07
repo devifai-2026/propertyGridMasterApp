@@ -48,7 +48,7 @@ const StepCard = ({
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const IconComponent = item.Icon;
-  
+
   return (
     <View style={styles.stepItemWrapper}>
       <TouchableOpacity
@@ -111,7 +111,7 @@ const DiscoveryWizard = () => {
       { label: '15%+', value: '15' },
       { label: '20%+', value: '20' },
     ],
-    '3': ['Residential', 'Retail', 'Offices', 'Industrial','Institutional' ,'Others'],
+    '3': ['Residential', 'Retail', 'Offices', 'Industrial', 'Institutional', 'Others'],
     '4': [
       { label: '< 1 Cr', value: { min: '0', max: '1' } },
       { label: '1 - 2.5 Cr', value: { min: '1', max: '2.5' } },
@@ -120,7 +120,7 @@ const DiscoveryWizard = () => {
       { label: '7.5 - 10 Cr', value: { min: '7.5', max: '10' } },
       { label: '> 10 Cr', value: { min: '10', max: '1000' } },
     ],
-    '5': ['Banks', 'IT/Tech', 'Retail', 'Logistics','Co-working', 'Others'],
+    '5': ['Banks', 'IT/Tech', 'Retail', 'Logistics', 'Co-working', 'Others'],
     '6': [
       { label: '< 1 Yrs', value: '1' },
       { label: '2 - 4 Yrs', value: '2' },
@@ -158,13 +158,11 @@ const DiscoveryWizard = () => {
     if (selections.type) queryParams.push(`propertyTypes=${selections.type}`);
     if (selections.budget) {
       queryParams.push(
-        `minPrice=${
-          selections.budget.value?.min || selections.budget.min || 0
+        `minPrice=${selections.budget.value?.min || selections.budget.min || 0
         }`,
       );
       queryParams.push(
-        `maxPrice=${
-          selections.budget.value?.max || selections.budget.max || 1000
+        `maxPrice=${selections.budget.value?.max || selections.budget.max || 1000
         }`,
       );
     }
@@ -192,25 +190,51 @@ const DiscoveryWizard = () => {
             JSON.stringify(currentSelection) === JSON.stringify(opt);
 
           return (
-            <TouchableOpacity
-              key={label}
+            // <TouchableOpacity
+            //   key={label}
+            //   style={[
+            //     styles.cityOption,
+            //     isMobile && { width: (width - (isMobile ? 40 : 120) - 10) / 2 },
+            //     isSelected && styles.cityOptionSelected,
+            //   ]}
+            //   onPress={() => handleSelection(opt)}
+            // >
+            //   <Text
+            //     style={[
+            //       styles.cityOptionText,
+            //       isSelected && styles.cityOptionTextSelected,
+            //       isMobile && { fontSize: 16 },
+            //     ]}
+            //   >
+            //     {label}
+            //   </Text>
+            // </TouchableOpacity>
+            <LinearGradient
+              colors={['#F2F2F2', '#FFFFFF']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
               style={[
                 styles.cityOption,
                 isMobile && { width: (width - (isMobile ? 40 : 120) - 10) / 2 },
                 isSelected && styles.cityOptionSelected,
               ]}
-              onPress={() => handleSelection(opt)}
             >
-              <Text
-                style={[
-                  styles.cityOptionText,
-                  isSelected && styles.cityOptionTextSelected,
-                  isMobile && { fontSize: 16 },
-                ]}
+              <TouchableOpacity
+                style={styles.cityOptionInner}
+                onPress={() => handleSelection(opt)}
+                activeOpacity={0.7}
               >
-                {label}
-              </Text>
-            </TouchableOpacity>
+                <Text
+                  style={[
+                    styles.cityOptionText,
+                    isSelected && styles.cityOptionTextSelected,
+                    isMobile && { fontSize: 16 },
+                  ]}
+                >
+                  {label}
+                </Text>
+              </TouchableOpacity>
+            </LinearGradient>
           );
         })}
       </View>
@@ -312,7 +336,9 @@ const DiscoveryWizard = () => {
 
 const styles = StyleSheet.create({
   wizardContainer: {
-    paddingVertical: 50,
+    // paddingVertical: 50,
+    paddingBottom: 0,
+    paddingTop: 50,
     alignItems: 'center',
     width: '100%',
     backgroundColor: '#FFFFFF',
@@ -394,12 +420,13 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
   wizardContentCard: {
-    width: '40%',
+    width: '50%',
     maxWidth: 900,
     backgroundColor: '#FFF',
     borderRadius: 20,
     paddingHorizontal: 30,
-    paddingVertical: 60,
+    paddingTop: 60,
+    paddingBottom: 6,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
@@ -458,24 +485,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 30,
     marginBottom: 40,
-    width: '85%',
-    maxWidth: 700,
+    height: 300,
+    width: 550
   },
   cityOption: {
-    width: '24%',
-    height: 135,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#EAEAEA',
-    shadowColor: '#999',
-    shadowOffset: { width: 1, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 3,
-  },
+  width: 130,
+  height: 130,
+  borderRadius: 15,
+  alignItems: 'center',
+  justifyContent: 'center',
+  shadowColor: '#000000',
+  shadowOffset: { width: 2, height: 2 },
+  shadowOpacity: 0.25,
+  shadowRadius: 4,
+  elevation: 3,
+},
+cityOptionInner: {
+  width: '100%',
+  height: '100%',
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderRadius: 15,
+},
   cityOptionSelected: {
     borderWidth: 0,
     backgroundColor: '#FFF',
@@ -487,9 +518,10 @@ const styles = StyleSheet.create({
   },
   cityOptionText: {
     fontFamily: FONTS.main,
-    fontSize: 22,
-    fontWeight: '600',
-    color: '#555',
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#767676',
+
   },
   cityOptionTextSelected: {
     color: COLORS.primary,
@@ -536,6 +568,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
   },
+  
 });
 
 export default DiscoveryWizard;

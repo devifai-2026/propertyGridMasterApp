@@ -2,7 +2,30 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { TrendingUp, Calendar } from 'lucide-react-native';
 
-const EMISummaryCards = () => {
+interface EMISummaryCardsProps {
+  data?: {
+    monthlyEMI?: number;
+    totalInterest?: number;
+    totalPayment?: number;
+    loanAmount?: number;
+    interestRate?: string;
+    loanTenure?: string;
+    propertyPrice?: number;
+    monthlyRent?: number;
+    downPayment?: number;
+  };
+}
+
+const EMISummaryCards = ({ data }: EMISummaryCardsProps) => {
+  const formatCurrency = (val?: number) => {
+    if (val === undefined) return '0';
+    return val.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+  };
+
+  const monthlyRent = 50000; // Placeholder or from data if I add it to results
+  const rentCoverage = data?.monthlyEMI ? ((monthlyRent / data.monthlyEMI) * 100).toFixed(1) : '0';
+  const monthlyCashFlow = data?.monthlyEMI ? (monthlyRent - data.monthlyEMI) : 0;
+
   return (
     <View>
       {/* Main Result Cards - 4 Cards Grid */}
@@ -11,7 +34,7 @@ const EMISummaryCards = () => {
         <View style={[styles.resultCard, styles.card1]}>
           <View style={styles.cardContent}>
             <Text style={styles.resultCardTitle}>Monthly EMI</Text>
-            <Text style={[styles.resultCardValue, { color: '#C73834' }]}>₹40,760.231</Text>
+            <Text style={[styles.resultCardValue, { color: '#C73834' }]}>₹{formatCurrency(data?.monthlyEMI)}</Text>
           </View>
           <Text style={styles.resultCardSubtitle}>Fixed monthly payment</Text>
           <View style={styles.descContainer}>
@@ -24,7 +47,7 @@ const EMISummaryCards = () => {
         <View style={[styles.resultCard, styles.card2]}>
           <View style={styles.cardContent}>
             <Text style={styles.resultCardTitle}>Rent Coverage</Text>
-            <Text style={[styles.resultCardValue, { color: '#26BFCC' }]}>122.7%</Text>
+            <Text style={[styles.resultCardValue, { color: '#26BFCC' }]}>{rentCoverage}%</Text>
           </View>
           <Text style={styles.resultCardSubtitle}>% Rent vs EMI ratio</Text>
           <View style={styles.descContainer}>
@@ -39,7 +62,7 @@ const EMISummaryCards = () => {
             <Text style={styles.resultCardTitle}>Monthly Cash Flow</Text>
             <TrendingUp size={24} color="#429482" />
           </View>
-          <Text style={[styles.resultCardValue, { color: '#429482' }]}>₹9,239.769</Text>
+          <Text style={[styles.resultCardValue, { color: '#429482' }]}>₹{formatCurrency(monthlyCashFlow)}</Text>
           <Text style={styles.resultCardSubtitle}>$ Rent minus EMI</Text>
           <View style={styles.descContainer}>
             <Text style={styles.resultCardDesc}>Net income after EMI.</Text>
@@ -70,21 +93,21 @@ const EMISummaryCards = () => {
           <View style={styles.summaryContent}>
             <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>Loan Amount (₹)</Text>
-              <Text style={styles.summaryValue}>31,50,000</Text>
+              <Text style={styles.summaryValue}>{formatCurrency(data?.loanAmount)}</Text>
             </View>
             <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>Monthly EMI (₹)</Text>
-              <Text style={styles.summaryValue}>40,760.231</Text>
+              <Text style={styles.summaryValue}>{formatCurrency(data?.monthlyEMI)}</Text>
             </View>
             <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>Total Interest Payable (₹)</Text>
-              <Text style={styles.summaryValue}>17,41,227.676</Text>
+              <Text style={styles.summaryValue}>{formatCurrency(data?.totalInterest)}</Text>
             </View>
           </View>
           <View style={styles.dividerLine} />
           <View style={styles.summaryItemTotal}>
             <Text style={styles.summaryLabelBold}>Total Repayment (₹)</Text>
-            <Text style={[styles.summaryValueTotal, { color: '#429482' }]}>48,91,227.676</Text>
+            <Text style={[styles.summaryValueTotal, { color: '#429482' }]}>{formatCurrency(data?.totalPayment)}</Text>
           </View>
         </View>
 
@@ -94,17 +117,17 @@ const EMISummaryCards = () => {
           <View style={styles.summaryContent}>
             <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>Total Initial Cost (₹)</Text>
-              <Text style={styles.summaryValue}>17,25,000</Text>
+              <Text style={styles.summaryValue}>{formatCurrency(data?.downPayment)}</Text>
             </View>
             <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>Monthly Rental Income (₹)</Text>
-              <Text style={styles.summaryValue}>50,000</Text>
+              <Text style={styles.summaryValue}>{formatCurrency(monthlyRent)}</Text>
             </View>
           </View>
           <View style={styles.dividerLine} />
           <View style={styles.summaryItemTotal}>
             <Text style={styles.summaryLabelBold}>Net Monthly Cash Flow (₹)</Text>
-            <Text style={[styles.summaryValueTotal, { color: '#429482' }]}>9,239.769</Text>
+            <Text style={[styles.summaryValueTotal, { color: '#429482' }]}>{formatCurrency(monthlyCashFlow)}</Text>
           </View>
         </View>
       </View>
@@ -117,13 +140,11 @@ const styles = StyleSheet.create({
   resultsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 16,
+    gap: 6,
     marginTop: 40,
   },
   resultCard: {
-    flex: 1,
-    minWidth: '47%',
-    maxWidth: '48%',
+    width: '24%',
     padding: 12,
     borderRadius: 6,
     borderWidth: 1,
@@ -177,10 +198,12 @@ const styles = StyleSheet.create({
 
   // Bottom 2 Summary Cards
   summarySection: {
+    flexDirection: 'row',
     gap: 20,
     marginTop: 40,
   },
   summaryCard: {
+    flex: 1,
     backgroundColor: '#FFFFFF',
     borderRadius: 6,
     padding: 12,
@@ -207,8 +230,8 @@ const styles = StyleSheet.create({
   summaryLabel: {
     fontSize: 18,
     color: '#767676',
-    flex: 1,
     marginRight: 16,
+    flexShrink: 1,
   },
   summaryValue: {
     fontSize: 18,
