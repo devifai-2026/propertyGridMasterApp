@@ -589,10 +589,12 @@ const styles = StyleSheet.create({
     color: '#EE2529',
     textAlign: 'center',
     marginBottom: 24,
+    fontFamily: 'Montserrat',
   },
   sectionTitleMobile: {
     fontSize: 18,
     marginBottom: 16,
+    fontFamily: 'Montserrat',
   },
   subHeader: {
     fontSize: 22,
@@ -600,6 +602,7 @@ const styles = StyleSheet.create({
     color: '#EE2529',
     marginBottom: 16,
     marginTop: 8,
+    fontFamily: 'Montserrat',
   },
   row: {
     flexDirection: 'row',
@@ -618,6 +621,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#444',
     marginBottom: 6,
+    fontFamily: 'Montserrat',
   },
   errorRow: {
     flexDirection: 'row',
@@ -630,11 +634,13 @@ const styles = StyleSheet.create({
     color: '#EE2529',
     fontSize: 10,
     fontWeight: '700',
+    fontFamily: 'Montserrat',
   },
   errorText: {
     color: '#EE2529',
     fontSize: 13,
     fontWeight: '500',
+    fontFamily: 'Montserrat',
   },
   inputWrapper: {
     position: 'relative',
@@ -645,10 +651,11 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 8,
     paddingHorizontal: 12,
-    fontSize: 14,
+    fontSize: 18,
     color: '#333',
     borderWidth: 1,
-    borderColor: '#eee', // subtle border by default or transparent
+    borderColor: '#eee',
+    fontFamily: 'Montserrat',
   },
   inputError: {
     borderColor: '#EE2529',
@@ -672,6 +679,7 @@ const styles = StyleSheet.create({
   unitText: {
     fontSize: 16,
     color: '#666',
+    fontFamily: 'Montserrat',
   },
   textArea: {
     height: 100,
@@ -694,11 +702,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#666',
     marginTop: 8,
+    fontFamily: 'Montserrat',
   },
   uploadSubtext: {
     fontSize: 12,
     color: '#999',
     marginTop: 4,
+    fontFamily: 'Montserrat',
   },
 });
 

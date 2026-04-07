@@ -660,10 +660,12 @@ const styles = StyleSheet.create({
     color: '#EE2529',
     textAlign: 'center',
     marginBottom: 24,
+    fontFamily: 'Montserrat',
   },
   sectionTitleMobile: {
     fontSize: 22,
     marginBottom: 16,
+    fontFamily: 'Montserrat',
   },
   row: {
     flexDirection: 'row',
@@ -683,6 +685,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#444',
     marginBottom: 8,
+    fontFamily: 'Montserrat',
   },
   input: {
     backgroundColor: '#F2F2F2',
@@ -693,6 +696,7 @@ const styles = StyleSheet.create({
     color: '#333',
     borderWidth: 1,
     borderColor: 'transparent',
+    fontFamily: 'Montserrat',
   },
   inputError: {
     borderColor: '#EE2529',
@@ -713,6 +717,7 @@ const styles = StyleSheet.create({
     color: '#EE2529',
     fontSize: 13,
     fontWeight: '500',
+    fontFamily: 'Montserrat',
   },
   radioGroup: {
     flexDirection: 'row',
@@ -746,6 +751,7 @@ const styles = StyleSheet.create({
   radioLabel: {
     fontSize: 18,
     color: '#444',
+    fontFamily: 'Montserrat',
   },
   mobileInputContainer: {
     flexDirection: 'row',
@@ -767,6 +773,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     paddingHorizontal: 12,
     fontSize: 18,
+    fontFamily: 'Montserrat',
   },
   otpBtn: {
     backgroundColor: '#EE2529',
@@ -787,6 +794,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 18,
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
   otpBtnTextMobile: {
     fontSize: 13,
@@ -809,6 +817,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     borderWidth: 1,
     borderColor: '#CCC',
+    fontFamily: 'Montserrat',
   },
   otpInputMobile: {
     width: 42,
@@ -839,6 +848,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 12,
     fontWeight: '700',
+    fontFamily: 'Montserrat',
   },
   checkboxSection: {
     gap: 12,
@@ -870,10 +880,12 @@ const styles = StyleSheet.create({
   checkboxLabel: {
     fontSize: 18,
     color: '#444',
+    fontFamily: 'Montserrat',
   },
   linkText: {
     color: '#2196F3',
     textDecorationLine: 'underline',
+    fontFamily: 'Montserrat',
   },
   radioInnerDisabled: {
     backgroundColor: '#9ca3af',
@@ -897,11 +909,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#333',
     fontWeight: '500',
+    fontFamily: 'Montserrat',
   },
   resendLink: {
     color: '#000',
     fontWeight: '500',
     textDecorationLine: 'underline',
+    fontFamily: 'Montserrat',
   },
 });
 

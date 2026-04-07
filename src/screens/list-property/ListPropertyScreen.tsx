@@ -750,9 +750,7 @@ const ListPropertyScreen = () => {
                         : 'List Property'
                       : 'Next'}
                   </Text>
-                  {currentStep < 6 && (
-                    <ChevronRight size={isMobile ? 18 : 20} color="#FFF" />
-                  )}
+                 
                 </>
               )}
             </TouchableOpacity>
@@ -991,7 +989,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#EE2529',
     flex: 0,
     flexGrow: 1,
-    maxWidth: 170,
+    maxWidth: 150,
     marginLeft: 16,
   },
   nextBtnDisabled: {

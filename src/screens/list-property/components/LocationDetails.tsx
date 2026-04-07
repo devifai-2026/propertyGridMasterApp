@@ -14,6 +14,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { ChevronDown, Plus, X, Trash2, AlertTriangle } from 'lucide-react-native';
+import LinearGradient from 'react-native-linear-gradient';
 import CustomDropdown from './CustomDropdown';
 
 const INDIAN_STATES = [
@@ -313,7 +314,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
             />
             {touched.city && errors.city && (
               <View style={styles.errorRow}>
-              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
+                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
                 <Text style={styles.errorText}>{errors.city}</Text>
               </View>
             )}
@@ -331,16 +332,16 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
                 </TouchableOpacity>
               )}
             </View>
-            <View style={styles.fieldContainer}>
-              <Text style={styles.labelSmall}>Type</Text>
-              <CustomDropdown
-                placeholder="Select Type"
-                value={item.type}
-                options={CONNECTIVITY_TYPES}
-                onChange={v => handleConnectivityChange(item.id, 'type', v)}
-              />
-            </View>
             <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
+              <View style={[styles.fieldContainer, { flex: 1.2 }]}>
+                <Text style={styles.labelSmall}>Type</Text>
+                <CustomDropdown
+                  placeholder="Select Type"
+                  value={item.type}
+                  options={CONNECTIVITY_TYPES}
+                  onChange={v => handleConnectivityChange(item.id, 'type', v)}
+                />
+              </View>
               <View style={[styles.fieldContainer, { flex: 2 }]}>
                 <Text style={styles.labelSmall}>Name</Text>
                 <TextInput
@@ -368,13 +369,22 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
           </View>
         ))}
 
-        <TouchableOpacity
-          style={styles.addOutlineBtn}
-          onPress={addConnectivity}
-        >
-          <Plus size={18} color="#EE2529" />
-          <Text style={styles.addOutlineBtnText}>Add Connectivity</Text>
-        </TouchableOpacity>
+        <View style={styles.centerWrapper}>
+          <TouchableOpacity
+            style={styles.gradientBtnWrapper}
+            onPress={addConnectivity}
+          >
+            <LinearGradient
+              colors={['#EE2529', '#C73834']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.addConnectivityBtn}
+            >
+              <Plus size={18} color="#FFF" />
+              <Text style={styles.addConnectivityBtnText}>Add Connectivity</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
 
         <Text style={styles.subHeader}>Demand Drivers</Text>
         <View style={styles.fieldContainer}>
@@ -452,22 +462,25 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 32,
     fontWeight: '700',
     color: '#EE2529',
     textAlign: 'center',
     marginBottom: 24,
+    fontFamily: 'Montserrat',
   },
   sectionTitleMobile: {
     fontSize: 18,
     marginBottom: 16,
+    fontFamily: 'Montserrat',
   },
   subHeader: {
-    fontSize: 14,
+    fontSize: 22,
     fontWeight: '700',
     color: '#EE2529',
     marginBottom: 16,
     marginTop: 8,
+    fontFamily: 'Montserrat',
   },
   row: {
     flexDirection: 'row',
@@ -482,15 +495,17 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: {
-    fontSize: 12,
+    fontSize: 18,
     fontWeight: '600',
     color: '#444',
     marginBottom: 6,
+    fontFamily: 'Montserrat',
   },
   labelSmall: {
-    fontSize: 11,
+    fontSize: 14,
     color: '#666',
     marginBottom: 4,
+    fontFamily: 'Montserrat',
   },
   errorRow: {
     flexDirection: 'row',
@@ -508,6 +523,7 @@ const styles = StyleSheet.create({
     color: '#EE2529',
     fontSize: 13,
     fontWeight: '500',
+    fontFamily: 'Montserrat',
   },
   inputWrapper: {
     position: 'relative',
@@ -518,10 +534,11 @@ const styles = StyleSheet.create({
     height: 44,
     borderRadius: 8,
     paddingHorizontal: 12,
-    fontSize: 14,
+    fontSize: 18,
     color: '#333',
     borderWidth: 1,
-    borderColor: '#eee', // subtle border by default or transparent
+    borderColor: '#eee',
+    fontFamily: 'Montserrat',
   },
   inputError: {
     borderColor: '#EE2529',
@@ -531,10 +548,11 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 6,
     paddingHorizontal: 8,
-    fontSize: 13,
+    fontSize: 16,
     color: '#333',
     borderWidth: 1,
     borderColor: '#E0E0E0',
+    fontFamily: 'Montserrat',
   },
   inputIcon: {
     position: 'absolute',
@@ -574,6 +592,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     color: '#999',
+    fontFamily: 'Montserrat',
   },
   addOutlineBtn: {
     flexDirection: 'row',
@@ -589,8 +608,32 @@ const styles = StyleSheet.create({
   },
   addOutlineBtnText: {
     color: '#EE2529',
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'Montserrat',
+  },
+  centerWrapper: {
+    alignItems: 'center',
+    width: '100%',
+    marginVertical: 16,
+  },
+  gradientBtnWrapper: {
+    width: '30%',
+    minWidth: 150,
+  },
+  addConnectivityBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    height: 48,
+    borderRadius: 8,
+  },
+  addConnectivityBtnText: {
+    color: '#FFF',
     fontSize: 14,
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
 });
 

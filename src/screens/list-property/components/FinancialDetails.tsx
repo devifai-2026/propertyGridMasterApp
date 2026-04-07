@@ -261,8 +261,10 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
             },
           ].map((item, idx) => (
             <View key={idx} style={styles.metricItem}>
-              <Text style={styles.metricLabel}>{item.label}</Text>
-              <Text style={styles.metricValue}>{item.value}</Text>
+              <View style={styles.metricContent}>
+                <Text style={styles.metricLabel}>{item.label}</Text>
+                <Text style={styles.metricValue}>{item.value}</Text>
+              </View>
             </View>
           ))}
         </View>
@@ -277,22 +279,25 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 32,
     fontWeight: '700',
     color: '#EE2529',
     textAlign: 'center',
     marginBottom: 24,
+    fontFamily: 'Montserrat',
   },
   sectionTitleMobile: {
     fontSize: 18,
     marginBottom: 16,
+    fontFamily: 'Montserrat',
   },
   subHeader: {
-    fontSize: 14,
+    fontSize: 22,
     fontWeight: '700',
     color: '#EE2529',
     marginBottom: 16,
     marginTop: 8,
+    fontFamily: 'Montserrat',
   },
   row: {
     flexDirection: 'row',
@@ -313,10 +318,11 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   label: {
-    fontSize: 12,
+    fontSize: 18,
     fontWeight: '600',
     color: '#444',
     marginBottom: 6,
+    fontFamily: 'Montserrat',
   },
   errorRow: {
     flexDirection: 'row',
@@ -334,16 +340,18 @@ const styles = StyleSheet.create({
     color: '#EE2529',
     fontSize: 13,
     fontWeight: '500',
+    fontFamily: 'Montserrat',
   },
   input: {
     backgroundColor: '#F2F2F2',
     height: 44,
     borderRadius: 8,
     paddingHorizontal: 12,
-    fontSize: 14,
+    fontSize: 18,
     color: '#333',
     borderWidth: 1,
-    borderColor: '#eee', // subtle border by default or transparent
+    borderColor: '#eee',
+    fontFamily: 'Montserrat',
   },
   inputError: {
     borderColor: '#EE2529',
@@ -358,43 +366,58 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   totalLabel: {
-    fontSize: 13,
+    fontSize: 18,
     fontWeight: '600',
     color: '#444',
+    fontFamily: 'Montserrat',
   },
   totalValue: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '700',
     color: '#000',
+    fontFamily: 'Montserrat',
   },
   helpText: {
-    fontSize: 11,
+    fontSize: 14,
     color: '#888',
     marginTop: 4,
+    fontFamily: 'Montserrat',
   },
   metricsGrid: {
-    gap: 10,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
     marginBottom: 20,
+    justifyContent: 'space-between',
   },
   metricItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    width: '48%',
     backgroundColor: '#FFF',
     borderWidth: 1,
     borderColor: '#E0E0E0',
     borderRadius: 8,
-    paddingHorizontal: 12,
-    height: 48,
+    padding: 12,
+    minHeight: 70,
+    justifyContent: 'center',
+  },
+  metricContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
   },
   metricLabel: {
-    fontSize: 12,
-    color: '#666',
+    fontSize: 18,
+    color: '#6666',
+    fontFamily: 'Montserrat',
+    flex: 1,
+    marginRight: 8,
   },
   metricValue: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#444',
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#6666',
+    fontFamily: 'Montserrat',
   },
 });
 

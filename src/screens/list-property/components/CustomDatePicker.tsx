@@ -41,9 +41,9 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
             background: 'transparent',
             width: '100%',
             height: '100%',
-            fontSize: '14px',
+            fontSize: '18px',
             color: '#333',
-            fontFamily: 'System', // Use system font
+            fontFamily: 'Montserrat', // Use Montserrat
             padding: '0 12px',
             margin: 0,
             cursor: 'pointer',
@@ -81,9 +81,10 @@ const styles = StyleSheet.create({
   },
   text: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 18,
     color: '#333',
     paddingHorizontal: 12,
+    fontFamily: 'Montserrat',
   },
   placeholder: {
     color: '#999',
