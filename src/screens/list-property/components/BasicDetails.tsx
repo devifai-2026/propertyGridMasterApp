@@ -584,7 +584,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 32,
     fontWeight: '700',
     color: '#EE2529',
     textAlign: 'center',
@@ -595,7 +595,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   subHeader: {
-    fontSize: 14,
+    fontSize: 22,
     fontWeight: '700',
     color: '#EE2529',
     marginBottom: 16,
@@ -614,7 +614,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   label: {
-    fontSize: 12,
+    fontSize: 20,
     fontWeight: '600',
     color: '#444',
     marginBottom: 6,
@@ -670,7 +670,7 @@ const styles = StyleSheet.create({
     height: 44,
   },
   unitText: {
-    fontSize: 13,
+    fontSize: 16,
     color: '#666',
   },
   textArea: {

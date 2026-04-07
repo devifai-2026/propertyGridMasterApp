@@ -12,7 +12,8 @@ import {
   Platform,
 } from 'react-native';
 import { Check, ChevronLeft } from 'lucide-react-native';
-import { COLORS } from '../../constants/theme';
+import LinearGradient from 'react-native-linear-gradient';
+import { COLORS, FONTS } from '../../constants/theme';
 import { useNavigation } from '../../context/NavigationContext';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
 import { useAuth } from '../../context/AuthContext';
@@ -52,8 +53,8 @@ const EnquiriesScreen = () => {
     if (user) {
       setFormData(prev => ({
         ...prev,
-        firstName: user.firstName || user.name.split(' ')[0] || '',
-        lastName: user.lastName || user.name.split(' ')[1] || '',
+        firstName: user.firstName || user.name?.split(' ')[0] || '',
+        lastName: user.lastName || user.name?.split(' ')[1] || '',
         email: user.email || '',
         phone: user.mobileNumber || '',
         inquirerRoleType: user.role === 'Broker' ? 'broker' : 'investor',
@@ -259,6 +260,7 @@ const EnquiriesScreen = () => {
             />
           </View>
 
+          {/* Header Banner - Full Width */}
           <View style={styles.headerBanner}>
             <Text style={styles.title}>
               {user?.role === 'Broker' || user?.role === 'Investor'
@@ -267,344 +269,288 @@ const EnquiriesScreen = () => {
             </Text>
           </View>
 
-          <Text style={styles.subtitle}>
-            Please read carefully before confirming the Enquiry.
-          </Text>
-
-          {/* Property Summary */}
-          {loading ? (
-            <View style={styles.loadingContainer}>
-              <Text>Loading property info...</Text>
-            </View>
-          ) : property ? (
-            <View style={styles.propertyInfo}>
-              <View style={styles.infoCol}>
-                <Text style={styles.infoLabel}>Property Type</Text>
-                <Text style={styles.infoValue}>{property.propertyType}</Text>
-              </View>
-              <View style={styles.infoCol}>
-                <Text style={styles.infoLabel}>Location</Text>
-                <Text style={styles.infoValue}>
-                  {property.city}, {property.state}
-                </Text>
-              </View>
-              <View style={styles.infoCol}>
-                <Text style={styles.infoLabel}>Cost</Text>
-                <Text style={styles.infoValue}>
-                  ₹{property.sellingPrice} Cr
-                </Text>
-              </View>
-            </View>
-          ) : null}
-
-          <View style={styles.descriptionContainer}>
-            <Text style={styles.infoLabel}>Description</Text>
-            <Text style={styles.descriptionText}>
-              The retail property diversification strategy focuses on spreading
-              investments across various types of retail spaces, such as
-              shopping malls, stand-alone stores, and mixed-use developments.
+          <View style={styles.contentWithPadding}>
+            <Text style={styles.subtitle}>
+              Please read carefully before confirming the Enquiry.
             </Text>
-          </View>
 
-          {/* Form */}
-          <View style={styles.form}>
-            <View style={styles.row}>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>
-                  First Name <Text style={styles.required}>*</Text>
-                </Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter your first name"
-                  value={formData.firstName}
-                  onChangeText={v => handleInputChange('firstName', v)}
-                />
+            {/* Property Summary */}
+            {loading ? (
+              <View style={styles.loadingContainer}>
+                <Text style={styles.loadingText}>Loading property info...</Text>
               </View>
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>
-                  Last Name <Text style={styles.required}>*</Text>
-                </Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="Enter your last name"
-                  value={formData.lastName}
-                  onChangeText={v => handleInputChange('lastName', v)}
-                />
-              </View>
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>
-                Enquiring as <Text style={styles.required}>*</Text>
-              </Text>
-              <View style={styles.radioGroup}>
-                <TouchableOpacity
-                  activeOpacity={0.6}
-                  style={[
-                    styles.radioOption,
-                    formData.inquirerRoleType === 'investor' && styles.radioOptionActive,
-                  ]}
-                  onPress={() => handleInputChange('inquirerRoleType', 'investor')}
-                >
-                  <View
-                    style={[
-                      styles.radioCircle,
-                      formData.inquirerRoleType === 'investor' && styles.radioCircleActive,
-                    ]}
-                  />
-                  <Text
-                    style={[
-                      styles.radioLabel,
-                      formData.inquirerRoleType === 'investor' && styles.radioLabelActive,
-                    ]}
-                  >
-                    Investor
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  activeOpacity={0.6}
-                  style={[
-                    styles.radioOption,
-                    formData.inquirerRoleType === 'broker' && styles.radioOptionActive,
-                  ]}
-                  onPress={() => handleInputChange('inquirerRoleType', 'broker')}
-                >
-                  <View
-                    style={[
-                      styles.radioCircle,
-                      formData.inquirerRoleType === 'broker' && styles.radioCircleActive,
-                    ]}
-                  />
-                  <Text
-                    style={[
-                      styles.radioLabel,
-                      formData.inquirerRoleType === 'broker' && styles.radioLabelActive,
-                    ]}
-                  >
-                    Broker
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Email</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter your Email"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={formData.email}
-                onChangeText={v => handleInputChange('email', v)}
-              />
-            </View>
-
-            <View style={styles.row}>
-              <View style={[styles.inputGroup, { flex: 1 }]}>
-                <Text style={styles.label}>Confirm Phone No.</Text>
-                <View style={styles.phoneInputContainer}>
-                  <TextInput
-                    style={styles.phoneInput}
-                    placeholder="+91 00000 00000"
-                    keyboardType="numeric"
-                    maxLength={10}
-                    value={formData.phone}
-                    onChangeText={v => handleInputChange('phone', v)}
-                    editable={!isVerified}
-                  />
-                  <TouchableOpacity
-                    style={[
-                      styles.otpButton,
-                      isVerified && styles.otpButtonVerified,
-                      formData.phone.length !== 10 && styles.otpButtonDisabled,
-                    ]}
-                    onPress={handleSendOTP}
-                    disabled={
-                      isVerified || formData.phone.length !== 10 || authLoading
-                    }
-                  >
-                    <Text style={styles.otpButtonText}>
-                      {isVerified
-                        ? 'Verified'
-                        : otpSent
-                        ? 'Resend OTP'
-                        : 'Send OTP'}
-                    </Text>
-                  </TouchableOpacity>
+            ) : property ? (
+              <View style={styles.propertyInfo}>
+                <View style={styles.infoCol}>
+                  <Text style={styles.infoLabel}>Property Type</Text>
+                  <Text style={styles.infoValue}>{property.propertyType}</Text>
                 </View>
-                {!isVerified && (
-                  <Text style={styles.otpHelpText}>
-                    Didn't received OTP?{' '}
-                    <Text style={styles.link} onPress={handleSendOTP}>
-                      Click to resend OTP.
-                    </Text>
+                <View style={styles.infoCol}>
+                  <Text style={styles.infoLabel}>Location</Text>
+                  <Text style={styles.infoValue}>
+                    {property.city}, {property.state}
                   </Text>
-                )}
+                </View>
+                <View style={styles.infoCol}>
+                  <Text style={styles.infoLabel}>Cost</Text>
+                  <Text style={styles.infoValue}>
+                    ₹{property.sellingPrice} Cr
+                  </Text>
+                </View>
+              </View>
+            ) : null}
+
+            <View style={styles.descriptionContainer}>
+              <Text style={styles.infoLabel}>Description</Text>
+              <Text style={styles.descriptionText}>
+                The retail property diversification strategy focuses on spreading
+                investments across various types of retail spaces, such as
+                shopping malls, stand-alone stores, and mixed-use developments.
+              </Text>
+            </View>
+
+            {/* Form */}
+            <View style={styles.form}>
+              <View style={styles.row}>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>
+                    First Name <Text style={styles.required}>*</Text>
+                  </Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter your first name"
+                    value={formData.firstName}
+                    onChangeText={v => handleInputChange('firstName', v)}
+                  />
+                </View>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>
+                    Last Name <Text style={styles.required}>*</Text>
+                  </Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Enter your last name"
+                    value={formData.lastName}
+                    onChangeText={v => handleInputChange('lastName', v)}
+                  />
+                </View>
               </View>
 
+             
+
               <View style={styles.inputGroup}>
-                <Text style={styles.label}>OTP</Text>
-                <View
-                  style={[styles.otpContainer, isVerified && { opacity: 0.6 }]}
-                >
-                  {[0, 1, 2, 3, 4, 5].map(idx => (
+                <Text style={styles.label}>Email</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Enter your Email"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  value={formData.email}
+                  onChangeText={v => handleInputChange('email', v)}
+                />
+              </View>
+
+              <View style={styles.row}>
+                <View style={[styles.inputGroup, { flex: 1 }]}>
+                  <Text style={styles.label}>Confirm Phone No.</Text>
+                  <View style={styles.phoneInputContainer}>
                     <TextInput
-                      key={idx}
-                      ref={ref => {
-                        otpInputRefs.current[idx] = ref;
-                      }}
-                      style={[
-                        styles.otpInput,
-                        isVerified && styles.otpInputVerified,
-                      ]}
-                      value={formData.otp[idx] || ''}
-                      onChangeText={v => handleOtpChange(idx, v)}
-                      onKeyPress={e => handleOtpKeyPress(e, idx)}
+                      style={styles.phoneInput}
+                      placeholder="+91 00000 00000"
                       keyboardType="numeric"
-                      maxLength={1}
+                      maxLength={10}
+                      value={formData.phone}
+                      onChangeText={v => handleInputChange('phone', v)}
                       editable={!isVerified}
-                      selectTextOnFocus
                     />
-                  ))}
-                  {!isVerified && formData.otp.length === 6 && (
                     <TouchableOpacity
-                      style={styles.verifyBtn}
-                      onPress={() => handleVerifyOTP()}
-                      disabled={authLoading}
+                      onPress={handleSendOTP}
+                      disabled={
+                        isVerified || formData.phone.length !== 10 || authLoading
+                      }
+                      style={{ borderRadius: 6, overflow: 'hidden' }}
                     >
-                      <Text style={styles.verifyBtnText}>
-                        {authLoading ? '...' : 'Verify'}
-                      </Text>
+                      <LinearGradient
+                        colors={
+                          isVerified
+                            ? ['#10B981', '#10B981']
+                            : formData.phone.length !== 10
+                            ? ['#D1D5DB', '#D1D5DB']
+                            : ['#EE2529', '#C73834']
+                        }
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.otpButton}
+                      >
+                        <Text style={styles.otpButtonText}>
+                          {isVerified
+                            ? 'Verified'
+                            : otpSent
+                            ? 'Resend OTP'
+                            : 'Send OTP'}
+                        </Text>
+                      </LinearGradient>
                     </TouchableOpacity>
+                  </View>
+                  {!isVerified && (
+                    <Text style={styles.otpHelpText}>
+                      Didn't received OTP?{' '}
+                      <Text style={styles.link} onPress={handleSendOTP}>
+                        Click to resend OTP.
+                      </Text>
+                    </Text>
                   )}
                 </View>
-                {isVerified && (
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
-                    <View style={styles.verifiedBadge}>
-                      <Check size={16} color={COLORS.white} />
-                    </View>
-                    <Text style={[styles.verifiedText, { marginTop: 0, marginLeft: 6 }]}>
-                      Verified
-                    </Text>
+
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>OTP</Text>
+                  <View
+                    style={[styles.otpContainer, isVerified && { opacity: 0.6 }]}
+                  >
+                    {[0, 1, 2, 3, 4, 5].map(idx => (
+                      <TextInput
+                        key={idx}
+                        ref={ref => {
+                          otpInputRefs.current[idx] = ref;
+                        }}
+                        style={[
+                          styles.otpInput,
+                          isVerified && styles.otpInputVerified,
+                        ]}
+                        value={formData.otp[idx] || ''}
+                        onChangeText={v => handleOtpChange(idx, v)}
+                        onKeyPress={e => handleOtpKeyPress(e, idx)}
+                        keyboardType="numeric"
+                        maxLength={1}
+                        editable={!isVerified}
+                        selectTextOnFocus
+                      />
+                    ))}
+                    {!isVerified && formData.otp.length === 6 && (
+                      <TouchableOpacity
+                        onPress={() => handleVerifyOTP()}
+                        disabled={authLoading}
+                        style={{ marginLeft: 4, borderRadius: 8, overflow: 'hidden' }}
+                      >
+                        <LinearGradient
+                          colors={['#EE2529', '#C73834']}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 0 }}
+                          style={styles.verifyBtn}
+                        >
+                          <Text style={styles.verifyBtnText}>
+                            {authLoading ? '...' : 'Verify'}
+                          </Text>
+                        </LinearGradient>
+                      </TouchableOpacity>
+                    )}
                   </View>
-                )}
+                  {isVerified && (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
+                      <View style={styles.verifiedBadge}>
+                        <Check size={16} color={COLORS.white} />
+                      </View>
+                      <Text style={[styles.verifiedText, { marginTop: 0, marginLeft: 6 }]}>
+                        Verified
+                      </Text>
+                    </View>
+                  )}
+                </View>
               </View>
-            </View>
 
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>
-                Your Inquiry <Text style={styles.required}>*</Text>
-              </Text>
-              <TextInput
-                style={[
-                  styles.input,
-                  { height: 100, textAlignVertical: 'top' },
-                ]}
-                placeholder="What would you like to know about this property?"
-                multiline
-                value={formData.question}
-                onChangeText={v => handleInputChange('question', v)}
-              />
-            </View>
-
-            {/* Checkboxes */}
-            <TouchableOpacity
-              style={styles.checkboxContainer}
-              onPress={() =>
-                handleInputChange('termsAccepted', !formData.termsAccepted)
-              }
-            >
-              <View
-                style={[
-                  styles.checkbox,
-                  formData.termsAccepted && styles.checkboxActive,
-                ]}
-              >
-                {formData.termsAccepted && (
-                  <Check size={12} color={COLORS.white} />
-                )}
-              </View>
-              <Text style={styles.checkboxLabel}>
-                I agree to the{' '}
-                <Text style={styles.link}>terms & conditions</Text>
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.checkboxContainer}
-              onPress={() =>
-                handleInputChange('privacyAccepted', !formData.privacyAccepted)
-              }
-            >
-              <View
-                style={[
-                  styles.checkbox,
-                  formData.privacyAccepted && styles.checkboxActive,
-                ]}
-              >
-                {formData.privacyAccepted && (
-                  <Check size={12} color={COLORS.white} />
-                )}
-              </View>
-              <Text style={styles.checkboxLabel}>
-                I agree to the <Text style={styles.link}>Privacy Policy</Text>
-              </Text>
-            </TouchableOpacity>
-
-            {/* Action Buttons */}
-            <View style={styles.buttonRow}>
-              <TouchableOpacity style={styles.cancelButton} onPress={goBack}>
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
+            
+              {/* Checkboxes */}
               <TouchableOpacity
-                style={[
-                  styles.submitButton,
-                  // user?.role !== 'Broker' &&
-                  //   user?.role !== 'Investor' && {
-                  //     backgroundColor: '#CCC',
-                  //   },
-                ]}
-                onPress={handleSubmit}
-                disabled={
-                  loading 
-                  // ||(user?.role !== 'Broker' && user?.role !== 'Investor')
+                style={styles.checkboxContainer}
+                onPress={() =>
+                  handleInputChange('termsAccepted', !formData.termsAccepted)
                 }
               >
-                {loading ? (
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 8,
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: 16,
-                        height: 16,
-                        borderTopColor: COLORS.white,
-                        borderRightColor: COLORS.white,
-                        borderBottomColor: 'transparent',
-                        borderLeftColor: 'transparent',
-                        borderWidth: 2,
-                        borderRadius: 8,
-                      }}
-                    />
-                    <Text style={styles.submitButtonText}>Processing...</Text>
-                  </View>
-                ) : (
-                  <Text style={styles.submitButtonText}>
-                    {user?.role === 'Broker' || user?.role === 'Investor'
-                      ? 'Enquiry'
-                      : 'Enquire'}
-                  </Text>
-                )}
-              </TouchableOpacity>
-              {/* {user?.role !== 'Broker' && user?.role !== 'Investor' && (
-                <Text style={styles.roleWarningText}>
-                  * Only Brokers and Investors can assign property.
+                <View
+                  style={[
+                    styles.checkbox,
+                    formData.termsAccepted && styles.checkboxActive,
+                  ]}
+                >
+                  {formData.termsAccepted && (
+                    <Check size={12} color={COLORS.white} />
+                  )}
+                </View>
+                <Text style={styles.checkboxLabel}>
+                  I agree to the{' '}
+                  <Text style={styles.blueLink}>terms & conditions</Text>
                 </Text>
-              )} */}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.checkboxContainer}
+                onPress={() =>
+                  handleInputChange('privacyAccepted', !formData.privacyAccepted)
+                }
+              >
+                <View
+                  style={[
+                    styles.checkbox,
+                    formData.privacyAccepted && styles.checkboxActive,
+                  ]}
+                >
+                  {formData.privacyAccepted && (
+                    <Check size={12} color={COLORS.white} />
+                  )}
+                </View>
+                <Text style={styles.checkboxLabel}>
+                  I agree to the <Text style={styles.blueLink}>Privacy Policy</Text>
+                </Text>
+              </TouchableOpacity>
+
+              {/* Action Buttons */}
+              <View style={styles.buttonRow}>
+                <TouchableOpacity style={styles.cancelButton} onPress={goBack}>
+                  <Text style={styles.cancelButtonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={{ flex: 1 }}
+                  onPress={handleSubmit}
+                  disabled={loading}
+                >
+                  <LinearGradient
+                    colors={['#EE2529', '#C73834']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.submitButton}
+                  >
+                    {loading ? (
+                      <View
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 8,
+                        }}
+                      >
+                        <View
+                          style={{
+                            width: 16,
+                            height: 16,
+                            borderTopColor: COLORS.white,
+                            borderRightColor: COLORS.white,
+                            borderBottomColor: 'transparent',
+                            borderLeftColor: 'transparent',
+                            borderWidth: 2,
+                            borderRadius: 8,
+                          }}
+                        />
+                        <Text style={styles.submitButtonText}>Processing...</Text>
+                      </View>
+                    ) : (
+                      <Text style={styles.submitButtonText}>
+                        {user?.role === 'Broker' || user?.role === 'Investor'
+                          ? 'Enquiry'
+                          : 'Enquire'}
+                      </Text>
+                    )}
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
@@ -622,7 +568,7 @@ const styles = StyleSheet.create({
   },
   backContainer: {
     marginBottom: 20,
-    maxWidth: 800,
+    maxWidth: 1000,
     alignSelf: 'center',
     width: '100%',
   },
@@ -635,6 +581,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.textDark,
     fontWeight: '500',
+    fontFamily: FONTS.main,
   },
   contentCard: {
     maxWidth: 800,
@@ -642,7 +589,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     backgroundColor: COLORS.white,
     borderRadius: 12,
-    padding: isDesktop ? 40 : 20,
+    overflow: 'hidden', // Important: This makes the header banner corners match the card
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 10,
@@ -651,60 +598,69 @@ const styles = StyleSheet.create({
   logoContainer: {
     marginBottom: 24,
     alignItems: 'flex-start',
+    paddingHorizontal: 0,
+    paddingTop: isDesktop ? 40 : 20,
   },
   logoImage: {
-    height: 48,
-    width: 200,
+    height: 70,
+    width: 320,
   },
   headerBanner: {
     backgroundColor: '#FFFCF4',
-    padding: 16,
-    borderRadius: 8,
+    paddingVertical: 16,
+    paddingHorizontal: 0,
     marginBottom: 12,
+    width: '100%',
   },
   title: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: '600',
-    color: COLORS.textDark,
+    color: '#262626',
     textAlign: 'center',
+    fontFamily: FONTS.main,
+  },
+  contentWithPadding: {
+    paddingHorizontal: isDesktop ? 40 : 20,
+    paddingBottom: isDesktop ? 40 : 20,
   },
   subtitle: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
+    fontSize: 22,
+    color: '#767676',
     textAlign: 'center',
     marginBottom: 32,
+    fontFamily: FONTS.main,
   },
   propertyInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     backgroundColor: '#FDFDFD',
-    padding: 16,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#F0F0F0',
     marginBottom: 24,
+    gap: 16,
   },
   infoCol: {
-    flex: 1,
   },
   infoLabel: {
-    fontSize: 12,
+    fontSize: 20,
     fontWeight: '600',
-    color: COLORS.textSecondary,
+    color: '#262626',
     marginBottom: 4,
+    fontFamily: FONTS.main,
   },
   infoValue: {
-    fontSize: 14,
-    color: COLORS.textDark,
-    fontWeight: '500',
+    fontSize: 18,
+    color: '#262626',
+    fontWeight: '400',
+    fontFamily: FONTS.main,
   },
   descriptionContainer: {
     marginBottom: 32,
   },
   descriptionText: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
+    fontSize: 18,
+    color: '#262626',
     lineHeight: 20,
+    fontWeight: '400',
+    fontFamily: FONTS.main,
   },
   form: {
     gap: 20,
@@ -717,27 +673,29 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   label: {
-    fontSize: 13,
+    fontSize: 20,
     fontWeight: '600',
     color: COLORS.textDark,
     marginBottom: 8,
+    fontFamily: FONTS.main,
   },
   required: {
     color: COLORS.primary,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: '#767676',
     borderRadius: 8,
     paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 14,
+    paddingVertical: 16,
+    fontSize: 18,
     color: COLORS.textDark,
+    fontFamily: FONTS.main,
   },
   phoneInputContainer: {
     flexDirection: 'row',
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: '#767676',
     borderRadius: 8,
     padding: 4,
     alignItems: 'center',
@@ -746,14 +704,13 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 12,
     paddingVertical: 8,
-    fontSize: 14,
+    fontSize: 18,
     color: COLORS.textDark,
+    fontFamily: FONTS.main,
   },
   otpButton: {
-    backgroundColor: COLORS.primary,
     paddingHorizontal: 16,
     paddingVertical: 10,
-    borderRadius: 6,
     minWidth: 100,
     alignItems: 'center',
     justifyContent: 'center',
@@ -768,15 +725,23 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 13,
     fontWeight: '700',
+    fontFamily: FONTS.main,
   },
   otpHelpText: {
-    fontSize: 12,
+    fontSize: 18,
     color: COLORS.textSecondary,
     marginTop: 8,
+    fontFamily: FONTS.main,
   },
   link: {
-    color: '#3B82F6',
+    color: '#262626',
     textDecorationLine: 'underline',
+    fontFamily: FONTS.main,
+  },
+  blueLink: {
+    color: '#1D4ED8',
+    textDecorationLine: 'underline',
+    fontFamily: FONTS.main,
   },
   otpContainer: {
     flexDirection: 'row',
@@ -784,7 +749,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   otpInput: {
-    width: 32,
+    width: 48,
     height: 48,
     borderWidth: 1.5,
     borderColor: '#D1D5DB',
@@ -793,7 +758,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: COLORS.textDark,
-    backgroundColor: '#F2F2F2',
+    fontFamily: FONTS.main,
   },
   otpInputVerified: {
     borderColor: '#10B981',
@@ -810,23 +775,23 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   verifyBtn: {
-    backgroundColor: COLORS.primary,
     paddingHorizontal: 12,
-    borderRadius: 8,
     justifyContent: 'center',
+    alignItems: 'center',
     height: 48,
-    marginLeft: 4,
   },
   verifyBtnText: {
     color: COLORS.white,
     fontSize: 12,
     fontWeight: '700',
+    fontFamily: FONTS.main,
   },
   verifiedText: {
     color: '#10B981',
     fontSize: 12,
     fontWeight: '700',
     marginTop: 4,
+    fontFamily: FONTS.main,
   },
   checkboxContainer: {
     flexDirection: 'row',
@@ -847,8 +812,9 @@ const styles = StyleSheet.create({
     borderColor: COLORS.primary,
   },
   checkboxLabel: {
-    fontSize: 13,
+    fontSize: 18,
     color: COLORS.textSecondary,
+    fontFamily: FONTS.main,
   },
   buttonRow: {
     flexDirection: 'row',
@@ -864,28 +830,36 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cancelButtonText: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '600',
     color: '#767676',
+    fontFamily: FONTS.main,
   },
   submitButton: {
     flex: 1,
     paddingVertical: 14,
-    backgroundColor: COLORS.primary,
     borderRadius: 8,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   submitButtonDisabled: {
     backgroundColor: '#D1D5DB',
   },
   submitButtonText: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '600',
     color: COLORS.white,
+    fontFamily: FONTS.main,
   },
   loadingContainer: {
     padding: 20,
     alignItems: 'center',
+  },
+  loadingText: {
+    fontFamily: FONTS.main,
+    color: COLORS.textSecondary,
+    fontSize: 16,
+    marginTop: 10,
   },
   roleWarningText: {
     color: COLORS.primary,
@@ -894,6 +868,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     textAlign: 'center',
     fontStyle: 'italic',
+    fontFamily: FONTS.main,
   },
   radioGroup: {
     flexDirection: 'row',
@@ -932,10 +907,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: COLORS.textSecondary,
+    fontFamily: FONTS.main,
   },
   radioLabelActive: {
     color: COLORS.primary,
     fontWeight: '700',
+    fontFamily: FONTS.main,
   },
 });
 
