@@ -14,6 +14,8 @@ import {
 import Layout from '../../layout/Layout';
 import { TrendingUp, Calculator, ChevronDown } from 'lucide-react-native';
 import bg from "../../assets/Calculator/bg.png"
+import Svg, { Path,Rect } from 'react-native-svg';
+
 
 // RentalYield Components
 import RentalCards from './components/RentalYield/RentalCards';
@@ -30,10 +32,76 @@ import PrincipleChart from './components/EMI/PrincipleChart';
 import CoverageAnalysis from './components/EMI/CoverageAnalysis';
 import LinearGradient from 'react-native-linear-gradient';
 
+  const EMICalculatorIcon = ({ size = 20, color = '#767676' }) => (
+  <Svg width={size} height={size * (30/37)} viewBox="0 0 37 30" fill="none">
+    <Path
+      d="M30.9231 1.5H6.07692C3.54916 1.5 1.5 3.54916 1.5 6.07692V23.0769C1.5 25.6047 3.54916 27.6538 6.07692 27.6538H30.9231C33.4508 27.6538 35.5 25.6047 35.5 23.0769V6.07692C35.5 3.54916 33.4508 1.5 30.9231 1.5Z"
+      stroke={color}
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M1.5 9.34766H35.5"
+      stroke={color}
+      strokeWidth="3"
+      strokeLinejoin="round"
+    />
+    <Path
+      d="M11.9621 18.1758H8.03906V19.8104H11.9621V18.1758Z"
+      stroke={color}
+      strokeWidth="3"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
+const RedCardIcon = ({ size = 30, color = '#fff' }) => {
+  // Maintain aspect ratio (92x92 original)
+  const width = size;
+  const height = size;
+  
+  return (
+    <Svg width={width} height={height} viewBox="0 0 92 92" fill="none">
+      <Rect width="92" height="92" rx="15" fill="#EE2529" />
+      <Path
+        d="M63.0625 21.25C65.5039 21.25 67.75 23.4961 67.75 25.9375V66.5625C67.75 69.1016 65.5039 71.25 63.0625 71.25H28.6875C26.1484 71.25 24 69.1016 24 66.5625V25.9375C24 23.4961 26.1484 21.25 28.6875 21.25H63.0625ZM36.5 63.8281V60.0195C36.5 59.4336 35.8164 58.75 35.2305 58.75H31.4219C30.8359 58.75 30.25 59.4336 30.25 60.0195V63.8281C30.25 64.4141 30.8359 65 31.4219 65H35.2305C35.8164 65 36.5 64.4141 36.5 63.8281ZM36.5 51.3281V47.5195C36.5 46.9336 35.8164 46.25 35.2305 46.25H31.4219C30.8359 46.25 30.25 46.9336 30.25 47.5195V51.3281C30.25 51.9141 30.8359 52.5 31.4219 52.5H35.2305C35.8164 52.5 36.5 51.9141 36.5 51.3281ZM49 63.8281V60.0195C49 59.4336 48.3164 58.75 47.7305 58.75H43.9219C43.3359 58.75 42.75 59.4336 42.75 60.0195V63.8281C42.75 64.4141 43.3359 65 43.9219 65H47.7305C48.3164 65 49 64.4141 49 63.8281ZM49 51.3281V47.5195C49 46.9336 48.3164 46.25 47.7305 46.25H43.9219C43.3359 46.25 42.75 46.9336 42.75 47.5195V51.3281C42.75 51.9141 43.3359 52.5 43.9219 52.5H47.7305C48.3164 52.5 49 51.9141 49 51.3281ZM61.5 63.8281V47.5195C61.5 46.9336 60.8164 46.25 60.2305 46.25H56.4219C55.8359 46.25 55.25 46.9336 55.25 47.5195V63.8281C55.25 64.4141 55.8359 65 56.4219 65H60.2305C60.8164 65 61.5 64.4141 61.5 63.8281ZM61.5 38.8281V28.7695C61.5 28.1836 60.8164 27.5 60.2305 27.5H31.4219C30.8359 27.5 30.25 28.1836 30.25 28.7695V38.8281C30.25 39.4141 30.8359 40 31.4219 40H60.2305C60.8164 40 61.5 39.4141 61.5 38.8281Z"
+        fill={color}
+      />
+    </Svg>
+  );
+};
+
+const InfoIcon = ({ size = 15, color = '#909092' }) => (
+  <Svg width={size} height={size} viewBox="0 0 15 15" fill="none">
+    <Path
+      d="M7.5 14.5C11.366 14.5 14.5 11.366 14.5 7.5C14.5 3.63401 11.366 0.5 7.5 0.5C3.63401 0.5 0.5 3.63401 0.5 7.5C0.5 11.366 3.63401 14.5 7.5 14.5Z"
+      stroke={color}
+    />
+    <Path
+      d="M5.5 5.375C5.5 4.33947 6.39547 3.5 7.5 3.5C8.60453 3.5 9.5 4.33947 9.5 5.375C9.5 6.06245 9.10533 6.6635 8.51696 6.9899C8.00987 7.2711 7.5 7.6977 7.5 8.25V9.5"
+      stroke={color}
+      strokeLinecap="round"
+    />
+    <Path
+      d="M7.5 11.5C7.77614 11.5 8.00116 11.2761 8.00116 11C8.00116 10.7239 7.77536 10.5 7.49922 10.5C7.22308 10.5 7 10.7239 7 11C7 11.2761 7.22386 11.5 7.5 11.5Z"
+      fill={color}
+    />
+  </Svg>
+);
+
+const LabelWithIcon = ({ label, style }: { label: string; style?: any }) => (
+  <View style={[styles.labelRow, style]}>
+    <Text style={styles.label}>{label}</Text>
+    <InfoIcon />
+  </View>
+);
+
 const CalculatorsScreen = () => {
   const [activeTab, setActiveTab] = useState<'roi' | 'emi'>('roi');
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
+
 
   return (
     <Layout>
@@ -58,9 +126,9 @@ const CalculatorsScreen = () => {
               ]}
             >
               <View style={isDesktop ? { flexDirection: 'row', gap: 20, alignItems: 'center', marginBottom: 20 } : {}}>
-                <View style={styles.redIconBox}>
-                  <Calculator size={isDesktop ? 62 : 30} color="#fff" />
-                </View>
+               <View style={styles.redIconBox}>
+  <RedCardIcon size={isDesktop ? 62 : 30} color="#fff" />
+</View>
                 <View>
                   <View style={styles.badgeContainer}>
                     <Text style={styles.badgeText}>
@@ -75,7 +143,7 @@ const CalculatorsScreen = () => {
 
               <Text style={styles.heroSubtitle}>
                 Make data-driven decisions with comprehensive ROI analysis, loan
-                coverage insights, and detailed cash flow projections for your
+                coverage <br /> insights, and detailed cash flow projections for your
                 real estate investments
               </Text>
 
@@ -127,8 +195,8 @@ const CalculatorsScreen = () => {
                 styles.heroImage,
                 isDesktop
                   ? {
-                    width: '40%',       // ← slightly narrower
-                    height: 639,        // ← reduced from 500
+                    width: '39%',       // ← slightly narrower
+                    height: 598,        // ← reduced from 500
                     position: 'absolute',
                     right: -20,
                     top: -119,
@@ -160,7 +228,6 @@ const CalculatorsScreen = () => {
               style={[
                 styles.tabText,
                 activeTab === 'roi' && styles.activeTabText,
-                isDesktop && { fontSize: 16 },
               ]}
             >
               ROI & Rental Yield Calculator
@@ -168,27 +235,21 @@ const CalculatorsScreen = () => {
             {activeTab === 'roi' && <View style={styles.activeIndicator} />}
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.tabItem}
-            onPress={() => setActiveTab('emi')}
-          >
-            <View style={[styles.tabIconBox, activeTab === 'emi' && styles.activeTabIconBox]}>
-              <Calculator
-                size={20}
-                color={activeTab === 'emi' ? '#fff' : '#767676'}
-              />
-            </View>
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === 'emi' && styles.activeTabText,
-                isDesktop && { fontSize: 16 },
-              ]}
-            >
-              EMI Calculator
-            </Text>
-            {activeTab === 'emi' && <View style={styles.activeIndicator} />}
-          </TouchableOpacity>
+         <TouchableOpacity
+  style={styles.tabItem}
+  onPress={() => setActiveTab('emi')}
+>
+  <View style={[styles.tabIconBox, activeTab === 'emi' && styles.activeTabIconBox]}>
+    <EMICalculatorIcon
+      size={20}
+      color={activeTab === 'emi' ? '#fff' : '#767676'}
+    />
+  </View>
+  <Text style={[styles.tabText, activeTab === 'emi' && styles.activeTabText]}>
+    EMI Calculator
+  </Text>
+  {activeTab === 'emi' && <View style={styles.activeIndicator} />}
+</TouchableOpacity>
         </View>
 
         <View
@@ -214,7 +275,7 @@ const InfoCardsSummary = ({ type }: { type: 'roi' | 'emi' }) => {
     type === 'roi'
       ? [
         'Get clarity on your\nmonthly or annual yield.',
-        'Compare ROI across different properties or investments.',
+        'Compare ROI across different\nproperties or investments.',
         'Adjust variables like rent,\npurchase price, and taxes to see\nimpact in real time',
       ]
       : [
@@ -238,13 +299,21 @@ const CalculatorHeader = ({ type }: { type: 'roi' | 'emi' }) => {
   const headerData =
     type === 'roi'
       ? {
-        icon: <Calculator size={32} color="#fff" />,
+         icon: (
+          <View style={styles.redIconBox}>
+            <RedCardIcon size={62} color="#fff" />
+          </View>
+        ),
         title: 'Property Investment ROI Calculator',
         subtitle:
           'Get clarity on your monthly or annual yield using rent,\n purchase price, and taxes.',
       }
       : {
-        icon: <Calculator size={32} color="#fff" />,
+         icon: (
+          <View style={styles.redIconBox}>
+            <RedCardIcon size={62} color="#fff" />
+          </View>
+        ),
         title: 'Property EMI Calculator',
         subtitle:
           'Estimate your monthly loan repayment instantly based on loan amount,\n tenure, interest rate, and other key factors.',
@@ -297,9 +366,10 @@ const Dropdown = ({
         { zIndex: isOpen ? 10000 : 1 }
       ]}
     >
-      <Text style={[styles.label, row ? styles.dropdownLabel : { width: 'auto' }]}>
-        {label}
-      </Text>
+      <LabelWithIcon
+        label={label}
+        style={row ? styles.dropdownLabel : { width: 'auto' }}
+      />
       <View style={{ flex: 1, position: 'relative', zIndex: isOpen ? 10000 : 1 }}>
         <TouchableOpacity
           style={[styles.dropdownHeader, row && styles.dropdownHeaderRow]}
@@ -473,10 +543,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
       <InfoCardsSummary type="roi" />
 
       {/* Property Details */}
-      <View style={styles.sectionCard}>
+      <View style={[styles.sectionCard, { zIndex: 100 }]}>
         <Text style={styles.sectionTitle}>Property Details</Text>
 
-        <View style={[styles.gridRow, { zIndex: 10 }]}>
+        <View style={[styles.gridRow, { zIndex: 50 }]}>
           <View style={styles.inputCol}>
             <Dropdown
               row
@@ -487,27 +557,27 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Carpet Area (sq ft)</Text>
+            <LabelWithIcon label="Carpet Area (sq ft)" />
             <TextInput
               style={styles.input}
               placeholder="5000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.carpetArea}
               onChangeText={v => handleInputChange('carpetArea', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Purchase Price (₹)</Text>
+            <LabelWithIcon label="Purchase Price (₹)" />
             <TextInput
               style={styles.input}
               placeholder="45,00,000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.purchasePrice}
               onChangeText={v => handleInputChange('purchasePrice', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
@@ -518,9 +588,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
         <View style={styles.sectionHeaderRow}>
           <Text style={styles.sectionTitle}>Financing Options</Text>
           <View style={styles.toggleRow}>
-            <Text style={[styles.label, { marginBottom: 0, fontSize: 12 }]}>
-              Include Loan
-            </Text>
+            <LabelWithIcon
+              label="Include Loan"
+              style={{ marginBottom: 0, fontSize: 14, width: 'auto' }}
+            />
             <Switch
               value={includeLoan}
               onValueChange={setIncludeLoan}
@@ -537,49 +608,49 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
           <>
             <View style={styles.gridRow}>
               <View style={styles.inputCol}>
-                <Text style={styles.label}>Loan Amount (₹)</Text>
+                <LabelWithIcon label="Loan Amount (₹)" />
                 <TextInput
                   style={styles.input}
                   placeholder="31,50,000"
-                  keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+                  keyboardType="numeric"
                   value={formData.loanAmount}
                   onChangeText={v => handleInputChange('loanAmount', v)}
-                  placeholderTextColor="#999"
+                  placeholderTextColor="#262626"
                 />
               </View>
               <View style={styles.inputCol}>
-                <Text style={styles.label}>Down Payment (₹)</Text>
+                <LabelWithIcon label="Down Payment (₹)" />
                 <TextInput
                   style={styles.input}
                   placeholder="13,50,000"
-                  keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+                  keyboardType="numeric"
                   value={formData.downPayment}
                   onChangeText={v => handleInputChange('downPayment', v)}
-                  placeholderTextColor="#999"
+                  placeholderTextColor="#262626"
                 />
               </View>
             </View>
             <View style={styles.gridRow}>
               <View style={styles.inputCol}>
-                <Text style={styles.label}>Interest Rate (%)</Text>
+                <LabelWithIcon label="Interest Rate (%)" />
                 <TextInput
                   style={styles.input}
                   placeholder="8.5"
-                  keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+                  keyboardType="numeric"
                   value={formData.interestRate}
                   onChangeText={v => handleInputChange('interestRate', v)}
-                  placeholderTextColor="#999"
+                  placeholderTextColor="#262626"
                 />
               </View>
               <View style={styles.inputCol}>
-                <Text style={styles.label}>Loan Tenure (Years)</Text>
+                <LabelWithIcon label="Loan Tenure (Years)" />
                 <TextInput
                   style={styles.input}
                   placeholder="20"
-                  keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+                  keyboardType="numeric"
                   value={formData.loanTenure}
                   onChangeText={v => handleInputChange('loanTenure', v)}
-                  placeholderTextColor="#999"
+                  placeholderTextColor="#262626"
                 />
               </View>
             </View>
@@ -592,72 +663,72 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
         <Text style={styles.sectionTitle}>Rental Details</Text>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Monthly Rent (₹)</Text>
+            <LabelWithIcon label="Monthly Rent (₹)" />
             <TextInput
               style={styles.input}
               placeholder="50,000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.monthlyRent}
               onChangeText={v => handleInputChange('monthlyRent', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Security Deposit (₹)</Text>
+            <LabelWithIcon label="Security Deposit (₹)" />
             <TextInput
               style={styles.input}
               placeholder="3,00,000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.securityDeposit}
               onChangeText={v => handleInputChange('securityDeposit', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Rent Escalation every(yrs)</Text>
+            <LabelWithIcon label="Rent Escalation every(yrs)" />
             <TextInput
               style={styles.input}
               placeholder="3"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.rentEscalationEvery}
               onChangeText={v => handleInputChange('rentEscalationEvery', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Rent Escalation(% per year)</Text>
+            <LabelWithIcon label="Rent Escalation(% per year)" />
             <TextInput
               style={styles.input}
               placeholder="8"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.rentEscalationPercent}
               onChangeText={v => handleInputChange('rentEscalationPercent', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Lease Start Date *</Text>
+            <LabelWithIcon label="Lease Start Date *" />
             <TextInput
               style={styles.input}
               placeholder="DD/MM/YYYY"
               value={formData.leaseStartDate}
               onChangeText={v => handleInputChange('leaseStartDate', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Lease Term (Months) *</Text>
+            <LabelWithIcon label="Lease Term (Months) *" />
             <TextInput
               style={styles.input}
               placeholder="10"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.leaseTerm}
               onChangeText={v => handleInputChange('leaseTerm', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
@@ -670,49 +741,49 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
         <Text style={styles.sectionTitle}>Recurring Expenses (Annual)</Text>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Property Tax (₹)</Text>
+            <LabelWithIcon label="Property Tax (₹)" />
             <TextInput
               style={styles.input}
               placeholder="15,000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.propertyTax}
               onChangeText={v => handleInputChange('propertyTax', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Maintenance (₹/sqft)</Text>
+            <LabelWithIcon label="Maintenance (₹/sqft)" />
             <TextInput
               style={styles.input}
               placeholder="30"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.maintenancePerSqft}
               onChangeText={v => handleInputChange('maintenancePerSqft', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Insurance (₹)</Text>
+            <LabelWithIcon label="Insurance (₹)" />
             <TextInput
               style={styles.input}
               placeholder="8,000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.insurance}
               onChangeText={v => handleInputChange('insurance', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Maintenance Lumpsum (₹)</Text>
+            <LabelWithIcon label="Maintenance Lumpsum (₹)" />
             <TextInput
               style={styles.input}
               placeholder="15,000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.maintenanceLumpSum}
               onChangeText={v => handleInputChange('maintenanceLumpSum', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
@@ -723,59 +794,66 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
         <Text style={styles.sectionTitle}>One-time Costs</Text>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Stamp Duty (%)</Text>
+            <LabelWithIcon label="Stamp Duty (%)" />
             <TextInput
               style={styles.input}
               placeholder="12"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.stampDuty}
               onChangeText={v => handleInputChange('stampDuty', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Legal Fees (₹)</Text>
+            <LabelWithIcon label="Legal Fees (₹)" />
             <TextInput
               style={styles.input}
               placeholder="30,000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.legalFees}
               onChangeText={v => handleInputChange('legalFees', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Brokerage (₹)</Text>
+            <LabelWithIcon label="Brokerage (₹)" />
             <TextInput
               style={styles.input}
               placeholder="67,500"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.brokerage}
               onChangeText={v => handleInputChange('brokerage', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Other Costs (₹)</Text>
+            <LabelWithIcon label="Other Costs (₹)" />
             <TextInput
               style={styles.input}
               placeholder="25,000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.otherCosts}
               onChangeText={v => handleInputChange('otherCosts', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
       </View>
 
       {/* Calculate Button */}
-      <TouchableOpacity style={styles.calculateBtn} onPress={handleCalculate}>
-        <Text style={styles.calculateBtnText}>
-          Calculate ROI & Rental Yield
-        </Text>
+      <TouchableOpacity onPress={handleCalculate} style={{ alignSelf: 'center' }}>
+        <LinearGradient
+          colors={['#EE2529', '#C73834']}
+          style={styles.calculateBtn}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+          <Text style={styles.calculateBtnText}>
+            Calculate ROI & Rental Yield
+          </Text>
+        </LinearGradient>
       </TouchableOpacity>
 
       {/* Result Components */}
@@ -884,27 +962,27 @@ const EMICalculatorView = () => {
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Carpet Area (sq ft)</Text>
+            <LabelWithIcon label="Carpet Area (sq ft)" />
             <TextInput
               style={styles.input}
               placeholder="5600"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.carpetArea}
               onChangeText={v => handleInputChange('carpetArea', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Purchase Price (₹)</Text>
+            <LabelWithIcon label="Purchase Price (₹)" />
             <TextInput
               style={styles.input}
               placeholder="400000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.purchasePrice}
               onChangeText={v => handleInputChange('purchasePrice', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
@@ -915,9 +993,10 @@ const EMICalculatorView = () => {
         <View style={styles.sectionHeaderRow}>
           <Text style={styles.sectionTitle}>EMI Options</Text>
           <View style={styles.toggleRow}>
-            <Text style={[styles.label, { marginBottom: 0, fontSize: 12 }]}>
-              Include Downpayment
-            </Text>
+            <LabelWithIcon
+              label="Include Downpayment"
+              style={{ marginBottom: 0, fontSize: 12, width: 'auto' }}
+            />
             <Switch
               value={includeLoan}
               onValueChange={setIncludeLoan}
@@ -931,53 +1010,53 @@ const EMICalculatorView = () => {
         </Text>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Loan Amount (₹)</Text>
+            <LabelWithIcon label="Loan Amount (₹)" />
             <TextInput
               style={[styles.input, !includeLoan && styles.inputDisabled]}
               placeholder="310000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.loanAmount}
               onChangeText={v => handleInputChange('loanAmount', v)}
               editable={includeLoan}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Down Payment (₹)</Text>
+            <LabelWithIcon label="Down Payment (₹)" />
             <TextInput
               style={[styles.input, !includeLoan && styles.inputDisabled]}
               placeholder="130000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.downPayment}
               onChangeText={v => handleInputChange('downPayment', v)}
               editable={includeLoan}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Interest (% per annum)</Text>
+            <LabelWithIcon label="Interest (% per annum)" />
             <TextInput
               style={[styles.input, !includeLoan && styles.inputDisabled]}
               placeholder="9.5"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.interestRate}
               onChangeText={v => handleInputChange('interestRate', v)}
               editable={includeLoan}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Loan Tenure (Years)</Text>
+            <LabelWithIcon label="Loan Tenure (Years)" />
             <TextInput
               style={[styles.input, !includeLoan && styles.inputDisabled]}
               placeholder="20"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.loanTenure}
               onChangeText={v => handleInputChange('loanTenure', v)}
               editable={includeLoan}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
@@ -988,72 +1067,72 @@ const EMICalculatorView = () => {
         <Text style={styles.sectionTitle}>Rental Details</Text>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Monthly Rent (₹)</Text>
+            <LabelWithIcon label="Monthly Rent (₹)" />
             <TextInput
               style={styles.input}
               placeholder="30000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.monthlyRent}
               onChangeText={v => handleInputChange('monthlyRent', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Security Deposit (₹)</Text>
+            <LabelWithIcon label="Security Deposit (₹)" />
             <TextInput
               style={styles.input}
               placeholder="300000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.securityDeposit}
               onChangeText={v => handleInputChange('securityDeposit', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Days Calculation Gregorian</Text>
+            <LabelWithIcon label="Days Calculation Gregorian" />
             <TextInput
               style={styles.input}
               placeholder="3"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.daysCalculation}
               onChangeText={v => handleInputChange('daysCalculation', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Rent Escalation (% per year)</Text>
+            <LabelWithIcon label="Rent Escalation (% per year)" />
             <TextInput
               style={styles.input}
               placeholder="8"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.rentEscalation}
               onChangeText={v => handleInputChange('rentEscalation', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Lease Start Date *</Text>
+            <LabelWithIcon label="Lease Start Date *" />
             <TextInput
               style={styles.input}
               placeholder="DD/MM/YYYY"
               value={formData.leaseStartDate}
               onChangeText={v => handleInputChange('leaseStartDate', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Lease Term (Yrs) *</Text>
+            <LabelWithIcon label="Lease Term (Yrs) *" />
             <TextInput
               style={styles.input}
               placeholder="10"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.leaseTerm}
               onChangeText={v => handleInputChange('leaseTerm', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
@@ -1066,49 +1145,49 @@ const EMICalculatorView = () => {
         <Text style={styles.sectionTitle}>Recurring Expenses (Annual)</Text>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Property Tax (₹)</Text>
+            <LabelWithIcon label="Property Tax (₹)" />
             <TextInput
               style={styles.input}
               placeholder="12000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.propertyTax}
               onChangeText={v => handleInputChange('propertyTax', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Maintenance per sq ft (₹)</Text>
+            <LabelWithIcon label="Maintenance per sq ft (₹)" />
             <TextInput
               style={styles.input}
               placeholder="30000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.maintenance}
               onChangeText={v => handleInputChange('maintenance', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Insurance (₹)</Text>
+            <LabelWithIcon label="Insurance (₹)" />
             <TextInput
               style={styles.input}
               placeholder="8000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.insurance}
               onChangeText={v => handleInputChange('insurance', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Maintenance Lump sum (₹)</Text>
+            <LabelWithIcon label="Maintenance Lump sum (₹)" />
             <TextInput
               style={styles.input}
               placeholder="58000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.maintenanceLumpsum}
               onChangeText={v => handleInputChange('maintenanceLumpsum', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
@@ -1119,59 +1198,66 @@ const EMICalculatorView = () => {
         <Text style={styles.sectionTitle}>One-time Costs</Text>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Stamp Duty (%)</Text>
+            <LabelWithIcon label="Stamp Duty (%)" />
             <TextInput
               style={styles.input}
               placeholder="12"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.stampDuty}
               onChangeText={v => handleInputChange('stampDuty', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Legal Fees (₹)</Text>
+            <LabelWithIcon label="Legal Fees (₹)" />
             <TextInput
               style={styles.input}
               placeholder="38000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.legalFees}
               onChangeText={v => handleInputChange('legalFees', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
         <View style={styles.gridRow}>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Brokerage (₹)</Text>
+            <LabelWithIcon label="Brokerage (₹)" />
             <TextInput
               style={styles.input}
               placeholder="67500"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.brokerage}
               onChangeText={v => handleInputChange('brokerage', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
           <View style={styles.inputCol}>
-            <Text style={styles.label}>Other One-time Costs (₹)</Text>
+            <LabelWithIcon label="Other One-time Costs (₹)" />
             <TextInput
               style={styles.input}
               placeholder="25000"
-              keyboardType="numeric" type={Platform.OS === 'web' ? 'number' : undefined}
+              keyboardType="numeric"
               value={formData.otherCosts}
               onChangeText={v => handleInputChange('otherCosts', v)}
-              placeholderTextColor="#999"
+              placeholderTextColor="#262626"
             />
           </View>
         </View>
       </View>
 
       {/* Calculate Button */}
-      <TouchableOpacity style={styles.calculateBtn} onPress={handleCalculate}>
-        <Text style={styles.calculateBtnText}>
-          Calculate ROI & Rental Yield
-        </Text>
+      <TouchableOpacity onPress={handleCalculate} style={{ alignSelf: 'center' }}>
+        <LinearGradient
+          colors={['#EE2529', '#C73834']}
+          style={styles.calculateBtn}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+          <Text style={styles.calculateBtnText}>
+            Calculate ROI & Rental Yield
+          </Text>
+        </LinearGradient>
       </TouchableOpacity>
 
       {/* Result Components */}
@@ -1225,7 +1311,7 @@ const styles = StyleSheet.create({
   },
   redIconBox: {
     backgroundColor: '#EE2529',
-    padding: 4,
+    padding: 2,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
@@ -1233,13 +1319,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 10,
     elevation: 5,
-    height: 70,
-    width: 70,
+    height: 72,
+    width: 72,
+    marginTop:10,
   },
   heroStatsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: 14,
     marginTop: 20,
   },
   heroStatCard: {
@@ -1251,6 +1338,7 @@ const styles = StyleSheet.create({
   shadowRadius: 10,
   elevation: 3,
   // backgroundColor: '#fff'
+   backgroundImage: 'linear-gradient(to right, #F2F2F2, rgba(255, 255, 255, 0.6))' as any,
   },
   heroStatCardGradient: {
   padding: 26,
@@ -1259,14 +1347,14 @@ const styles = StyleSheet.create({
   justifyContent: 'center',
 },
   heroStatLabel: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#767676',
     fontWeight: '600',
     marginBottom: 3,
     textAlign: 'center',
   },
   heroStatValue: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#EE2529',
     fontWeight: 400,
     textAlign: 'center',
@@ -1338,6 +1426,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 0,
     marginTop: 100,
+    marginBottom: 30, 
     backgroundColor: '#fff',
     borderRadius: 25,
     shadowColor: '#000',
@@ -1370,19 +1459,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#EE2529',
   },
   tabText: {
-    fontSize: 14,
+    fontSize: 24,
     color: '#767676',
-    fontWeight: '700',
+    fontWeight: 400,
+    lineHeight:24,
   },
   activeTabText: {
+    fontSize: 24,
     color: '#EE2529',
-    fontWeight: 'bold',
+    fontWeight: 700,
+    lineHeight:24,
   },
   activeIndicator: {
     position: 'absolute',
     bottom: 0,
     width: '50%',
-    height: 6,
+    height: 4,
     backgroundColor: '#EE2529',
   },
   divider: {
@@ -1398,24 +1490,26 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   calcTitle: {
-    fontSize: 20,
+    fontSize: 32,
     fontWeight: '700',
     marginBottom: 14,
+    marginTop:10,
     color: '#333',
     textAlign: 'center',
   },
   sectionCard: {
     backgroundColor: '#fff',
     borderRadius: 20,
-    padding: 14,
+    paddingVertical: 30,
+    paddingHorizontal:30,
     marginBottom: 12,
     shadowColor: '#000',
     shadowOpacity: 0.08,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 8 },
     elevation: 4,
-    borderWidth: 1,
-    borderColor: '#F3F4F6',
+   
+   
   },
   sectionHeaderRow: {
     flexDirection: 'row',
@@ -1424,14 +1518,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 24,
+    lineHeight: 28,
+    fontWeight: '600',
     color: '#EE2529',
     marginBottom: 8,
   },
   sectionNote: {
     color: '#6B7280',
-    fontSize: 13,
+    fontSize: 16,
     lineHeight: 18,
     marginBottom: 16,
   },
@@ -1446,6 +1541,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
+    
   },
   inputCol: {
     flexBasis: '48%',
@@ -1477,24 +1573,31 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   label: {
-    fontSize: 13,
+    fontSize: 18,
+    lineHeight: 20,
     marginBottom: 0,
-    color: '#555',
+    color: '#262626',
     fontWeight: '400',
-    width: '35%',
     textAlign: 'left',
+    fontFamily: 'Montserrat',
+  },
+  labelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '35%',
+    gap: 6,
   },
   input: {
     flex: 1,
-    backgroundColor: '#F6F6F6',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
+    backgroundColor: '#F2F2F2',
     borderRadius: 12,
     paddingVertical: 10,
     paddingHorizontal: 12,
-    fontSize: 13,
-    color: '#111827',
+    fontSize: 18,
+    color: '#262626',
     fontWeight: '600',
+    lineHeight: 20,
+    fontFamily: 'Montserrat',
     minHeight: 40,
     textAlign: 'right',
     ...Platform.select({
@@ -1533,8 +1636,8 @@ const styles = StyleSheet.create({
     color: '#d62d2d',
   },
   calculateBtn: {
-    backgroundColor: '#EE2529',
-    padding: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 8,
@@ -1543,13 +1646,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 5,
-    maxWidth: 250,
-    alignSelf: 'center',
+    minWidth: 280,
   },
   calculateBtnText: {
-    color: '#fff',
-    fontSize: 13,
-    fontWeight: 'bold',
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 600,
+    fontFamily:'Montserrat',
   },
   dropdownContainer: {
     marginBottom: 12,
@@ -1572,8 +1675,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#F6F6F6',
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
+   
     borderRadius: 12,
     paddingVertical: 10,
     paddingHorizontal: 12,
@@ -1583,9 +1685,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   dropdownHeaderText: {
-    fontSize: 13,
-    color: '#111827',
+    fontSize: 18,
+    color: '#262626',
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
   dropdownList: {
     position: 'absolute',
@@ -1612,8 +1715,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF3CA',
   },
   dropdownItemText: {
-    fontSize: 14,
-    color: '#555',
+    fontSize: 18,
+    color: '#262626',
+    fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
   activeDropdownItemText: {
     color: '#EE2529',
@@ -1623,18 +1728,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 12,
+    gap: 16,
     marginBottom: 30,
-    marginTop: 8,
+    marginTop: 20,
     width: '100%',
     maxWidth: '72%',
     alignSelf: 'center',
   },
   infoSummaryCard: {
     flex: 1,
-    minWidth: 120,
-    padding: 10,
-    backgroundColor: '#fff',
+    minWidth: 110,
+     paddingVertical: 20,
+     backgroundImage: 'linear-gradient(to bottom, #F2F2F2, rgba(255, 255, 255, 0.6))' as any,
     borderRadius: 8,
     borderBottomWidth: 3,
     borderBottomColor: '#EE2529',
@@ -1644,13 +1749,15 @@ const styles = StyleSheet.create({
     elevation: 3,
     alignItems: 'center',
     justifyContent: 'center',
+    maxHeight: 100,
   },
   infoSummaryText: {
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 18,
+    lineHeight: 28,
     color: '#767676',
     fontWeight: '600',
     textAlign: 'center',
+    
   },
   alertBox: {
     marginTop: 15,
@@ -1661,20 +1768,25 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   alertTitle: {
-    fontSize: 16,
-    color: '#767676',
-    fontWeight: '600',
+    fontSize: 20,
+    color: '#262626',
+    fontWeight: 600,
     marginBottom: 5,
+    lineHeight:28,
+    fontFamily:'Montserrat',
   },
   alertValue: {
     color: '#EE2529',
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 24,
+    fontWeight: 600,
+     fontFamily:'Montserrat',
   },
   alertSubtitle: {
     fontSize: 14,
-    color: '#767676',
+    color: '#262626',
     lineHeight: 18,
+     fontFamily:'Montserrat',
+
   },
   calcHeader: {
     alignItems: 'center',
@@ -1690,13 +1802,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   calcSubtitle: {
-    fontSize: 13,
+    fontSize: 18,
     fontWeight: '400',
     lineHeight: 18,
-    color: '#6B7280',
+    color: '#767676',
     textAlign: 'center',
     maxWidth: '85%',
     marginBottom: 4,
+    height:28,
   },
 });
 

@@ -6,7 +6,11 @@ import {
   ScrollView,
   TouchableOpacity,
   useWindowDimensions,
+  Image,
 } from 'react-native';
+import download from "../../../../assets/Calculator/download.png"
+import share from "../../../../assets/Calculator/share.png"
+
 
 type CashFlowRow = {
   year: string;
@@ -128,15 +132,18 @@ const RentalDetailsCashflow = ({ data }: RentalDetailsCashflowProps) => {
       </ScrollView>
 
       {/* Buttons */}
-      <View style={[styles.buttonContainer, isDesktop && { marginTop: 30 }]}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Download Report</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}>Share Report</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Buttons */}
+           <View style={[styles.buttonContainer, isDesktop && { marginTop: 30 }]}>
+             <TouchableOpacity style={styles.button}>
+               <Image source={download} style={styles.buttonIcon} />
+               <Text style={styles.buttonText}>Download Report</Text>
+             </TouchableOpacity>
+     
+             <TouchableOpacity style={styles.button}>
+               <Image source={share} style={styles.buttonIcon} />
+               <Text style={styles.buttonText}>Share Report</Text>
+             </TouchableOpacity>
+           </View>
     </View>
   );
 };
@@ -197,11 +204,19 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     borderWidth: 1,
     borderColor: '#767676',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 6,
+  },
+  buttonIcon: {
+    width: 18,
+    height: 18,
+    resizeMode: 'contain',
   },
   buttonText: {
     color: '#767676',

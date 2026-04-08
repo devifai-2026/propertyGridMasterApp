@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 
+
 interface CashFlowProjectionsProps {
   data?: {
     annualGrossRent?: number;
