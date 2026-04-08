@@ -333,7 +333,9 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
       <View
         style={[
           styles.headerContent,
-          { paddingHorizontal: isMobile ? 20 : 60 },
+          isMobile
+            ? { paddingLeft: 0, paddingRight: 40 }
+            : { paddingHorizontal: 60 },
         ]}
       >
         <TouchableOpacity
@@ -382,7 +384,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
           </View>
         )}
 
-        <View style={styles.headerActions}>
+        <View style={[styles.headerActions, isMobile && { gap: 8 }]}>
           {/* {isLoggedIn && user?.role === 'Owner' && (
             <TouchableOpacity
               style={styles.notificationBtn}
