@@ -26,6 +26,7 @@ import {
   Clock,
   User,
   Heart,
+  ChartNoAxesColumnIncreasing,
 } from 'lucide-react-native';
 import Layout from '../../layout/Layout';
 import { useNavigation } from '../../context/NavigationContext';
@@ -37,7 +38,13 @@ import RentalCards from '../calculators/components/RentalYield/RentalCards';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
 import DownloadIcon from "../../assets/propertyDetails/download.svg"
 import ShareIcon from "../../assets/propertyDetails/share.svg"
-import bg from "../../assets/Banner/bannerBg.png"
+import bannerBg from "../../assets/Banner/bannerBg.png"
+import propertDetails from "../../assets/propertyDetails/propertyDetails.png"
+import leaseDetails from "../../assets/propertyDetails/leaseDetails.png"
+import location from "../../assets/propertyDetails/locationDetails.png"
+import faqs from "../../assets/propertyDetails/faq.png"
+import squaresBg from "../../assets/propertyDetails/squaresbg.png"
+ 
 
 const { width } = Dimensions.get('window');
 
@@ -232,14 +239,14 @@ const PropertyDetailsScreen = () => {
 
 
   const tabs = [
-    { id: 'property', label: 'Property Details', icon: Building },
-    { id: 'lease', label: 'Lease Details', icon: FileText },
-    { id: 'analytics', label: 'Analytics', icon: BarChart2 },
-    { id: 'location', label: 'Location Details', icon: MapPin },
+    { id: 'property', label: 'Property Details', icon: propertDetails },
+    { id: 'lease', label: 'Lease Details', icon: leaseDetails },
+    { id: 'analytics', label: 'Analytics', icon: <ChartNoAxesColumnIncreasing />},
+    { id: 'location', label: 'Location Details', icon: location },
     ...(isAddedByUser
       ? [{ id: 'notes', label: 'Notes', icon: MessageSquare }]
       : []),
-    { id: 'faqs', label: 'FAQs', icon: HelpCircle },
+    { id: 'faqs', label: 'FAQs', icon: faqs },
   ];
 
   // Only show full screen loading if we don't have property data yet
@@ -288,12 +295,12 @@ const PropertyDetailsScreen = () => {
               </TouchableOpacity>
             )}
             <TouchableOpacity style={styles.actionOutlineBtn}>
-              <Image source={DownloadIcon} style={{ width: 22, height: 22 }} />
-              <Text style={styles.actionOutlineText}>Download</Text>
+              <Image source={DownloadIcon} style={{ width: 16, height: 16 }} />
+              <Text style={styles.actionOutlineText}>Download Report</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.actionOutlineBtn}>
-              <Image source={ShareIcon} style={{ width: 22, height: 22 }} />
-              <Text style={styles.actionOutlineText}>Share</Text>
+              <Image source={ShareIcon} style={{ width: 16, height: 16 }} />
+              <Text style={styles.actionOutlineText}>Share Report</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -1250,7 +1257,24 @@ const PropertyDetailsScreen = () => {
 
   return (
     <Layout>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={{ flex: 1, backgroundColor: '#fff', position: 'relative' }}>
+        <Image
+          source={squaresBg}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 480, // Approximate 40vh on standard screens, or use useWindowDimensions
+            opacity: 0.8,
+            zIndex: 0,
+          }}
+          resizeMode="cover"
+        />
+        <ScrollView
+          style={[styles.container, { zIndex: 1 }]}
+          showsVerticalScrollIndicator={false}
+        >
        
 
         <View
@@ -1292,15 +1316,38 @@ const PropertyDetailsScreen = () => {
                 return (
                   <TouchableOpacity
                     key={tab.id}
-                    style={styles.tab}
+                    style={[styles.tab, isActive && styles.activeTab]}
                     onPress={() => setActiveTab(tab.id)}
                   >
                     <View style={{ position: 'relative' }}>
-                      <Icon
-                        size={26}
-                        color={isActive ? COLORS.primary : COLORS.textSecondary}
-                        style={styles.tabIcon}
-                      />
+                      {React.isValidElement(Icon) ? (
+                        React.cloneElement(Icon as React.ReactElement<any>, {
+                          size: 26,
+                          color: isActive ? COLORS.primary : COLORS.textSecondary,
+                          style: styles.tabIcon,
+                        })
+                      ) : typeof Icon === 'function' ? (
+                        <Icon
+                          size={26}
+                          color={isActive ? COLORS.primary : COLORS.textSecondary}
+                          style={styles.tabIcon}
+                        />
+                      ) : (
+                        <Image
+                          source={Icon}
+                          style={[
+                            styles.tabIcon,
+                            {
+                              width: 26,
+                              height: 26,
+                              tintColor: isActive
+                                ? COLORS.primary
+                                : COLORS.textSecondary,
+                            },
+                          ]}
+                          resizeMode="contain"
+                        />
+                      )}
                       {isNotes && notesCount > 0 && (
                         <View style={styles.notesBadge}>
                           <Text style={styles.notesBadgeText}>
@@ -1332,8 +1379,9 @@ const PropertyDetailsScreen = () => {
 
         <View style={styles.spacer} />
       </ScrollView>
-    </Layout>
-  );
+    </View>
+  </Layout>
+);
 };
 
 const styles = StyleSheet.create({
@@ -1369,6 +1417,12 @@ const styles = StyleSheet.create({
     height: 90,
     flexGrow: 0,
     flexShrink: 0,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    elevation: 10,
   },
   tabsContent: {
     width: '100%',
@@ -1389,15 +1443,15 @@ const styles = StyleSheet.create({
     
   },
   tabText: {
-    fontSize: 24,
-    color: COLORS.textSecondary,
-    fontWeight: '600',
+    fontSize: 18,
+    color: '#767676',
+    fontWeight: 400,
     marginTop: 4,
   },
   activeTabText: {
     color:'#EE2529',
-    fontFamily:'700',
-    fontSize:24,
+    fontWeight:700,
+    fontSize:18,
   },
   activeTabIndicator: {
     position: 'absolute',
@@ -1412,6 +1466,17 @@ const styles = StyleSheet.create({
 
   tabContent: {
     gap: 20,
+    backgroundColor: '#FFFFFF',
+    padding: 24,
+    borderRadius: 16,
+    marginTop: 16,
+    width: '90%',
+    alignSelf: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 10, height: 10 },
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    elevation: 8,
   },
   detailsHeader: {
     marginBottom: 8,
@@ -1429,8 +1494,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   premiumText: {
-    color: '#767676', // Darker goldish
-    fontSize: 22,
+    color: '#767676', 
+    fontSize: 18,
     fontWeight: '500',
   },
   actionButtonsRow: {
@@ -1440,7 +1505,7 @@ const styles = StyleSheet.create({
   actionOutlineBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1.5,
+    borderWidth: 2.5,
     borderColor: '#EEEEEE',
     borderRadius: 8,
     paddingHorizontal: 28,
@@ -1451,9 +1516,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   actionOutlineText: {
-    fontSize: 22,
+    fontSize: 16,
     color: '#767676',
-    fontWeight: '700',
+    fontWeight: 600,
+    fontFamily:'Montserrat',
   },
   descriptionTitle: {
     fontSize: 36,
@@ -1474,45 +1540,48 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     shadowColor: '#000',
     shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 3,
-    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 20,
+    elevation: 8,
+    shadowOffset: { width: 10, height: 10 },
     overflow: 'hidden',
   },
   cardHeader: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#F5F5F5',
     padding: 16,
+    paddingBottom: 8,
   },
   cardTitle: {
     fontSize: 24,
     fontWeight: '700',
     color: '#EE2529',
+    fontFamily: 'Montserrat',
   },
   cardContent: {
     padding: 16,
-    gap: 12,
+    paddingTop: 8,
+    gap: 14,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 16,
+    gap: 24,
   },
   col: {
     flex: 1,
     gap: 12,
   },
   infoRow: {
-    gap: 4,
+    gap: 10,
   },
   infoLabel: {
-    fontSize: 18,
+    fontSize: 14,
     color: COLORS.textSecondary,
+    fontFamily: 'Montserrat',
   },
   infoValue: {
-    fontSize: 22,
+    fontSize: 18,
     color: COLORS.textDark,
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
   placeholderContent: {
     padding: 40,
@@ -1613,7 +1682,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   faqItem: {
-    backgroundColor: COLORS.white,
+    backgroundColor: '#F2F2F2',
     borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 1,
@@ -1626,7 +1695,7 @@ const styles = StyleSheet.create({
   },
   faqItemOpen: {
     borderColor: COLORS.primary,
-    backgroundColor: COLORS.white,
+    backgroundColor: '#F2F2F2',
     shadowOpacity: 0.05,
     elevation: 3,
   },
@@ -1649,7 +1718,7 @@ const styles = StyleSheet.create({
   faqAnswerContainer: {
     padding: 20,
     paddingTop: 0,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#F2F2F2',
   },
   loadingContainer: {
     flex: 1,

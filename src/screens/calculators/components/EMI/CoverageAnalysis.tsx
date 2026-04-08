@@ -6,7 +6,10 @@ import {
   ScrollView,
   TouchableOpacity,
   useWindowDimensions,
+  Image,
 } from 'react-native';
+import download from "../../../../assets/Calculator/download.png"
+import share from "../../../../assets/Calculator/share.png"
 
 
 const CoverageAnalysis: React.FC = () => {
@@ -76,10 +79,12 @@ const CoverageAnalysis: React.FC = () => {
       {/* Buttons */}
       <View style={[styles.buttonContainer, isDesktop && { marginTop: 30 }]}>
         <TouchableOpacity style={styles.button}>
+          <Image source={download} style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Download Report</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.button}>
+          <Image source={share} style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Share Report</Text>
         </TouchableOpacity>
       </View>
@@ -158,11 +163,19 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   button: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#767676',
     paddingVertical: 10,
     paddingHorizontal: 18,
     borderRadius: 6,
+    gap: 8,
+  },
+  buttonIcon: {
+    width: 18,
+    height: 18,
+    resizeMode: 'contain',
   },
   buttonText: {
     color: '#767676',
