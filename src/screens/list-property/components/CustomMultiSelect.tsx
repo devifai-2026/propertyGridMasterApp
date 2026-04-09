@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Pressable,
   TextInput,
+  useWindowDimensions,
 } from 'react-native';
 import { ChevronDown, X, Search } from 'lucide-react-native';
 
@@ -33,17 +34,19 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
   onBlur,
   error = false,
 }) => {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 480;
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Filter options based on search query
-  const filteredOptions = options.filter(option =>
-    option.label.toLowerCase().includes(searchQuery.toLowerCase()),
+  const filteredOptions = (options || []).filter(option =>
+    (option.label || '').toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Derive selected labels
-  const selectedLabels = value
-    .map(val => options.find(opt => opt.value === val)?.label || val)
+  const selectedLabels = (value || [])
+    .map(val => (options || []).find(opt => opt.value === val)?.label || val)
     .join(', ');
 
   const handleSelect = (optionValue: string | number) => {
@@ -71,6 +74,7 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
         <Text
           style={[
             styles.dropdownText,
+            isMobile && styles.dropdownTextMobile,
             value.length === 0 && styles.placeholderText,
           ]}
           numberOfLines={1}
@@ -106,7 +110,7 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
             <View style={styles.searchContainer}>
               <Search size={18} color="#999" style={styles.searchIcon} />
               <TextInput
-                style={styles.searchInput}
+                style={[styles.searchInput, isMobile && styles.searchInputMobile]}
                 placeholder="Search..."
                 value={searchQuery}
                 onChangeText={setSearchQuery}
@@ -128,6 +132,7 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
                     <Text
                       style={[
                         styles.optionText,
+                        isMobile && styles.optionTextMobile,
                         isSelected && styles.optionTextSelected,
                       ]}
                     >
@@ -141,6 +146,13 @@ const CustomMultiSelect: React.FC<CustomMultiSelectProps> = ({
                   </TouchableOpacity>
                 );
               }}
+              ListEmptyComponent={
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.emptyText}>
+                    {searchQuery ? 'No matches found' : 'No options available'}
+                  </Text>
+                </View>
+              }
               style={styles.optionsList}
               showsVerticalScrollIndicator={false}
             />
@@ -171,9 +183,12 @@ const styles = StyleSheet.create({
     borderColor: '#EE2529',
   },
   dropdownText: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#333',
     flex: 1,
+  },
+  dropdownTextMobile: {
+    fontSize: 14,
   },
   placeholderText: {
     color: '#999',
@@ -216,6 +231,7 @@ const styles = StyleSheet.create({
   },
   optionsList: {
     maxHeight: 400,
+    minHeight: 100,
   },
   option: {
     flexDirection: 'row',
@@ -229,9 +245,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFEBEE',
   },
   optionText: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#333',
     flex: 1,
+  },
+  optionTextMobile: {
+    fontSize: 14,
   },
   optionTextSelected: {
     color: '#EE2529',
@@ -277,9 +296,22 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     height: '100%',
-    fontSize: 14,
+    fontSize: 18,
     color: '#333',
     padding: 0,
+  },
+  searchInputMobile: {
+    fontSize: 14,
+  },
+  emptyContainer: {
+    padding: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    color: '#999',
+    fontSize: 14,
+    fontFamily: 'Montserrat',
   },
 });
 

@@ -334,8 +334,8 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
         style={[
           styles.headerContent,
           isMobile
-            ? { paddingLeft: 0, paddingRight: 40 }
-            : { paddingHorizontal: 60 },
+            ? { paddingLeft: 0, paddingRight: 60 }
+            : { paddingLeft: 60, paddingRight: 80 },
         ]}
       >
         <TouchableOpacity

@@ -79,6 +79,26 @@ const ListPropertyScreen = () => {
   const financialDetailsRef = useRef<any>(null);
   const locationDetailsRef = useRef<any>(null);
 
+  const stepperScrollRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    if (isMobile && stepperScrollRef.current) {
+      const tabWidth = 110;
+      const gap = 8;
+      const padding = 12;
+      const index = currentStep - 1;
+      
+      const tabOffset = padding + (index * (tabWidth + gap));
+      const tabCenter = tabOffset + (tabWidth / 2);
+      const scrollX = tabCenter - (width / 2);
+      
+      stepperScrollRef.current.scrollTo({
+        x: Math.max(0, scrollX),
+        animated: true,
+      });
+    }
+  }, [currentStep, isMobile, width]);
+
   const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
@@ -603,8 +623,10 @@ const ListPropertyScreen = () => {
         {/* Dynamic Stepper Cards */}
         <View style={styles.stepperWrapper}>
           <ScrollView
+            ref={stepperScrollRef}
             horizontal
             showsHorizontalScrollIndicator={false}
+            style={isMobile ? { width: '100%' } : undefined}
             contentContainerStyle={[
               styles.stepperContent,
               isMobile && styles.stepperContentMobile,

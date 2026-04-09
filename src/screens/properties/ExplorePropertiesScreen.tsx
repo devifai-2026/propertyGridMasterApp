@@ -438,7 +438,7 @@ const ExplorePropertiesScreen = () => {
         return (
           <View style={styles.filterSection}>
             <Text style={styles.filterLabel}>Proximity to</Text>
-            <View style={styles.proximityGrid}>
+            <View style={[styles.proximityGrid, width <= 768 && { flexDirection: 'column', gap: 10 }]}>
               <View style={styles.proximityColumn}>
                 {proximityOptions.slice(0, 3).map(opt => (
                   <TouchableOpacity
@@ -513,11 +513,17 @@ const ExplorePropertiesScreen = () => {
           <View style={styles.filterSection}>
             <Text style={styles.filterLabel}>Purchase Price</Text>
 
-            <View style={styles.sliderContainer}>
-              <Text style={styles.sliderEndpoint}>₹0 Lakhs</Text>
+            <View style={[styles.sliderContainer, width <= 768 ? { flexDirection: 'column', alignItems: 'stretch' } : { flexDirection: 'row', alignItems: 'center' }]}>
+              {width <= 768 && (
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10, width: '100%' }}>
+                  <Text style={styles.sliderEndpoint}>Min price</Text>
+                  <Text style={styles.sliderEndpoint}>Max price</Text>
+                </View>
+              )}
+              {width > 768 && <Text style={styles.sliderEndpoint}>₹0 Lakhs</Text>}
               <View
                 ref={sliderRef}
-                style={styles.sliderTrackContainer}
+                style={[styles.sliderTrackContainer, width <= 768 && { width: '100%', flex: 0, height: 20 }]}
                 onLayout={onSliderLayout}
                 {...panResponder.panHandlers}
               >
@@ -559,14 +565,14 @@ const ExplorePropertiesScreen = () => {
                   />
                 )}
               </View>
-              <Text style={styles.sliderEndpoint}>₹50 Lakhs</Text>
+              {width > 768 && <Text style={styles.sliderEndpoint}>₹50 Lakhs</Text>}
             </View>
 
             <Text style={styles.filterSeparator}>
               Or enter specific values:
             </Text>
 
-            <View style={styles.priceInputGrid}>
+            <View style={[styles.priceInputGrid, width <= 768 && { flexDirection: 'column', gap: 15 }]}>
               <View style={styles.priceInputCol}>
                 <Text style={styles.priceInputLabel}>Minimum Price (₹)</Text>
                 <View
@@ -663,7 +669,7 @@ const ExplorePropertiesScreen = () => {
         return (
           <View style={styles.filterSection}>
             <Text style={styles.filterLabel}>Select Property Types</Text>
-            <View style={styles.proximityGrid}>
+            <View style={[styles.proximityGrid, width <= 768 && { flexDirection: 'column', gap: 10 }]}>
               <View style={styles.proximityColumn}>
                 {componentUnitTypes.slice(0, 3).map(u => (
                   <TouchableOpacity
@@ -735,11 +741,17 @@ const ExplorePropertiesScreen = () => {
           <View style={styles.filterSection}>
             <Text style={styles.filterLabel}>Annual Rent Range</Text>
 
-            <View style={styles.sliderContainer}>
-              <Text style={styles.sliderEndpoint}>₹0 Lakhs</Text>
+            <View style={[styles.sliderContainer, width <= 768 ? { flexDirection: 'column', alignItems: 'stretch' } : { flexDirection: 'row', alignItems: 'center' }]}>
+              {width <= 768 && (
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10, width: '100%' }}>
+                  <Text style={styles.sliderEndpoint}>Min price</Text>
+                  <Text style={styles.sliderEndpoint}>Max price</Text>
+                </View>
+              )}
+              {width > 768 && <Text style={styles.sliderEndpoint}>₹0 Lakhs</Text>}
               <View
                 ref={sliderRef}
-                style={styles.sliderTrackContainer}
+                style={[styles.sliderTrackContainer, width <= 768 && { width: '100%', flex: 0, height: 20 }]}
                 onLayout={onSliderLayout}
                 {...panResponder.panHandlers}
               >
@@ -775,14 +787,14 @@ const ExplorePropertiesScreen = () => {
                   />
                 )}
               </View>
-              <Text style={styles.sliderEndpoint}>₹50 Lakhs</Text>
+              {width > 768 && <Text style={styles.sliderEndpoint}>₹50 Lakhs</Text>}
             </View>
 
             <Text style={styles.filterSeparator}>
               Or enter specific values:
             </Text>
 
-            <View style={styles.priceInputGrid}>
+            <View style={[styles.priceInputGrid, width <= 768 && { flexDirection: 'column', gap: 15 }]}>
               <View style={styles.priceInputCol}>
                 <Text style={styles.priceInputLabel}>
                   Minimum Annual Rent (₹)
@@ -882,11 +894,17 @@ const ExplorePropertiesScreen = () => {
               Return on Investment (ROI) Range
             </Text>
 
-            <View style={styles.sliderContainer}>
-              <Text style={styles.sliderEndpoint}>5%</Text>
+            <View style={[styles.sliderContainer, width <= 768 ? { flexDirection: 'column', alignItems: 'stretch' } : { flexDirection: 'row', alignItems: 'center' }]}>
+              {width <= 768 && (
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10, width: '100%' }}>
+                  <Text style={styles.sliderEndpoint}>Min ROI</Text>
+                  <Text style={styles.sliderEndpoint}>Max ROI</Text>
+                </View>
+              )}
+              {width > 768 && <Text style={styles.sliderEndpoint}>5%</Text>}
               <View
                 ref={sliderRef}
-                style={styles.sliderTrackContainer}
+                style={[styles.sliderTrackContainer, width <= 768 && { width: '100%', flex: 0, height: 20 }]}
                 onLayout={onSliderLayout}
                 {...panResponder.panHandlers}
               >
@@ -923,7 +941,7 @@ const ExplorePropertiesScreen = () => {
                   />
                 )}
               </View>
-              <Text style={styles.sliderEndpoint}>20%</Text>
+              {width > 768 && <Text style={styles.sliderEndpoint}>20%</Text>}
             </View>
 
             <View style={styles.descInfoBox}>
@@ -939,11 +957,17 @@ const ExplorePropertiesScreen = () => {
           <View style={styles.filterSection}>
             <Text style={styles.filterLabel}>Tenure Left (yrs)</Text>
 
-            <View style={styles.sliderContainer}>
-              <Text style={styles.sliderEndpoint}>1 yrs</Text>
+            <View style={[styles.sliderContainer, width <= 768 ? { flexDirection: 'column', alignItems: 'stretch' } : { flexDirection: 'row', alignItems: 'center' }]}>
+              {width <= 768 && (
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 10, width: '100%' }}>
+                  <Text style={styles.sliderEndpoint}>Min Tenure</Text>
+                  <Text style={styles.sliderEndpoint}>Max Tenure</Text>
+                </View>
+              )}
+              {width > 768 && <Text style={styles.sliderEndpoint}>1 yrs</Text>}
               <View
                 ref={sliderRef}
-                style={styles.sliderTrackContainer}
+                style={[styles.sliderTrackContainer, width <= 768 && { width: '100%', flex: 0, height: 20 }]}
                 onLayout={onSliderLayout}
                 {...panResponder.panHandlers}
               >
@@ -980,7 +1004,7 @@ const ExplorePropertiesScreen = () => {
                   />
                 )}
               </View>
-              <Text style={styles.sliderEndpoint}>20 yrs</Text>
+              {width > 768 && <Text style={styles.sliderEndpoint}>20 yrs</Text>}
             </View>
 
             <View style={styles.descInfoBox}>
@@ -1186,37 +1210,39 @@ const ExplorePropertiesScreen = () => {
 
                 <View style={styles.mobileFilterBody}>
                   {/* Sidebar Tabs */}
-                  {['location', 'pricing', 'unit', 'rent', 'roi', 'tenure'].map(
-                    tab => (
-                      <TouchableOpacity
-                        key={tab}
-                        style={[
-                          styles.mobileTabItem,
-                          activeTab === tab && styles.mobileActiveTab,
-                        ]}
-                        onPress={() => setActiveTab(tab as any)}
-                      >
-                        <Text
+                  <ScrollView style={styles.mobileTabsSidebar} showsVerticalScrollIndicator={false}>
+                    {['location', 'pricing', 'unit', 'rent', 'roi', 'tenure'].map(
+                      tab => (
+                        <TouchableOpacity
+                          key={tab}
                           style={[
-                            styles.mobileTabText,
-                            activeTab === tab && styles.mobileActiveTabText,
+                            styles.mobileTabItem,
+                            activeTab === tab && styles.mobileActiveTab,
                           ]}
+                          onPress={() => setActiveTab(tab as any)}
                         >
-                          {tab === 'location'
-                            ? 'Location Proximity'
-                            : tab === 'pricing'
-                            ? 'Pricing'
-                            : tab === 'unit'
-                            ? 'Type of Unit'
-                            : tab === 'rent'
-                            ? 'Annual Rent achieved'
-                            : tab === 'roi'
-                            ? 'ROI'
-                            : 'Tenure Left'}
-                        </Text>
-                      </TouchableOpacity>
-                    ),
-                  )}
+                          <Text
+                            style={[
+                              styles.mobileTabText,
+                              activeTab === tab && styles.mobileActiveTabText,
+                            ]}
+                          >
+                            {tab === 'location'
+                              ? 'Location Proximity'
+                              : tab === 'pricing'
+                              ? 'Pricing'
+                              : tab === 'unit'
+                              ? 'Type of Unit'
+                              : tab === 'rent'
+                              ? 'Annual Rent achieved'
+                              : tab === 'roi'
+                              ? 'ROI'
+                              : 'Tenure Left'}
+                          </Text>
+                        </TouchableOpacity>
+                      ),
+                    )}
+                  </ScrollView>
 
                   {/* Content */}
                   <ScrollView style={styles.mobileFilterContent}>
@@ -1925,11 +1951,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   sliderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
     paddingHorizontal: 10,
     marginBottom: 30,
     gap: 15,
+    width: '100%',
   },
   sliderEndpoint: {
     fontSize: 14,
@@ -1995,9 +2020,11 @@ const styles = StyleSheet.create({
   priceInputGrid: {
     flexDirection: 'row',
     gap: 30,
+    width: '100%',
   },
   priceInputCol: {
     flex: 1,
+    width: '100%',
   },
   priceInputLabel: {
     fontSize: 14,
@@ -2064,6 +2091,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
     padding: 5,
+    ...Platform.select({
+      web: {
+        '@media (max-width: 768px)': {
+          width: '100%',
+        }
+      } as any
+    }),
   },
   checkbox: {
     width: 20,
@@ -2084,6 +2118,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#262626',
     fontWeight: '400',
+    ...Platform.select({
+      web: {
+        '@media (max-width: 768px)': {
+          fontSize: 14,
+        }
+      } as any
+    }),
   },
   proximityGrid: {
     flexDirection: 'row',

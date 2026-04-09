@@ -90,12 +90,17 @@ const InfoIcon = ({ size = 15, color = '#909092' }) => (
   </Svg>
 );
 
-const LabelWithIcon = ({ label, style }: { label: string; style?: any }) => (
-  <View style={[styles.labelRow, style]}>
-    <Text style={styles.label}>{label}</Text>
-    <InfoIcon />
-  </View>
-);
+
+const LabelWithIcon = ({ label, style }: { label: string; style?: any }) => {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
+  return (
+    <View style={[styles.labelRow, !isDesktop && { width: '100%', alignItems: 'center' }, style]}>
+      <Text style={[styles.label, { flexShrink: 1, flexWrap: 'wrap' }]}>{label}</Text>
+      <InfoIcon />
+    </View>
+  );
+};
 
 const CalculatorsScreen = () => {
   const [activeTab, setActiveTab] = useState<'roi' | 'emi'>('roi');
@@ -125,30 +130,30 @@ const CalculatorsScreen = () => {
                 !isDesktop && { marginRight: 0, marginTop: 40 },
               ]}
             >
-              <View style={isDesktop ? { flexDirection: 'row', gap: 20, alignItems: 'center', marginBottom: 20 } : {}}>
-               <View style={styles.redIconBox}>
-  <RedCardIcon size={isDesktop ? 62 : 30} color="#fff" />
-</View>
-                <View>
-                  <View style={styles.badgeContainer}>
-                    <Text style={styles.badgeText}>
+              <View style={isDesktop ? { flexDirection: 'row', gap: 20, alignItems: 'center', marginBottom: 20 } : { alignItems: 'center' }}>
+               <View style={[styles.redIconBox, !isDesktop && { width: 60, height: 60, marginBottom: 20 }]}>
+                 <RedCardIcon size={isDesktop ? 62 : 40} color="#fff" />
+               </View>
+                <View style={!isDesktop && { alignItems: 'center' }}>
+                  <View style={[styles.badgeContainer, !isDesktop && { alignSelf: 'center' }]}>
+                    <Text style={[styles.badgeText, !isDesktop && { textAlign: 'center' }]}>
                       Professional Investment Tools
                     </Text>
                   </View>
-                  <Text style={[styles.heroTitle, isDesktop && { fontSize: 36, marginBottom: 0 }]}>
+                  <Text style={[styles.heroTitle, isDesktop ? { fontSize: 36, marginBottom: 0 } : { textAlign: 'center' }]}>
                     Property Investment Platform
                   </Text>
                 </View>
               </View>
 
-              <Text style={styles.heroSubtitle}>
+              <Text style={[styles.heroSubtitle, !isDesktop && { fontSize: 16, lineHeight: 20, textAlign: 'center' }]}>
                 Make data-driven decisions with comprehensive ROI analysis, loan
                 coverage <br /> insights, and detailed cash flow projections for your
                 real estate investments
               </Text>
 
-              <View style={styles.heroStatsRow}>
-                <View style={styles.heroStatCard}>
+              <View style={[styles.heroStatsRow, !isDesktop && { justifyContent: 'flex-start', gap: 12 }]}>
+                <View style={[styles.heroStatCard, !isDesktop && { minWidth: '47%', flex: 1 }]}>
                   <LinearGradient
                     colors={['rgba(242, 242, 242, 0.1)', 'rgba(255, 255, 255, 0.1)']}
                     start={{ x: 0, y: 0 }}
@@ -161,7 +166,7 @@ const CalculatorsScreen = () => {
                   </LinearGradient>
                 </View>
 
-                <View style={styles.heroStatCard}>
+                <View style={[styles.heroStatCard, !isDesktop && { minWidth: '47%', flex: 1 }]}>
                   <LinearGradient
                     colors={['rgba(242, 242, 242, 0.1)', 'rgba(255, 255, 255, 0.1)']}
                     start={{ x: 0, y: 0 }}
@@ -174,7 +179,7 @@ const CalculatorsScreen = () => {
                   </LinearGradient>
                 </View>
 
-                <View style={styles.heroStatCard}>
+                <View style={[styles.heroStatCard, !isDesktop && { minWidth: '47%', flex: 1 }]}>
                   <LinearGradient
                     colors={['rgba(242, 242, 242, 0.1)', 'rgba(255, 255, 255, 0.1)']}
                     start={{ x: 0, y: 0 }}
@@ -201,9 +206,9 @@ const CalculatorsScreen = () => {
                     right: -20,
                     top: -119,
                   }
-                  : { width: 350, height: 250 },
+                  : { width: '100%', height: 260, alignSelf: 'flex-end', marginLeft: 'auto', right: -24, marginTop: 20 },
               ]}
-              resizeMode="cover"
+              resizeMode={isDesktop ? "cover" : "contain"}
             />
           </View>
         </View>
@@ -211,6 +216,7 @@ const CalculatorsScreen = () => {
         <View
           style={[
             styles.tabsContainer,
+            !isDesktop && { width: '100%' },
             isDesktop && { width: '90%', maxWidth: 1600, alignSelf: 'center' },
           ]}
         >
@@ -228,11 +234,12 @@ const CalculatorsScreen = () => {
               style={[
                 styles.tabText,
                 activeTab === 'roi' && styles.activeTabText,
+                !isDesktop && { fontSize: 13, lineHeight: 18 }
               ]}
             >
               ROI & Rental Yield Calculator
             </Text>
-            {activeTab === 'roi' && <View style={styles.activeIndicator} />}
+            {activeTab === 'roi' && <View style={[styles.activeIndicator, !isDesktop && { width: '100%' }]} />}
           </TouchableOpacity>
 
          <TouchableOpacity
@@ -245,16 +252,17 @@ const CalculatorsScreen = () => {
       color={activeTab === 'emi' ? '#fff' : '#767676'}
     />
   </View>
-  <Text style={[styles.tabText, activeTab === 'emi' && styles.activeTabText]}>
+  <Text style={[styles.tabText, activeTab === 'emi' && styles.activeTabText, !isDesktop && { fontSize: 13, lineHeight: 18 }]}>
     EMI Calculator
   </Text>
-  {activeTab === 'emi' && <View style={styles.activeIndicator} />}
+  {activeTab === 'emi' && <View style={[styles.activeIndicator, !isDesktop && { width: '100%' }]} />}
 </TouchableOpacity>
         </View>
 
         <View
           style={[
             styles.contentArea,
+            !isDesktop && { paddingHorizontal: 0 },
             isDesktop && { maxWidth: '100%', alignSelf: 'center', width: '100%' },
           ]}
         >
@@ -271,6 +279,8 @@ const CalculatorsScreen = () => {
 
 // Helper Components
 const InfoCardsSummary = ({ type }: { type: 'roi' | 'emi' }) => {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
   const cards =
     type === 'roi'
       ? [
@@ -285,9 +295,9 @@ const InfoCardsSummary = ({ type }: { type: 'roi' | 'emi' }) => {
       ];
 
   return (
-    <View style={styles.infoCardsGrid}>
+    <View style={[styles.infoCardsGrid, !isDesktop && { maxWidth: '100%' }]}>
       {cards.map((text, i) => (
-        <View key={i} style={styles.infoSummaryCard}>
+        <View key={i} style={[styles.infoSummaryCard, !isDesktop && { flex: undefined, width: '100%', minWidth: '100%' }]}>
           <Text style={styles.infoSummaryText}>{text}</Text>
         </View>
       ))}
@@ -296,6 +306,8 @@ const InfoCardsSummary = ({ type }: { type: 'roi' | 'emi' }) => {
 };
 
 const CalculatorHeader = ({ type }: { type: 'roi' | 'emi' }) => {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
   const headerData =
     type === 'roi'
       ? {
@@ -322,25 +334,29 @@ const CalculatorHeader = ({ type }: { type: 'roi' | 'emi' }) => {
   return (
     <View style={styles.calcHeader}>
       <View style={styles.calcHeaderIconBox}>{headerData.icon}</View>
-      <Text style={styles.calcTitle}>{headerData.title}</Text>
-      <Text style={styles.calcSubtitle}>{headerData.subtitle}</Text>
+      <Text style={[styles.calcTitle, !isDesktop && { fontSize: 24 }]}>{headerData.title}</Text>
+      <Text style={[styles.calcSubtitle, !isDesktop && { fontSize: 14, height: 'auto' }]}>{headerData.subtitle}</Text>
     </View>
   );
 };
 
-const BalanceLeaseTenureAlert = () => (
-  <View style={styles.alertBox}>
-    <Text style={styles.alertTitle}>
-      Balance Lease Tenure:{' '}
-      <Text style={styles.alertValue}>10 years 9 months 2 days</Text>
-    </Text>
-    <Text style={styles.alertSubtitle}>
-      Typically defined as the period from the expiry of the initial lease term
-      to the end of the lease agreement, or the lease period or expiry date,
-      whichever comes first.
-    </Text>
-  </View>
-);
+const BalanceLeaseTenureAlert = () => {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
+  return (
+    <View style={styles.alertBox}>
+      <Text style={[styles.alertTitle, !isDesktop && { fontSize: 16, lineHeight: 22 }]}>
+        Balance Lease Tenure:{' '}
+        <Text style={[styles.alertValue, !isDesktop && { fontSize: 18 }]}>10 years 9 months 2 days</Text>
+      </Text>
+      <Text style={[styles.alertSubtitle, !isDesktop && { fontSize: 13 }]}>
+        Typically defined as the period from the expiry of the initial lease term
+        to the end of the lease agreement, or the lease period or expiry date,
+        whichever comes first.
+      </Text>
+    </View>
+  );
+};
 
 // Custom Dropdown Component
 const Dropdown = ({
@@ -357,20 +373,23 @@ const Dropdown = ({
   row?: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
 
   return (
     <View
       style={[
         styles.dropdownContainer,
         row && styles.dropdownRow,
+        !isDesktop && row && { flexDirection: 'column', alignItems: 'flex-start' },
         { zIndex: isOpen ? 10000 : 1 }
       ]}
     >
       <LabelWithIcon
         label={label}
-        style={row ? styles.dropdownLabel : { width: 'auto' }}
+        style={row ? [styles.dropdownLabel, !isDesktop && { width: '100%', marginBottom: 8, fontSize: 16 }] : { width: 'auto' }}
       />
-      <View style={{ flex: 1, position: 'relative', zIndex: isOpen ? 10000 : 1 }}>
+      <View style={[{ flex: 1, position: 'relative' }, !isDesktop && { width: '100%', flex: undefined }, { zIndex: isOpen ? 10000 : 1 }]}>
         <TouchableOpacity
           style={[styles.dropdownHeader, row && styles.dropdownHeaderRow]}
           onPress={() => setIsOpen(!isOpen)}
@@ -444,6 +463,8 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
 
   const [includeLoan, setIncludeLoan] = useState(false);
   const [results, setResults] = useState<any>(null);
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
 
   const calculateROIValues = () => {
     const purchasePrice = parseFloat(formData.purchasePrice.replace(/,/g, '')) || 0;
@@ -535,7 +556,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
 
   return (
     <ScrollView
-      style={styles.calcContainer}
+      style={[styles.calcContainer, !isDesktop && { maxWidth: '90%', paddingHorizontal: 0 }]}
       showsVerticalScrollIndicator={false}
     >
       <CalculatorHeader type="roi" />
@@ -544,10 +565,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
 
       {/* Property Details */}
       <View style={[styles.sectionCard, { zIndex: 100 }]}>
-        <Text style={styles.sectionTitle}>Property Details</Text>
+        <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Property Details</Text>
 
         <View style={[styles.gridRow, { zIndex: 50 }]}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }, { zIndex: 1000 }]}>
             <Dropdown
               row
               label="Property Type"
@@ -556,10 +577,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
               onSelect={val => handleInputChange('propertyType', val)}
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Carpet Area (sq ft)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="5000"
               keyboardType="numeric"
               value={formData.carpetArea}
@@ -569,10 +590,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
           </View>
         </View>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Purchase Price (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="45,00,000"
               keyboardType="numeric"
               value={formData.purchasePrice}
@@ -586,7 +607,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
       {/* Financing Options */}
       <View style={styles.sectionCard}>
         <View style={styles.sectionHeaderRow}>
-          <Text style={styles.sectionTitle}>Financing Options</Text>
+          <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Financing Options</Text>
           <View style={styles.toggleRow}>
             <LabelWithIcon
               label="Include Loan"
@@ -600,17 +621,17 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             />
           </View>
         </View>
-        <Text style={styles.sectionNote}>
+        <Text style={[styles.sectionNote, !isDesktop && { fontSize: 13, lineHeight: 16 }]}>
           Note: Loan amount cannot exceed the property purchase price.
         </Text>
 
         {includeLoan && (
           <>
             <View style={styles.gridRow}>
-              <View style={styles.inputCol}>
+              <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
                 <LabelWithIcon label="Loan Amount (₹)" />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
                   placeholder="31,50,000"
                   keyboardType="numeric"
                   value={formData.loanAmount}
@@ -618,10 +639,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
                   placeholderTextColor="#262626"
                 />
               </View>
-              <View style={styles.inputCol}>
+              <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
                 <LabelWithIcon label="Down Payment (₹)" />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
                   placeholder="13,50,000"
                   keyboardType="numeric"
                   value={formData.downPayment}
@@ -631,10 +652,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
               </View>
             </View>
             <View style={styles.gridRow}>
-              <View style={styles.inputCol}>
+              <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
                 <LabelWithIcon label="Interest Rate (%)" />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
                   placeholder="8.5"
                   keyboardType="numeric"
                   value={formData.interestRate}
@@ -642,10 +663,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
                   placeholderTextColor="#262626"
                 />
               </View>
-              <View style={styles.inputCol}>
+              <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
                 <LabelWithIcon label="Loan Tenure (Years)" />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
                   placeholder="20"
                   keyboardType="numeric"
                   value={formData.loanTenure}
@@ -660,12 +681,12 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
 
       {/* Rental Details */}
       <View style={styles.sectionCard}>
-        <Text style={styles.sectionTitle}>Rental Details</Text>
+        <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Rental Details</Text>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Monthly Rent (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="50,000"
               keyboardType="numeric"
               value={formData.monthlyRent}
@@ -673,10 +694,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
               placeholderTextColor="#262626"
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Security Deposit (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="3,00,000"
               keyboardType="numeric"
               value={formData.securityDeposit}
@@ -686,10 +707,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
           </View>
         </View>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Rent Escalation every(yrs)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="3"
               keyboardType="numeric"
               value={formData.rentEscalationEvery}
@@ -697,10 +718,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
               placeholderTextColor="#262626"
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Rent Escalation(% per year)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="8"
               keyboardType="numeric"
               value={formData.rentEscalationPercent}
@@ -710,20 +731,20 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
           </View>
         </View>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Lease Start Date *" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="DD/MM/YYYY"
               value={formData.leaseStartDate}
               onChangeText={v => handleInputChange('leaseStartDate', v)}
               placeholderTextColor="#262626"
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Lease Term (Months) *" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="10"
               keyboardType="numeric"
               value={formData.leaseTerm}
@@ -738,12 +759,12 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
 
       {/* Recurring Expenses (Annual) */}
       <View style={styles.sectionCard}>
-        <Text style={styles.sectionTitle}>Recurring Expenses (Annual)</Text>
+        <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Recurring Expenses (Annual)</Text>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Property Tax (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="15,000"
               keyboardType="numeric"
               value={formData.propertyTax}
@@ -751,10 +772,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
               placeholderTextColor="#262626"
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Maintenance (₹/sqft)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="30"
               keyboardType="numeric"
               value={formData.maintenancePerSqft}
@@ -764,10 +785,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
           </View>
         </View>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Insurance (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="8,000"
               keyboardType="numeric"
               value={formData.insurance}
@@ -775,10 +796,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
               placeholderTextColor="#262626"
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Maintenance Lumpsum (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="15,000"
               keyboardType="numeric"
               value={formData.maintenanceLumpSum}
@@ -791,12 +812,12 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
 
       {/* One-time Costs */}
       <View style={styles.sectionCard}>
-        <Text style={styles.sectionTitle}>One-time Costs</Text>
+        <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>One-time Costs</Text>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Stamp Duty (%)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="12"
               keyboardType="numeric"
               value={formData.stampDuty}
@@ -804,10 +825,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
               placeholderTextColor="#262626"
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Legal Fees (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="30,000"
               keyboardType="numeric"
               value={formData.legalFees}
@@ -817,10 +838,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
           </View>
         </View>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Brokerage (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="67,500"
               keyboardType="numeric"
               value={formData.brokerage}
@@ -828,10 +849,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
               placeholderTextColor="#262626"
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Other Costs (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="25,000"
               keyboardType="numeric"
               value={formData.otherCosts}
@@ -899,6 +920,8 @@ const EMICalculatorView = () => {
 
   const [includeLoan, setIncludeLoan] = useState(true);
   const [results, setResults] = useState<any>(null);
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
 
   const calculateEMIValues = () => {
     const loanAmount = parseFloat(formData.loanAmount.replace(/,/g, '')) || 0;
@@ -941,7 +964,7 @@ const EMICalculatorView = () => {
 
   return (
     <ScrollView
-      style={styles.calcContainer}
+      style={[styles.calcContainer, !isDesktop && { maxWidth: '90%', paddingHorizontal: 0 }]}
       showsVerticalScrollIndicator={false}
     >
       <CalculatorHeader type="emi" />
@@ -950,9 +973,9 @@ const EMICalculatorView = () => {
 
       {/* Property Details */}
       <View style={styles.sectionCard}>
-        <Text style={styles.sectionTitle}>Property Details</Text>
+        <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Property Details</Text>
         <View style={[styles.gridRow, { zIndex: 10 }]}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }, { zIndex: 1000 }]}>
             <Dropdown
               row
               label="Property Type"
@@ -961,10 +984,10 @@ const EMICalculatorView = () => {
               onSelect={val => handleInputChange('propertyType', val)}
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Carpet Area (sq ft)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="5600"
               keyboardType="numeric"
               value={formData.carpetArea}
@@ -974,10 +997,10 @@ const EMICalculatorView = () => {
           </View>
         </View>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Purchase Price (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="400000"
               keyboardType="numeric"
               value={formData.purchasePrice}
@@ -991,7 +1014,7 @@ const EMICalculatorView = () => {
       {/* EMI Options */}
       <View style={styles.sectionCard}>
         <View style={styles.sectionHeaderRow}>
-          <Text style={styles.sectionTitle}>EMI Options</Text>
+          <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>EMI Options</Text>
           <View style={styles.toggleRow}>
             <LabelWithIcon
               label="Include Downpayment"
@@ -1005,11 +1028,11 @@ const EMICalculatorView = () => {
             />
           </View>
         </View>
-        <Text style={styles.sectionNote}>
+        <Text style={[styles.sectionNote, !isDesktop && { fontSize: 13, lineHeight: 16 }]}>
           Note: Loan amount cannot exceed the property purchase price.
         </Text>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Loan Amount (₹)" />
             <TextInput
               style={[styles.input, !includeLoan && styles.inputDisabled]}
@@ -1021,7 +1044,7 @@ const EMICalculatorView = () => {
               placeholderTextColor="#262626"
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Down Payment (₹)" />
             <TextInput
               style={[styles.input, !includeLoan && styles.inputDisabled]}
@@ -1035,7 +1058,7 @@ const EMICalculatorView = () => {
           </View>
         </View>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Interest (% per annum)" />
             <TextInput
               style={[styles.input, !includeLoan && styles.inputDisabled]}
@@ -1047,7 +1070,7 @@ const EMICalculatorView = () => {
               placeholderTextColor="#262626"
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Loan Tenure (Years)" />
             <TextInput
               style={[styles.input, !includeLoan && styles.inputDisabled]}
@@ -1064,12 +1087,12 @@ const EMICalculatorView = () => {
 
       {/* Rental Details */}
       <View style={styles.sectionCard}>
-        <Text style={styles.sectionTitle}>Rental Details</Text>
+        <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Rental Details</Text>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Monthly Rent (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="30000"
               keyboardType="numeric"
               value={formData.monthlyRent}
@@ -1077,10 +1100,10 @@ const EMICalculatorView = () => {
               placeholderTextColor="#262626"
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Security Deposit (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="300000"
               keyboardType="numeric"
               value={formData.securityDeposit}
@@ -1090,10 +1113,10 @@ const EMICalculatorView = () => {
           </View>
         </View>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Days Calculation Gregorian" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="3"
               keyboardType="numeric"
               value={formData.daysCalculation}
@@ -1101,10 +1124,10 @@ const EMICalculatorView = () => {
               placeholderTextColor="#262626"
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Rent Escalation (% per year)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="8"
               keyboardType="numeric"
               value={formData.rentEscalation}
@@ -1114,20 +1137,20 @@ const EMICalculatorView = () => {
           </View>
         </View>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Lease Start Date *" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="DD/MM/YYYY"
               value={formData.leaseStartDate}
               onChangeText={v => handleInputChange('leaseStartDate', v)}
               placeholderTextColor="#262626"
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Lease Term (Yrs) *" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="10"
               keyboardType="numeric"
               value={formData.leaseTerm}
@@ -1142,12 +1165,12 @@ const EMICalculatorView = () => {
 
       {/* Recurring Expenses */}
       <View style={styles.sectionCard}>
-        <Text style={styles.sectionTitle}>Recurring Expenses (Annual)</Text>
+        <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Recurring Expenses (Annual)</Text>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Property Tax (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="12000"
               keyboardType="numeric"
               value={formData.propertyTax}
@@ -1155,10 +1178,10 @@ const EMICalculatorView = () => {
               placeholderTextColor="#262626"
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Maintenance per sq ft (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="30000"
               keyboardType="numeric"
               value={formData.maintenance}
@@ -1168,10 +1191,10 @@ const EMICalculatorView = () => {
           </View>
         </View>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Insurance (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="8000"
               keyboardType="numeric"
               value={formData.insurance}
@@ -1179,10 +1202,10 @@ const EMICalculatorView = () => {
               placeholderTextColor="#262626"
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Maintenance Lump sum (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="58000"
               keyboardType="numeric"
               value={formData.maintenanceLumpsum}
@@ -1195,12 +1218,12 @@ const EMICalculatorView = () => {
 
       {/* One-time Costs */}
       <View style={styles.sectionCard}>
-        <Text style={styles.sectionTitle}>One-time Costs</Text>
+        <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>One-time Costs</Text>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Stamp Duty (%)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="12"
               keyboardType="numeric"
               value={formData.stampDuty}
@@ -1208,10 +1231,10 @@ const EMICalculatorView = () => {
               placeholderTextColor="#262626"
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Legal Fees (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="38000"
               keyboardType="numeric"
               value={formData.legalFees}
@@ -1221,10 +1244,10 @@ const EMICalculatorView = () => {
           </View>
         </View>
         <View style={styles.gridRow}>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Brokerage (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="67500"
               keyboardType="numeric"
               value={formData.brokerage}
@@ -1232,10 +1255,10 @@ const EMICalculatorView = () => {
               placeholderTextColor="#262626"
             />
           </View>
-          <View style={styles.inputCol}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Other One-time Costs (₹)" />
             <TextInput
-              style={styles.input}
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="25000"
               keyboardType="numeric"
               value={formData.otherCosts}
@@ -1501,7 +1524,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 20,
     paddingVertical: 30,
-    paddingHorizontal:30,
+    paddingHorizontal: 30,
+    ...Platform.select({
+      web: {
+        '@media (max-width: 1024px)': {
+          paddingHorizontal: 16,
+        }
+      } as any
+    }),
     marginBottom: 12,
     shadowColor: '#000',
     shadowOpacity: 0.08,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, useWindowDimensions } from 'react-native';
 import Svg, {
   G,
   Text as SvgText,
@@ -7,10 +7,14 @@ import Svg, {
   Line as SvgLine,
 } from 'react-native-svg';
 
-const { width } = Dimensions.get('window');
-const chartWidth = width - 60;
-
 const PrincipleChart = () => {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
+  const isTablet = width >= 768 && width < 1024;
+  
+  // Conditionally adjust chart width based on parent padding/layout
+  const chartWidth = isDesktop ? 600 : isTablet ? width - 80 : width - 60;
+
   // Calculate amortization schedule for 20 years loan
   const loanAmount = 315000;
   const interestRate = 9.5;

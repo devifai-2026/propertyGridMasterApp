@@ -112,6 +112,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
   ({ onNext, onFormValid, initialData }, ref) => {
     const { width } = useWindowDimensions();
     const isSmallScreen = width < 768;
+    const isMobile = width < 480;
 
     useImperativeHandle(ref, () => ({
       submit: () => {
@@ -245,12 +246,13 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
           Location & Market Details
         </Text>
 
-        <Text style={styles.subHeader}>Location Details</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Location Details</Text>
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Micro Market *</Text>
+          <Text style={[styles.label, isMobile && styles.labelMobile]}>Micro Market *</Text>
           <TextInput
             style={[
               styles.input,
+              isMobile && styles.inputMobile,
               touched.microMarket && errors.microMarket && styles.inputError,
             ]}
             placeholder="Enter Micro Market"
@@ -268,7 +270,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
 
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>State *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>State *</Text>
             <CustomDropdown
               placeholder="Select State"
               value={formData.state}
@@ -292,7 +294,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
           </View>
 
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>City *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>City *</Text>
             <CustomDropdown
               placeholder="Select City"
               value={formData.city}
@@ -321,7 +323,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
           </View>
         </View>
 
-        <Text style={styles.subHeader}>Connectivity Details</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Connectivity Details</Text>
         {formData.connectivity.map((item: any, index: number) => (
           <View key={item.id} style={styles.connectivityCard}>
             <View style={styles.connectivityHeader}>
@@ -334,7 +336,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
             </View>
             <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
               <View style={[styles.fieldContainer, { flex: 1.2 }]}>
-                <Text style={styles.labelSmall}>Type</Text>
+                <Text style={[styles.labelSmall, isMobile && styles.labelSmallMobile]}>Type</Text>
                 <CustomDropdown
                   placeholder="Select Type"
                   value={item.type}
@@ -343,9 +345,9 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
                 />
               </View>
               <View style={[styles.fieldContainer, { flex: 2 }]}>
-                <Text style={styles.labelSmall}>Name</Text>
+                <Text style={[styles.labelSmall, isMobile && styles.labelSmallMobile]}>Name</Text>
                 <TextInput
-                  style={styles.inputSmall}
+                  style={[styles.inputSmall, isMobile && styles.inputSmallMobile]}
                   placeholder="Enter Name"
                   value={item.name}
                   onChangeText={v =>
@@ -354,9 +356,9 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
                 />
               </View>
               <View style={styles.fieldContainer}>
-                <Text style={styles.labelSmall}>Distance (KM)</Text>
+                <Text style={[styles.labelSmall, isMobile && styles.labelSmallMobile]}>Distance (KM)</Text>
                 <TextInput
-                  style={styles.inputSmall}
+                  style={[styles.inputSmall, isMobile && styles.inputSmallMobile]}
                   placeholder="0"
                   keyboardType="numeric"
                   value={item.distance}
@@ -381,16 +383,16 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
               style={styles.addConnectivityBtn}
             >
               <Plus size={18} color="#FFF" />
-              <Text style={styles.addConnectivityBtnText}>Add Connectivity</Text>
+              <Text style={[styles.addConnectivityBtnText, isMobile && styles.addConnectivityBtnTextMobile]}>Add Connectivity</Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.subHeader}>Demand Drivers</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Demand Drivers</Text>
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Key factors driving property demand</Text>
+          <Text style={[styles.label, isMobile && styles.labelMobile]}>Key factors driving property demand</Text>
           <TextInput
-            style={[styles.input, styles.textArea]}
+            style={[styles.input, styles.textArea, isMobile && styles.inputMobile]}
             placeholder="e.g., Proximity to campuses"
             multiline
             numberOfLines={3}
@@ -400,11 +402,11 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
           />
         </View>
 
-        <Text style={styles.subHeader}>Future Infrastructure</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Future Infrastructure</Text>
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Upcoming developments and projects</Text>
+          <Text style={[styles.label, isMobile && styles.labelMobile]}>Upcoming developments and projects</Text>
           <TextInput
-            style={[styles.input, styles.textArea]}
+            style={[styles.input, styles.textArea, isMobile && styles.inputMobile]}
             placeholder="e.g., Upcoming Ring Road"
             multiline
             numberOfLines={3}
@@ -414,7 +416,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
           />
         </View>
 
-        <Text style={styles.subHeader}>Frequently Asked Questions</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Frequently Asked Questions</Text>
         {formData.faqs.map((faq: any, index: number) => (
           <View key={faq.id} style={styles.faqCard}>
             <View style={styles.faqHeader}>
@@ -424,18 +426,18 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
               </TouchableOpacity>
             </View>
             <View style={styles.fieldContainer}>
-              <Text style={styles.labelSmall}>Question</Text>
+              <Text style={[styles.labelSmall, isMobile && styles.labelSmallMobile]}>Question</Text>
               <TextInput
-                style={styles.inputSmall}
+                style={[styles.inputSmall, isMobile && styles.inputSmallMobile]}
                 placeholder="Enter Question"
                 value={faq.question}
                 onChangeText={v => handleFaqChange(faq.id, 'question', v)}
               />
             </View>
             <View style={styles.fieldContainer}>
-              <Text style={styles.labelSmall}>Answer</Text>
+              <Text style={[styles.labelSmall, isMobile && styles.labelSmallMobile]}>Answer</Text>
               <TextInput
-                style={[styles.inputSmall, { height: 60, paddingTop: 8 }]}
+                style={[styles.inputSmall, isMobile && styles.inputSmallMobile, { height: 60, paddingTop: 8 }]}
                 placeholder="Enter Answer"
                 multiline
                 textAlignVertical="top"
@@ -448,7 +450,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
 
         <TouchableOpacity style={styles.addOutlineBtn} onPress={addFaq}>
           <Plus size={18} color="#EE2529" />
-          <Text style={styles.addOutlineBtnText}>Add FAQ</Text>
+          <Text style={[styles.addOutlineBtnText, isMobile && styles.addOutlineBtnTextMobile]}>Add FAQ</Text>
         </TouchableOpacity>
 
         <View style={{ height: 40 }} />
@@ -482,6 +484,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontFamily: 'Montserrat',
   },
+  subHeaderMobile: {
+    fontSize: 16,
+  },
   row: {
     flexDirection: 'row',
     gap: 12,
@@ -501,11 +506,17 @@ const styles = StyleSheet.create({
     marginBottom: 6,
     fontFamily: 'Montserrat',
   },
+  labelMobile: {
+    fontSize: 14,
+  },
   labelSmall: {
     fontSize: 14,
     color: '#666',
     marginBottom: 4,
     fontFamily: 'Montserrat',
+  },
+  labelSmallMobile: {
+    fontSize: 12,
   },
   errorRow: {
     flexDirection: 'row',
@@ -540,6 +551,9 @@ const styles = StyleSheet.create({
     borderColor: '#eee',
     fontFamily: 'Montserrat',
   },
+  inputMobile: {
+    fontSize: 14,
+  },
   inputError: {
     borderColor: '#EE2529',
   },
@@ -553,6 +567,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E0E0E0',
     fontFamily: 'Montserrat',
+  },
+  inputSmallMobile: {
+    fontSize: 13,
   },
   inputIcon: {
     position: 'absolute',
@@ -612,6 +629,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontFamily: 'Montserrat',
   },
+  addOutlineBtnTextMobile: {
+    fontSize: 14,
+  },
   centerWrapper: {
     alignItems: 'center',
     width: '100%',
@@ -634,6 +654,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     fontFamily: 'Montserrat',
+  },
+  addConnectivityBtnTextMobile: {
+    fontSize: 12,
   },
 });
 

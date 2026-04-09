@@ -30,6 +30,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
   ({ onNext, onFormValid, initialData }, ref) => {
     const { width } = useWindowDimensions();
     const isSmallScreen = width < 768;
+    const isMobile = width < 480;
     const { getAmenities, getCaretakers } = usePropertyAPIs();
 
     useImperativeHandle(ref, () => ({
@@ -229,10 +230,10 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
           Property Overview and Basic Details
         </Text>
 
-        <Text style={styles.subHeader}>Basic Property Details</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Basic Property Details</Text>
 
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Property Type *</Text>
+          <Text style={[styles.label, isMobile && styles.labelMobile]}>Property Type *</Text>
           <CustomDropdown
             placeholder="Select Property Type"
             value={formData.propertyType}
@@ -254,11 +255,12 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
 
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Carpet Area *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Carpet Area *</Text>
             <View style={styles.areaInputGroup}>
               <TextInput
                 style={[
                   styles.input,
+                  isMobile && styles.inputMobile,
                   { flex: 1 },
                   touched.carpetArea && errors.carpetArea && styles.inputError,
                 ]}
@@ -271,7 +273,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
                 }
               />
               <View style={styles.unitSelector}>
-                <Text style={styles.unitText}>Sq. Ft.</Text>
+                <Text style={[styles.unitText, isMobile && styles.unitTextMobile]}>Sq. Ft.</Text>
               </View>
             </View>
             {touched.carpetArea && errors.carpetArea && (
@@ -283,10 +285,11 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
           </View>
 
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Completion Year *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Completion Year *</Text>
             <TextInput
               style={[
                 styles.input,
+                isMobile && styles.inputMobile,
                 touched.builtYear && errors.builtYear && styles.inputError,
               ]}
               placeholder="Year"
@@ -306,7 +309,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
 
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Building Grade *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Building Grade *</Text>
             <CustomDropdown
               placeholder="Select Grade"
               value={formData.buildingGrade}
@@ -327,7 +330,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
           </View>
 
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Ownership *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Ownership *</Text>
             <CustomDropdown
               placeholder="Select Ownership"
               value={formData.ownership}
@@ -348,13 +351,14 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
           </View>
         </View>
 
-        <Text style={styles.subHeader}>Parking Details</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Parking Details</Text>
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>4 Wheeler Parkings *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>4 Wheeler Parkings *</Text>
             <TextInput
               style={[
                 styles.input,
+                isMobile && styles.inputMobile,
                 touched.fourWheelerParkings &&
                   errors.fourWheelerParkings &&
                   styles.inputError,
@@ -375,10 +379,11 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
             )}
           </View>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>2 Wheeler Parkings *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>2 Wheeler Parkings *</Text>
             <TextInput
               style={[
                 styles.input,
+                isMobile && styles.inputMobile,
                 touched.twoWheelerParkings &&
                   errors.twoWheelerParkings &&
                   styles.inputError,
@@ -400,10 +405,10 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
           </View>
         </View>
 
-        <Text style={styles.subHeader}>Infrastructure</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Infrastructure</Text>
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Furnishing Status *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Furnishing Status *</Text>
             <CustomDropdown
               placeholder="Select Status"
               value={formData.furnishingStatus}
@@ -423,9 +428,9 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
             )}
           </View>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Number of Lifts</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Number of Lifts</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, isMobile && styles.inputMobile]}
               placeholder="0"
               keyboardType="numeric"
               value={formData.numLifts}
@@ -434,12 +439,12 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
           </View>
         </View>
 
-        <Text style={styles.subHeader}>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>
           Building Amenities & Infrastructure
         </Text>
         {/* Amenities Multi-Select */}
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Amenities</Text>
+          <Text style={[styles.label, isMobile && styles.labelMobile]}>Amenities</Text>
           <CustomMultiSelect
             placeholder="Select Amenities"
             value={formData.amenityIds}
@@ -450,7 +455,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
 
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Power Backup</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Power Backup</Text>
             <CustomDropdown
               placeholder="Select Power Backup"
               value={formData.powerBackup}
@@ -464,7 +469,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
             />
           </View>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>HVAC Type</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>HVAC Type</Text>
             <CustomDropdown
               placeholder="Select HVAC Type"
               value={formData.hvacType}
@@ -481,7 +486,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
 
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Building Maintained By</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Building Maintained By</Text>
             <CustomDropdown
               placeholder="Select Building Maintenance"
               value={formData.buildingMaintained}
@@ -496,7 +501,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
             />
           </View>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Last Refurbished</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Last Refurbished</Text>
             <CustomDropdown
               placeholder="Select Year"
               value={formData.lastRefurbished}
@@ -512,9 +517,9 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
         </View>
 
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Property Description</Text>
+          <Text style={[styles.label, isMobile && styles.labelMobile]}>Property Description</Text>
           <TextInput
-            style={[styles.input, styles.textArea]}
+            style={[styles.input, styles.textArea, isMobile && styles.inputMobile]}
             placeholder="Describe your property..."
             multiline
             numberOfLines={4}
@@ -604,6 +609,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontFamily: 'Montserrat',
   },
+  subHeaderMobile: {
+    fontSize: 16,
+  },
   row: {
     flexDirection: 'row',
     gap: 12,
@@ -622,6 +630,9 @@ const styles = StyleSheet.create({
     color: '#444',
     marginBottom: 6,
     fontFamily: 'Montserrat',
+  },
+  labelMobile: {
+    fontSize: 14,
   },
   errorRow: {
     flexDirection: 'row',
@@ -657,6 +668,10 @@ const styles = StyleSheet.create({
     borderColor: '#eee',
     fontFamily: 'Montserrat',
   },
+  inputMobile: {
+    fontSize: 14,
+    height: 38,
+  },
   inputError: {
     borderColor: '#EE2529',
   },
@@ -680,6 +695,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     fontFamily: 'Montserrat',
+  },
+  unitTextMobile: {
+    fontSize: 13,
   },
   textArea: {
     height: 100,

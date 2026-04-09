@@ -105,7 +105,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
         <View
           style={[
             styles.cardContent,
-            { flexDirection: !isMobile ? 'row' : 'column' },
+            { flexDirection: !isMobile ? 'row' : 'column', padding: isMobile ? 16 : 30 },
           ]}
         >
           {/* Left Section */}
@@ -235,7 +235,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
           resizeMode="contain" 
         />
         
-        <View style={styles.cardContentBack}>
+        <View style={[styles.cardContentBack, { padding: isMobile ? 12 : 30 }]}>
           <View style={styles.backHeader}>
             <Text style={styles.backAgentName}>{capitalize(item.agentName) || "Rajendra P"}</Text>
             <Text style={styles.backCompany}>{capitalize(item.name) || "APJ Realtors"}</Text>
@@ -259,18 +259,18 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
                 colors={['#EE2529', '#C73834']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
-                style={styles.backContactBtn}
+                style={[styles.backContactBtn, isMobile && { paddingVertical: 8, paddingHorizontal: 12 }]}
               >
-                <Text style={styles.backContactBtnText}>Contact Broker</Text>
+                <Text style={[styles.backContactBtnText, isMobile && { fontSize: 13 }]}>Contact Broker</Text>
               </LinearGradient>
             </TouchableOpacity>
             
             <TouchableOpacity 
-              style={styles.shareBtn}
+              style={[styles.shareBtn, isMobile && { paddingVertical: 6, paddingHorizontal: 10 }]}
               onPress={(e) => e.stopPropagation()}
             >
-              <Image source={share} style={{ width: 18, height: 18 }} />
-              <Text style={styles.shareText}>Share</Text>
+              <Image source={share} style={{ width: isMobile ? 14 : 18, height: isMobile ? 14 : 18 }} />
+              <Text style={[styles.shareText, isMobile && { fontSize: 13 }]}>Share</Text>
             </TouchableOpacity>
           </View>
         </View>

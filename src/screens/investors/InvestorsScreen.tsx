@@ -384,7 +384,12 @@ const InvestorsScreen = () => {
                     </Text>
                   </View>
                 )}
-                <Text style={styles.userName}>{userData.name}</Text>
+                <Text style={styles.userName}>
+                  {(userData.name || '')
+                    .split(' ')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                    .join(' ')}
+                </Text>
               </View>
 
               <View style={styles.statsDivider}>
@@ -579,11 +584,14 @@ const styles = StyleSheet.create({
   container: {
     minHeight: '100%',
     backgroundColor: '#F9F9F9',
-    padding: 20,
+    padding: 10,
   },
   grid: {
     flexDirection: isDesktop ? 'row' : 'column',
     gap: 20,
+    width: '100%',
+    maxWidth: '92%',
+    alignSelf: 'center',
   },
   leftColumn: {
     flex: isDesktop ? 1 : undefined,
@@ -797,14 +805,15 @@ const styles = StyleSheet.create({
   },
   brokerStatsRow: {
     flexDirection: 'row',
-    gap: 16,
+    flexWrap: 'wrap',
+    gap: isDesktop ? 16 : 10,
     marginBottom: 25,
   },
   brokerStatCard: {
-    alignSelf: 'flex-start',
+    width: isDesktop ? '31%' : '48%',
     backgroundColor: '#fff',
     paddingVertical: 16,
-    paddingHorizontal: 28,
+    paddingHorizontal: isDesktop ? 22 : 12,
     borderRadius: 12,
     shadowColor: '#000',
     shadowOpacity: 0.06,
@@ -813,13 +822,13 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   brokerStatLabel: {
-    fontSize: 13,
+    fontSize: isDesktop ? 13 : 11,
     color: '#999',
-    marginBottom: 16,
-    fontWeight: '400',
+    marginBottom: 12,
+    fontWeight: '500',
   },
   brokerStatValue: {
-    fontSize: 18,
+    fontSize: isDesktop ? 22 : 16,
     fontWeight: 'bold',
     color: '#EE2529',
   },

@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  useWindowDimensions,
 } from 'react-native';
 import {
   ChevronLeft,
@@ -118,6 +119,9 @@ const LeaseRenewalsCard = ({ renewals }: { renewals: any[] }) => (
 );
 
 const PropertyDetailsScreen = () => {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
+
   const { currentPath, navigate, goBack } = useNavigation();
   const { user } = useAuth();
   const propertyId = currentPath.split('/propertyDetails/')[1];
@@ -270,14 +274,14 @@ const PropertyDetailsScreen = () => {
     );
   }
   const renderPropertyContent = () => (
-    <View style={styles.tabContent}>
+    <View style={[styles.tabContent, isMobile && styles.tabContentMobile]}>
       {/* Description Section */}
       <View style={styles.detailsHeader}>
-        <View style={styles.badgeRow}>
+        <View style={[styles.badgeRow, isMobile && { flexDirection: 'column', alignItems: 'flex-start', gap: 12 }]}>
           <View style={styles.premiumBadge}>
             <Text style={styles.premiumText}>Premium Location</Text>
           </View>
-          <View style={styles.actionButtonsRow}>
+          <View style={[styles.actionButtonsRow, isMobile && { width: '100%', flexDirection: 'column', gap: 12 }]}>
             {user?.userId === property.raw.added_by && (
               <TouchableOpacity
                 style={[
@@ -294,19 +298,19 @@ const PropertyDetailsScreen = () => {
                 </Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity style={styles.actionOutlineBtn}>
+            <TouchableOpacity style={[styles.actionOutlineBtn, isMobile && styles.actionOutlineBtnMobile]}>
               <Image source={DownloadIcon} style={{ width: 16, height: 16 }} />
-              <Text style={styles.actionOutlineText}>Download Report</Text>
+              <Text style={styles.actionOutlineText} numberOfLines={1}>Download Report</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.actionOutlineBtn}>
+            <TouchableOpacity style={[styles.actionOutlineBtn, isMobile && styles.actionOutlineBtnMobile]}>
               <Image source={ShareIcon} style={{ width: 16, height: 16 }} />
-              <Text style={styles.actionOutlineText}>Share Report</Text>
+              <Text style={styles.actionOutlineText} numberOfLines={1}>Share Report</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        <Text style={styles.descriptionTitle}>{property.title}</Text>
-        <Text style={styles.descriptionText}>
+        <Text style={[styles.descriptionTitle, isMobile && styles.descriptionTitleMobile]}>{property.title}</Text>
+        <Text style={[styles.descriptionText, isMobile && styles.descriptionTextMobile]}>
           {property.title} located at {property.location}. This {property.type}{' '}
           property offers a great investment opportunity with an ROI of{' '}
           {property.roi}. The tenure left is {property.tenure}.
@@ -315,12 +319,12 @@ const PropertyDetailsScreen = () => {
 
       {/* Details Grid */}
       <View style={styles.gridContainer}>
-        <View style={styles.row}>
+        <View style={[styles.row, isMobile && { flexDirection: 'column', gap: 12, justifyContent: 'flex-start' }]}>
           {/* Left Side */}
           <View style={styles.col}>
             {/* Basic Information */}
             <PropertyDetailsCard title="Basic Information">
-              <View style={styles.row}>
+              <View style={[styles.row, isMobile && { flexDirection: 'column', gap: 12 }]}>
                 <View style={styles.col}>
                   <InfoRow
                     label="Property Type"
@@ -370,7 +374,7 @@ const PropertyDetailsScreen = () => {
 
             {/* Building Amenities */}
             <PropertyDetailsCard title="Building Amenities">
-              <View style={styles.row}>
+              <View style={[styles.row, isMobile && { flexDirection: 'column', gap: 12 }]}>
                 <View style={styles.col}>
                   <InfoRow
                     label="Number of lifts"
@@ -418,7 +422,7 @@ const PropertyDetailsScreen = () => {
 
             {/* Building Infrastructure */}
             <PropertyDetailsCard title="Building Infrastructure">
-              <View style={styles.row}>
+              <View style={[styles.row, isMobile && { flexDirection: 'column', gap: 12 }]}>
                 <View style={styles.col}>
                   <InfoRow
                     label="Power Backup"
@@ -477,13 +481,13 @@ const PropertyDetailsScreen = () => {
   ];
 
   const renderLeaseContent = () => (
-    <View style={styles.tabContent}>
+    <View style={[styles.tabContent, isMobile && styles.tabContentMobile]}>
       <View style={styles.detailsHeader}>
-        <Text style={styles.descriptionTitle}>Lease & Tenant Details</Text>
+        <Text style={[styles.descriptionTitle, isMobile && styles.descriptionTitleMobile]}>Lease & Tenant Details</Text>
       </View>
 
       <View style={styles.gridContainer}>
-        <View style={styles.row}>
+        <View style={[styles.row, isMobile && { flexDirection: 'column' }]}>
           {/* Left Column */}
           <View style={styles.col}>
             <PropertyDetailsCard title="Tenant Information">
@@ -494,7 +498,7 @@ const PropertyDetailsScreen = () => {
             </PropertyDetailsCard>
 
             <PropertyDetailsCard title="Rental & Deposit Details">
-              <View style={styles.row}>
+              <View style={[styles.row, isMobile && { flexDirection: 'column', gap: 12 }]}>
                 <View style={styles.col}>
                   <InfoRow
                     label="Total Monthly Rent"
@@ -529,7 +533,7 @@ const PropertyDetailsScreen = () => {
           {/* Right Column */}
           <View style={styles.col}>
             <PropertyDetailsCard title="Lease Duration & Terms">
-              <View style={styles.row}>
+              <View style={[styles.row, isMobile && { flexDirection: 'column', gap: 12 }]}>
                 <View style={styles.col}>
                   <InfoRow
                     label="Lease Start Date"
@@ -554,7 +558,7 @@ const PropertyDetailsScreen = () => {
             </PropertyDetailsCard>
 
             <PropertyDetailsCard title="Escalation Terms">
-              <View style={styles.row}>
+              <View style={[styles.row, isMobile && { flexDirection: 'column', gap: 12 }]}>
                 <View style={styles.col}>
                   <InfoRow
                     label="Escalation Rate"
@@ -576,17 +580,17 @@ const PropertyDetailsScreen = () => {
   );
 
   const renderAnalyticsContent = () => (
-    <View style={styles.tabContent}>
+    <View style={[styles.tabContent, isMobile && styles.tabContentMobile]}>
       <View style={styles.detailsHeader}>
-        <Text style={styles.descriptionTitle}>Property Investment ROI Analytics</Text>
+        <Text style={[styles.descriptionTitle, isMobile && styles.descriptionTitleMobile]}>Property Investment ROI Analytics</Text>
       </View>
 
       <View style={styles.gridContainer}>
-        <View style={styles.row}>
+        <View style={[styles.row, isMobile && { flexDirection: 'column' }]}>
           {/* Left Column */}
           <View style={styles.col}>
             <PropertyDetailsCard title="Property Details">
-              <View style={styles.row}>
+              <View style={[styles.row, isMobile && { flexDirection: 'column', gap: 12 }]}>
                 <View style={styles.col}>
                   <InfoRow
                     label="Property Type"
@@ -607,7 +611,7 @@ const PropertyDetailsScreen = () => {
             </PropertyDetailsCard>
 
             <PropertyDetailsCard title="Recurring Expenses (Annual)">
-              <View style={styles.row}>
+              <View style={[styles.row, isMobile && { flexDirection: 'column', gap: 12 }]}>
                 <View style={styles.col}>
                   <InfoRow
                     label="Property Tax (₹)"
@@ -635,7 +639,7 @@ const PropertyDetailsScreen = () => {
           {/* Right Column */}
           <View style={styles.col}>
             <PropertyDetailsCard title="Rental Details">
-              <View style={styles.row}>
+              <View style={[styles.row, isMobile && { flexDirection: 'column', gap: 12 }]}>
                 <View style={styles.col}>
                   <InfoRow
                     label="Monthly Rent (₹)"
@@ -668,7 +672,7 @@ const PropertyDetailsScreen = () => {
             </PropertyDetailsCard>
 
             <PropertyDetailsCard title="One-time Costs">
-              <View style={styles.row}>
+              <View style={[styles.row, isMobile && { flexDirection: 'column', gap: 12 }]}>
                 <View style={styles.col}>
                   <InfoRow
                     label="Legal Fees (₹)"
@@ -696,9 +700,9 @@ const PropertyDetailsScreen = () => {
 
         {/* ROI Metrics Section - Moved BELOW main cards */}
         <View style={{ marginTop: 24, marginBottom: 24 }}>
-          <View style={styles.row}>
+          <View style={[styles.row, isMobile && { flexDirection: 'column' }]}>
             {/* Gross Rental Yield - Red Theme */}
-            <View style={[styles.col, { flex: 1, backgroundColor: '#FEF2F2', padding: 20, borderRadius: 16, borderWidth: 2, borderColor: '#FCA5A5', minHeight: 180 }]}>
+            <View style={[styles.col, { flex: isMobile ? undefined : 1, backgroundColor: '#FEF2F2', padding: 20, borderRadius: 16, borderWidth: 2, borderColor: '#FCA5A5', minHeight: isMobile ? undefined : 180 }]}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <Text style={{ fontSize: 18, color: '#111827', fontWeight: '800' }}>Gross Rental Yield</Text>
                 <Text style={{ fontSize: 24, fontWeight: '900', color: '#B91C1C' }}>
@@ -710,10 +714,10 @@ const PropertyDetailsScreen = () => {
               <Text style={{ fontSize: 16, color: '#6B7280', lineHeight: 22 }}>Higher % = stronger rental income.</Text>
             </View>
 
-            <View style={{ width: 14 }} />
+            {!isMobile && <View style={{ width: 14 }} />}
 
             {/* Net Rental Yield - Blue Theme */}
-            <View style={[styles.col, { flex: 1, backgroundColor: '#E0F2FE', padding: 20, borderRadius: 16, borderWidth: 2, borderColor: '#7DD3FC', minHeight: 180 }]}>
+            <View style={[styles.col, { flex: isMobile ? undefined : 1, backgroundColor: '#E0F2FE', padding: 20, borderRadius: 16, borderWidth: 2, borderColor: '#7DD3FC', minHeight: isMobile ? undefined : 180 }]}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <Text style={{ fontSize: 18, color: '#111827', fontWeight: '800' }}>Net Rental Yield</Text>
                 <Text style={{ fontSize: 24, fontWeight: '900', color: '#0369A1' }}>
@@ -728,9 +732,9 @@ const PropertyDetailsScreen = () => {
 
           <View style={{ height: 14 }} />
 
-          <View style={styles.row}>
+          <View style={[styles.row, isMobile && { flexDirection: 'column' }]}>
             {/* Annual Cash Flow - Green Theme */}
-            <View style={[styles.col, { flex: 1, backgroundColor: '#F0FDFA', padding: 20, borderRadius: 16, borderWidth: 2, borderColor: '#5EEAD4', minHeight: 180 }]}>
+            <View style={[styles.col, { flex: isMobile ? undefined : 1, backgroundColor: '#F0FDFA', padding: 20, borderRadius: 16, borderWidth: 2, borderColor: '#5EEAD4', minHeight: isMobile ? undefined : 180 }]}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <Text style={{ fontSize: 18, color: '#111827', fontWeight: '800' }}>Annual Cash Flow</Text>
                 <Text style={{ fontSize: 24, fontWeight: '900', color: '#0D9488' }}>
@@ -742,10 +746,10 @@ const PropertyDetailsScreen = () => {
               <Text style={{ fontSize: 16, color: '#0D9488', lineHeight: 22 }}>Money you can use or reinvest.</Text>
             </View>
 
-            <View style={{ width: 14 }} />
+            {!isMobile && <View style={{ width: 14 }} />}
 
             {/* Payback Period - Yellow Theme */}
-            <View style={[styles.col, { flex: 1, backgroundColor: '#FFFBEB', padding: 20, borderRadius: 16, borderWidth: 2, borderColor: '#FDE68A', minHeight: 180 }]}>
+            <View style={[styles.col, { flex: isMobile ? undefined : 1, backgroundColor: '#FFFBEB', padding: 20, borderRadius: 16, borderWidth: 2, borderColor: '#FDE68A', minHeight: isMobile ? undefined : 180 }]}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <Text style={{ fontSize: 18, color: '#111827', fontWeight: '800' }}>Payback Period</Text>
                 <Text style={{ fontSize: 24, fontWeight: '900', color: '#B45309' }}>
@@ -760,29 +764,29 @@ const PropertyDetailsScreen = () => {
         </View>
 
         {/* Investment Summary & Additional Income - 2 Column Grid */}
-        <View style={[styles.row, { marginTop: 12 }]}>
+        <View style={[styles.row, { marginTop: 12 }, isMobile && { flexDirection: 'column' }]}>
           {/* Investment Summary */}
-          <View style={[styles.col, { flex: 1 }]}>
+          <View style={[styles.col, { flex: isMobile ? undefined : 1 }]}>
             <PropertyDetailsCard title="Investment Summary">
               <View style={{ gap: 20, marginTop: 10 }}>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', gap: isMobile ? 4 : 0 }}>
                   <Text style={{ fontSize: 16, color: '#999' }}>Total Initial Investment (₹)</Text>
                   <Text style={{ fontSize: 18, color: '#444', fontWeight: '700' }}>
                     ₹{property.raw.sellingPrice ? (property.raw.sellingPrice * 100).toFixed(0) + ',00,000' : '48,52,500'}
                   </Text>
                 </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', gap: isMobile ? 4 : 0 }}>
                   <Text style={{ fontSize: 16, color: '#999' }}>Gross Annual Rent (₹)</Text>
                   <Text style={{ fontSize: 18, color: '#444', fontWeight: '700' }}>
                     ₹{property.raw.annualGrossRent ? property.raw.annualGrossRent + ' L' : '6,00,000'}
                   </Text>
                 </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', gap: isMobile ? 4 : 0 }}>
                   <Text style={{ fontSize: 16, color: '#999' }}>Total Annual Expenses (₹)</Text>
                   <Text style={{ fontSize: 18, color: '#444', fontWeight: '700' }}>₹65,000</Text>
                 </View>
                 <View style={{ height: 1, backgroundColor: '#EEE', marginVertical: 4 }} />
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <View style={{ flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', gap: isMobile ? 4 : 0 }}>
                   <Text style={{ fontSize: 18, color: '#444', fontWeight: '700' }}>Net Annual Income (₹)</Text>
                   <Text style={{ fontSize: 20, color: '#10B981', fontWeight: '800' }}>
                     ₹{property.raw.annualGrossRent ? (property.raw.annualGrossRent - 0.65).toFixed(2) + ' L' : '5,35,000'}
@@ -792,10 +796,10 @@ const PropertyDetailsScreen = () => {
             </PropertyDetailsCard>
           </View>
 
-          <View style={{ width: 14 }} />
+          {!isMobile && <View style={{ width: 14 }} />}
 
           {/* Additional Income */}
-          <View style={[styles.col, { flex: 1 }]}>
+          <View style={[styles.col, { flex: isMobile ? undefined : 1 }]}>
             <PropertyDetailsCard title="Additional Income">
               <View style={{ gap: 20, marginTop: 10 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
@@ -814,7 +818,7 @@ const PropertyDetailsScreen = () => {
         <View style={{ marginTop: 24 }}>
           <Text style={{ fontSize: 24, color: '#EE2529', fontWeight: '800', marginBottom: 20 }}>Performance Analytics</Text>
           
-          <View style={styles.row}>
+          <View style={[styles.row, isMobile && { flexDirection: 'column' }]}>
             {/* Annual Expense Breakdown - Simulated Chart */}
             <View style={[styles.col, { flex: 1, backgroundColor: 'white', padding: 20, borderRadius: 16, elevation: 4 }]}>
               <Text style={{ fontSize: 18, color: '#444', fontWeight: '700', textAlign: 'center', marginBottom: 20 }}>Annual Expense Breakdown</Text>
@@ -832,7 +836,7 @@ const PropertyDetailsScreen = () => {
               </View>
             </View>
 
-            <View style={{ width: 14 }} />
+            {!isMobile && <View style={{ width: 14 }} />}
 
             {/* Rental Yield Comparison - Simulated Chart */}
             <View style={[styles.col, { flex: 1, backgroundColor: 'white', padding: 20, borderRadius: 16, elevation: 4 }]}>
@@ -885,7 +889,7 @@ const PropertyDetailsScreen = () => {
             {['Year 1', 'Year 3', 'Year 5', 'Year 7', 'Year 10'].map(y => <Text key={y} style={{ fontSize: 13, color: '#999' }}>{y}</Text>)}
           </View>
           
-          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 20, marginTop: 24 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 20, marginTop: 24, flexWrap: 'wrap' }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#0D9488' }} /><Text style={{ fontSize: 15, color: '#0D9488', fontWeight: '800' }}>Annual Cash Flow</Text></View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#B91C1C' }} /><Text style={{ fontSize: 15, color: '#B91C1C', fontWeight: '800' }}>Annual Rent</Text></View>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#F59E0B' }} /><Text style={{ fontSize: 15, color: '#F59E0B', fontWeight: '800' }}>Cumulative Cash Flow</Text></View>
@@ -896,6 +900,8 @@ const PropertyDetailsScreen = () => {
         <View style={{ marginTop: 24, backgroundColor: 'white', padding: 25, borderRadius: 16, elevation: 4 }}>
           <Text style={{ fontSize: 20, color: '#444', fontWeight: '700', textAlign: 'center', marginBottom: 20 }}>Detailed Cashflow Projections</Text>
           <View style={{ borderTopWidth: 1, borderColor: '#EEE' }}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <View style={{ width: isMobile ? 600 : '100%' }}>
             <View style={{ flexDirection: 'row', paddingVertical: 15, backgroundColor: '#F9FAFB', borderBottomWidth: 1, borderColor: '#EEE' }}>
               <Text style={{ flex: 0.5, fontSize: 15, fontWeight: '800', textAlign: 'center' }}>Year</Text>
               <Text style={{ flex: 1, fontSize: 15, fontWeight: '800', textAlign: 'center' }}>Annual Rent</Text>
@@ -914,6 +920,8 @@ const PropertyDetailsScreen = () => {
                 <Text style={{ flex: 0.8, fontSize: 14, textAlign: 'center', color: '#444' }}>{(yr*6.4).toFixed(1)}%</Text>
               </View>
             ))}
+              </View>
+            </ScrollView>
           </View>
         </View>
       </View>
@@ -921,17 +929,17 @@ const PropertyDetailsScreen = () => {
   );
 
   const renderLocationContent = () => (
-    <View style={styles.tabContent}>
+    <View style={[styles.tabContent, isMobile && styles.tabContentMobile]}>
       <View style={styles.detailsHeader}>
-        <Text style={styles.descriptionTitle}>Location & Market Overview</Text>
+        <Text style={[styles.descriptionTitle, isMobile && styles.descriptionTitleMobile]}>Location & Market Overview</Text>
       </View>
 
       <View style={styles.gridContainer}>
-        <View style={styles.row}>
+        <View style={[styles.row, isMobile && { flexDirection: 'column' }]}>
           {/* Left Column */}
           <View style={styles.col}>
             <PropertyDetailsCard title="Location Details">
-              <View style={styles.row}>
+              <View style={[styles.row, isMobile && { flexDirection: 'column', gap: 12 }]}>
                 <View style={styles.col}>
                   <InfoRow label="Micro-Market" value={property.raw.microMarket || 'N/A'} />
                   <InfoRow label="State" value={property.raw.state || 'N/A'} />
@@ -950,7 +958,7 @@ const PropertyDetailsScreen = () => {
             </PropertyDetailsCard>
 
             <PropertyDetailsCard title="Market Benchmark Data">
-              <View style={styles.row}>
+              <View style={[styles.row, isMobile && { flexDirection: 'column', gap: 12 }]}>
                 <View style={styles.col}>
                   <InfoRow label="Market Min Rent" value="₹45/sq.ft" />
                   <InfoRow label="Market Max Rent" value="₹70/sq.ft" />
@@ -1039,12 +1047,12 @@ const PropertyDetailsScreen = () => {
     ];
 
     return (
-      <View style={styles.tabContent}>
+      <View style={[styles.tabContent, isMobile && styles.tabContentMobile]}>
         <View style={styles.detailsHeader}>
-          <Text style={styles.descriptionTitle}>
+          <Text style={[styles.descriptionTitle, isMobile && styles.descriptionTitleMobile]}>
             Frequently Asked Questions
           </Text>
-          <Text style={styles.descriptionText}>
+          <Text style={[styles.descriptionText, isMobile && styles.descriptionTextMobile]}>
             Get answers to common stakeholder questions
           </Text>
         </View>
@@ -1076,7 +1084,7 @@ const PropertyDetailsScreen = () => {
                 </TouchableOpacity>
                 {isOpen && (
                   <View style={styles.faqAnswerContainer}>
-                    <Text style={styles.descriptionText}>{faq.a}</Text>
+                    <Text style={[styles.descriptionText, isMobile && styles.descriptionTextMobile]}>{faq.a}</Text>
                   </View>
                 )}
               </View>
@@ -1118,16 +1126,9 @@ const PropertyDetailsScreen = () => {
   const renderNotesContent = () => {
     if (!property) return null;
     return (
-      <View style={styles.tabContent}>
-        <View style={styles.detailsHeader}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'flex-start',
-              justifyContent: 'space-between',
-            }}
-          >
-            <View style={{ flex: 1 }}>
+      <View style={[styles.tabContent, isMobile && styles.tabContentMobile]}>
+        <View style={[styles.detailsHeader, { flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'center', gap: 16 }]}>
+          <View style={{ flex: isMobile ? 0 : 1 }}>
               <Text style={styles.descriptionTitle}>Manager Notes</Text>
               <Text style={styles.descriptionText}>
                 Updates and observations from our property management team
@@ -1137,7 +1138,8 @@ const PropertyDetailsScreen = () => {
               <TouchableOpacity
                 style={[
                   styles.actionOutlineBtn,
-                  { borderColor: COLORS.primary, marginLeft: 12 },
+                  isMobile && styles.actionOutlineBtnMobile,
+                  { borderColor: COLORS.primary },
                 ]}
                 onPress={() => navigate(`/list-property/${propertyId}`)}
               >
@@ -1149,7 +1151,6 @@ const PropertyDetailsScreen = () => {
                 </Text>
               </TouchableOpacity>
             )}
-          </View>
         </View>
 
         {property.isVerified !== 'completed' && (
@@ -1265,20 +1266,20 @@ const PropertyDetailsScreen = () => {
             top: 0,
             left: 0,
             right: 0,
-            height: 480, // Approximate 40vh on standard screens, or use useWindowDimensions
+            height: isMobile ? 300 : 480, // Approximate 40vh on standard screens, or use useWindowDimensions
             opacity: 0.8,
             zIndex: 0,
           }}
           resizeMode="cover"
         />
         <ScrollView
-          style={[styles.container, { zIndex: 1 }]}
+          style={[styles.container, { zIndex: 1, width: isMobile ? '100%' : '81%', paddingHorizontal: isMobile ? 16 : 0 }]}
           showsVerticalScrollIndicator={false}
         >
        
 
         <View
-          style={{ flexDirection: width > 900 ? 'row' : 'column', gap: 24 }}
+          style={{ flexDirection: !isMobile && width > 900 ? 'row' : 'column', gap: 24 }}
         >
           {/* Left Column (Card + Assistance) */}
           <View style={{ width: width > 900 ? 380 : '100%' }}>
@@ -1307,7 +1308,7 @@ const PropertyDetailsScreen = () => {
               horizontal
               showsHorizontalScrollIndicator={false}
               style={styles.tabsContainer}
-              contentContainerStyle={styles.tabsContent}
+              contentContainerStyle={[styles.tabsContent, isMobile && { justifyContent: 'flex-start', gap: 20 }]}
             >
               {tabs.map(tab => {
                 const Icon = tab.icon;
@@ -1458,7 +1459,7 @@ const styles = StyleSheet.create({
     
     bottom: -14,
     height: 3,
-    width: '120%', // Relative width for better scaling
+    width: '100%', // Relative width for better scaling
     backgroundColor: '#EE2529',
     borderTopLeftRadius: 3,
     borderTopRightRadius: 3,
@@ -1514,6 +1515,12 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     minWidth: 200,
     justifyContent: 'center',
+    flexShrink: 0,
+  },
+  actionOutlineBtnMobile: {
+    width: '100%',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
   },
   actionOutlineText: {
     fontSize: 16,
@@ -1527,13 +1534,20 @@ const styles = StyleSheet.create({
     color: '#EE2529',
     marginBottom: 8,
   },
+  descriptionTitleMobile: {
+    fontSize: 24,
+  },
   descriptionText: {
     fontSize: 22,
     color: COLORS.textSecondary,
     lineHeight: 32,
   },
+  descriptionTextMobile: {
+    fontSize: 16,
+    lineHeight: 24,
+  },
   gridContainer: {
-    gap: 16,
+    gap: width < 768 ? 12 : 16,
   },
   card: {
     backgroundColor: COLORS.white,
@@ -1542,7 +1556,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 20,
     elevation: 8,
-    shadowOffset: { width: 10, height: 10 },
+    shadowOffset: width < 768 ? { width: 0, height: 2 } : { width: 10, height: 10 },
     overflow: 'hidden',
   },
   cardHeader: {
@@ -1550,7 +1564,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   cardTitle: {
-    fontSize: 24,
+    fontSize: width < 768 ? 18 : 24,
     fontWeight: '700',
     color: '#EE2529',
     fontFamily: 'Montserrat',
@@ -1558,16 +1572,22 @@ const styles = StyleSheet.create({
   cardContent: {
     padding: 16,
     paddingTop: 8,
-    gap: 14,
+    gap: width < 768 ? 10 : 14,
+  },
+  tabContentMobile: {
+    width: '100%',
+    padding: 16,
+    borderRadius: 0,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    gap: 24,
+    gap: width < 768 ? 12 : 24,
   },
   col: {
-    flex: 1,
-    gap: 12,
+    flex: width < 768 ? undefined : 1,
+    width: width < 768 ? '100%' : undefined,
+    gap: width < 768 ? 12 : 16,
   },
   infoRow: {
     gap: 10,
