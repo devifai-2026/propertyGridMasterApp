@@ -30,6 +30,8 @@ const Footer = () => {
     navigate(path);
   };
 
+  if (isMobile) return null;
+
   return (
     <View style={styles.footerContainer}>
       <View style={[styles.contentWrapper, isMobile && styles.contentWrapperMobile]}>

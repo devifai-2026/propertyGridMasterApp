@@ -16,7 +16,15 @@ interface EMISummaryCardsProps {
   };
 }
 
+import { useWindowDimensions } from 'react-native';
+
 const EMISummaryCards = ({ data }: EMISummaryCardsProps) => {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
+  const isTablet = width >= 768 && width < 1024;
+
+  const cardWidth = isDesktop ? '24%' : isTablet ? '48%' : '100%';
+
   const formatCurrency = (val?: number) => {
     if (val === undefined) return '0';
     return val.toLocaleString('en-IN', { maximumFractionDigits: 0 });
@@ -31,7 +39,7 @@ const EMISummaryCards = ({ data }: EMISummaryCardsProps) => {
       {/* Main Result Cards - 4 Cards Grid */}
       <View style={styles.resultsGrid}>
         {/* Card 1 - Monthly EMI */}
-        <View style={[styles.resultCard, styles.card1]}>
+        <View style={[styles.resultCard, styles.card1, { width: cardWidth }]}>
           <View style={styles.cardContent}>
             <Text style={styles.resultCardTitle}>Monthly EMI</Text>
             <Text style={[styles.resultCardValue, { color: '#C73834' }]}>₹{formatCurrency(data?.monthlyEMI)}</Text>
@@ -44,7 +52,7 @@ const EMISummaryCards = ({ data }: EMISummaryCardsProps) => {
         </View>
 
         {/* Card 2 - Rent Coverage */}
-        <View style={[styles.resultCard, styles.card2]}>
+        <View style={[styles.resultCard, styles.card2, { width: cardWidth }]}>
           <View style={styles.cardContent}>
             <Text style={styles.resultCardTitle}>Rent Coverage</Text>
             <Text style={[styles.resultCardValue, { color: '#26BFCC' }]}>{rentCoverage}%</Text>
@@ -57,7 +65,7 @@ const EMISummaryCards = ({ data }: EMISummaryCardsProps) => {
         </View>
 
         {/* Card 3 - Monthly Cash Flow */}
-        <View style={[styles.resultCard, styles.card3]}>
+        <View style={[styles.resultCard, styles.card3, { width: cardWidth }]}>
           <View style={styles.cardHeader}>
             <Text style={styles.resultCardTitle}>Monthly Cash Flow</Text>
             <TrendingUp size={24} color="#429482" />
@@ -71,7 +79,7 @@ const EMISummaryCards = ({ data }: EMISummaryCardsProps) => {
         </View>
 
         {/* Card 4 - Payback Period */}
-        <View style={[styles.resultCard, styles.card4]}>
+        <View style={[styles.resultCard, styles.card4, { width: cardWidth }]}>
           <View style={styles.cardHeader}>
             <Text style={styles.resultCardTitle}>Payback Period</Text>
             <Calendar size={24} color="#F7C952" />
@@ -86,7 +94,7 @@ const EMISummaryCards = ({ data }: EMISummaryCardsProps) => {
       </View>
 
       {/* Summary Cards Section - 2 Cards */}
-      <View style={styles.summarySection}>
+      <View style={[styles.summarySection, !isDesktop && { flexDirection: 'column' }]}>
         {/* Loan Summary */}
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>Loan Summary</Text>

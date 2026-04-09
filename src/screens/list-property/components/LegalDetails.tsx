@@ -26,6 +26,7 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
   ({ onNext, onFormValid, initialData }, ref) => {
     const { width } = useWindowDimensions();
     const isSmallScreen = width < 768;
+    const isMobile = width < 480;
 
     useImperativeHandle(ref, () => ({
       submit: () => {
@@ -172,11 +173,11 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
           Legal & Title Details
         </Text>
 
-        <Text style={styles.subHeader}>Title & Ownership Status</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Title & Ownership Status</Text>
 
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Title Status *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Title Status *</Text>
             <CustomDropdown
               placeholder="Select Status"
               value={formData.titleStatus}
@@ -197,7 +198,7 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
           </View>
 
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Occupancy Certificate (OC) *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Occupancy Certificate (OC) *</Text>
             <CustomDropdown
               placeholder="Select Status"
               value={formData.occupancyCertificate}
@@ -224,7 +225,7 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
 
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Lease Registration *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Lease Registration *</Text>
             <CustomDropdown
               placeholder="Select Status"
               value={formData.leaseRegistration}
@@ -247,7 +248,7 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
         </View>
 
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Any Pending Litigations *</Text>
+          <Text style={[styles.label, isMobile && styles.labelMobile]}>Any Pending Litigations *</Text>
           <View style={styles.radioGroup}>
             <TouchableOpacity
               style={styles.radioButton}
@@ -266,7 +267,7 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
                   <View style={styles.radioInner} />
                 )}
               </View>
-              <Text style={styles.radioLabel}>Yes</Text>
+              <Text style={[styles.radioLabel, isMobile && styles.radioLabelMobile]}>Yes</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -286,7 +287,7 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
                   <View style={styles.radioInner} />
                 )}
               </View>
-              <Text style={styles.radioLabel}>No</Text>
+              <Text style={[styles.radioLabel, isMobile && styles.radioLabelMobile]}>No</Text>
             </TouchableOpacity>
           </View>
           {touched.pendingLitigations && errors.pendingLitigations && (
@@ -303,6 +304,7 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
               style={[
                 styles.input,
                 styles.textArea,
+                isMobile && styles.inputMobile,
                 touched.litigationNote &&
                   errors.litigationNote &&
                   styles.inputError,
@@ -326,7 +328,7 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
           </View>
         )}
 
-        <Text style={styles.subHeader}>Licenses & Certifications</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Licenses & Certifications</Text>
         <View style={styles.certGrid}>
           {(['rera', 'leed', 'igbc'] as const).map(cert => (
             <TouchableOpacity
@@ -344,17 +346,17 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
                   <Text style={styles.checkmark}>✓</Text>
                 )}
               </View>
-              <Text style={styles.checkboxLabel}>{cert.toUpperCase()}</Text>
+              <Text style={[styles.checkboxLabel, isMobile && styles.checkboxLabelMobile]}>{cert.toUpperCase()}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
         <View style={styles.otherCertContainer}>
-          <Text style={styles.labelSmall}>Add Others (if Any)</Text>
+          <Text style={[styles.labelSmall, isMobile && styles.labelMobile]}>Add Others (if Any)</Text>
           {formData.otherCertifications.map((cert: any, index: number) => (
             <View key={index} style={styles.certInputRow}>
               <TextInput
-                style={[styles.input, { flex: 1 }]}
+                style={[styles.input, isMobile && styles.inputMobile, { flex: 1 }]}
                 placeholder="Enter certification"
                 value={cert}
                 onChangeText={v => handleOtherCertChange(index, v)}
@@ -405,6 +407,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontFamily: 'Montserrat',
   },
+  subHeaderMobile: {
+    fontSize: 16,
+  },
   row: {
     flexDirection: 'row',
     gap: 12,
@@ -423,6 +428,9 @@ const styles = StyleSheet.create({
     color: '#444',
     marginBottom: 6,
     fontFamily: 'Montserrat',
+  },
+  labelMobile: {
+    fontSize: 14,
   },
   labelSmall: {
     fontSize: 18,
@@ -464,6 +472,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#eee',
     fontFamily: 'Montserrat',
+  },
+  inputMobile: {
+    fontSize: 14,
   },
   inputError: {
     borderColor: '#EE2529',
@@ -510,6 +521,9 @@ const styles = StyleSheet.create({
     color: '#444',
     fontFamily: 'Montserrat',
   },
+  radioLabelMobile: {
+    fontSize: 14,
+  },
   certGrid: {
     gap: 12,
     marginBottom: 20,
@@ -541,6 +555,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#444',
     fontFamily: 'Montserrat',
+  },
+  checkboxLabelMobile: {
+    fontSize: 14,
   },
   otherCertContainer: {
     marginTop: 8,

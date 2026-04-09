@@ -25,6 +25,7 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
   ({ onNext, onFormValid, initialData }, ref) => {
     const { width } = useWindowDimensions();
     const isSmallScreen = width < 768;
+    const isMobile = width < 480;
 
     useImperativeHandle(ref, () => ({
       submit: () => {
@@ -136,15 +137,16 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
           Financial Analytics
         </Text>
 
-        <Text style={styles.subHeader}>Property Details</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Property Details</Text>
         <View style={styles.fieldContainer}>
           <View style={styles.labelRow}>
-            <Text style={styles.label}>Selling Price *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Selling Price *</Text>
             <Info size={14} color="#999" />
           </View>
           <TextInput
             style={[
               styles.input,
+              isMobile && styles.inputMobile,
               touched.sellingPrice && errors.sellingPrice && styles.inputError,
             ]}
             placeholder="Enter Property Selling Price"
@@ -161,13 +163,14 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
           )}
         </View>
 
-        <Text style={styles.subHeader}>Annual Operating Costs</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Annual Operating Costs</Text>
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Property Tax (Annual) *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Property Tax (Annual) *</Text>
             <TextInput
               style={[
                 styles.input,
+                isMobile && styles.inputMobile,
                 touched.propertyTax && errors.propertyTax && styles.inputError,
               ]}
               placeholder="0"
@@ -184,10 +187,11 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
             )}
           </View>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Insurance (Annual) *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Insurance (Annual) *</Text>
             <TextInput
               style={[
                 styles.input,
+                isMobile && styles.inputMobile,
                 touched.insurance && errors.insurance && styles.inputError,
               ]}
               placeholder="0"
@@ -206,9 +210,9 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
         </View>
 
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Other Costs (Annual)</Text>
+          <Text style={[styles.label, isMobile && styles.labelMobile]}>Other Costs (Annual)</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, isMobile && styles.inputMobile]}
             placeholder="0"
             keyboardType="numeric"
             value={formData.otherCosts}
@@ -217,15 +221,15 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
         </View>
 
         <View style={styles.totalBox}>
-          <Text style={styles.totalLabel}>Total Operating Annual Costs</Text>
-          <Text style={styles.totalValue}>{metrics.annualOperatingCosts}</Text>
+          <Text style={[styles.totalLabel, isMobile && styles.totalLabelMobile]}>Total Operating Annual Costs</Text>
+          <Text style={[styles.totalValue, isMobile && styles.totalValueMobile]}>{metrics.annualOperatingCosts}</Text>
         </View>
 
-        <Text style={styles.subHeader}>Additional Income Details</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Additional Income Details</Text>
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Additional Income (Annual)</Text>
+          <Text style={[styles.label, isMobile && styles.labelMobile]}>Additional Income (Annual)</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, isMobile && styles.inputMobile]}
             placeholder="Enter Additional Income"
             keyboardType="numeric"
             value={formData.additionalIncome}
@@ -236,7 +240,7 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
           </Text>
         </View>
 
-        <Text style={styles.subHeader}>Calculated Metrics</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Calculated Metrics</Text>
         <View style={styles.metricsGrid}>
           {[
             { label: 'Annual Gross Rent:', value: metrics.annualGrossRent },
@@ -262,8 +266,8 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
           ].map((item, idx) => (
             <View key={idx} style={styles.metricItem}>
               <View style={styles.metricContent}>
-                <Text style={styles.metricLabel}>{item.label}</Text>
-                <Text style={styles.metricValue}>{item.value}</Text>
+                <Text style={[styles.metricLabel, isMobile && styles.metricLabelMobile]}>{item.label}</Text>
+                <Text style={[styles.metricValue, isMobile && styles.metricValueMobile]}>{item.value}</Text>
               </View>
             </View>
           ))}
@@ -299,6 +303,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontFamily: 'Montserrat',
   },
+  subHeaderMobile: {
+    fontSize: 16,
+  },
   row: {
     flexDirection: 'row',
     gap: 12,
@@ -323,6 +330,9 @@ const styles = StyleSheet.create({
     color: '#444',
     marginBottom: 6,
     fontFamily: 'Montserrat',
+  },
+  labelMobile: {
+    fontSize: 14,
   },
   errorRow: {
     flexDirection: 'row',
@@ -353,6 +363,9 @@ const styles = StyleSheet.create({
     borderColor: '#eee',
     fontFamily: 'Montserrat',
   },
+  inputMobile: {
+    fontSize: 14,
+  },
   inputError: {
     borderColor: '#EE2529',
   },
@@ -371,11 +384,17 @@ const styles = StyleSheet.create({
     color: '#444',
     fontFamily: 'Montserrat',
   },
+  totalLabelMobile: {
+    fontSize: 14,
+  },
   totalValue: {
     fontSize: 16,
     fontWeight: '700',
     color: '#000',
     fontFamily: 'Montserrat',
+  },
+  totalValueMobile: {
+    fontSize: 13,
   },
   helpText: {
     fontSize: 14,
@@ -413,11 +432,17 @@ const styles = StyleSheet.create({
     flex: 1,
     marginRight: 8,
   },
+  metricLabelMobile: {
+    fontSize: 13,
+  },
   metricValue: {
     fontSize: 16,
     fontWeight: '700',
     color: '#6666',
     fontFamily: 'Montserrat',
+  },
+  metricValueMobile: {
+    fontSize: 13,
   },
 });
 

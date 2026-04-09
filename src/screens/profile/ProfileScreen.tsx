@@ -197,7 +197,12 @@ const ProfileScreen = () => {
                 <Settings size={16} color="#FFF" />
               </TouchableOpacity>
             </View>
-            <Text style={styles.userName}>{user?.name || 'User'}</Text>
+            <Text style={styles.userName}>
+              {(user?.name || '')
+                .split(' ')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ')}
+            </Text>
             <View style={styles.roleBadge}>
               <Shield
                 size={14}
@@ -436,7 +441,7 @@ const styles = StyleSheet.create({
   },
   content: {
     width: '100%',
-    maxWidth: 600,
+    maxWidth: '80%',
   },
   desktopContent: {
     paddingVertical: 40,

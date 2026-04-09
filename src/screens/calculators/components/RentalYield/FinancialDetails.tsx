@@ -60,7 +60,7 @@ const FinancialDetails = ({ data }: FinancialDetailsProps) => {
   const getCardWidth = () => {
     if (isDesktop) return "19%";
     if (isTablet) return "32%";
-    return "48%";
+    return "100%";
   };
 
   return (

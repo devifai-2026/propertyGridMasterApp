@@ -318,10 +318,11 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
 
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>First Name *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>First Name *</Text>
             <TextInput
               style={[
                 styles.input,
+                isMobile && styles.inputMobile,
                 touched.firstName && errors.firstName && styles.inputError,
               ]}
               value={formData.firstName}
@@ -339,10 +340,11 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
           </View>
 
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Last Name *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Last Name *</Text>
             <TextInput
               style={[
                 styles.input,
+                isMobile && styles.inputMobile,
                 touched.lastName && errors.lastName && styles.inputError,
               ]}
               value={formData.lastName}
@@ -362,10 +364,11 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
 
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Email</Text>
             <TextInput
               style={[
                 styles.input,
+                isMobile && styles.inputMobile,
                 touched.email && errors.email && styles.inputError,
               ]}
               value={formData.email}
@@ -384,7 +387,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
           </View>
 
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>List Property Under *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>List Property Under *</Text>
             <View
               style={[
                 styles.radioGroup,
@@ -417,6 +420,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
                 <Text
                   style={[
                     styles.radioLabel,
+                    isMobile && styles.radioLabelMobile,
                     isEditMode && styles.radioLabelDisabled,
                   ]}
                 >
@@ -450,6 +454,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
                 <Text
                   style={[
                     styles.radioLabel,
+                    isMobile && styles.radioLabelMobile,
                     isEditMode && styles.radioLabelDisabled,
                   ]}
                 >
@@ -468,7 +473,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
 
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Mobile Number *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Mobile Number *</Text>
             <View
               style={[
                 styles.mobileInputContainer,
@@ -479,6 +484,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
                 style={[
                   styles.input,
                   styles.mobileInput,
+                  isMobile && styles.inputMobile,
                   touched.mobile && errors.mobile && styles.inputError,
                 ]}
                 value={formData.mobile}
@@ -527,7 +533,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
 
           {otpSent ? (
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>OTP *</Text>
+              <Text style={[styles.label, isMobile && styles.labelMobile]}>OTP *</Text>
               <View
                 style={[
                   styles.otpInputGroup,
@@ -584,7 +590,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
 
         {!isOtpVerified && (
           <View style={styles.otpHelpWrapper}>
-            <Text style={styles.otpHelpText}>
+            <Text style={[styles.otpHelpText, isMobile && styles.otpHelpTextMobile]}>
               Didn’t received OTP?{' '}
               <Text style={styles.resendLink} onPress={handleSendOtp}>
                 Click to resend OTP.
@@ -606,7 +612,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
             >
               {formData.agreeTerms && <Text style={styles.checkmark}>✓</Text>}
             </View>
-            <Text style={styles.checkboxLabel}>
+            <Text style={[styles.checkboxLabel, isMobile && styles.checkboxLabelMobile]}>
               I agree to the{' '}
               <Text style={styles.linkText}>terms & conditions</Text>
             </Text>
@@ -632,7 +638,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
             >
               {formData.agreePrivacy && <Text style={styles.checkmark}>✓</Text>}
             </View>
-            <Text style={styles.checkboxLabel}>
+            <Text style={[styles.checkboxLabel, isMobile && styles.checkboxLabelMobile]}>
               I agree to the <Text style={styles.linkText}>Privacy Policy</Text>
             </Text>
           </TouchableOpacity>
@@ -687,6 +693,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontFamily: 'Montserrat',
   },
+  labelMobile: {
+    fontSize: 14,
+  },
   input: {
     backgroundColor: '#F2F2F2',
     height: 48,
@@ -697,6 +706,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'transparent',
     fontFamily: 'Montserrat',
+  },
+  inputMobile: {
+    fontSize: 14,
+    height: 40,
   },
   inputError: {
     borderColor: '#EE2529',
@@ -752,6 +765,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#444',
     fontFamily: 'Montserrat',
+  },
+  radioLabelMobile: {
+    fontSize: 14,
   },
   mobileInputContainer: {
     flexDirection: 'row',
@@ -882,6 +898,9 @@ const styles = StyleSheet.create({
     color: '#444',
     fontFamily: 'Montserrat',
   },
+  checkboxLabelMobile: {
+    fontSize: 14,
+  },
   linkText: {
     color: '#2196F3',
     textDecorationLine: 'underline',
@@ -910,6 +929,9 @@ const styles = StyleSheet.create({
     color: '#333',
     fontWeight: '500',
     fontFamily: 'Montserrat',
+  },
+  otpHelpTextMobile: {
+    fontSize: 14,
   },
   resendLink: {
     color: '#000',

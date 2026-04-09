@@ -9,6 +9,7 @@ import {
   TextInput,
   Pressable,
   Dimensions,
+  useWindowDimensions,
 } from 'react-native';
 import { ChevronDown, X, Search } from 'lucide-react-native';
 
@@ -36,6 +37,8 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
   searchable = false,
   error = false,
 }) => {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 480;
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
@@ -82,6 +85,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
         <Text
           style={[
             styles.dropdownText,
+            isMobile && styles.dropdownTextMobile,
             !selectedOption && styles.placeholderText,
           ]}
           numberOfLines={1}
@@ -116,7 +120,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
               <View style={styles.searchContainer}>
                 <Search size={18} color="#999" style={styles.searchIcon} />
                 <TextInput
-                  style={styles.searchInput}
+                  style={[styles.searchInput, isMobile && styles.searchInputMobile]}
                   placeholder="Search..."
                   value={searchQuery}
                   onChangeText={setSearchQuery}
@@ -140,6 +144,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({
                   <Text
                     style={[
                       styles.optionText,
+                      isMobile && styles.optionTextMobile,
                       item.value === value && styles.optionTextSelected,
                     ]}
                   >
@@ -187,6 +192,9 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: 'Montserrat',
   },
+  dropdownTextMobile: {
+    fontSize: 14,
+  },
   placeholderText: {
     color: '#999',
   },
@@ -227,6 +235,9 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     fontFamily: 'Montserrat',
   },
+  searchInputMobile: {
+    fontSize: 14,
+  },
   optionsList: {
     maxHeight: 250,
   },
@@ -246,6 +257,9 @@ const styles = StyleSheet.create({
     color: '#333',
     flex: 1,
     fontFamily: 'Montserrat',
+  },
+  optionTextMobile: {
+    fontSize: 14,
   },
   optionTextSelected: {
     color: '#EE2529',

@@ -5,6 +5,7 @@ import {
   Platform,
   StyleSheet,
   TouchableOpacity,
+  useWindowDimensions,
 } from 'react-native';
 import { Calendar } from 'lucide-react-native';
 
@@ -23,6 +24,9 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   placeholder,
   error,
 }) => {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 480;
+
   if (Platform.OS === 'web') {
     // Use standard HTML input for web to leverage browser's native date picker
     const DateInput = 'input' as any;
@@ -41,7 +45,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
             background: 'transparent',
             width: '100%',
             height: '100%',
-            fontSize: '18px',
+            fontSize: isMobile ? '14px' : '18px',
             color: '#333',
             fontFamily: 'Montserrat', // Use Montserrat
             padding: '0 12px',
@@ -57,7 +61,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   // Fallback for native: Displays value with an icon (interactive picker would require native library)
   return (
     <View style={[styles.container, error && styles.errorBorder]}>
-      <Text style={[styles.text, !value && styles.placeholder]}>
+      <Text style={[styles.text, isMobile && styles.textMobile, !value && styles.placeholder]}>
         {value || placeholder || 'YYYY-MM-DD'}
       </Text>
       <Calendar size={20} color="#999" style={styles.icon} />
@@ -85,6 +89,9 @@ const styles = StyleSheet.create({
     color: '#333',
     paddingHorizontal: 12,
     fontFamily: 'Montserrat',
+  },
+  textMobile: {
+    fontSize: 14,
   },
   placeholder: {
     color: '#999',

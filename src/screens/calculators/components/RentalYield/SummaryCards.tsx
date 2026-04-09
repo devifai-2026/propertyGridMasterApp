@@ -12,52 +12,62 @@ interface SummaryCardsProps {
   };
 }
 
+import { useWindowDimensions } from 'react-native';
+
 const SummaryCards = ({ data }: SummaryCardsProps) => {
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 1024;
+
   const formatCurrency = (val?: number) => {
     if (val === undefined) return '0';
     return val.toLocaleString('en-IN');
   };
 
+  const cardStyle = [
+    styles.card,
+    !isDesktop && { minWidth: '100%', maxWidth: '100%', marginBottom: 20 },
+  ];
+
   return (
     <View style={styles.container}>
-      <View style={styles.grid}>
+      <View style={[styles.grid, !isDesktop && { flexDirection: 'column', gap: 0 }]}>
         {/* 1 - Investment Summary */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Investment Summary</Text>
+        <View style={cardStyle}>
+          <Text style={[styles.cardTitle, !isDesktop && { fontSize: 20 }]}>Investment Summary</Text>
           <View style={styles.spaceY}>
             <View style={styles.rowBetween}>
-              <Text style={styles.label}>Total Initial Investment (₹)</Text>
-              <Text style={styles.value}>{formatCurrency(data?.totalInvestment)}</Text>
+              <Text style={[styles.label, !isDesktop && { fontSize: 14 }]}>Total Initial Investment (₹)</Text>
+              <Text style={[styles.value, !isDesktop && { fontSize: 14 }]}>{formatCurrency(data?.totalInvestment)}</Text>
             </View>
             <View style={styles.rowBetween}>
-              <Text style={styles.label}>Gross Annual Rent (₹)</Text>
-              <Text style={styles.value}>{formatCurrency(data?.annualGrossRent)}</Text>
+              <Text style={[styles.label, !isDesktop && { fontSize: 14 }]}>Gross Annual Rent (₹)</Text>
+              <Text style={[styles.value, !isDesktop && { fontSize: 14 }]}>{formatCurrency(data?.annualGrossRent)}</Text>
             </View>
             <View style={styles.rowBetween}>
-              <Text style={styles.label}>Total Annual Expenses (₹)</Text>
-              <Text style={styles.value}>{formatCurrency(data?.totalAnnualExpenses)}</Text>
+              <Text style={[styles.label, !isDesktop && { fontSize: 14 }]}>Total Annual Expenses (₹)</Text>
+              <Text style={[styles.value, !isDesktop && { fontSize: 14 }]}>{formatCurrency(data?.totalAnnualExpenses)}</Text>
             </View>
           </View>
           <View style={styles.divider} />
           <View style={styles.rowBetween}>
-            <Text style={styles.labelBold}>Net Annual Income (₹)</Text>
-            <Text style={styles.valueGreen}>{formatCurrency(data?.annualNetIncome)}</Text>
+            <Text style={[styles.labelBold, !isDesktop && { fontSize: 16 }]}>Net Annual Income (₹)</Text>
+            <Text style={[styles.valueGreen, !isDesktop && { fontSize: 18 }]}>{formatCurrency(data?.annualNetIncome)}</Text>
           </View>
         </View>
 
         {/* 2 - Additional Income */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Additional Income</Text>
+        <View style={cardStyle}>
+          <Text style={[styles.cardTitle, !isDesktop && { fontSize: 20 }]}>Additional Income</Text>
           <View style={styles.spaceY}>
             <View style={styles.rowBetween}>
-              <Text style={styles.label}>
+              <Text style={[styles.label, !isDesktop && { fontSize: 14 }]}>
                 Annual Interest on Security Deposit (₹)
               </Text>
-              <Text style={styles.valueGreen}>{formatCurrency(data?.securityDepositInterest)}</Text>
+              <Text style={[styles.valueGreen, !isDesktop && { fontSize: 16 }]}>{formatCurrency(data?.securityDepositInterest)}</Text>
             </View>
             <View style={styles.rowBetween}>
-              <Text style={styles.labelDark}>Total Annual Return (₹)</Text>
-              <Text style={styles.valueGreen}>{formatCurrency(data?.totalAnnualReturn)}</Text>
+              <Text style={[styles.labelDark, !isDesktop && { fontSize: 16 }]}>Total Annual Return (₹)</Text>
+              <Text style={[styles.valueGreen, !isDesktop && { fontSize: 18 }]}>{formatCurrency(data?.totalAnnualReturn)}</Text>
             </View>
           </View>
         </View>

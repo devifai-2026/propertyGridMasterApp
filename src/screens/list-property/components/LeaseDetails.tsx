@@ -40,6 +40,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
   ({ onNext, onFormValid, initialData }, ref) => {
     const { width } = useWindowDimensions();
     const isSmallScreen = width < 768;
+    const isMobile = width < 480;
 
     useImperativeHandle(ref, () => ({
       submit: () => {
@@ -187,9 +188,9 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
           Lease & Tenant
         </Text>
 
-        <Text style={styles.subHeader}>Tenant Information</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Tenant Information</Text>
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Tenant Type *</Text>
+          <Text style={[styles.label, isMobile && styles.labelMobile]}>Tenant Type *</Text>
           <CustomDropdown
             placeholder="Select Tenant Type"
             value={formData.tenantType}
@@ -209,10 +210,10 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
           )}
         </View>
 
-        <Text style={styles.subHeader}>Lease Duration & Terms</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Lease Duration & Terms</Text>
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Lease Start Date *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Lease Start Date *</Text>
             <CustomDatePicker
               value={formData.leaseStartDate}
               onChange={v => handleInputChange('leaseStartDate', v)}
@@ -228,7 +229,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
             )}
           </View>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Lease End Date *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Lease End Date *</Text>
             <CustomDatePicker
               value={formData.leaseExpiryDate}
               onChange={v => handleInputChange('leaseExpiryDate', v)}
@@ -247,17 +248,17 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
 
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Lock In Period</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Lock In Period</Text>
             <View style={styles.flexRow}>
               <TextInput
-                style={[styles.input, { flex: 1, marginRight: 8 }]}
+                style={[styles.input, isMobile && styles.inputMobile, { flex: 1, marginRight: 8 }]}
                 placeholder="Years"
                 keyboardType="numeric"
                 value={formData.lockInYears}
                 onChangeText={v => handleInputChange('lockInYears', v)}
               />
               <TextInput
-                style={[styles.input, { flex: 1 }]}
+                style={[styles.input, isMobile && styles.inputMobile, { flex: 1 }]}
                 placeholder="Months"
                 keyboardType="numeric"
                 value={formData.lockInMonths}
@@ -266,10 +267,11 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
             </View>
           </View>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Lease Duration (Years) *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Lease Duration (Years) *</Text>
             <TextInput
               style={[
                 styles.input,
+                isMobile && styles.inputMobile,
                 touched.leaseDuration &&
                   errors.leaseDuration &&
                   styles.inputError,
@@ -291,10 +293,10 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
           </View>
         </View>
 
-        <Text style={styles.subHeader}>Rental & Deposit Details</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Rental & Deposit Details</Text>
         <View style={[styles.toggleRow, isSmallScreen && styles.rowColumn]}>
           <View style={styles.toggleGroup}>
-            <Text style={styles.label}>Rent Type</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Rent Type</Text>
             <View style={styles.radioGroup}>
               <TouchableOpacity
                 style={styles.radioButton}
@@ -310,7 +312,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                     <View style={styles.radioInner} />
                   )}
                 </View>
-                <Text style={styles.radioLabel}>Sq Ft</Text>
+                <Text style={[styles.radioLabel, isMobile && styles.radioLabelMobile]}>Sq Ft</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.radioButton}
@@ -326,13 +328,13 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                     <View style={styles.radioInner} />
                   )}
                 </View>
-                <Text style={styles.radioLabel}>Lump</Text>
+                <Text style={[styles.radioLabel, isMobile && styles.radioLabelMobile]}>Lump</Text>
               </TouchableOpacity>
             </View>
           </View>
 
           <View style={styles.toggleGroup}>
-            <Text style={styles.label}>Deposit Type</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Deposit Type</Text>
             <View style={styles.radioGroup}>
               <TouchableOpacity
                 style={styles.radioButton}
@@ -351,7 +353,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                     <View style={styles.radioInner} />
                   )}
                 </View>
-                <Text style={styles.radioLabel}>Months</Text>
+                <Text style={[styles.radioLabel, isMobile && styles.radioLabelMobile]}>Months</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.radioButton}
@@ -370,7 +372,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                     <View style={styles.radioInner} />
                   )}
                 </View>
-                <Text style={styles.radioLabel}>Lump</Text>
+                <Text style={[styles.radioLabel, isMobile && styles.radioLabelMobile]}>Lump</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -379,10 +381,11 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           {formData.rentType === 'perSqFt' ? (
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Rent Per Sq Ft *</Text>
+              <Text style={[styles.label, isMobile && styles.labelMobile]}>Rent Per Sq Ft *</Text>
               <TextInput
                 style={[
                   styles.input,
+                  isMobile && styles.inputMobile,
                   touched.rentPerSqFt &&
                     errors.rentPerSqFt &&
                     styles.inputError,
@@ -404,10 +407,11 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
             </View>
           ) : (
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Total Monthly Rent *</Text>
+              <Text style={[styles.label, isMobile && styles.labelMobile]}>Total Monthly Rent *</Text>
               <TextInput
                 style={[
                   styles.input,
+                  isMobile && styles.inputMobile,
                   touched.totalMonthlyRent &&
                     errors.totalMonthlyRent &&
                     styles.inputError,
@@ -431,10 +435,11 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
 
           {formData.securityDepositType === 'months' ? (
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Deposit (Months) *</Text>
+              <Text style={[styles.label, isMobile && styles.labelMobile]}>Deposit (Months) *</Text>
               <TextInput
                 style={[
                   styles.input,
+                  isMobile && styles.inputMobile,
                   touched.securityDepositMonths &&
                     errors.securityDepositMonths &&
                     styles.inputError,
@@ -461,10 +466,11 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
             </View>
           ) : (
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Deposit Amount *</Text>
+              <Text style={[styles.label, isMobile && styles.labelMobile]}>Deposit Amount *</Text>
               <TextInput
                 style={[
                   styles.input,
+                  isMobile && styles.inputMobile,
                   touched.securityDepositAmount &&
                     errors.securityDepositAmount &&
                     styles.inputError,
@@ -492,13 +498,14 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
           )}
         </View>
 
-        <Text style={styles.subHeader}>Escalation Terms & Maintenance</Text>
+        <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Escalation Terms & Maintenance</Text>
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Frequency (Years) *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Frequency (Years) *</Text>
             <TextInput
               style={[
                 styles.input,
+                isMobile && styles.inputMobile,
                 touched.escalationFrequency &&
                   errors.escalationFrequency &&
                   styles.inputError,
@@ -519,10 +526,11 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
             )}
           </View>
           <View style={styles.fieldContainer}>
-            <Text style={styles.label}>Annual Escalation (%) *</Text>
+            <Text style={[styles.label, isMobile && styles.labelMobile]}>Annual Escalation (%) *</Text>
             <TextInput
               style={[
                 styles.input,
+                isMobile && styles.inputMobile,
                 touched.escalationPercentage &&
                   errors.escalationPercentage &&
                   styles.inputError,
@@ -547,7 +555,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
         </View>
 
         <View style={styles.fieldContainer}>
-          <Text style={styles.label}>Maintenance Costs *</Text>
+          <Text style={[styles.label, isMobile && styles.labelMobile]}>Maintenance Costs *</Text>
           <CustomDropdown
             placeholder="Are maintenance costs included?"
             value={formData.maintenanceScope}
@@ -576,10 +584,10 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
             ]}
           >
             <View style={[styles.fieldContainer, { flex: 0.4 }]}>
-              <Text style={styles.label}>Type</Text>
+              <Text style={[styles.label, isMobile && styles.labelMobile]}>Type</Text>
               <View style={[styles.inputWrapper]}>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, isMobile && styles.inputMobile]}
                   value={
                     formData.maintenanceType === 'perSqFt' ? 'Sq Ft' : 'Lump'
                   }
@@ -589,9 +597,9 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
               </View>
             </View>
             <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Amount</Text>
+              <Text style={[styles.label, isMobile && styles.labelMobile]}>Amount</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, isMobile && styles.inputMobile]}
                 placeholder="0.00"
                 keyboardType="numeric"
                 value={formData.maintenanceAmount}
@@ -631,6 +639,9 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontFamily: 'Montserrat',
   },
+  subHeaderMobile: {
+    fontSize: 16,
+  },
   row: {
     flexDirection: 'row',
     gap: 12,
@@ -652,6 +663,9 @@ const styles = StyleSheet.create({
     color: '#444',
     marginBottom: 6,
     fontFamily: 'Montserrat',
+  },
+  labelMobile: {
+    fontSize: 14,
   },
   errorRow: {
     flexDirection: 'row',
@@ -686,6 +700,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#eee',
     fontFamily: 'Montserrat',
+  },
+  inputMobile: {
+    fontSize: 14,
   },
   inputError: {
     borderColor: '#EE2529',
@@ -735,6 +752,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     fontFamily: 'Montserrat',
+  },
+  radioLabelMobile: {
+    fontSize: 14,
   },
 });
 

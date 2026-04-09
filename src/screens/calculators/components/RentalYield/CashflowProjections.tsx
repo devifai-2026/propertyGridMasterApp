@@ -24,7 +24,7 @@ const CashflowProjections = ({ data }: CashFlowProjectionsProps) => {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
 
-  const chartWidth = width - 40;
+  const chartWidth = isDesktop ? width - 40 : width - 75;
 
   const calculateProjections = () => {
     const projections = [];
@@ -82,7 +82,7 @@ const CashflowProjections = ({ data }: CashFlowProjectionsProps) => {
                 strokeWidth: 3,
               },
             ],
-            legend: ['Annual Cash Flow', 'Annual Rent', 'Cumulative Cash Flow'],
+            legend: isDesktop ? ['Annual Cash Flow', 'Annual Rent', 'Cumulative Cash Flow'] : ['Cash Flow', 'Rent', 'Cum. Flow'],
           }}
           width={chartWidth}
           height={isDesktop ? 450 : 350}
@@ -98,6 +98,9 @@ const CashflowProjections = ({ data }: CashFlowProjectionsProps) => {
             decimalPlaces: 1,
             color: (opacity = 1) => `rgba(0,0,0,${opacity})`,
             labelColor: () => '#767676',
+            propsForLabels: {
+              fontSize: isDesktop ? 12 : 10,
+            },
             propsForDots: {
               r: isDesktop ? '6' : '4',
               strokeWidth: '2',
