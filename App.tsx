@@ -27,6 +27,10 @@ import PrivacyPolicyScreen from './src/screens/legal/PrivacyPolicyScreen';
 import TermsOfServiceScreen from './src/screens/legal/TermsOfServiceScreen';
 import NotesScreen from './src/screens/notes/NotesScreen';
 import EnquiryDetailsScreen from './src/screens/enquiries/EnquiryDetailsScreen';
+import NotFoundScreen from './src/screens/not-found/NotFoundScreen';
+import OfflineScreen from './src/screens/offline/OfflineScreen';
+import ErrorScreen from './src/screens/error/ErrorScreen';
+import ServerErrorScreen from './src/screens/error/ServerErrorScreen';
 
 const AppContent = () => {
   const {
@@ -38,6 +42,25 @@ const AppContent = () => {
     closeSignupModal,
   } = useNavigation();
   const { isLoggedIn, isLoading } = useAuth();
+  const [isOnline, setIsOnline] = React.useState(true);
+
+  React.useEffect(() => {
+    // Basic network status detection for Web
+    if (typeof window !== 'undefined' && 'navigator' in window) {
+      const handleOnline = () => setIsOnline(true);
+      const handleOffline = () => setIsOnline(false);
+
+      window.addEventListener('online', handleOnline);
+      window.addEventListener('offline', handleOffline);
+
+      setIsOnline(window.navigator.onLine);
+
+      return () => {
+        window.removeEventListener('online', handleOnline);
+        window.removeEventListener('offline', handleOffline);
+      };
+    }
+  }, []);
 
   // Redirect to login if accessing private pages while not logged in
   const privatePages = ['/my-prifile', '/my-profile'];
@@ -59,6 +82,10 @@ const AppContent = () => {
 
   // Simple Router Switch
   const renderScreen = () => {
+    if (!isOnline) {
+      return <OfflineScreen />;
+    }
+
     switch (true) {
       case currentPath === '/dashboard':
       case currentPath === '/':
@@ -104,9 +131,14 @@ const AppContent = () => {
         return <PrivacyPolicyScreen />;
       case currentPath === '/terms-of-service':
         return <TermsOfServiceScreen />;
+      case currentPath === '/offline':
+        return <OfflineScreen />;
+      case currentPath === '/error':
+        return <ErrorScreen />;
+      case currentPath === '/server-error':
+        return <ServerErrorScreen />;
       default:
-        // Default redirection to /dashboard
-        return <Dashboard />;
+        return <NotFoundScreen />;
     }
   };
 
