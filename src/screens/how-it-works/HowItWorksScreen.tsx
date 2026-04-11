@@ -366,6 +366,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: '#EE2529',
+    whiteSpace: 'nowrap',
   },
 });
 

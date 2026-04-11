@@ -26,6 +26,7 @@ const ContactUsScreen = () => {
     <Layout>
       <ScrollView
         style={styles.mainContainer}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.container}>
@@ -77,10 +78,10 @@ const ContactUsScreen = () => {
                 isSmallScreen && styles.cardsFormContainerMobile,
               ]}
             >
-              <View style={styles.cardsWrapper}>
+              <View style={[styles.cardsWrapper, !isSmallScreen && { flex: 1 }]}>
                 <ContactCards />
               </View>
-              <View style={styles.formWrapper}>
+              <View style={[styles.formWrapper, !isSmallScreen && { flex: 1 }]}>
                 <ContactForm />
               </View>
             </View>
@@ -94,7 +95,9 @@ const ContactUsScreen = () => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-  
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   container: {
     width: '100%',
@@ -161,10 +164,10 @@ const styles = StyleSheet.create({
   },
   headerImage: {
     position: 'absolute',
-    top: -380,
+    top: -280,
     right: -100,
     width: 950,
-    height: 750,
+    height: 650,
     zIndex: 20,
   },
   contentSection: {
@@ -199,14 +202,12 @@ const styles = StyleSheet.create({
   },
   cardsFormContainerMobile: {
     flexDirection: 'column',
-    gap: 30,
+    gap: 40,
   },
   cardsWrapper: {
-    flex: 1,
     width: '100%',
   },
   formWrapper: {
-    flex: 1,
     width: '100%',
   },
 });
