@@ -10,6 +10,10 @@ import {
 } from 'react-native';
 import download from "../../../../assets/Calculator/download.png"
 import share from "../../../../assets/Calculator/share.png"
+import { Dimensions } from 'react-native';
+
+const { width: windowWidth } = Dimensions.get('window');
+const isDesktop = windowWidth >= 1024;
 
 
 const CoverageAnalysis: React.FC = () => {
@@ -155,22 +159,25 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   buttonContainer: {
-    flexDirection: 'row',
+    flexDirection: isDesktop ? 'row' : 'column',
     justifyContent: 'center',
     gap: 12,
-    marginTop: 30,
+    marginTop: isDesktop ? 30 : 20,
     paddingHorizontal: 16,
     paddingBottom: 20,
+    width: '100%',
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
     borderColor: '#767676',
     paddingVertical: 10,
-    paddingHorizontal: 18,
+    paddingHorizontal: isDesktop ? 18 : 10,
     borderRadius: 6,
     gap: 8,
+    width: isDesktop ? 'auto' : '100%',
   },
   buttonIcon: {
     width: 18,
@@ -180,6 +187,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#767676',
     fontWeight: '600',
+    fontSize: isDesktop ? 16 : 14,
   },
 });
 

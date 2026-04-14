@@ -1343,6 +1343,98 @@ const ExplorePropertiesScreen = () => {
             </>
           )}
         </View>
+
+        {/* Mobile Filter Modal */}
+        <Modal
+          visible={showFilters && width <= 768}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={toggleFilters}
+        >
+          <View style={styles.mobileFilterOverlay}>
+            <View style={styles.mobileFilterPanel}>
+              <View style={styles.mobileFilterHeader}>
+                <TouchableOpacity onPress={toggleFilters}>
+                  <X size={24} color="#333" />
+                </TouchableOpacity>
+                <Text style={styles.filterPanelTitle}>Advanced Filters</Text>
+              </View>
+
+              <View style={styles.mobileFilterBody}>
+                {/* Tabs Sidebar */}
+                <ScrollView style={styles.mobileTabsSidebar}>
+                  {['location', 'pricing', 'unit', 'rent', 'roi', 'tenure'].map(
+                    tab => (
+                      <TouchableOpacity
+                        key={tab}
+                        style={[
+                          styles.mobileTabItem,
+                          activeTab === tab && styles.mobileActiveTab,
+                        ]}
+                        onPress={() => setActiveTab(tab as any)}
+                      >
+                        <Text
+                          style={[
+                            styles.mobileTabText,
+                            activeTab === tab && styles.mobileActiveTabText,
+                          ]}
+                        >
+                          {tab === 'location'
+                            ? 'Location'
+                            : tab === 'pricing'
+                            ? 'Pricing'
+                            : tab === 'unit'
+                            ? 'Type'
+                            : tab === 'rent'
+                            ? 'Rent'
+                            : tab === 'roi'
+                            ? 'ROI'
+                            : 'Tenure'}
+                        </Text>
+                      </TouchableOpacity>
+                    ),
+                  )}
+                </ScrollView>
+
+                {/* Content Area */}
+                <ScrollView style={styles.mobileFilterContent}>
+                  {renderFilterContent()}
+                </ScrollView>
+              </View>
+
+              <View style={styles.mobileFooter}>
+                <TouchableOpacity
+                  onPress={handleResetFilters}
+                  style={[styles.resetFilterBtn, { flex: 1 }]}
+                >
+                  <Text
+                    style={[
+                      styles.btnText,
+                      { color: '#666', textAlign: 'center' },
+                    ]}
+                  >
+                    Reset
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleApplyFilters}
+                  style={{ flex: 1 }}
+                >
+                  <LinearGradient
+                    colors={['#EE2529', '#C73834']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={[styles.applyFilterBtn, { width: '100%' }]}
+                  >
+                    <Text style={[styles.btnText, { color: '#fff' }]}>
+                      Apply
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     </Layout>
   );

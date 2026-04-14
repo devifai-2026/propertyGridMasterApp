@@ -14,7 +14,11 @@ import {
 import Layout from '../../layout/Layout';
 import { TrendingUp, Calculator, ChevronDown } from 'lucide-react-native';
 import bg from "../../assets/Calculator/bg.png"
-import Svg, { Path,Rect } from 'react-native-svg';
+import Svg, { Path, Rect } from 'react-native-svg';
+import { Dimensions } from 'react-native';
+
+const { width: windowWidth } = Dimensions.get('window');
+const isDesktop = windowWidth >= 1024;
 
 
 // RentalYield Components
@@ -127,7 +131,7 @@ const CalculatorsScreen = () => {
             <View
               style={[
                 styles.heroTextContainer,
-                !isDesktop && { marginRight: 0, marginTop: 40 },
+                !isDesktop && { marginRight: 0, marginTop: 10 },
               ]}
             >
               <View style={isDesktop ? { flexDirection: 'row', gap: 20, alignItems: 'center', marginBottom: 20 } : { alignItems: 'center' }}>
@@ -153,7 +157,7 @@ const CalculatorsScreen = () => {
               </Text>
 
               <View style={[styles.heroStatsRow, !isDesktop && { justifyContent: 'flex-start', gap: 12 }]}>
-                <View style={[styles.heroStatCard, !isDesktop && { minWidth: '47%', flex: 1 }]}>
+                <View style={[styles.heroStatCard, !isDesktop && { minWidth: '47%', flex: 1, maxWidth: '48%' }]}>
                   <LinearGradient
                     colors={['rgba(242, 242, 242, 0.1)', 'rgba(255, 255, 255, 0.1)']}
                     start={{ x: 0, y: 0 }}
@@ -166,7 +170,7 @@ const CalculatorsScreen = () => {
                   </LinearGradient>
                 </View>
 
-                <View style={[styles.heroStatCard, !isDesktop && { minWidth: '47%', flex: 1 }]}>
+                <View style={[styles.heroStatCard, !isDesktop && { minWidth: '47%', flex: 1, maxWidth: '48%' }]}>
                   <LinearGradient
                     colors={['rgba(242, 242, 242, 0.1)', 'rgba(255, 255, 255, 0.1)']}
                     start={{ x: 0, y: 0 }}
@@ -179,7 +183,7 @@ const CalculatorsScreen = () => {
                   </LinearGradient>
                 </View>
 
-                <View style={[styles.heroStatCard, !isDesktop && { minWidth: '47%', flex: 1 }]}>
+                <View style={[styles.heroStatCard, !isDesktop && { minWidth: '47%', flex: 1, maxWidth: '48%' }]}>
                   <LinearGradient
                     colors={['rgba(242, 242, 242, 0.1)', 'rgba(255, 255, 255, 0.1)']}
                     start={{ x: 0, y: 0 }}
@@ -194,22 +198,22 @@ const CalculatorsScreen = () => {
               </View>
             </View>
 
-            <Image
-              source={require('../../assets/Calculator/bannerImg.png')}
-              style={[
-                styles.heroImage,
-                isDesktop
-                  ? {
-                    width: '39%',       // ← slightly narrower
-                    height: 598,        // ← reduced from 500
+            {isDesktop && (
+              <Image
+                source={require('../../assets/Calculator/bannerImg.png')}
+                style={[
+                  styles.heroImage,
+                  {
+                    width: '39%',
+                    height: 598,
                     position: 'absolute',
                     right: -20,
                     top: -119,
-                  }
-                  : { width: '100%', height: 260, alignSelf: 'flex-end', marginLeft: 'auto', right: -24, marginTop: 20 },
-              ]}
-              resizeMode={isDesktop ? "cover" : "contain"}
-            />
+                  },
+                ]}
+                resizeMode="cover"
+              />
+            )}
           </View>
         </View>
 
@@ -606,9 +610,9 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
 
       {/* Financing Options */}
       <View style={styles.sectionCard}>
-        <View style={styles.sectionHeaderRow}>
-          <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Financing Options</Text>
-          <View style={styles.toggleRow}>
+        <View style={[styles.sectionHeaderRow, !isDesktop && { flexDirection: 'column', alignItems: 'flex-start', gap: 10 }]}>
+          <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22, marginBottom: 0 }]}>Financing Options</Text>
+          <View style={[styles.toggleRow, !isDesktop && { width: '100%', justifyContent: 'space-between' }]}>
             <LabelWithIcon
               label="Include Loan"
               style={{ marginBottom: 0, fontSize: 14, width: 'auto' }}
@@ -1013,9 +1017,9 @@ const EMICalculatorView = () => {
 
       {/* EMI Options */}
       <View style={styles.sectionCard}>
-        <View style={styles.sectionHeaderRow}>
-          <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>EMI Options</Text>
-          <View style={styles.toggleRow}>
+        <View style={[styles.sectionHeaderRow, !isDesktop && { flexDirection: 'column', alignItems: 'flex-start', gap: 10 }]}>
+          <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22, marginBottom: 0 }]}>EMI Options</Text>
+          <View style={[styles.toggleRow, !isDesktop && { width: '100%', justifyContent: 'space-between' }]}>
             <LabelWithIcon
               label="Include Downpayment"
               style={{ marginBottom: 0, fontSize: 12, width: 'auto' }}
@@ -1322,9 +1326,9 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingLeft: '8%',
+    paddingLeft: isDesktop ? '8%' : 20,
     paddingRight: 0,
-    minHeight: 380,
+    minHeight: isDesktop ? 380 : 'auto',
   },
   heroTextContainer: {
     flex: 1,
@@ -1448,7 +1452,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 0,
-    marginTop: 100,
+    marginTop: isDesktop ? 100 : 20,
     marginBottom: 30, 
     backgroundColor: '#fff',
     borderRadius: 25,
