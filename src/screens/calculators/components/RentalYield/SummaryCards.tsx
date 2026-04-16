@@ -12,7 +12,10 @@ interface SummaryCardsProps {
   };
 }
 
-import { useWindowDimensions } from 'react-native';
+import { useWindowDimensions, Dimensions } from 'react-native';
+
+const { width: windowWidth } = Dimensions.get('window');
+const isDesktop = windowWidth >= 1024;
 
 const SummaryCards = ({ data }: SummaryCardsProps) => {
   const { width } = useWindowDimensions();
@@ -50,8 +53,8 @@ const SummaryCards = ({ data }: SummaryCardsProps) => {
           </View>
           <View style={styles.divider} />
           <View style={styles.rowBetween}>
-            <Text style={[styles.labelBold, !isDesktop && { fontSize: 16 }]}>Net Annual Income (₹)</Text>
-            <Text style={[styles.valueGreen, !isDesktop && { fontSize: 18 }]}>{formatCurrency(data?.annualNetIncome)}</Text>
+            <Text style={[styles.labelBold, !isDesktop && { fontSize: 14 }]}>Net Annual Income (₹)</Text>
+            <Text style={[styles.valueGreen, !isDesktop && { fontSize: 16 }]}>{formatCurrency(data?.annualNetIncome)}</Text>
           </View>
         </View>
 
@@ -66,8 +69,8 @@ const SummaryCards = ({ data }: SummaryCardsProps) => {
               <Text style={[styles.valueGreen, !isDesktop && { fontSize: 16 }]}>{formatCurrency(data?.securityDepositInterest)}</Text>
             </View>
             <View style={styles.rowBetween}>
-              <Text style={[styles.labelDark, !isDesktop && { fontSize: 16 }]}>Total Annual Return (₹)</Text>
-              <Text style={[styles.valueGreen, !isDesktop && { fontSize: 18 }]}>{formatCurrency(data?.totalAnnualReturn)}</Text>
+              <Text style={[styles.labelDark, !isDesktop && { fontSize: 14 }]}>Total Annual Return (₹)</Text>
+              <Text style={[styles.valueGreen, !isDesktop && { fontSize: 16 }]}>{formatCurrency(data?.totalAnnualReturn)}</Text>
             </View>
           </View>
         </View>
@@ -109,7 +112,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   spaceY: {
-    gap: 15,
+    gap: isDesktop ? 15 : 2,
   },
   rowBetween: {
     flexDirection: 'row',
@@ -143,6 +146,6 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: '#eee',
-    marginVertical: 20,
+    marginVertical: isDesktop ? 20 : 6,
   },
 });

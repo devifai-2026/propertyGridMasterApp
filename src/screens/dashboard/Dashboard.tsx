@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Animated, Easing } from 'react-native';
+import { Animated, Easing, Platform, View } from 'react-native';
 import Layout from '../../layout/Layout';
 import Hero from './components/Hero';
 import DiscoveryWizard from './components/DiscoveryWizard';
@@ -35,20 +35,40 @@ const Dashboard = () => {
     );
   }, []);
   return (
-    <Layout>
-      <Animated.View
-        style={{
-          opacity: fadeAnim,
-          transform: [{ translateY: slideAnim }],
-        }}
-      >
-        <Hero />
-        <DiscoveryWizard />
-        <FeaturedSection properties={properties} />
-        <CategoriesSection />
-        <WhyChooseSection />
-      </Animated.View>
-    </Layout>
+    <>
+      {Platform.OS === 'web' && (
+        <View
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: -1,
+            backgroundImage: `url(${require('../../assets/Banner/bannerBg.png')})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundColor: 'rgba(255,255,255,0.3)',
+            backgroundBlendMode: 'overlay',
+          }}
+        />
+      )}
+      <Layout style={{ backgroundColor: 'transparent' }}>
+        <Animated.View
+          style={{
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+            backgroundColor: Platform.OS === 'web' ? 'transparent' : 'white',
+          }}
+        >
+          <Hero />
+          <DiscoveryWizard />
+          <FeaturedSection properties={properties} />
+          <CategoriesSection />
+          <WhyChooseSection />
+        </Animated.View>
+      </Layout>
+    </>
   );
 };
 

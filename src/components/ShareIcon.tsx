@@ -3,14 +3,19 @@ import Svg, { Path } from 'react-native-svg';
 
 interface ShareIconProps {
   size?: number;
+  width?: number;
+  height?: number;
   color?: string;
 }
 
-const ShareIcon: React.FC<ShareIconProps> = ({ size = 22, color = "#F2F2F2" }) => {
+const ShareIcon: React.FC<ShareIconProps> = ({ size = 22, width, height, color = "#F2F2F2" }) => {
+  const iconWidth = width || size;
+  const iconHeight = height || (iconWidth * 16) / 20;
+  
   return (
     <Svg
-      width={size}
-      height={(size * 16) / 20}
+      width={iconWidth}
+      height={iconHeight}
       viewBox="0 0 20 16"
       fill="none"
     >

@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Linking,
+  useWindowDimensions,
 } from 'react-native';
 import {
   MapPin,
@@ -13,8 +14,12 @@ import {
   MessageCircle,
   ExternalLink,
 } from 'lucide-react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 const ContactCards = () => {
+  const { width } = useWindowDimensions();
+  const isSmallScreen = width < 768;
+
   const cards = [
     {
       id: 1,
@@ -56,7 +61,7 @@ const ContactCards = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.description}>
+      <Text style={[styles.description, isSmallScreen && { fontSize: 15, textAlign: 'center' }]}>
         Whether you're an investor looking for opportunities, a property owner
         wanting to list, or a developer seeking partnerships, we're here to help
         you succeed.
@@ -64,15 +69,22 @@ const ContactCards = () => {
 
       <View style={styles.grid}>
         {cards.map(card => (
-          <View key={card.id} style={styles.card}>
+          <View key={card.id} style={[styles.card, { width: isSmallScreen ? '100%' : '48%' }]}>
             <View style={styles.header}>
               {card.icon}
-              <Text style={styles.title}>{card.title}</Text>
+              <Text style={[styles.title, isSmallScreen && { fontSize: 16 }]}>{card.title}</Text>
             </View>
-            <Text style={styles.content}>{card.content}</Text>
-            <TouchableOpacity style={styles.button} onPress={card.action}>
-              <Text style={styles.buttonText}>{card.buttonText}</Text>
-              {card.buttonIcon}
+            <Text style={[styles.content, isSmallScreen && { fontSize: 14 }]}>{card.content}</Text>
+            <TouchableOpacity onPress={card.action}>
+              <LinearGradient
+                colors={['#EE2529', '#C73834']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={[styles.button, isSmallScreen && { width: '100%' }]}
+              >
+                <Text style={[styles.buttonText, isSmallScreen && { fontSize: 16 }]}>{card.buttonText}</Text>
+                {card.buttonIcon}
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         ))}
@@ -83,65 +95,74 @@ const ContactCards = () => {
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
     padding: 16,
     marginBottom: 20,
   },
   description: {
-    fontSize: 16,
-    color: '#333',
+    fontSize: 20,
+    fontWeight: 400,
+    color: '#262626',
     marginBottom: 20,
-    lineHeight: 24,
+    lineHeight: 25,
+    fontFamily:'Montserrat',
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 16,
+    justifyContent: 'space-between',
+    width: '100%',
   },
   card: {
     backgroundColor: '#fff',
     borderRadius: 8,
-    padding: 16,
-    width: '100%', // Full width on mobile, adjust for tablet later if needed
-    marginBottom: 16,
+    padding: 20,
+    marginBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
-    borderWidth: 1,
-    borderColor: '#eee',
+
+    minHeight: 200,
+    justifyContent: 'space-between',
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 8,
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    gap: 12,
+    marginBottom: 12,
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: 700,
+    color: '#262626',
+    fontFamily: 'Montserrat',
+    lineHeight:25,
   },
   content: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#767676',
-    marginBottom: 16,
-    flex: 1,
+    marginBottom: 20,
+    lineHeight: 24,
+    fontFamily: 'Montserrat',
   },
   button: {
-    backgroundColor: '#EE2529',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
     gap: 8,
+    marginTop: 12,
+    width: 220,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 14,
+    color: '#FFFFFF',
+    fontSize: 18,
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
 });
 

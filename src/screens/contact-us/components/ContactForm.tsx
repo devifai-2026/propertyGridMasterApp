@@ -5,11 +5,15 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
+  useWindowDimensions,
 } from 'react-native';
 import { ChevronDown } from 'lucide-react-native';
+import LinearGradient from 'react-native-linear-gradient';
 
 const ContactForm = () => {
+  const { width } = useWindowDimensions();
+  const isSmallScreen = width < 768;
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,6 +21,7 @@ const ContactForm = () => {
     role: '',
     message: '',
   });
+  const [showRoleDropdown, setShowRoleDropdown] = useState(false);
 
   const roles = [
     { value: 'investor', label: 'Investor' },
@@ -39,27 +44,24 @@ const ContactForm = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Send us a Message</Text>
+    <View style={[styles.container, isSmallScreen && { padding: 16, paddingBottom: 8 }]}>
+      <Text style={[styles.header, isSmallScreen && { fontSize: 18, textAlign: 'center' }]}>Send us a Message</Text>
 
       <View style={styles.form}>
-        <View style={styles.row}>
+        <View style={[styles.row, isSmallScreen && { flexDirection: 'column' }]}>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Name *</Text>
+            <Text style={[styles.label, isSmallScreen && { fontSize: 14 }]}>Name *</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, isSmallScreen && { fontSize: 14 }]}
               placeholder="Your full name"
               value={formData.name}
               onChangeText={text => handleChange('name', text)}
             />
           </View>
-        </View>
-
-        <View style={styles.row}>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email *</Text>
+            <Text style={[styles.label, isSmallScreen && { fontSize: 14 }]}>Email *</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, isSmallScreen && { fontSize: 14 }]}
               placeholder="Your email"
               keyboardType="email-address"
               value={formData.email}
@@ -68,61 +70,58 @@ const ContactForm = () => {
           </View>
         </View>
 
-        <View style={styles.row}>
+        <View style={[styles.row, { zIndex: 10 }, isSmallScreen && { flexDirection: 'column' }]}>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Phone Number</Text>
+            <Text style={[styles.label, isSmallScreen && { fontSize: 14 }]}>Phone Number</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, isSmallScreen && { fontSize: 14 }]}
               placeholder="Mobile no"
               keyboardType="phone-pad"
               value={formData.phone}
               onChangeText={text => handleChange('phone', text)}
             />
           </View>
-        </View>
-
-        <View style={styles.row}>
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Choose Role</Text>
-            {/* Simple dropdown simulation using TextInput for now, or implement a picker if critical */}
-            <View style={styles.dropdownContainer}>
-              <TextInput
-                style={styles.input}
-                placeholder="Select role"
-                value={roles.find(r => r.value === formData.role)?.label || ''}
-                editable={false} // Make it read-only, would ideally open a modal/picker
-              />
-              <ChevronDown size={20} color="#999" style={styles.dropdownIcon} />
-            </View>
-            {/* For simplicity in this iteration, keeping it as a text input or placeholder unless user specifically asks for full dropdown interaction here too. given previous detailed work on dropdowns, creating a full custom dropdown here might be overkill or requires reusing the component. I'll stick to a simple innovative approach: show options as buttons or just use a text input for now as placeholder for intricate logic.*/}
-            <View style={styles.roleOptions}>
-              {roles.map(role => (
-                <TouchableOpacity
-                  key={role.value}
-                  style={[
-                    styles.roleChip,
-                    formData.role === role.value && styles.activeRoleChip,
-                  ]}
-                  onPress={() => handleChange('role', role.value)}
-                >
-                  <Text
-                    style={[
-                      styles.roleText,
-                      formData.role === role.value && styles.activeRoleText,
-                    ]}
+            <Text style={[styles.label, isSmallScreen && { fontSize: 14 }]}>Choose Role</Text>
+            <TouchableOpacity 
+              style={styles.dropdownTrigger}
+              onPress={() => setShowRoleDropdown(!showRoleDropdown)}
+            >
+              <Text style={[styles.dropdownValue, !formData.role && { color: '#999' }, isSmallScreen && { fontSize: 14 }]}>
+                {roles.find(r => r.value === formData.role)?.label || 'Select role'}
+              </Text>
+              <ChevronDown size={20} color="#666" />
+            </TouchableOpacity>
+            
+            {showRoleDropdown && (
+              <View style={styles.dropdownMenu}>
+                {roles.map(role => (
+                  <TouchableOpacity
+                    key={role.value}
+                    style={styles.dropdownItem}
+                    onPress={() => {
+                      handleChange('role', role.value);
+                      setShowRoleDropdown(false);
+                    }}
                   >
-                    {role.label}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+                    <Text style={[
+                      styles.dropdownItemText,
+                      formData.role === role.value && styles.activeDropdownItemText,
+                      isSmallScreen && { fontSize: 13 }
+                    ]}>
+                      {role.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            )}
           </View>
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Message *</Text>
+          <Text style={[styles.label, isSmallScreen && { fontSize: 14 }]}>Message *</Text>
           <TextInput
-            style={[styles.input, styles.textArea]}
+            style={[styles.input, styles.textArea, isSmallScreen && { fontSize: 14 }]}
             placeholder="Please describe your inquiry in detail..."
             multiline
             numberOfLines={4}
@@ -132,8 +131,15 @@ const ContactForm = () => {
           />
         </View>
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <Text style={styles.submitButtonText}>Send Message</Text>
+        <TouchableOpacity onPress={handleSubmit}>
+          <LinearGradient
+            colors={['#EE2529', '#C73834']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.submitButton}
+          >
+            <Text style={styles.submitButtonText}>Send Message</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
     </View>
@@ -142,8 +148,10 @@ const ContactForm = () => {
 
 const styles = StyleSheet.create({
   container: {
+    flexGrow: 1,
     backgroundColor: '#fff',
     padding: 24,
+    paddingBottom: 0,
     borderRadius: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -151,8 +159,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     elevation: 4,
     marginBottom: 20,
-    borderWidth: 1,
-    borderColor: '#eee',
+    fontFamily: 'Montserrat',
   },
   header: {
     fontSize: 24,
@@ -164,69 +171,82 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   row: {
+    flexDirection: 'row',
+    gap: 20,
     marginBottom: 0,
   },
   inputGroup: {
     flex: 1,
+    position: 'relative',
   },
   label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#444',
+    fontSize: 16,
+    fontWeight: 600,
+    color: '#262626',
     marginBottom: 8,
+    fontFamily: 'Montserrat',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: '#000000',
     borderRadius: 8,
     padding: 12,
-    fontSize: 15,
+    fontSize: 16,
     color: '#333',
-    backgroundColor: '#FAFAFA',
+    fontFamily: 'Montserrat',
   },
   textArea: {
-    minHeight: 120,
+    minHeight: 140,
     paddingTop: 12,
   },
-  dropdownContainer: {
-    position: 'relative',
-    display: 'none',
-  },
-  dropdownIcon: {
-    position: 'absolute',
-    right: 12,
-    top: 14,
-  },
-  roleOptions: {
+  dropdownTrigger: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginTop: 4,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#000000',
+    borderRadius: 8,
+    padding: 12,
+    backgroundColor: '#FAFAFA',
   },
-  roleChip: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
+  dropdownValue: {
+    fontSize: 15,
+    color: '#333',
+    fontFamily: 'Montserrat',
+  },
+  dropdownMenu: {
+    position: 'absolute',
+    top: '100%',
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    backgroundColor: '#fff',
+    marginTop: 4,
+    zIndex: 9999,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 10,
   },
-  activeRoleChip: {
-    backgroundColor: '#FFF0F0',
-    borderColor: '#EE2529',
+  dropdownItem: {
+    padding: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F5F5F5',
   },
-  roleText: {
-    fontSize: 13,
+  dropdownItemText: {
+    fontSize: 14,
     color: '#666',
-    fontWeight: '500',
+    fontFamily: 'Montserrat',
   },
-  activeRoleText: {
+  activeDropdownItemText: {
     color: '#EE2529',
     fontWeight: '600',
   },
   submitButton: {
-    backgroundColor: '#EE2529',
-    paddingVertical: 14,
+    paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 12,
@@ -240,7 +260,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
+    fontFamily: 'Montserrat',
   },
 });
 
 export default ContactForm;
+

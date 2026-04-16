@@ -6,7 +6,11 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   StyleSheet,
+  Dimensions,
 } from 'react-native';
+
+const { width } = Dimensions.get('window');
+const isDesktop = width >= 768;
 import { COLORS, FONTS } from '../../../constants/theme';
 import { useNavigation } from '../../../context/NavigationContext';
 import LinearGradient from 'react-native-linear-gradient';
@@ -61,8 +65,8 @@ const StepCard = ({
         activeOpacity={0.7}
       >
         <IconComponent
-          size={isMobile ? 20 : 30}
-          color={active ? COLORS.primary : '#666'}
+          size={isMobile ? 20 : 26}
+          color={active ? '#EE2529' : '#767676'}
           style={styles.stepIcon}
         />
         <Text
@@ -210,12 +214,13 @@ const DiscoveryWizard = () => {
             //   </Text>
             // </TouchableOpacity>
             <LinearGradient
+              key={label}
               colors={['#F2F2F2', '#FFFFFF']}
               start={{ x: 0, y: 0 }}
               end={{ x: 0, y: 1 }}
               style={[
                 styles.cityOption,
-                isMobile && { width: (width - (isMobile ? 40 : 120) - 10) / 2 },
+                isMobile && { width: (width - (isMobile ? 160 : 120)) / 2 }, 
                 isSelected && styles.cityOptionSelected,
               ]}
             >
@@ -228,7 +233,7 @@ const DiscoveryWizard = () => {
                   style={[
                     styles.cityOptionText,
                     isSelected && styles.cityOptionTextSelected,
-                    isMobile && { fontSize: 16 },
+                    isMobile && { fontSize: 13 },
                   ]}
                 >
                   {label}
@@ -276,7 +281,7 @@ const DiscoveryWizard = () => {
       <View
         style={[
           styles.wizardContentCard,
-          isMobile && { width: '95%', paddingVertical: 40, paddingHorizontal: 20 },
+          isMobile && { width: '100%', paddingVertical: 35, paddingHorizontal: 15 },
         ]}
       >
         <View style={styles.badgeRow}>
@@ -290,7 +295,7 @@ const DiscoveryWizard = () => {
           </View>
         </View>
 
-        <Text style={[styles.wizardQuestion, { fontSize: isMobile ? 22 : 36 }]}>
+        <Text style={[styles.wizardQuestion, { fontSize: isMobile ? 18 : 32 }]}>
           What's your {STEPS.find(s => s.id === activeStep)?.label} Preference?
         </Text>
         <Text style={styles.wizardSubtext}>
@@ -311,12 +316,12 @@ const DiscoveryWizard = () => {
             }
           }}
         >
-          <Text style={styles.skipBtnText}>
+          <Text style={[styles.skipBtnText, isMobile && { fontSize: 12 }]}>
             {parseInt(activeStep) < 6 ? 'Skip' : 'Finish'}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[isMobile && { flex: 2 }]}
+          style={[isMobile && { flex: 2.5 }]}
           onPress={handleShowProperties}
           activeOpacity={0.8}
         >
@@ -326,7 +331,9 @@ const DiscoveryWizard = () => {
             end={{ x: 1, y: 0 }}
             style={styles.showPropertiesBtn}
           >
-            <Text style={styles.showPropertiesText}>Show Properties</Text>
+            <Text style={[styles.showPropertiesText, isMobile && { fontSize: 12 }]}>
+              Show Properties
+            </Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>
@@ -341,10 +348,10 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     alignItems: 'center',
     width: '100%',
-    backgroundColor: '#FFFFFF',
+    
   },
   wizardTitle: {
-    fontFamily: FONTS.main,
+    fontFamily: FONTS.avenir,
     fontSize: 42,
     fontWeight: '400',
     color: '#262626',
@@ -408,7 +415,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   stepLabelActive: {
-    color: COLORS.primary,
+    color: '#EE2529',
     fontWeight: '700',
   },
   stepProgressIndicator: {
@@ -417,10 +424,10 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   stepProgressIndicatorActive: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: '#EE2529',
   },
   wizardContentCard: {
-    width: '50%',
+    width: '40%',
     maxWidth: 900,
     backgroundColor: '#FFF',
     borderRadius: 20,
@@ -436,6 +443,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     borderWidth: 1,
     borderColor: '#F0F0F0',
+    overflow: 'hidden',
   },
   badgeRow: {
     flexDirection: 'row',
@@ -459,17 +467,17 @@ const styles = StyleSheet.create({
   },
   wizardStepText: {
     fontFamily: FONTS.main,
-    fontSize: 12, // Slightly smaller for mobile compatibility
+    fontSize: 12,
     fontWeight: '500',
     color: '#8B7B3E',
   },
   wizardQuestion: {
-    fontFamily: FONTS.main,
+    fontFamily: FONTS.avenir,
     fontWeight: '400',
     color: '#1A1A1A',
-    marginBottom: 10,
+    marginBottom: 20,
     textAlign: 'center',
-    marginTop: 10,
+    marginTop: isDesktop ? 10 : 25,
   },
   wizardSubtext: {
     fontFamily: FONTS.main,
@@ -483,14 +491,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 30,
-    marginBottom: 40,
-    height: 300,
-    width: 550
+    gap: isDesktop ? 30 : 10,
+    marginBottom: isDesktop ? 40 : 20,
+    width: isDesktop ? 550 : '100%',
+    height: isDesktop ? 300 : 'auto',
+    maxWidth: 550,
   },
   cityOption: {
   width: 130,
-  height: 130,
+  height: isDesktop ? 130 : 90,
   borderRadius: 15,
   alignItems: 'center',
   justifyContent: 'center',
@@ -499,6 +508,7 @@ const styles = StyleSheet.create({
   shadowOpacity: 0.25,
   shadowRadius: 4,
   elevation: 3,
+  marginBottom: isDesktop ? 0 : 10,
 },
 cityOptionInner: {
   width: '100%',
@@ -534,14 +544,16 @@ cityOptionInner: {
     marginTop: 30,
   },
   skipBtn: {
-    height: 48,
-    minWidth: 100,
+    height: 52,
+    minWidth: 91,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#CCC',
+    borderColor: '#767676',
     borderRadius: 8,
-    paddingHorizontal: 20,
+    paddingHorizontal: 25,
+    paddingVertical: 15,
+    backgroundColor:'white',
   },
   skipBtnText: {
     fontFamily: FONTS.main,
@@ -551,11 +563,11 @@ cityOptionInner: {
   },
   showPropertiesBtn: {
     height: 48,
-    minWidth: 180,
+    minWidth: isDesktop ? 180 : 120,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    paddingHorizontal: 30,
+    paddingHorizontal: isDesktop ? 30 : 10,
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,

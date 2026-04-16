@@ -95,5 +95,8 @@ module.exports = {
   devServer: {
     historyApiFallback: true,
     hot: true,
+    static: {
+      directory: path.join(__dirname, 'web'),
+    },
   },
 };

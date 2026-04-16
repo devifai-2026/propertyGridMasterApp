@@ -37,6 +37,8 @@ import PropertyCard, { Property } from '../../components/PropertyCard';
 import CompareBanner from '../dashboard/components/CompareBanner';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
 import { COLORS } from '../../constants/theme';
+import NoPropertiesFound from './components/NoPropertiesFound';
+import ReachedTheEnd from './components/ReachedTheEnd';
 
 declare const window: any;
 
@@ -1104,137 +1106,44 @@ const ExplorePropertiesScreen = () => {
             </View>
           </View>
 
-          {/* Desktop Filter Panel */}
-          {showDesktopFilters && width > 768 && (
-            <View style={styles.desktopFilterPanel}>
-              <View style={styles.filterPanelHeader}>
-                <Filter size={24} color="#EE2529" />
-                <Text style={styles.filterPanelTitle}>Advanced Filters</Text>
-              </View>
+          {/* Content Area: Either show the No Results component OR the Filters + Results grid */}
+          {properties.length === 0 && !apiLoading ? (
+            <NoPropertiesFound onReset={handleResetFilters} />
+          ) : (
+            <>
+              {/* Desktop Filter Panel */}
+              {showDesktopFilters && width > 768 && (
+                <View style={styles.desktopFilterPanel}>
+                  <View style={styles.filterPanelHeader}>
+                    <Filter size={24} color="#EE2529" />
+                    <Text style={styles.filterPanelTitle}>Advanced Filters</Text>
+                  </View>
 
-              <View style={styles.filterTabs}>
-                {['location', 'pricing', 'unit', 'rent', 'roi', 'tenure'].map(
-                  tab => (
-                    <TouchableOpacity
-                      key={tab}
-                      style={[
-                        styles.filterTabItem,
-                        activeTab === tab && styles.activeFilterTab,
-                      ]}
-                      onPress={() => setActiveTab(tab as any)}
-                    >
-                      <Text
-                        style={[
-                          styles.filterTabText,
-                          activeTab === tab && styles.activeFilterTabText,
-                        ]}
-                      >
-                        {tab === 'location'
-                          ? 'Location\nProximity'
-                          : tab === 'pricing'
-                          ? 'Pricing'
-                          : tab === 'unit'
-                          ? 'Type of Unit'
-                          : tab === 'rent'
-                          ? 'Annual Rent\nAchieved'
-                          : tab === 'roi'
-                          ? 'ROI'
-                          : 'Tenure Left'}
-                      </Text>
-                    </TouchableOpacity>
-                  ),
-                )}
-              </View>
-
-              <View style={styles.infoBox}>
-                <Info size={12} color="#262626" />
-                <Text style={styles.infoText}>
-                  This information is certified from the person listing the
-                  property
-                </Text>
-              </View>
-
-              <View style={styles.filterContentArea}>
-                {renderFilterContent()}
-              </View>
-
-              <View style={styles.filterFooter}>
-                <TouchableOpacity
-                  onPress={handleResetFilters}
-                  style={styles.resetFilterBtn}
-                >
-                  <Text style={[styles.btnText, { color: '#666' }]}>
-                    Reset Filters
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={handleApplyFilters}
-                  activeOpacity={0.8}
-                >
-                  <LinearGradient
-                    colors={['#EE2529', '#C73834']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                    style={styles.applyFilterBtn}
-                  >
-                    <Text style={[styles.btnText, { color: '#fff' }]}>
-                      Apply Filters
-                    </Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
-
-          {/* Mobile Filter Modal */}
-          <Modal
-            visible={showFilters}
-            transparent={true}
-            animationType="slide"
-            onRequestClose={() => setShowFilters(false)}
-          >
-            <View style={styles.mobileFilterOverlay}>
-              <View style={styles.mobileFilterPanel}>
-                <View style={styles.mobileFilterHeader}>
-                  <Filter size={20} color="#EE2529" />
-                  <Text style={[styles.filterPanelTitle, { fontSize: 16 }]}>
-                    Advanced Filters
-                  </Text>
-                  <TouchableOpacity
-                    onPress={() => setShowFilters(false)}
-                    style={{ marginLeft: 'auto' }}
-                  >
-                    <X size={24} color="#333" />
-                  </TouchableOpacity>
-                </View>
-
-                <View style={styles.mobileFilterBody}>
-                  {/* Sidebar Tabs */}
-                  <ScrollView style={styles.mobileTabsSidebar} showsVerticalScrollIndicator={false}>
+                  <View style={styles.filterTabs}>
                     {['location', 'pricing', 'unit', 'rent', 'roi', 'tenure'].map(
                       tab => (
                         <TouchableOpacity
                           key={tab}
                           style={[
-                            styles.mobileTabItem,
-                            activeTab === tab && styles.mobileActiveTab,
+                            styles.filterTabItem,
+                            activeTab === tab && styles.activeFilterTab,
                           ]}
                           onPress={() => setActiveTab(tab as any)}
                         >
                           <Text
                             style={[
-                              styles.mobileTabText,
-                              activeTab === tab && styles.mobileActiveTabText,
+                              styles.filterTabText,
+                              activeTab === tab && styles.activeFilterTabText,
                             ]}
                           >
                             {tab === 'location'
-                              ? 'Location Proximity'
+                              ? 'Location\nProximity'
                               : tab === 'pricing'
                               ? 'Pricing'
                               : tab === 'unit'
                               ? 'Type of Unit'
                               : tab === 'rent'
-                              ? 'Annual Rent achieved'
+                              ? 'Annual Rent\nAchieved'
                               : tab === 'roi'
                               ? 'ROI'
                               : 'Tenure Left'}
@@ -1242,212 +1151,290 @@ const ExplorePropertiesScreen = () => {
                         </TouchableOpacity>
                       ),
                     )}
-                  </ScrollView>
+                  </View>
 
-                  {/* Content */}
-                  <ScrollView style={styles.mobileFilterContent}>
-                    <View
-                      style={[styles.infoBox, { marginBottom: 10, padding: 5 }]}
-                    >
-                      <Info size={12} color="#EE2529" />
-                      <Text style={[styles.infoText, { fontSize: 10 }]}>
-                        Certified information
-                      </Text>
-                    </View>
+                  <View style={styles.infoBox}>
+                    <Info size={12} color="#262626" />
+                    <Text style={styles.infoText}>
+                      This information is certified from the person listing the
+                      property
+                    </Text>
+                  </View>
+
+                  <View style={styles.filterContentArea}>
                     {renderFilterContent()}
-                  </ScrollView>
-                </View>
+                  </View>
 
-                <View style={styles.mobileFooter}>
+                  <View style={styles.filterFooter}>
+                    <TouchableOpacity
+                      onPress={handleResetFilters}
+                      style={styles.resetFilterBtn}
+                    >
+                      <Text style={[styles.btnText, { color: '#666' }]}>
+                        Reset Filters
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={handleApplyFilters}
+                      activeOpacity={0.8}
+                    >
+                      <LinearGradient
+                        colors={['#EE2529', '#C73834']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.applyFilterBtn}
+                      >
+                        <Text style={[styles.btnText, { color: '#fff' }]}>
+                          Apply Filters
+                        </Text>
+                      </LinearGradient>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+
+              <View style={[styles.gridContainer, { justifyContent: 'center' }]}>
+                {properties.map((property, index) => {
+                  // Special Card Logic (Index 7)
+                  if (index === 7) {
+                    return (
+                      <View
+                        key="special"
+                        style={[
+                          styles.card,
+                          { width: width > 768 ? '31.8%' : '100%' },
+                          styles.specialCard,
+                        ]}
+                      >
+                        <Image
+                          source={require('../../assets/PropertyCard/rounded.png')}
+                          style={styles.specialIcon}
+                          resizeMode="contain"
+                        />
+                        <Text style={styles.specialTextSmall}>
+                          Need assistance with your Investment?
+                        </Text>
+                        <Text style={styles.specialTextLarge}>
+                          Get in touch with our expert to find a customized
+                          solution.
+                        </Text>
+                        <TouchableOpacity
+                          style={styles.contactExpertBtn}
+                          onPress={() => navigate('/explore-brokers')}
+                        >
+                          <Text style={styles.contactExpertText}>
+                            Contact our Expert
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                    );
+                  }
+
+                  return (
+                    <PropertyCard
+                      key={property.id}
+                      item={property}
+                      width={width > 768 ? '31.8%' : '100%'}
+                      isSelected={selectedProperties.some(
+                        p => p.id === property.id,
+                      )}
+                      onToggleCompare={handleCompareToggle}
+                      isCompare={true}
+                    />
+                  );
+                })}
+              </View>
+
+              {/* Pagination Controls */}
+              {pagination.totalPages > 1 && (
+                <View style={styles.paginationContainer}>
                   <TouchableOpacity
-                    onPress={handleResetFilters}
                     style={[
-                      styles.resetFilterBtn,
-                      { flex: 1, paddingVertical: 8 },
+                      styles.pageBtn,
+                      !pagination.hasPrevPage && styles.pageBtnDisabled,
                     ]}
+                    disabled={!pagination.hasPrevPage}
+                    onPress={() =>
+                      fetchProperties(filters, pagination.currentPage - 1)
+                    }
                   >
                     <Text
                       style={[
-                        styles.btnText,
-                        { color: '#666', textAlign: 'center' },
+                        styles.pageBtnText,
+                        !pagination.hasPrevPage && styles.pageBtnTextDisabled,
                       ]}
                     >
-                      Reset
+                      Previous
                     </Text>
                   </TouchableOpacity>
+
+                  <View style={styles.pageNumbers}>
+                    {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                      .filter(p => {
+                        // Show current page, and one page before/after
+                        return (
+                          p === 1 ||
+                          p === pagination.totalPages ||
+                          Math.abs(p - pagination.currentPage) <= 1
+                        );
+                      })
+                      .map((p, i, arr) => {
+                        return (
+                          <React.Fragment key={p}>
+                            {i > 0 && arr[i - 1] !== p - 1 && (
+                              <Text style={styles.paginationEllipsis}>...</Text>
+                            )}
+                            <TouchableOpacity
+                              style={[
+                                styles.pageNumberBtn,
+                                pagination.currentPage === p &&
+                                  styles.activePageNumberBtn,
+                              ]}
+                              onPress={() => fetchProperties(filters, p)}
+                            >
+                              <Text
+                                style={[
+                                  styles.pageNumberText,
+                                  pagination.currentPage === p &&
+                                    styles.activePageNumberText,
+                                ]}
+                              >
+                                {p}
+                              </Text>
+                            </TouchableOpacity>
+                          </React.Fragment>
+                        );
+                      })}
+                  </View>
+
                   <TouchableOpacity
-                    onPress={handleApplyFilters}
-                    style={{ flex: 1 }}
-                    activeOpacity={0.8}
+                    style={[
+                      styles.pageBtn,
+                      !pagination.hasNextPage && styles.pageBtnDisabled,
+                    ]}
+                    disabled={!pagination.hasNextPage}
+                    onPress={() =>
+                      fetchProperties(filters, pagination.currentPage + 1)
+                    }
                   >
-                    <LinearGradient
-                      colors={['#EE2529', '#C73834']}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                      style={[styles.applyFilterBtn, { paddingVertical: 8 }]}
+                    <Text
+                      style={[
+                        styles.pageBtnText,
+                        !pagination.hasNextPage && styles.pageBtnTextDisabled,
+                      ]}
                     >
-                      <Text
-                        style={[
-                          styles.btnText,
-                          { color: '#fff', textAlign: 'center' },
-                        ]}
-                      >
-                        Apply
-                      </Text>
-                    </LinearGradient>
+                      Next
+                    </Text>
                   </TouchableOpacity>
                 </View>
-              </View>
-            </View>
-          </Modal>
+              )}
 
-          {selectedProperties.length > 0 && (
-            <View style={styles.compareBannerContainer}>
-              <CompareBanner
-                selectedProperties={selectedProperties}
-                onClear={handleClearCompare}
-                onRemove={handleRemoveCompare}
-                onCompare={handleCompareAction}
-              />
-            </View>
-          )}
-
-          <View style={[styles.gridContainer, { justifyContent: 'center' }]}>
-            {properties.map((property, index) => {
-              // Special Card Logic (Index 7)
-              if (index === 7) {
-                return (
-                  <View
-                    key="special"
-                    style={[
-                      styles.card,
-                      { width: width > 768 ? '31.8%' : '100%' },
-                      styles.specialCard,
-                    ]}
-                  >
-                    <Image
-                      source={require('../../assets/PropertyCard/rounded.png')}
-                      style={styles.specialIcon}
-                      resizeMode="contain"
-                    />
-                    <Text style={styles.specialTextSmall}>
-                      Need assistance with your Investment?
-                    </Text>
-                    <Text style={styles.specialTextLarge}>
-                      Get in touch with our expert to find a customized
-                      solution.
-                    </Text>
-                    <TouchableOpacity
-                      style={styles.contactExpertBtn}
-                      onPress={() => navigate('/explore-brokers')}
-                    >
-                      <Text style={styles.contactExpertText}>
-                        Contact our Expert
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                );
-              }
-
-              return (
-                <PropertyCard
-                  key={property.id}
-                  item={property}
-                  width={width > 768 ? '31.8%' : '100%'}
-                  isSelected={selectedProperties.some(
-                    p => p.id === property.id,
-                  )}
-                  onToggleCompare={handleCompareToggle}
-                  isCompare={true}
+              {/* End of results footer */}
+              {pagination.currentPage === pagination.totalPages && properties.length > 0 && (
+                <ReachedTheEnd 
+                  propertyCount={pagination.totalItems} 
+                  onGoToTop={() => {
+                    if (typeof window !== 'undefined') {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                  }} 
                 />
-              );
-            })}
-          </View>
-
-          {/* Pagination Controls */}
-          {pagination.totalPages > 1 && (
-            <View style={styles.paginationContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.pageBtn,
-                  !pagination.hasPrevPage && styles.pageBtnDisabled,
-                ]}
-                disabled={!pagination.hasPrevPage}
-                onPress={() =>
-                  fetchProperties(filters, pagination.currentPage - 1)
-                }
-              >
-                <Text
-                  style={[
-                    styles.pageBtnText,
-                    !pagination.hasPrevPage && styles.pageBtnTextDisabled,
-                  ]}
-                >
-                  Previous
-                </Text>
-              </TouchableOpacity>
-
-              <View style={styles.pageNumbers}>
-                {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
-                  .filter(p => {
-                    // Show current page, and one page before/after
-                    return (
-                      p === 1 ||
-                      p === pagination.totalPages ||
-                      Math.abs(p - pagination.currentPage) <= 1
-                    );
-                  })
-                  .map((p, i, arr) => {
-                    return (
-                      <React.Fragment key={p}>
-                        {i > 0 && arr[i - 1] !== p - 1 && (
-                          <Text style={styles.paginationEllipsis}>...</Text>
-                        )}
-                        <TouchableOpacity
-                          style={[
-                            styles.pageNumberBtn,
-                            pagination.currentPage === p &&
-                              styles.activePageNumberBtn,
-                          ]}
-                          onPress={() => fetchProperties(filters, p)}
-                        >
-                          <Text
-                            style={[
-                              styles.pageNumberText,
-                              pagination.currentPage === p &&
-                                styles.activePageNumberText,
-                            ]}
-                          >
-                            {p}
-                          </Text>
-                        </TouchableOpacity>
-                      </React.Fragment>
-                    );
-                  })}
-              </View>
-
-              <TouchableOpacity
-                style={[
-                  styles.pageBtn,
-                  !pagination.hasNextPage && styles.pageBtnDisabled,
-                ]}
-                disabled={!pagination.hasNextPage}
-                onPress={() =>
-                  fetchProperties(filters, pagination.currentPage + 1)
-                }
-              >
-                <Text
-                  style={[
-                    styles.pageBtnText,
-                    !pagination.hasNextPage && styles.pageBtnTextDisabled,
-                  ]}
-                >
-                  Next
-                </Text>
-              </TouchableOpacity>
-            </View>
+              )}
+            </>
           )}
         </View>
+
+        {/* Mobile Filter Modal */}
+        <Modal
+          visible={showFilters && width <= 768}
+          animationType="slide"
+          transparent={true}
+          onRequestClose={toggleFilters}
+        >
+          <View style={styles.mobileFilterOverlay}>
+            <View style={styles.mobileFilterPanel}>
+              <View style={styles.mobileFilterHeader}>
+                <TouchableOpacity onPress={toggleFilters}>
+                  <X size={24} color="#333" />
+                </TouchableOpacity>
+                <Text style={styles.filterPanelTitle}>Advanced Filters</Text>
+              </View>
+
+              <View style={styles.mobileFilterBody}>
+                {/* Tabs Sidebar */}
+                <ScrollView style={styles.mobileTabsSidebar}>
+                  {['location', 'pricing', 'unit', 'rent', 'roi', 'tenure'].map(
+                    tab => (
+                      <TouchableOpacity
+                        key={tab}
+                        style={[
+                          styles.mobileTabItem,
+                          activeTab === tab && styles.mobileActiveTab,
+                        ]}
+                        onPress={() => setActiveTab(tab as any)}
+                      >
+                        <Text
+                          style={[
+                            styles.mobileTabText,
+                            activeTab === tab && styles.mobileActiveTabText,
+                          ]}
+                        >
+                          {tab === 'location'
+                            ? 'Location'
+                            : tab === 'pricing'
+                            ? 'Pricing'
+                            : tab === 'unit'
+                            ? 'Type'
+                            : tab === 'rent'
+                            ? 'Rent'
+                            : tab === 'roi'
+                            ? 'ROI'
+                            : 'Tenure'}
+                        </Text>
+                      </TouchableOpacity>
+                    ),
+                  )}
+                </ScrollView>
+
+                {/* Content Area */}
+                <ScrollView style={styles.mobileFilterContent}>
+                  {renderFilterContent()}
+                </ScrollView>
+              </View>
+
+              <View style={styles.mobileFooter}>
+                <TouchableOpacity
+                  onPress={handleResetFilters}
+                  style={[styles.resetFilterBtn, { flex: 1 }]}
+                >
+                  <Text
+                    style={[
+                      styles.btnText,
+                      { color: '#666', textAlign: 'center' },
+                    ]}
+                  >
+                    Reset
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleApplyFilters}
+                  style={{ flex: 1 }}
+                >
+                  <LinearGradient
+                    colors={['#EE2529', '#C73834']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={[styles.applyFilterBtn, { width: '100%' }]}
+                  >
+                    <Text style={[styles.btnText, { color: '#fff' }]}>
+                      Apply
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     </Layout>
   );
@@ -1561,6 +1548,9 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     marginBottom: 20,
+    maxWidth: 1200,
+    width: '100%',
+    alignSelf: 'center',
   },
   pageTitle: {
     fontSize: 18,
@@ -1570,7 +1560,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 20,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
+    maxWidth: 1200,
+    width: '100%',
+    alignSelf: 'center',
   },
   card: {
     backgroundColor: '#fff',
@@ -1831,9 +1824,9 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   filterTitleText: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#767676',
-    fontWeight: '600',
+    fontWeight: '700',
   },
   filterActions: {
     flexDirection: 'row',
@@ -2108,7 +2101,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#EEEEEE',
   },
   checkboxActive: {
     backgroundColor: '#6E6E6E',

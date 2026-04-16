@@ -11,10 +11,12 @@ import {
 import ContactCards from './components/ContactCards';
 import ContactForm from './components/ContactForm';
 import Layout from '../../layout/Layout';
+import bgBanner from "../../assets/Banner/bannerBg.png"
 
 const ContactUsScreen = () => {
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const isSmallScreen = width < 768;
+  const headerHeight = height * 0.50;
 
   useEffect(() => {
     // Scroll to top on mount if needed
@@ -24,18 +26,14 @@ const ContactUsScreen = () => {
     <Layout>
       <ScrollView
         style={styles.mainContainer}
+        contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.container}>
           {/* Header Section */}
           <ImageBackground
-            //   source={require('../../assets/propertyDetails/squaresbg.png')} // path relative to this file: ../../assets... wait. src/screens/contact-us/ContactUsScreen.tsx -> ../../assets -> src/assets
-            // Let's try to be precise.
-            // src/screens/contact-us/ContactUsScreen.tsx
-            // ../../assets/propertyDetails/squaresbg.png SHOULD work if structure is correct.
-            // Actually, let's use a safe fallback color if require fails, but require is compile time.
-            source={require('../../assets/propertyDetails/squaresbg.png')}
-            style={styles.headerBackground}
+            source={bgBanner}
+            style={[styles.headerBackground, { height: headerHeight }]}
             imageStyle={styles.headerBackgroundImage}
           >
             <View
@@ -44,17 +42,19 @@ const ContactUsScreen = () => {
                 isSmallScreen && styles.headerContentMobile,
               ]}
             >
-              <View style={styles.headerTextContainer}>
-                <Text style={styles.title}>We're Here to Help</Text>
-                <Text style={styles.subtitle}>
+              <View style={[styles.headerTextContainer, isSmallScreen && { alignItems: 'center', paddingRight: 0 }]}>
+                <Text style={[styles.title, isSmallScreen && { fontSize: 32, lineHeight: 38, textAlign: 'center' }]}>
+                  We're Here to Help
+                </Text>
+                <Text style={[styles.subtitle, isSmallScreen && { fontSize: 16, textAlign: 'center' }]}>
                   Questions about properties, investments, partnerships, or your
                   account?
                 </Text>
-                <Text style={styles.subtitle2}>
+                <Text style={[styles.subtitle2, isSmallScreen && { fontSize: 16, textAlign: 'center' }]}>
                   Reach out and we'll get back to you promptly.
                 </Text>
               </View>
-              <View style={styles.headerImageContainer}>
+              <View style={[styles.headerImageContainer, isSmallScreen && { display: 'none' }]}>
                 <Image
                   source={require('../../assets/ContactUs/img.png')}
                   style={styles.headerImage}
@@ -65,9 +65,9 @@ const ContactUsScreen = () => {
           </ImageBackground>
 
           {/* Content Section */}
-          <View style={styles.contentSection}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>
+          <View style={[styles.contentSection, isSmallScreen && { marginTop: 20 }]}>
+            <View style={[styles.sectionHeader, isSmallScreen && { marginTop: 40, padding: 16 }]}>
+              <Text style={[styles.sectionTitle, isSmallScreen && { fontSize: 22, textAlign: 'center' }]}>
                 Let's Start a Conversation
               </Text>
             </View>
@@ -78,10 +78,10 @@ const ContactUsScreen = () => {
                 isSmallScreen && styles.cardsFormContainerMobile,
               ]}
             >
-              <View style={styles.cardsWrapper}>
+              <View style={[styles.cardsWrapper, !isSmallScreen && { flex: 1 }]}>
                 <ContactCards />
               </View>
-              <View style={styles.formWrapper}>
+              <View style={[styles.formWrapper, !isSmallScreen && { flex: 1 }]}>
                 <ContactForm />
               </View>
             </View>
@@ -95,7 +95,9 @@ const ContactUsScreen = () => {
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: '#fff',
+  },
+  scrollContent: {
+    flexGrow: 1,
   },
   container: {
     width: '100%',
@@ -103,21 +105,23 @@ const styles = StyleSheet.create({
   },
   headerBackground: {
     width: '100%',
-    backgroundColor: '#f9f9f9',
     paddingBottom: 40,
+    justifyContent: 'center',
+    overflow: 'visible',
   },
   headerBackgroundImage: {
-    opacity: 0.1,
+    resizeMode: 'cover',
   },
   headerContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: '5%',
     paddingTop: 40,
-    maxWidth: 1200,
+    maxWidth: '90%',
     alignSelf: 'center',
     width: '100%',
     alignItems: 'center',
+    overflow: 'visible',
   },
   headerContentMobile: {
     flexDirection: 'column',
@@ -127,80 +131,83 @@ const styles = StyleSheet.create({
   },
   headerTextContainer: {
     flex: 1,
-    paddingRight: 20,
+    paddingRight: 10,
   },
   title: {
-    fontSize: 40,
-    fontWeight: '800',
-    color: '#000',
-    marginBottom: 16,
+    fontSize: 56,
+    fontWeight: 700,
+    color: '#262626',
+    marginBottom: 20,
     lineHeight: 48,
+    fontFamily:'Montserrat',
   },
   subtitle: {
     fontSize: 18,
     color: '#333',
-    fontWeight: '600',
-    marginBottom: 8,
-    lineHeight: 28,
+    fontWeight: 600,
+    marginBottom: 3,
+    lineHeight: 24,
+    fontFamily:'Montserrat',
   },
   subtitle2: {
     fontSize: 18,
     color: '#333',
-    fontWeight: '600',
-    lineHeight: 28,
+    fontWeight: 600,
+    lineHeight: 24,
+    fontFamily:'Montserrat',
   },
   headerImageContainer: {
-    flex: 1,
+    position: 'relative',
     alignItems: 'flex-end',
     justifyContent: 'center',
+    overflow: 'visible',
   },
   headerImage: {
-    width: 350,
-    height: 350,
-    maxWidth: '100%',
+    position: 'absolute',
+    top: -280,
+    right: -100,
+    width: 950,
+    height: 650,
+    zIndex: 20,
   },
   contentSection: {
     paddingHorizontal: '5%',
-    maxWidth: 1200,
+    maxWidth: '90%',
     alignSelf: 'center',
     width: '100%',
     marginTop: -40,
     marginBottom: 60,
   },
   sectionHeader: {
-    backgroundColor: '#fff',
+   
     padding: 24,
     borderRadius: 12,
     alignItems: 'center',
     marginBottom: 30,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
     elevation: 4,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
+    marginTop:200,
+    
+   
   },
   sectionTitle: {
-    fontSize: 26,
-    fontWeight: '700',
+    fontSize: 32,
+    fontWeight: 700,
     color: '#EE2529',
+    fontFamily:'Montserrat',
   },
   cardsFormContainer: {
     flexDirection: 'row',
     gap: 30,
-    alignItems: 'flex-start',
+    alignItems: 'stretch',
   },
   cardsFormContainerMobile: {
     flexDirection: 'column',
-    gap: 30,
+    gap: 40,
   },
   cardsWrapper: {
-    flex: 1,
     width: '100%',
   },
   formWrapper: {
-    flex: 1,
     width: '100%',
   },
 });

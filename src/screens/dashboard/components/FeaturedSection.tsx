@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { useNavigation } from '../../../context/NavigationContext';
-import { COLORS } from '../../../constants/theme';
+import { COLORS, FONTS } from '../../../constants/theme';
 import PropertyCard, { Property } from '../../../components/PropertyCard';
 import CompareBanner from './CompareBanner';
 import LinearGradient from 'react-native-linear-gradient';
@@ -169,7 +169,6 @@ const FeaturedSection = ({ properties }: { properties: any[] }) => {
           <PropertyCard
             key={prop.id}
             item={prop}
-            width={cardWidth}
             isCompare={true} // Enable compare button
             isSelected={selectedProperties.some(p => p.id === prop.id)}
             onToggleCompare={handleToggleCompare}
@@ -205,11 +204,12 @@ const styles = StyleSheet.create({
     marginTop: 60,
   },
   sectionTitle: {
-    fontWeight: '300',
+    fontWeight: '400',
     color: '#262626',
     marginBottom: 40,
     textAlign: 'center',
     fontSize: 42,
+    fontFamily:FONTS.avenir,
     // fontStyle: 'normal',
   },
   stickyBannerWrapper: {

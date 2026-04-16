@@ -10,6 +10,10 @@ import {
 } from 'react-native';
 import download from "../../../../assets/Calculator/download.png"
 import share from "../../../../assets/Calculator/share.png"
+import { Dimensions } from 'react-native';
+
+const { width: windowWidth } = Dimensions.get('window');
+const isDesktop = windowWidth >= 1024;
 
 
 type CashFlowRow = {
@@ -198,20 +202,23 @@ const styles = StyleSheet.create({
     color: '#429482',
   },
   buttonContainer: {
-    flexDirection: 'row',
+    flexDirection: isDesktop ? 'row' : 'column',
     justifyContent: 'center',
     gap: 12,
-    marginTop: 20,
+    marginTop: isDesktop ? 30 : 20,
+    width: '100%',
   },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 8,
     borderWidth: 1,
     borderColor: '#767676',
     paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingHorizontal: isDesktop ? 20 : 10,
     borderRadius: 6,
+    width: isDesktop ? 'auto' : '100%',
   },
   buttonIcon: {
     width: 18,
@@ -221,6 +228,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#767676',
     fontWeight: '600',
-    fontSize: 16,
+    fontSize: isDesktop ? 16 : 14,
   },
 });

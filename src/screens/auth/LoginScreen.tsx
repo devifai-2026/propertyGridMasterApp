@@ -13,6 +13,8 @@ import {
   Animated,
   Easing,
   Image,
+  useWindowDimensions,
+  Dimensions,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useAuth } from '../../context/AuthContext';
@@ -32,6 +34,8 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
   const { login } = useAuth();
   const { login: authenticate, sendOtp, loading: apiLoading } = useAuthAPIs();
   const { openSignupModal, closeLoginModal } = useNavigation();
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
 
   const otpInputRefs = useRef<Array<TextInput | null>>([]);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -404,7 +408,8 @@ const styles = StyleSheet.create({
 
   /* ── Card ── */
   modalContent: {
-    width: 665,
+    width: Platform.OS === 'web' ? (Dimensions.get('window').width > 768 ? 665 : '92%') : '92%',
+    maxWidth: 665,
     backgroundColor: COLORS.white,
     borderRadius: 20,
     overflow: 'hidden',
@@ -501,8 +506,8 @@ const styles = StyleSheet.create({
     marginBottom: 28,
   },
   inputGroup_phone:{
-    width:541,
-    paddingLeft:44,
+    width: '100%',
+    paddingHorizontal: Platform.OS === 'web' && Dimensions.get('window').width > 768 ? 44 : 0,
     marginBottom: 28
   },
   inputLabel: {
@@ -535,8 +540,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     marginTop: 8,
-    width:560,
-    paddingLeft:20
+    width: '100%',
+    paddingHorizontal: Platform.OS === 'web' && Dimensions.get('window').width > 768 ? 20 : 0
   },
 
   /* Sign Up button */
@@ -598,8 +603,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   otpInput: {
-    width: 72,
-    height: 72,
+    width: Dimensions.get('window').width > 768 ? 72 : 45,
+    height: Dimensions.get('window').width > 768 ? 72 : 45,
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     textAlign: 'center',

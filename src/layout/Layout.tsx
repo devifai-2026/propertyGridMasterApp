@@ -52,7 +52,7 @@ import {
   ChevronDown,
 } from 'lucide-react-native';
 
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Circle, Path, Line } from 'react-native-svg';
 
 const ListPropertyIcon = () => (
   <Svg width="32" height="32" viewBox="0 0 38 38" fill="none">
@@ -61,6 +61,38 @@ const ListPropertyIcon = () => (
       d="M18.9985 11V19.808M18.9985 28.41V19.808M18.9985 19.808H27.41M18.9985 19.808H10"
       stroke="white"
       strokeWidth="2.5"
+      strokeLinecap="round"
+    />
+  </Svg>
+);
+
+const HamburgerIcon = () => (
+  <Svg width="22" height="16" viewBox="0 0 22 16" fill="none">
+    <Line
+      x1="1"
+      y1="1"
+      x2="20.8182"
+      y2="1"
+      stroke="#C73834"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+    <Line
+      x1="1"
+      y1="7.54492"
+      x2="20.8182"
+      y2="7.54492"
+      stroke="#C73834"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+    <Line
+      x1="1"
+      y1="14.0918"
+      x2="20.8182"
+      y2="14.0918"
+      stroke="#C73834"
+      strokeWidth="2"
       strokeLinecap="round"
     />
   </Svg>
@@ -329,13 +361,13 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
   const isMobile = width < 768;
 
   return (
-    <View style={styles.headerContainer}>
+    <View style={[styles.headerContainer, !isMobile && { height: 90 }]}>
       <View
         style={[
           styles.headerContent,
           isMobile
             ? { paddingLeft: 0, paddingRight: 60 }
-            : { paddingLeft: 60, paddingRight: 80 },
+            : { paddingLeft: 60, paddingRight: 80, height: 90 },
         ]}
       >
         <TouchableOpacity
@@ -344,7 +376,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
         >
           <Image
             source={require('../assets/Navbar/Preleasegrid logo 1.png')}
-            style={styles.logoImage}
+            style={[styles.logoImage, !isMobile && { width: 184, height: 75 }]}
             resizeMode="contain"
           />
         </TouchableOpacity>
@@ -446,7 +478,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
             )}
           </TouchableOpacity>
           <TouchableOpacity style={styles.menuBtn} onPress={onMenuPress}>
-            <Menu size={24} color={COLORS.primary} />
+            <HamburgerIcon />
           </TouchableOpacity>
         </View>
       </View>
@@ -503,9 +535,10 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
 
 interface LayoutProps {
   children: ReactNode;
+  style?: any;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<LayoutProps> = ({ children, style }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isLoggedIn, user, logout } = useAuth();
   const { navigate, openLoginModal } = useNavigation();
@@ -516,7 +549,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, style]}>
       <StatusBar barStyle="dark-content" />
       <Header onMenuPress={() => setIsMenuOpen(true)} />
 
@@ -531,7 +564,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       />
 
       <ScrollView
-        contentContainerStyle={[styles.scrollContent, { paddingTop: 100 }]}
+        style={{ backgroundColor: 'transparent' }}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingTop: Platform.OS === 'web' ? 120 : 100 },
+        ]}
       >
         {children}
         <Footer />
@@ -609,7 +646,8 @@ const styles = StyleSheet.create({
     gap: 50,
   },
   navLinkText: {
-    fontSize: 18,
+    fontFamily: 'Montserrat',
+    fontSize: 16,
     fontWeight: '600',
     color: '#262626',
   },
@@ -623,11 +661,13 @@ const styles = StyleSheet.create({
   },
   signInBtn: {
     paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingHorizontal: 0,
   },
   signInText: {
+    fontFamily: 'Montserrat',
     fontWeight: '600',
-    color: COLORS.textDark,
+    color: '#262626',
+    fontSize:16,
   },
   listPropertyBtn: {
     flexDirection: 'row',
@@ -636,12 +676,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#262626',
     borderRadius: 30,
-    paddingHorizontal: 5,
+    paddingHorizontal: 2,
     paddingVertical: 2.5,
     height: 40,
     paddingRight: 15
   },
   listPropertyText: {
+    fontFamily: 'Montserrat',
     fontWeight: '400',
     color: '#262626',
     fontSize: 16,

@@ -248,7 +248,7 @@ const PropertyDetailsScreen = () => {
     { id: 'analytics', label: 'Analytics', icon: <ChartNoAxesColumnIncreasing />},
     { id: 'location', label: 'Location Details', icon: location },
     ...(isAddedByUser
-      ? [{ id: 'notes', label: 'Notes', icon: MessageSquare }]
+      ? [{ id: 'notes', label: 'Notes', icon: <MessageSquare /> }]
       : []),
     { id: 'faqs', label: 'FAQs', icon: faqs },
   ];

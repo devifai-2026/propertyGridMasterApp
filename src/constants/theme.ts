@@ -17,6 +17,11 @@ export const FONTS = {
   main: Platform.select({
     ios: 'Montserrat',
     android: 'Montserrat',
-    web: "Montserrat",
-  }) || 'Montserrat',
+    web: 'Montserrat, sans-serif',
+  }) || 'sans-serif',
+  avenir: Platform.select({
+    web: '"Avenir LT Pro", "Segoe UI", sans-serif',
+    ios: 'Avenir Next',
+    android: 'Avenir-Heavy',
+  }) || 'sans-serif',
 };

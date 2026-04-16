@@ -16,6 +16,8 @@ import {
   Easing,
   Image,
   Linking,
+  useWindowDimensions,
+  Dimensions,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useAuth } from '../../context/AuthContext';
@@ -108,6 +110,8 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
   const { login, updateUser } = useAuth();
   const { signup: register, sendOtp, loading: apiLoading } = useAuthAPIs();
   const { navigate, openLoginModal, closeSignupModal } = useNavigation();
+  const { width: SCREEN_WIDTH } = useWindowDimensions();
+  const isMobile = SCREEN_WIDTH < 768;
 
   const otpInputRefs = useRef<Array<TextInput | null>>([]);
 
@@ -1025,8 +1029,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   card: {
-    width: 673,
-    height: 645,
+    width: Dimensions.get('window').width > 768 ? 673 : '94%',
+    height: Dimensions.get('window').width > 768 ? 645 : '90%',
     backgroundColor: COLORS.white,
     borderRadius: 24,
     overflow: 'hidden',
@@ -1045,7 +1049,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 14,
-    paddingHorizontal: 48,
+    paddingHorizontal: Dimensions.get('window').width > 768 ? 48 : 12,
   },
   logoContainer: { flexDirection: 'row', alignItems: 'center', height: 40 },
   logoImage: { width: 120, height: 40 },
@@ -1065,7 +1069,7 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#E5E7EB',
     marginBottom: 20,
-    marginHorizontal: -48,
+    marginHorizontal: Dimensions.get('window').width > 768 ? -48 : -12,
   },
 
   /* ── Shared headings ── */
@@ -1073,7 +1077,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFCF4',
     marginHorizontal: -48,
     paddingVertical: 16,
-    paddingHorizontal: 48,
+    paddingHorizontal: Dimensions.get('window').width > 768 ? 48 : 12,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
@@ -1100,7 +1104,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 16,
     marginBottom: 36,
-    paddingHorizontal: 48,
+    paddingHorizontal: Dimensions.get('window').width > 768 ? 48 : 12,
   },
   roleCardWrapper: {
     flex: 1,
@@ -1155,13 +1159,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     marginTop: 48,
-    paddingHorizontal: 48,
+    paddingHorizontal: Dimensions.get('window').width > 768 ? 48 : 12,
   },
   buttonRow_OTP:{
     flexDirection: 'row',
     gap: 12,
     marginTop: 48,
-    paddingHorizontal: 48,
+    paddingHorizontal: Dimensions.get('window').width > 768 ? 48 : 12,
   },
   btnOutline: {
     flex: 1,
@@ -1199,13 +1203,13 @@ const styles = StyleSheet.create({
 
   /* ── Form inputs ── */
   nameRow: {
-    flexDirection: 'row',
-    gap: 16,
+    flexDirection: Dimensions.get('window').width > 768 ? 'row' : 'column',
+    gap: Dimensions.get('window').width > 768 ? 16 : 32,
     marginBottom: 32,
-    paddingHorizontal: 48,
+    paddingHorizontal: Dimensions.get('window').width > 768 ? 48 : 12,
   },
   nameField: { flex: 1 },
-  inputGroup: { marginBottom: 32, paddingHorizontal: 48 },
+  inputGroup: { marginBottom: 32, paddingHorizontal: Dimensions.get('window').width > 768 ? 48 : 12, },
   inputLabel: {
     fontSize: 13,
     fontWeight: '600',
@@ -1260,7 +1264,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 10,
     marginBottom: 14,
-    paddingHorizontal: 48,
+    paddingHorizontal: Dimensions.get('window').width > 768 ? 48 : 12,
   },
   checkbox: {
     width: 18,
@@ -1288,8 +1292,8 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   otpInput: {
-    width: 80,
-    height: 80,
+    width: Dimensions.get('window').width > 768 ? 80 : 45,
+    height: Dimensions.get('window').width > 768 ? 80 : 45,
     borderWidth: 1.5,
     borderColor: '#E5E7EB',
     borderRadius: 12,
@@ -1333,8 +1337,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   cardOtp: {
-    width: 673,
-    height: 580,
+    width: Dimensions.get('window').width > 768 ? 673 : '92%',
+    height: Dimensions.get('window').width > 768 ? 580 : 'auto',
     borderRadius: 15,
   },
   tagsRow: {
