@@ -65,8 +65,8 @@ const StepCard = ({
         activeOpacity={0.7}
       >
         <IconComponent
-          size={isMobile ? 20 : 30}
-          color={active ? COLORS.primary : '#666'}
+          size={isMobile ? 20 : 26}
+          color={active ? '#EE2529' : '#767676'}
           style={styles.stepIcon}
         />
         <Text
@@ -214,6 +214,7 @@ const DiscoveryWizard = () => {
             //   </Text>
             // </TouchableOpacity>
             <LinearGradient
+              key={label}
               colors={['#F2F2F2', '#FFFFFF']}
               start={{ x: 0, y: 0 }}
               end={{ x: 0, y: 1 }}
@@ -294,7 +295,7 @@ const DiscoveryWizard = () => {
           </View>
         </View>
 
-        <Text style={[styles.wizardQuestion, { fontSize: isMobile ? 18 : 36 }]}>
+        <Text style={[styles.wizardQuestion, { fontSize: isMobile ? 18 : 32 }]}>
           What's your {STEPS.find(s => s.id === activeStep)?.label} Preference?
         </Text>
         <Text style={styles.wizardSubtext}>
@@ -347,10 +348,10 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     alignItems: 'center',
     width: '100%',
-    backgroundColor: '#FFFFFF',
+    
   },
   wizardTitle: {
-    fontFamily: FONTS.main,
+    fontFamily: FONTS.avenir,
     fontSize: 42,
     fontWeight: '400',
     color: '#262626',
@@ -414,7 +415,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   stepLabelActive: {
-    color: COLORS.primary,
+    color: '#EE2529',
     fontWeight: '700',
   },
   stepProgressIndicator: {
@@ -423,10 +424,10 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
   stepProgressIndicatorActive: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: '#EE2529',
   },
   wizardContentCard: {
-    width: '50%',
+    width: '40%',
     maxWidth: 900,
     backgroundColor: '#FFF',
     borderRadius: 20,
@@ -466,15 +467,15 @@ const styles = StyleSheet.create({
   },
   wizardStepText: {
     fontFamily: FONTS.main,
-    fontSize: 12, // Slightly smaller for mobile compatibility
+    fontSize: 12,
     fontWeight: '500',
     color: '#8B7B3E',
   },
   wizardQuestion: {
-    fontFamily: FONTS.main,
+    fontFamily: FONTS.avenir,
     fontWeight: '400',
     color: '#1A1A1A',
-    marginBottom: 10,
+    marginBottom: 20,
     textAlign: 'center',
     marginTop: isDesktop ? 10 : 25,
   },
@@ -543,14 +544,16 @@ cityOptionInner: {
     marginTop: 30,
   },
   skipBtn: {
-    height: 48,
-    minWidth: 100,
+    height: 52,
+    minWidth: 91,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#CCC',
+    borderColor: '#767676',
     borderRadius: 8,
-    paddingHorizontal: 20,
+    paddingHorizontal: 25,
+    paddingVertical: 15,
+    backgroundColor:'white',
   },
   skipBtnText: {
     fontFamily: FONTS.main,

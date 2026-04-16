@@ -7,7 +7,7 @@ import {
   useWindowDimensions,
   StyleSheet,
 } from 'react-native';
-import { COLORS } from '../../../constants/theme';
+import { COLORS, FONTS } from '../../../constants/theme';
 import LinearGradient from 'react-native-linear-gradient';
 
 const FEATURES = [
@@ -82,7 +82,6 @@ const WhyChooseSection = () => {
           isMobile && styles.contentContainerMobile,
         ]}
       >
-        {/* Left Side Illustration */}
         {!isMobile && (
           <View style={styles.illustrationContainer}>
             <Image
@@ -142,7 +141,6 @@ const WhyChooseSection = () => {
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 80,
-    backgroundColor: COLORS.white,
     alignItems: 'center',
     paddingHorizontal: 20,
     width: '100%',
@@ -161,11 +159,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 42,
-    fontWeight: '700',
+    fontWeight: '400',
     color: '#262626',
     marginBottom: 16,
     textAlign: 'center',
-    fontFamily: 'Montserrat',
+    fontFamily: FONTS.avenir,
   },
   titleMobile: {
     fontSize: 32,
@@ -188,7 +186,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     width: '100%',
-    maxWidth: 1200,
+    maxWidth: 1300,
     justifyContent: 'center',
     alignItems: 'stretch',
     gap: 80,
@@ -211,7 +209,7 @@ const styles = StyleSheet.create({
   },
   illustration: {
     width: '100%',
-    height: 500,
+    height: '100%',
   },
   illustrationMobile: {
     width: '100%',
@@ -220,8 +218,8 @@ const styles = StyleSheet.create({
   },
   featuresContainer: {
     flex: 1,
-    paddingLeft: 40,
-    maxWidth: 600,
+    paddingLeft: 10,
+    maxWidth: 800,
   },
   featuresContainerMobile: {
     paddingLeft: 0,
@@ -229,15 +227,14 @@ const styles = StyleSheet.create({
   },
   featureItem: {
     flexDirection: 'row',
-    // marginBottom: 40,
-    alignItems: 'flex-start',
+    alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 8,
   },
   iconWrapper: {
-    width: 60,
-    height: 60,
+    width: 72,
+    height: 72,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -245,23 +242,23 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   featureIcon: {
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
   },
   featureContent: {
     flex: 1,
   },
   featureTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 20,
+    fontWeight: '600',
     color: '#262626',
     marginBottom: 8,
     fontFamily: 'Montserrat',
     lineHeight: 24,
   },
   featureDescription: {
-    fontSize: 14,
-    color: '#666666',
+    fontSize: 16,
+    color: '#262626',
     lineHeight: 22,
     fontFamily: 'Montserrat',
     fontWeight: '400',
@@ -293,7 +290,7 @@ const styles = StyleSheet.create({
   height: 1,
   backgroundColor: '#767676',
   marginVertical: 10,
-  marginLeft: 76,  // 👈 iconWrapper width (60) + marginRight (16)
+  marginLeft: 92,  // 👈 iconWrapper width (76) + marginRight (16)
 },
 });
 

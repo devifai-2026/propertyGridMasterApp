@@ -30,58 +30,60 @@ const Hero = () => {
   const { navigate } = useNavigation();
   const isMobile = width < 768;
 
+  const bannerBg = require('../../../assets/Banner/bannerBg.png');
+
+  const HeroContent = (
+    <View
+      style={[
+        styles.heroContainer,
+        {
+          paddingHorizontal: isMobile ? 20 : 60,
+          paddingVertical: isMobile ? 20 : 30,
+        },
+      ]}
+    >
+      <Text style={[styles.heroTitle, { fontSize: isMobile ? 36 : 60 }]}>
+        Earn Effortlessly With
+      </Text>
+      <Text style={[styles.heroTitleRed, { fontSize: isMobile ? 48 : 65 }]}>
+        PreleaseGrid
+      </Text>
+      <Text
+        style={[
+          styles.heroDescription,
+          {
+            fontSize: 18,
+          },
+        ]}
+      >
+        PreleaseGrid offers carefully curated pre-leased properties designed to
+        deliver steady, reliable income — with verified assets, trusted tenants,
+        and zero management hassle.
+      </Text>
+
+      <TouchableOpacity
+        onPress={() => navigate('/explore-properties')}
+        activeOpacity={0.9}
+        style={styles.getStartedWrapper}
+      >
+        <LinearGradient
+          colors={['#EE2529', '#C73834']}
+          start={{ x: 0.0209, y: 0.5 }}
+          end={{ x: 0.9879, y: 0.5 }}
+          style={styles.getStartedBtn}
+        >
+          <Text style={styles.getStartedText}>Get Started</Text>
+          <GetStartedIcon />
+        </LinearGradient>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
     <View style={styles.heroWrapper}>
-      <ImageBackground
-        source={require('../../../assets/Banner/bannerBg.png')}
-        style={styles.heroBackground}
-        resizeMode="cover"
-      >
-        <View
-          style={[
-            styles.heroContainer,
-            {
-              paddingHorizontal: isMobile ? 20 : 60,
-              paddingVertical: isMobile ? 20 : 30,
-            },
-          ]}
-        >
-          <Text style={[styles.heroTitle, { fontSize: isMobile ? 36 : 60 }]}>
-            Earn Effortlessly With
-          </Text>
-          <Text style={[styles.heroTitleRed, { fontSize: isMobile ? 48 : 65 }]}>
-            PreleaseGrid
-          </Text>
-          <Text
-            style={[
-              styles.heroDescription,
-              {
-                fontSize: 18,
-              },
-            ]}
-          >
-            PreleaseGrid offers carefully curated pre-leased properties designed
-            to deliver steady, reliable income — with verified assets, trusted
-            tenants, and zero management hassle.
-          </Text>
-
-          <TouchableOpacity
-            onPress={() => navigate('/explore-properties')}
-            activeOpacity={0.9}
-            style={styles.getStartedWrapper}
-          >
-            <LinearGradient
-              colors={['#EE2529', '#C73834']}
-              start={{ x: 0.0209, y: 0.5 }}
-              end={{ x: 0.9879, y: 0.5 }}
-              style={styles.getStartedBtn}
-            >
-              <Text style={styles.getStartedText}>Get Started</Text>
-              <GetStartedIcon />
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-      </ImageBackground>
+      <View style={styles.heroBackground}>
+        {HeroContent}
+      </View>
     </View>
   );
 };
@@ -95,13 +97,7 @@ const styles = StyleSheet.create({
     width: '100%',
     minHeight: 600,
     justifyContent: 'center',
-    ...Platform.select({
-      web: {
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
-        backgroundSize: 'cover',
-      },
-    }),
+    backgroundColor: 'transparent',
   },
   heroContainer: {
     alignItems: 'center',
@@ -109,31 +105,34 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   heroTitle: {
-    fontFamily: FONTS.main,
+    fontFamily: FONTS.avenir,
     fontWeight: '400', 
     color: '#1A1A1A',
     textAlign: 'center',
     textTransform: 'capitalize',
     letterSpacing: 2,
-    marginBottom: -10, // Pull red text closer
+    marginBottom: -10, 
+    fontSize:60,
   },
   heroTitleRed: {
-    fontFamily: FONTS.main,
+    fontFamily: FONTS.avenir,
     fontWeight: '700', 
     color: '#EE2529',
     textAlign: 'center',
     textTransform: 'capitalize',
-    marginBottom: 10,
+    marginBottom: 14,
     letterSpacing: -1,
+    fontSize:60,
   },
   heroDescription: {
     fontFamily: FONTS.main,
-    color: '#777777', // Lighter gray as in ss
+    color: '#262626',
     textAlign: 'center',
     lineHeight: 20,
-    maxWidth: 600, // Reduced to force 3-line wrap
+    maxWidth: 600,
     marginBottom: 30,
     fontWeight: '400',
+    fontSize:18,
   },
   getStartedWrapper: {
     borderRadius: 100,
@@ -148,9 +147,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
+    paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 100,
+    width:189,
+    height:59,
   },
   getStartedText: {
     fontFamily: FONTS.main,

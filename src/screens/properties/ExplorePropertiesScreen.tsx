@@ -1548,6 +1548,9 @@ const styles = StyleSheet.create({
   },
   headerRow: {
     marginBottom: 20,
+    maxWidth: 1200,
+    width: '100%',
+    alignSelf: 'center',
   },
   pageTitle: {
     fontSize: 18,
@@ -1557,7 +1560,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 20,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
+    maxWidth: 1200,
+    width: '100%',
+    alignSelf: 'center',
   },
   card: {
     backgroundColor: '#fff',
@@ -1818,9 +1824,9 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   filterTitleText: {
-    fontSize: 14,
+    fontSize: 18,
     color: '#767676',
-    fontWeight: '600',
+    fontWeight: '700',
   },
   filterActions: {
     flexDirection: 'row',
@@ -2095,7 +2101,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: '#EEEEEE',
   },
   checkboxActive: {
     backgroundColor: '#6E6E6E',

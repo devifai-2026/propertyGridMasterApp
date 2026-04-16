@@ -8,6 +8,7 @@ import {
   ViewStyle,
   DimensionValue,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import {
   MapPin,
@@ -58,7 +59,7 @@ interface PropertyCardProps {
 
 const PropertyCard: React.FC<PropertyCardProps> = ({
   item,
-  width = '100%',
+  width,
   isCompare = false,
   isSelected = false,
   noView = false,
@@ -68,6 +69,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   onEnquire,
   style,
 }) => {
+  const { width: screenWidth } = useWindowDimensions();
+  const isMobile = screenWidth < 768;
   const { navigate } = useNavigation();
   const { user } = useAuth();
   const { toggleLikeProperty, checkIfLiked } = usePropertyAPIs();
@@ -160,7 +163,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
       {/* Header Section */}
       <View style={styles.propHeader}>
         <View style={styles.headerTextGroup}>
-          <Text style={styles.propCategory}>{item.title}</Text>
+          <Text style={[styles.propCategory, isMobile && { fontSize: 18 }]} numberOfLines={1}>
+            {item.title}
+          </Text>
           <TouchableOpacity
             style={styles.locationRow}
             onPress={() => setIsLocationExpanded(!isLocationExpanded)}
@@ -168,7 +173,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           >
             <MapPin size={16} color="#EF4444" style={{ marginRight: 4 }} />
             <Text
-              style={styles.propLocationText}
+              style={[styles.propLocationText, isMobile && { fontSize: 14 }]}
               numberOfLines={isLocationExpanded ? undefined : 1}
               ellipsizeMode="tail"
             >
@@ -224,7 +229,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         {/* Share and Favorite Buttons */}
         <View style={styles.actionButtons}>
           <TouchableOpacity style={styles.iconButton}>
-            <ShareIcon size={15} color={COLORS.white} />
+            <ShareIcon width={19.35} height={16.67} color={COLORS.white} />
           </TouchableOpacity>
           {user && (
             <TouchableOpacity
@@ -232,7 +237,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               onPress={handleToggleLike}
             >
               <Heart
-                size={15}
+                width={19.35}
+                height={16.67}
                 color={isLiked ? COLORS.primary : COLORS.white}
                 fill={isLiked ? COLORS.primary : 'transparent'}
               />
@@ -362,7 +368,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderWidth: 1,
     borderColor: '#f0f0f0',
-    maxWidth: 420,
+    width: 420,
+    maxWidth: '100%',
   },
   propHeader: {
     paddingHorizontal: 20,
@@ -376,9 +383,9 @@ const styles = StyleSheet.create({
     paddingRight: 110,
   },
   propCategory: {
-    fontFamily: FONTS.main,
+    fontFamily: 'Montserrat',
     fontSize: 24,
-    fontWeight: '300',
+    fontWeight: '400',
     color: '#262626',
     marginBottom: 2,
   },
@@ -389,7 +396,8 @@ const styles = StyleSheet.create({
   propLocationText: {
     fontSize: 16,
     color: '#262626',
-    fontWeight: '200',
+    fontWeight: '400',
+    fontFamily:'Montserrat',
   },
   verifiedBadgeContainer: {
     position: 'absolute',
@@ -441,16 +449,19 @@ const styles = StyleSheet.create({
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'center',
+    alignItems: 'center',
     gap: 8,
     zIndex: 10,
   },
   dot: {
-    width: 10,
-    height: 10,
+    width: 7.91,
+    height: 7.91,
     borderRadius: 100,
     backgroundColor: 'rgba(255,255,255,0.7)',
   },
   activeDot: {
+    width: 11.42,
+    height: 11.42,
     backgroundColor: '#EE2529',
   },
   actionButtons: {
