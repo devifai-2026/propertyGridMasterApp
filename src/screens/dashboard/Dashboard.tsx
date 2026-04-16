@@ -9,7 +9,7 @@ import WhyChooseSection from './components/WhyChooseSection';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
 
 const Dashboard = () => {
-  const { getProperties } = usePropertyAPIs();
+  const { getProperties, loading } = usePropertyAPIs();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(20)).current;
   const [properties, setProperties] = useState<any[]>([]);
@@ -50,7 +50,7 @@ const Dashboard = () => {
             backgroundPosition: 'center',
             backgroundColor: 'rgba(255,255,255,0.3)',
             backgroundBlendMode: 'overlay',
-          }}
+          } as any}
         />
       )}
       <Layout style={{ backgroundColor: 'transparent' }}>
@@ -63,7 +63,7 @@ const Dashboard = () => {
         >
           <Hero />
           <DiscoveryWizard />
-          <FeaturedSection properties={properties} />
+          <FeaturedSection properties={properties} loading={loading} />
           <CategoriesSection />
           <WhyChooseSection />
         </Animated.View>

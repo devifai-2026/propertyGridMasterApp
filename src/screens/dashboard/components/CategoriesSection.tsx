@@ -65,7 +65,9 @@ const CategoryCard = ({
       </View>
       <View style={styles.cardFooter}>
         <View style={styles.countBadge}>
-          <Text style={styles.countText}>{count} Properties Listed</Text>
+          <Text style={styles.countText}>
+            {count} {count === 1 ? 'Property' : 'Properties'} Listed
+          </Text>
         </View>
         <TouchableOpacity
           activeOpacity={0.8}
@@ -123,12 +125,15 @@ const CategoriesSection = () => {
     <View style={styles.outerContainer}>
       <View style={[styles.container, { paddingHorizontal: containerPadding }]}>
         <View style={styles.headerRow}>
+          <View style={{ width: 30 }} /> 
           <Text style={[styles.sectionTitle, { fontSize: isMobile ? 28 : 42 }]}>
-           Explore all Categories 
+            Explore all Categories
           </Text>
-          {loading && <ActivityIndicator color={COLORS.primary} size="small" />}
+          <View style={{ width: 30, alignItems: 'center' }}>
+            {loading && <ActivityIndicator color={COLORS.primary} size="small" />}
+          </View>
         </View>
-        <View style={[styles.grid, { gap, maxWidth: gridWidth, alignSelf: 'center' }]}>
+        <View style={[styles.grid, { gap, rowGap: 30, maxWidth: gridWidth, alignSelf: 'center' }]}>
           {INITIAL_CATEGORIES.map(cat => (
             <CategoryCard
               key={cat.id}
@@ -150,9 +155,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   container: {
-    paddingVertical: 60,
+    paddingVertical: 80,
     width: '100%',
-    maxWidth: '90%',
+    maxWidth: 1200,
   },
   headerRow: {
     flexDirection: 'row',
@@ -173,7 +178,7 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     width: '100%',
   },
   card: {
