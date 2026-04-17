@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   Image,
+  Share,
+  Platform,
 } from 'react-native';
 import download from "../../../../assets/Calculator/download.png"
 import share from "../../../../assets/Calculator/share.png"
@@ -19,6 +21,17 @@ const isDesktop = windowWidth >= 1024;
 const CoverageAnalysis: React.FC = () => {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
+
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: 'Loan Coverage Analysis Report. View year-by-year principal, interest, and coverage ratio projections.',
+        url: Platform.OS === 'web' ? window.location.href : undefined,
+      });
+    } catch (error) {
+      console.error('Error sharing report:', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -87,7 +100,7 @@ const CoverageAnalysis: React.FC = () => {
           <Text style={styles.buttonText}>Download Report</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleShare}>
           <Image source={share} style={styles.buttonIcon} />
           <Text style={styles.buttonText}>Share Report</Text>
         </TouchableOpacity>

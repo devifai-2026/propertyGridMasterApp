@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Platform, Animated } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Platform, Animated, Share } from 'react-native';
 import { MapPin, Phone, Mail, X } from 'lucide-react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import bottom from "../../../assets/ExploreBrokers/bottom.png";
@@ -77,6 +77,17 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
   const backAnimatedStyle = {
     transform: [{ rotateY: backInterpolate }],
     opacity: backOpacity,
+  };
+
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: `Check out this Broker: ${item.agentName} from ${item.name}. Specializes in ${item.tags?.join(', ') || 'Real Estate'}.`,
+        url: Platform.OS === 'web' ? window.location.href : undefined,
+      });
+    } catch (error) {
+      console.error('Error sharing broker:', error);
+    }
   };
 
   return (
@@ -172,45 +183,47 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
             style={[
               styles.rightSection,
               !isMobile
-                ? { flex: 1 }
+                ? { flex: 1, minHeight: '100%' }
                 : { width: '100%', marginTop: isVisibleContact ? 25 : 10 },
             ]}
           >
-            <Text
-              style={[
-                styles.agentName,
-                { fontSize: isMobile ? 24 : 32, textAlign: !isMobile ? 'left' : 'center' },
-              ]}
-            >
-              {capitalize(item.agentName) || "Rajendra P"}
-            </Text>
-            <View
-              style={[
-                styles.locationRow,
-                { justifyContent: !isMobile ? 'flex-start' : 'center' },
-              ]}
-            >
-              <MapPin size={isMobile ? 14 : 18} color="#EE2529" />
-              <Text style={[styles.locationText, isMobile && { fontSize: 14 }]}>{item.location || "Pune"}</Text>
-              <Text style={[styles.reraText, isMobile && { fontSize: 14 }]}>RERA : {item.rera || "123456789"}</Text>
-            </View>
-
-            <View style={styles.divider} />
-
-            <View style={styles.specializationContainer}>
+            <View>
               <Text
                 style={[
-                  styles.specLabel,
-                  { textAlign: !isMobile ? 'left' : 'center' },
+                  styles.agentName,
+                  { fontSize: isMobile ? 24 : 32, textAlign: !isMobile ? 'left' : 'center' },
                 ]}
               >
-                Specializes In:
+                {capitalize(item.agentName) || "Rajendra P"}
               </Text>
-              {(item.tags && item.tags.length > 0 ? item.tags : ['MNC Client', 'Industrial', 'Residential', 'Commercial', 'Office Lease']).map((tag: any, idx: number) => (
-                <View key={idx} style={styles.tag}>
-                  <Text style={[styles.tagText, isMobile && { fontSize: 14 }]}>{tag}</Text>
-                </View>
-              ))}
+              <View
+                style={[
+                  styles.locationRow,
+                  { justifyContent: !isMobile ? 'flex-start' : 'center' },
+                ]}
+              >
+                <MapPin size={isMobile ? 14 : 18} color="#EE2529" />
+                <Text style={[styles.locationText, isMobile && { fontSize: 14 }]}>{item.location || "Pune"}</Text>
+                <Text style={[styles.reraText, isMobile && { fontSize: 14 }]}>RERA : {item.rera || "123456789"}</Text>
+              </View>
+
+              <View style={styles.divider} />
+
+              <View style={styles.specializationContainer}>
+                <Text
+                  style={[
+                    styles.specLabel,
+                    { textAlign: !isMobile ? 'left' : 'center' },
+                  ]}
+                >
+                  Specializes In:
+                </Text>
+                {(item.tags && item.tags.length > 0 ? item.tags : ['MNC Client', 'Industrial', 'Residential', 'Commercial', 'Office Lease']).map((tag: any, idx: number) => (
+                  <View key={idx} style={styles.tag}>
+                    <Text style={[styles.tagText, isMobile && { fontSize: 14 }]}>{tag}</Text>
+                  </View>
+                ))}
+              </View>
             </View>
 
             <View style={styles.statsColumn}>
@@ -236,14 +249,14 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
         />
         
         <View style={[styles.cardContentBack, { padding: isMobile ? 12 : 30 }]}>
-          <View style={styles.backHeader}>
-            <Text style={styles.backAgentName}>{capitalize(item.agentName) || "Rajendra P"}</Text>
-            <Text style={styles.backCompany}>{capitalize(item.name) || "APJ Realtors"}</Text>
+          <View style={[styles.backHeader, isMobile && { flexDirection: 'column', gap: 5, alignItems: 'flex-start' }]}>
+            <Text style={[styles.backAgentName, isMobile && { fontSize: 20 }]}>{capitalize(item.agentName) || "Rajendra P"}</Text>
+            <Text style={[styles.backCompany, isMobile && { fontSize: 14 }]}>{capitalize(item.name) || "APJ Realtors"}</Text>
           </View>
           
-          <View style={styles.backDivider} />
+          <View style={[styles.backDivider, isMobile && { marginVertical: 10 }]} />
           
-          <Text style={styles.backDescription}>
+          <Text style={[styles.backDescription, isMobile && { fontSize: 13, lineHeight: 18 }]}>
             {item.description || `${item.name || "APJ Realtors"} is a dynamic real estate firm dedicated to helping clients find their perfect property. Whether you're buying, selling, or investing, our expert team combines market insight with personalized service to ensure a smooth and successful experience. At APJ, we make your real estate journey our top priority`}
           </Text>
           
@@ -267,7 +280,10 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
             
             <TouchableOpacity 
               style={[styles.shareBtn, isMobile && { paddingVertical: 6, paddingHorizontal: 10 }]}
-              onPress={(e) => e.stopPropagation()}
+              onPress={(e) => {
+                e.stopPropagation();
+                handleShare();
+              }}
             >
               <Image source={share} style={{ width: isMobile ? 14 : 18, height: isMobile ? 14 : 18 }} />
               <Text style={[styles.shareText, isMobile && { fontSize: 13 }]}>Share</Text>
@@ -290,6 +306,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#fff',
+    height: 391,
     borderRadius: 24,
     shadowColor: '#000',
     shadowOffset: { width: 10, height: 10 },
@@ -316,6 +333,7 @@ const styles = StyleSheet.create({
     padding: 30,
     gap: 30,
     zIndex: 2,
+    flex: 1,
   },
   cardContentBack: {
     padding: 30,
@@ -330,7 +348,7 @@ const styles = StyleSheet.create({
   },
   backAgentName: {
     fontSize: 32,
-    fontWeight: '700',
+    fontWeight: '600',
     color: '#EE2529',
     fontFamily: 'Montserrat',
   },
@@ -389,6 +407,7 @@ const styles = StyleSheet.create({
   },
   leftSection: {
     justifyContent: 'space-between',
+    height: '100%',
   },
   brokerCompany: {
     fontSize: 24,
@@ -398,9 +417,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat',
   },
   brokerImage: {
-    width: 140,
-    height: 140,
-    borderRadius: 16,
+    width: 150,
+    height: 150,
+    borderRadius: 20,
     marginBottom: 20,
     backgroundColor: '#f5f5f5',
   },
@@ -413,9 +432,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   contactBtnText: {
-    color: '#fff',
+    color: '#FFFFFF',
     fontWeight: '600',
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: 'Montserrat',
   },
   contactInfoContainer: {
@@ -456,7 +475,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat',
   },
   rightSection: {
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
+    height: '100%',
   },
   agentName: {
     fontSize: 32,
@@ -544,7 +564,7 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: 250,
-    opacity: 1.0,
+    opacity: 0.8,
     zIndex: -1,
   },
   bottomOrnament: {
@@ -553,7 +573,7 @@ const styles = StyleSheet.create({
     right: 0,
     width: 200,
     height: 200,
-    opacity: 1.0,
+    opacity: 0.8,
     zIndex: -1,
   },
 });

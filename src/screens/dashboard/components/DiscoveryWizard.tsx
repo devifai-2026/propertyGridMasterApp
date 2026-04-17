@@ -7,6 +7,7 @@ import {
   useWindowDimensions,
   StyleSheet,
   Dimensions,
+  Platform,
 } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -65,7 +66,7 @@ const StepCard = ({
         activeOpacity={0.7}
       >
         <IconComponent
-          size={isMobile ? 20 : 26}
+          size={35}
           color={active ? '#EE2529' : '#767676'}
           style={styles.stepIcon}
         />
@@ -73,7 +74,7 @@ const StepCard = ({
           style={[
             styles.stepLabel,
             active && styles.stepLabelActive,
-            { fontSize: isMobile ? 12 : 18 },
+            { fontSize: isMobile ? 11 : 16 },
           ]}
         >
           {item.label}
@@ -87,6 +88,51 @@ const StepCard = ({
         ]}
       />
     </View>
+  );
+};
+
+const WizardOption = ({ label, isSelected, onPress, isMobile, width }: any) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const isWeb = Platform.OS === 'web';
+
+  return (
+    <LinearGradient
+      colors={['#F2F2F2', '#FFFFFF']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={[
+        styles.cityOption,
+        isMobile && { width: (width - (isMobile ? 160 : 120)) / 2 },
+        isSelected && styles.cityOptionSelected,
+        (isHovered && !isSelected) && {
+          shadowColor: COLORS.primary,
+          shadowOffset: { width: -3, height: 4 },
+          shadowOpacity: 0.35,
+          shadowRadius: 8,
+          elevation: 6,
+        }
+      ]}
+      {...(isWeb ? {
+        onMouseEnter: () => setIsHovered(true),
+        onMouseLeave: () => setIsHovered(false),
+      } : {})}
+    >
+      <TouchableOpacity
+        style={styles.cityOptionInner}
+        onPress={onPress}
+        activeOpacity={0.7}
+      >
+        <Text
+          style={[
+            styles.cityOptionText,
+            isSelected && styles.cityOptionTextSelected,
+            isMobile && { fontSize: 13 },
+          ]}
+        >
+          {label}
+        </Text>
+      </TouchableOpacity>
+    </LinearGradient>
   );
 };
 
@@ -189,57 +235,18 @@ const DiscoveryWizard = () => {
       <View style={[styles.wizardOptions, isMobile && { gap: 10 }]}>
         {currentOptions.map((opt: any) => {
           const label = opt.label || opt;
-          const value = opt.value || opt;
           const isSelected =
             JSON.stringify(currentSelection) === JSON.stringify(opt);
 
           return (
-            // <TouchableOpacity
-            //   key={label}
-            //   style={[
-            //     styles.cityOption,
-            //     isMobile && { width: (width - (isMobile ? 40 : 120) - 10) / 2 },
-            //     isSelected && styles.cityOptionSelected,
-            //   ]}
-            //   onPress={() => handleSelection(opt)}
-            // >
-            //   <Text
-            //     style={[
-            //       styles.cityOptionText,
-            //       isSelected && styles.cityOptionTextSelected,
-            //       isMobile && { fontSize: 16 },
-            //     ]}
-            //   >
-            //     {label}
-            //   </Text>
-            // </TouchableOpacity>
-            <LinearGradient
+            <WizardOption
               key={label}
-              colors={['#F2F2F2', '#FFFFFF']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
-              style={[
-                styles.cityOption,
-                isMobile && { width: (width - (isMobile ? 160 : 120)) / 2 }, 
-                isSelected && styles.cityOptionSelected,
-              ]}
-            >
-              <TouchableOpacity
-                style={styles.cityOptionInner}
-                onPress={() => handleSelection(opt)}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.cityOptionText,
-                    isSelected && styles.cityOptionTextSelected,
-                    isMobile && { fontSize: 13 },
-                  ]}
-                >
-                  {label}
-                </Text>
-              </TouchableOpacity>
-            </LinearGradient>
+              label={label}
+              isSelected={isSelected}
+              onPress={() => handleSelection(opt)}
+              isMobile={isMobile}
+              width={width}
+            />
           );
         })}
       </View>
@@ -386,8 +393,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     borderRadius: 16,
     alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingTop: 24,
+    justifyContent: 'center',
     borderTopWidth: 5,
     borderTopColor: '#666',
     borderLeftWidth: 1,
@@ -556,9 +562,9 @@ cityOptionInner: {
     backgroundColor:'white',
   },
   skipBtnText: {
-    fontFamily: FONTS.main,
-    color: '#666',
-    fontSize: 15,
+    fontFamily: 'Montserrat',
+    color: '#767676',
+    fontSize: 18,
     fontWeight: '500',
   },
   showPropertiesBtn: {
@@ -575,9 +581,9 @@ cityOptionInner: {
     elevation: 4,
   },
   showPropertiesText: {
-    fontFamily: FONTS.main,
-    color: '#FFF',
-    fontSize: 15,
+    fontFamily: 'Montserrat',
+    color: '#FFFFFF',
+    fontSize: 18,
     fontWeight: '600',
   },
   

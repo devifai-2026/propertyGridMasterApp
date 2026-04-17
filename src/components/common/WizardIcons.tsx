@@ -20,7 +20,7 @@ export const CitiesIcon = ({ color, size, style }: IconProps) => (
 );
 
 export const AnnualReturnsIcon = ({ color, size, style }: IconProps) => (
-  <Svg width={size} height={size} viewBox="0 0 38 38" fill="none" style={style}>
+  <Svg width={size} height={size} viewBox="-2 -2 42 42" fill="none" style={style}>
     <Path d="M34.4989 2.99805L2.99805 34.4989" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
     <Path d="M7.37517 13.5003C10.758 13.5003 13.5003 10.758 13.5003 7.37517C13.5003 3.99233 10.758 1.25 7.37517 1.25C3.99233 1.25 1.25 3.99233 1.25 7.37517C1.25 10.758 3.99233 13.5003 7.37517 13.5003Z" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
     <Path d="M30.1252 36.2503C33.508 36.2503 36.2503 33.508 36.2503 30.1252C36.2503 26.7423 33.508 24 30.1252 24C26.7423 24 24 26.7423 24 30.1252C24 33.508 26.7423 36.2503 30.1252 36.2503Z" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -28,20 +28,20 @@ export const AnnualReturnsIcon = ({ color, size, style }: IconProps) => (
 );
 
 export const PropertyTypeIcon = ({ color, size, style }: IconProps) => (
-  <Svg width={size} height={size} viewBox="359 31 35 35" fill="none" style={style}>
+  <Svg width={size} height={size} viewBox="355 29 43 43" fill="none" style={style}>
     <Path d="M371.727 66V53.8265H381.273V66H394V47.7398C394 47.5399 393.959 47.3419 393.879 47.1572C393.799 46.9725 393.682 46.8046 393.535 46.6632L377.626 31.4463C377.478 31.3048 377.302 31.1926 377.109 31.116C376.916 31.0394 376.709 31 376.5 31C376.291 31 376.084 31.0394 375.891 31.116C375.698 31.1926 375.522 31.3048 375.374 31.4463L359.465 46.6632C359.318 46.8046 359.201 46.9725 359.121 47.1572C359.041 47.3419 359 47.5399 359 47.7398V66H371.727Z" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
   </Svg>
 );
 
 export const BudgetIcon = ({ color, size, style }: IconProps) => (
-  <Svg width={size} height={size} viewBox="0 0 24 38" fill="none" style={style}>
+  <Svg width={size} height={size} viewBox="-9 -2 42 42" fill="none" style={style}>
     <Path d="M11.9199 1.15039V36.1504" stroke={color} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" />
     <Path d="M21.3427 11.9192C21.3427 11.0353 21.1686 10.1601 20.8303 9.34349C20.4921 8.52688 19.9963 7.78488 19.3713 7.15987C18.7463 6.53486 18.0043 6.03908 17.1877 5.70083C16.3711 5.36257 15.4958 5.18848 14.6119 5.18848H9.22731C7.4422 5.18848 5.73021 5.89761 4.46794 7.15987C3.20568 8.42214 2.49654 10.1341 2.49654 11.9192C2.49654 13.7044 3.20568 15.4164 4.46794 16.6786C5.73021 17.9409 7.4422 18.65 9.22731 18.65H15.9581C17.7432 18.65 19.4552 19.3591 20.7175 20.6214C21.9797 21.8837 22.6889 23.5957 22.6889 25.3808C22.6889 27.1659 21.9797 28.8779 20.7175 30.1402C19.4552 31.4024 17.7432 32.1116 15.9581 32.1116H7.88116C6.09605 32.1116 4.38405 31.4024 3.12179 30.1402C1.85952 28.8779 1.15039 27.1659 1.15039 25.3808" stroke={color} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" />
   </Svg>
 );
 
 export const TenantTypeIcon = ({ color, size, style }: IconProps) => (
-  <Svg width={size} height={size} viewBox="0 0 58 38" fill="none" style={style}>
+  <Svg width={size} height={size} viewBox="0 -10 58 58" fill="none" style={style}>
     <Path d="M19.1764 26.5266C26.1564 26.5266 31.8147 20.8683 31.8147 13.8883C31.8147 6.90837 26.1564 1.25 19.1764 1.25C12.1965 1.25 6.53809 6.90837 6.53809 13.8883C6.53809 20.8683 12.1965 26.5266 19.1764 26.5266Z" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
     <Path d="M1.25 36.2454C3.19214 33.2593 5.84937 30.8055 8.98044 29.1069C12.1115 27.4083 15.6173 26.5186 19.1794 26.5186C22.7416 26.5186 26.2473 27.4083 29.3784 29.1069C32.5094 30.8055 35.1667 33.2593 37.1088 36.2454" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
     <Path d="M38.3105 26.5283C41.8725 26.5262 45.3785 27.4145 48.5098 29.1124C51.6411 30.8102 54.2983 33.2638 56.24 36.2501" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -50,7 +50,7 @@ export const TenantTypeIcon = ({ color, size, style }: IconProps) => (
 );
 
 export const TenureLeftIcon = ({ color, size, style }: IconProps) => (
-  <Svg width={size} height={size} viewBox="0 0 38 38" fill="none" style={style}>
+  <Svg width={size} height={size} viewBox="-2 -2 42 42" fill="none" style={style}>
     <Path d="M18.75 36.25C28.415 36.25 36.25 28.415 36.25 18.75C36.25 9.08502 28.415 1.25 18.75 1.25C9.08502 1.25 1.25 9.08502 1.25 18.75C1.25 28.415 9.08502 36.25 18.75 36.25Z" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
     <Path d="M18.75 8.53906V18.7474H28.9583" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
   </Svg>

@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   Image,
+  Share,
+  Platform,
 } from 'react-native';
 import download from "../../../../assets/Calculator/download.png"
 import share from "../../../../assets/Calculator/share.png"
@@ -86,6 +88,17 @@ const RentalDetailsCashflow = ({ data }: RentalDetailsCashflowProps) => {
 
   const cashFlowDetails = calculateDetailedCashflow();
 
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: `Property Investment Detailed Cashflow Projections Report. 10-Year Net Income projection starts at ${cashFlowDetails[0]?.netCashFlow || 'N/A'}.`,
+        url: Platform.OS === 'web' ? window.location.href : undefined,
+      });
+    } catch (error) {
+      console.error('Error sharing report:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.heading}>Detailed Cashflow Projections</Text>
@@ -143,7 +156,7 @@ const RentalDetailsCashflow = ({ data }: RentalDetailsCashflowProps) => {
                <Text style={styles.buttonText}>Download Report</Text>
              </TouchableOpacity>
      
-             <TouchableOpacity style={styles.button}>
+             <TouchableOpacity style={styles.button} onPress={handleShare}>
                <Image source={share} style={styles.buttonIcon} />
                <Text style={styles.buttonText}>Share Report</Text>
              </TouchableOpacity>

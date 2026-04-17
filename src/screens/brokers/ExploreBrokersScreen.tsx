@@ -36,7 +36,11 @@ const ExploreBrokersScreen = () => {
   const fetchBrokers = (page: number = 1, sort: string = sortBy) => {
     getBrokers(
       (data: any[], meta?: any) => {
-        setBrokers(data);
+        if (page === 1) {
+          setBrokers(data);
+        } else {
+          setBrokers(prev => [...prev, ...data]);
+        }
         if (meta && meta.pagination) {
           setPagination(meta.pagination);
         }
@@ -57,12 +61,18 @@ const ExploreBrokersScreen = () => {
     setSortBy(nextSort);
   };
 
-  const handlePageChange = (page: number) => {
-    fetchBrokers(page, sortBy);
+  const handleScroll = (event: any) => {
+    const { layoutMeasurement, contentOffset, contentSize } = event.nativeEvent;
+    const isCloseToBottom =
+      layoutMeasurement.height + contentOffset.y >= contentSize.height - 200;
+
+    if (isCloseToBottom && pagination.hasNextPage && !loading) {
+      fetchBrokers(pagination.currentPage + 1, sortBy);
+    }
   };
 
   return (
-    <Layout>
+    <Layout onScroll={handleScroll} scrollEventThrottle={16}>
       <View style={{ flex: 1 }}>
         <Image 
           source={bg} 
@@ -76,7 +86,7 @@ const ExploreBrokersScreen = () => {
             onToggleSort={toggleSort}
           />
 
-          {loading ? (
+          {loading && brokers.length === 0 ? (
             <View style={styles.centerContainer}>
               <ActivityIndicator size="large" color="#EE2529" />
               <Text style={styles.loadingText}>
@@ -90,37 +100,40 @@ const ExploreBrokersScreen = () => {
               </Text>
             </View>
           ) : (
-            <View
-              style={[
-                styles.gridContainer,
-                {
-                  flexDirection: 'row',
-                  flexWrap: 'wrap',
-                  justifyContent: 'space-between',
-                },
-              ]}
-            >
-              {brokers.map(item => (
-                <BrokerCard
-                  key={item.id}
-                  item={item}
-                  isMobile={isMobile}
-                  isDesktop={isDesktop}
-                  isVisibleContact={visibleContactId === item.id}
-                  onToggleContact={() =>
-                    setVisibleContactId(
-                      visibleContactId === item.id ? null : item.id,
-                    )
-                  }
-                />
-              ))}
-            </View>
+            <>
+              <View
+                style={[
+                  styles.gridContainer,
+                  {
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    justifyContent: 'space-between',
+                  },
+                ]}
+              >
+                {brokers.map(item => (
+                  <BrokerCard
+                    key={item.id}
+                    item={item}
+                    isMobile={isMobile}
+                    isDesktop={isDesktop}
+                    isVisibleContact={visibleContactId === item.id}
+                    onToggleContact={() =>
+                      setVisibleContactId(
+                        visibleContactId === item.id ? null : item.id,
+                      )
+                    }
+                  />
+                ))}
+              </View>
+              
+              {loading && brokers.length > 0 && (
+                <View style={{ paddingVertical: 20 }}>
+                  <ActivityIndicator size="small" color="#EE2529" />
+                </View>
+              )}
+            </>
           )}
-
-          <BrokerPagination
-            pagination={pagination}
-            onPageChange={handlePageChange}
-          />
         </View>
       </View>
     </Layout>
@@ -155,7 +168,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     color: '#888',
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '400',
   },
   emptyText: {
     color: '#999',

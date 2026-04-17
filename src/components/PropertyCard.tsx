@@ -9,6 +9,7 @@ import {
   DimensionValue,
   Platform,
   useWindowDimensions,
+  Share,
 } from 'react-native';
 import {
   MapPin,
@@ -132,6 +133,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     });
   };
 
+  const handleShare = async () => {
+    try {
+      await Share.share({
+        message: `Check out this property: ${item.title} at ${item.location}. Price: ${item.price}, ROI: ${item.roi}%`,
+        url: Platform.OS === 'web' ? window.location.href : undefined,
+      });
+    } catch (error) {
+      console.error('Error sharing property:', error);
+    }
+  };
+
   // if (!user) {
   //   return (
   //     <TouchableOpacity
@@ -228,7 +240,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
         {/* Share and Favorite Buttons */}
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.iconButton}>
+          <TouchableOpacity style={styles.iconButton} onPress={handleShare}>
             <ShareIcon width={19.35} height={16.67} color={COLORS.white} />
           </TouchableOpacity>
           {user && (
