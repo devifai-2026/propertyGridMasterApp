@@ -18,17 +18,20 @@ const BrokerHeader: React.FC<BrokerHeaderProps> = ({
       <View style={styles.headerContent}>
         <View>
           <Text style={styles.headerTitle}>
-            <Text style={{ color: '#EE2529', fontWeight: '800' }}>
+            <Text style={{ color: '#EE2529', fontWeight: '800', fontFamily: 'Montserrat' }}>
               {totalCount}
             </Text>{' '}
-            <Text style={{ color: '#EE2529' }}>Agents</Text> available for you
+            <Text style={{ color: '#EE2529', fontFamily: 'Montserrat' }}>Agents</Text>{' '}
+            <Text style={{ fontWeight: '400', color: '#767676', fontFamily: 'Montserrat' }}>
+              available for you
+            </Text>
           </Text>
         
         </View>
         <TouchableOpacity style={styles.sortContainer} onPress={onToggleSort}>
           <Text style={styles.sortLabel}>
             Sort by:{' '}
-            <Text style={{ color: '#EE2529', fontWeight: '600' }}>
+            <Text style={{ color: '#EE2529', fontWeight: '600', fontFamily: 'Montserrat' }}>
               {sortBy === 'name_asc' ? 'A-Z' : 'Most Listed'}
             </Text>
           </Text>
@@ -67,6 +70,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1a1a1a',
     letterSpacing: -0.5,
+    fontFamily: 'Montserrat',
   },
   headerSubtitle: {
     fontSize: 14,

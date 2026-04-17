@@ -56,9 +56,7 @@ const Hero = () => {
           },
         ]}
       >
-        PreleaseGrid offers carefully curated pre-leased properties designed to
-        deliver steady, reliable income — with verified assets, trusted tenants,
-        and zero management hassle.
+      PreleaseGrid offers carefully curated pre-leased properties designed to deliver steady, reliable income — with verified assets, trusted tenants, and zero management hassle.
       </Text>
 
       <TouchableOpacity
@@ -128,8 +126,8 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.main,
     color: '#262626',
     textAlign: 'center',
-    lineHeight: 20,
-    maxWidth: 600,
+    lineHeight: 24,
+    maxWidth: 700,
     marginBottom: 30,
     fontWeight: '400',
     fontSize:18,
@@ -148,9 +146,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     borderRadius: 100,
-    width:189,
+    width:170,
     height:59,
   },
   getStartedText: {

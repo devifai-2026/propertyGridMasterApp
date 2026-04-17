@@ -536,9 +536,11 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
 interface LayoutProps {
   children: ReactNode;
   style?: any;
+  onScroll?: (event: any) => void;
+  scrollEventThrottle?: number;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, style }) => {
+const Layout: React.FC<LayoutProps> = ({ children, style, onScroll, scrollEventThrottle }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isLoggedIn, user, logout } = useAuth();
   const { navigate, openLoginModal } = useNavigation();
@@ -565,6 +567,8 @@ const Layout: React.FC<LayoutProps> = ({ children, style }) => {
 
       <ScrollView
         style={{ backgroundColor: 'transparent' }}
+        onScroll={onScroll}
+        scrollEventThrottle={scrollEventThrottle || 16}
         contentContainerStyle={[
           styles.scrollContent,
           { paddingTop: Platform.OS === 'web' ? 120 : 100 },

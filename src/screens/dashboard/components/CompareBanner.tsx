@@ -8,9 +8,11 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native';
-import { X, AlertCircle, Image as LucideImage } from 'lucide-react-native';
+import { X, AlertCircle, Image as LucideImage, MapPin } from 'lucide-react-native';
 import { COLORS } from '../../../constants/theme';
+import LinearGradient from 'react-native-linear-gradient';
 import { Property } from '../../../components/PropertyCard';
+import warning from "../../../assets/ExploreProperties/warning.png"
 
 interface CompareBannerProps {
   selectedProperties: Property[];
@@ -34,19 +36,19 @@ const CompareBanner: React.FC<CompareBannerProps> = ({
           <Text style={styles.bannerCount}>
             {selectedProperties.length} of 3 added
           </Text>
+          {selectedProperties.length === 1 && (
+            <View style={styles.headerWarning}>
+              <Image source={warning} style={{ width: 14, height: 14 }} />
+              <Text style={styles.headerWarningText}>Add 2 properties to compare</Text>
+            </View>
+          )}
         </View>
         <TouchableOpacity onPress={onClear} style={styles.clearBtn}>
-          <Text style={styles.clearText}>Clear all</Text>
           <X size={16} color="#666" />
         </TouchableOpacity>
       </View>
 
-      {selectedProperties.length === 1 && (
-        <View style={styles.warningContainer}>
-          <AlertCircle size={14} color="#D32F2F" />
-          <Text style={styles.warningText}>Add 2 properties to compare</Text>
-        </View>
-      )}
+
 
       <View style={styles.bannerContent}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -72,15 +74,18 @@ const CompareBanner: React.FC<CompareBannerProps> = ({
                   <Text numberOfLines={1} style={styles.selectedTitle}>
                     {prop.title}
                   </Text>
-                  <Text numberOfLines={1} style={styles.selectedLoc}>
-                    {prop.location}
-                  </Text>
+                  <View style={styles.locationContainer}>
+                    <MapPin size={10} color="#EF4444" style={{ marginRight: 2 }} />
+                    <Text numberOfLines={1} style={styles.selectedLoc}>
+                      {prop.location}
+                    </Text>
+                  </View>
                 </View>
                 <TouchableOpacity
                   style={styles.removeBtn}
                   onPress={() => onRemove(prop.id)}
                 >
-                  <X size={12} color="#999" />
+                  <X size={10} color="#FFF" />
                 </TouchableOpacity>
               </View>
             ))}
@@ -93,16 +98,28 @@ const CompareBanner: React.FC<CompareBannerProps> = ({
         </ScrollView>
 
         <TouchableOpacity
-          style={[
-            styles.compareActionBtn,
-            selectedProperties.length < 2 && styles.compareActionDisabled,
-          ]}
           onPress={onCompare}
           disabled={selectedProperties.length < 2}
+          activeOpacity={0.8}
         >
-          <Text style={styles.compareActionText}>
-            Compare ({selectedProperties.length})
-          </Text>
+          {selectedProperties.length < 2 ? (
+            <View style={[styles.compareActionBtn, styles.compareActionDisabled]}>
+              <Text style={styles.compareActionText}>
+                Compare ({selectedProperties.length})
+              </Text>
+            </View>
+          ) : (
+            <LinearGradient
+              colors={['#EE2529', '#C73834']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.compareActionBtn}
+            >
+              <Text style={styles.compareActionText}>
+                Compare ({selectedProperties.length})
+              </Text>
+            </LinearGradient>
+          )}
         </TouchableOpacity>
       </View>
     </View>
@@ -115,7 +132,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     width: '100%',
-    maxWidth: 800,
+    maxWidth: 1300,
+    height: 180,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
@@ -147,6 +165,23 @@ const styles = StyleSheet.create({
   bannerCount: {
     fontSize: 14,
     color: '#333',
+    fontFamily: 'Montserrat',
+  },
+  headerWarning: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF0F0',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+    gap: 6,
+    marginLeft: 8,
+  },
+  headerWarningText: {
+    color: '#D32F2F',
+    fontSize: 12,
+    fontWeight: '500',
+    fontFamily: 'Montserrat',
   },
   clearBtn: {
     flexDirection: 'row',
@@ -179,22 +214,28 @@ const styles = StyleSheet.create({
   selectedList: {
     flexDirection: 'row',
     gap: 12,
+    padding: 10,
   },
   selectedItem: {
-    width: 200,
+    width: 350,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FAFAFA',
-    borderRadius: 8,
-    padding: 6,
-    borderWidth: 1,
-    borderColor: '#EEE',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 10,
+    height: 90,
+    
     position: 'relative',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.20,
+    shadowRadius: 8,
+    elevation: 3,
   },
   selectedThumb: {
-    width: 50,
-    height: 40,
-    borderRadius: 4,
+    width: 85,
+    height: 60,
+    
     backgroundColor: '#DDD',
   },
   selectedInfo: {
@@ -202,20 +243,37 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   selectedTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#333',
+    fontSize: 18,
+    fontWeight: '400',
+    color: '#262626',
+    fontFamily: 'Montserrat',
+    marginBottom:12,
   },
   selectedLoc: {
-    fontSize: 11,
-    color: '#888',
+    fontSize: 14,
+    color: '#262626',
+    fontWeight: '400',
+    fontFamily: 'Montserrat',
+  },
+  locationContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   removeBtn: {
-    padding: 4,
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    backgroundColor: '#767676',
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
   },
   emptySlot: {
-    width: 120,
-    height: 52,
+    width: 350,
+    height: 90,
     borderWidth: 1,
     borderColor: '#DDD',
     borderStyle: 'dashed',
@@ -228,18 +286,21 @@ const styles = StyleSheet.create({
     color: '#AAA',
   },
   compareActionBtn: {
-    backgroundColor: COLORS.primary,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 5,
+    minWidth: 120,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   compareActionDisabled: {
     backgroundColor: '#CCC',
   },
   compareActionText: {
-    color: COLORS.white,
-    fontWeight: '700',
-    fontSize: 14,
+    color: '#F2F2F2',
+    fontWeight: '600',
+    fontSize: 18,
+     fontFamily: 'Montserrat',
   },
 });
 

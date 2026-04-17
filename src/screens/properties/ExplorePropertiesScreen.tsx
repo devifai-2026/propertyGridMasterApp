@@ -39,6 +39,7 @@ import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/useProperty
 import { COLORS } from '../../constants/theme';
 import NoPropertiesFound from './components/NoPropertiesFound';
 import ReachedTheEnd from './components/ReachedTheEnd';
+import filter from "../../assets/ExploreProperties/filter.png"
 
 declare const window: any;
 
@@ -72,6 +73,7 @@ const ExplorePropertiesScreen = () => {
       roi: '',
       tenure: '',
       city: '',
+      proximity: [] as string[],
     };
     let hasParams = false;
 
@@ -217,14 +219,14 @@ const ExplorePropertiesScreen = () => {
 
   const handleClearCompare = () => setSelectedProperties([]);
 
-  const handleCompareAction = () => {
+  const handleCompare = () => {
     if (selectedProperties.length < 2) return;
     const ids = selectedProperties.map(p => p.id).join(',');
     navigate(`/compare/${ids}`);
   };
 
   const [showFilters, setShowFilters] = useState(false);
-  const [showDesktopFilters, setShowDesktopFilters] = useState(true);
+  const [showDesktopFilters, setShowDesktopFilters] = useState(false);
   const [activeTab, setActiveTab] = useState<
     'location' | 'pricing' | 'unit' | 'roi' | 'tenure' | 'rent'
   >('location');
@@ -1056,7 +1058,7 @@ const ExplorePropertiesScreen = () => {
               {/* Left Text */}
               <View>
                 <Text style={styles.filterTitleText}>
-                  <Text style={{ color: '#EE2529', fontWeight: 'bold' }}>
+                  <Text style={{ color: '#EE2529', fontWeight: 'bold', fontFamily: 'Montserrat' }}>
                     Properties
                   </Text>{' '}
                   found based on your above search criteria.
@@ -1077,16 +1079,16 @@ const ExplorePropertiesScreen = () => {
                   }}
                   style={styles.filterToggleBtn}
                 >
-                  {(width > 768 ? showDesktopFilters : showFilters) ? (
-                    <X size={16} color="#333" />
-                  ) : (
-                    <Filter size={16} color="#EE2529" />
-                  )}
                   <Text style={styles.filterToggleText}>
                     {(width > 768 ? showDesktopFilters : showFilters)
                       ? 'Close Filters'
                       : 'Advance Filters'}
                   </Text>
+                  {(width > 768 ? showDesktopFilters : showFilters) ? (
+                    <X size={16} color="#333" />
+                  ) : (
+                    <Image source={filter} style={{ width: 15, height: 14 }} />
+                  )}
                 </TouchableOpacity>
 
                 <View
@@ -1096,7 +1098,7 @@ const ExplorePropertiesScreen = () => {
                     gap: 10,
                   }}
                 >
-                  <Text style={{ fontSize: 14, color: '#666' }}>Sort by:</Text>
+                  <Text style={{ fontSize: 14, color: '#666', fontFamily: 'Montserrat' }}>Sort by:</Text>
                   <TouchableOpacity style={styles.sortBtn}>
                     <Text style={styles.sortBtnText}>A-Z</Text>
                     <ChevronDown size={14} color="#EE2529" />
@@ -1105,6 +1107,17 @@ const ExplorePropertiesScreen = () => {
               </View>
             </View>
           </View>
+          
+          {selectedProperties.length > 0 && (
+            <View style={styles.compareBannerContainer}>
+              <CompareBanner
+                selectedProperties={selectedProperties}
+                onClear={handleClearCompare}
+                onRemove={handleRemoveCompare}
+                onCompare={handleCompare}
+              />
+            </View>
+          )}
 
           {/* Content Area: Either show the No Results component OR the Filters + Results grid */}
           {properties.length === 0 && !apiLoading ? (
@@ -1193,7 +1206,8 @@ const ExplorePropertiesScreen = () => {
                 </View>
               )}
 
-              <View style={[styles.gridContainer, { justifyContent: 'center' }]}>
+              <View style={{ backgroundColor: '#F2F2F2', paddingVertical: 40, width: '100%' }}>
+                <View style={[styles.gridContainer, { justifyContent: 'center' }]}>
                 {properties.map((property, index) => {
                   // Special Card Logic (Index 7)
                   if (index === 7) {
@@ -1340,6 +1354,7 @@ const ExplorePropertiesScreen = () => {
                   }} 
                 />
               )}
+              </View>
             </>
           )}
         </View>
@@ -1443,7 +1458,7 @@ const ExplorePropertiesScreen = () => {
 const styles = StyleSheet.create({
   container: {
     paddingBottom: 40,
-    backgroundColor: '#F9F9F9',
+   
     minHeight: '100%',
   },
   stickyBanner: {
@@ -1508,10 +1523,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     color: '#333',
+    fontFamily: 'Montserrat',
   },
   selectedItemLocation: {
     fontSize: 10,
     color: '#666',
+    fontFamily: 'Montserrat',
   },
   removeBtn: {
     position: 'absolute',
@@ -1541,10 +1558,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 14,
+    fontFamily: 'Montserrat',
   },
   contentContainer: {
-    padding: 20,
-    marginTop: 0, // Adjusted if banner is persistent
+    marginTop: 0, 
   },
   headerRow: {
     marginBottom: 20,
@@ -1555,6 +1572,7 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 18,
     color: '#333',
+    fontFamily: 'Montserrat',
   },
   gridContainer: {
     flexDirection: 'row',
@@ -1594,12 +1612,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     marginBottom: 10,
+    fontFamily: 'Montserrat',
   },
   specialTextLarge: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#262626',
     marginBottom: 20,
+    fontFamily: 'Montserrat',
   },
   contactExpertBtn: {
     backgroundColor: '#EE2529',
@@ -1610,6 +1630,7 @@ const styles = StyleSheet.create({
   contactExpertText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontFamily: 'Montserrat',
   },
   imageContainer: {
     height: 250,
@@ -1658,6 +1679,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     left: 20,
     top: 6,
+    fontFamily: 'Montserrat',
   },
   imageOverlayTop: {
     position: 'absolute',
@@ -1689,6 +1711,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#767676',
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
   compareActionBtn: {
     flexDirection: 'row',
@@ -1711,6 +1734,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     color: '#EE2529',
+    fontFamily: 'Montserrat',
   },
   cardContent: {
     padding: 15,
@@ -1720,6 +1744,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 5,
     color: '#333',
+    fontFamily: 'Montserrat',
   },
   locationRow: {
     flexDirection: 'row',
@@ -1730,6 +1755,7 @@ const styles = StyleSheet.create({
   locationText: {
     fontSize: 14,
     color: '#666',
+    fontFamily: 'Montserrat',
   },
   statsRow: {
     flexDirection: 'row',
@@ -1744,10 +1770,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#767676',
     marginBottom: 2,
+    fontFamily: 'Montserrat',
   },
   statValue: {
     color: '#333',
     fontWeight: 'bold',
+    fontFamily: 'Montserrat',
   },
   roiBadge: {
     backgroundColor: '#F8F9FA', // Gradient effect simulated
@@ -1763,11 +1791,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#333',
     fontWeight: 'bold',
+    fontFamily: 'Montserrat',
   },
   roiValue: {
     fontSize: 16,
     color: '#EE2529',
     fontWeight: 'bold',
+    fontFamily: 'Montserrat',
   },
   cardActions: {
     flexDirection: 'row',
@@ -1784,6 +1814,7 @@ const styles = StyleSheet.create({
   viewBtnText: {
     color: '#666',
     fontWeight: 'bold',
+    fontFamily: 'Montserrat',
   },
   enquireBtn: {
     flex: 1,
@@ -1795,6 +1826,7 @@ const styles = StyleSheet.create({
   enquireBtnText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontFamily: 'Montserrat',
   },
   // Filter Styles
   filterHeader: {
@@ -1827,6 +1859,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#767676',
     fontWeight: '700',
+    fontFamily: 'Montserrat',
   },
   filterActions: {
     flexDirection: 'row',
@@ -1836,26 +1869,30 @@ const styles = StyleSheet.create({
   filterToggleBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'center',
+    width: 158,
+    height: 32,
+    gap: 14,
     backgroundColor: '#fff',
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: '#767676',
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 6,
   },
   filterToggleText: {
-    fontSize: 14,
-    color: '#333',
-    fontWeight: '600',
+    fontSize: 12,
+    color: '#767676',
+    fontWeight: '400',
+    lineHeight: 17,
+    fontFamily: 'Montserrat',
   },
   sortBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
     backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ccc',
+    
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 6,
@@ -1864,6 +1901,7 @@ const styles = StyleSheet.create({
     color: '#EE2529',
     fontWeight: 'bold',
     fontSize: 14,
+    fontFamily: 'Montserrat',
   },
   // Desktop Filter Panel
   desktopFilterPanel: {
@@ -1889,13 +1927,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#EE2529',
+    fontFamily: 'Montserrat',
   },
   filterTabs: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    
     width: '100%',
   },
   filterTabItem: {
@@ -1907,12 +1945,14 @@ const styles = StyleSheet.create({
   },
   activeFilterTab: {
     borderBottomColor: '#EE2529',
+   
   },
   filterTabText: {
     fontSize: 18,
     color: '#333',
     fontWeight: '700',
     textAlign: 'center',
+    fontFamily: 'Montserrat',
   },
   activeFilterTabText: {
     color: '#EE2529',
@@ -1930,6 +1970,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#262626',
     flex: 1,
+    fontFamily: 'Montserrat',
   },
   filterContentArea: {
     minHeight: 100,
@@ -1942,6 +1983,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#262626',
     marginBottom: 20,
+    fontFamily: 'Montserrat',
   },
   sliderContainer: {
     paddingHorizontal: 10,
@@ -1953,6 +1995,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#262626',
+    fontFamily: 'Montserrat',
   },
   sliderTrackContainer: {
     flex: 1,
@@ -2009,6 +2052,7 @@ const styles = StyleSheet.create({
     color: '#999',
     marginBottom: 15,
     paddingLeft: 5,
+    fontFamily: 'Montserrat',
   },
   priceInputGrid: {
     flexDirection: 'row',
@@ -2024,6 +2068,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#262626',
     marginBottom: 8,
+    fontFamily: 'Montserrat',
   },
   inputWrapper: {
     position: 'relative',
@@ -2038,6 +2083,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#262626',
     fontWeight: '500',
+    fontFamily: 'Montserrat',
   },
   stepperIcons: {
     position: 'absolute',
@@ -2068,6 +2114,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     backgroundColor: '#fff',
+    fontFamily: 'Montserrat',
   },
   filterDash: {
     fontSize: 20,
@@ -2082,7 +2129,7 @@ const styles = StyleSheet.create({
     width: '30%',
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 5,
     padding: 5,
     ...Platform.select({
       web: {
@@ -2111,6 +2158,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#262626',
     fontWeight: '400',
+    fontFamily: 'Montserrat',
     ...Platform.select({
       web: {
         '@media (max-width: 768px)': {
@@ -2160,6 +2208,7 @@ const styles = StyleSheet.create({
   btnText: {
     fontWeight: '600',
     fontSize: 14,
+    fontFamily: 'Montserrat',
   },
   // Mobile Filter Drawer
   mobileFilterOverlay: {
@@ -2209,6 +2258,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
   mobileActiveTabText: {
     color: '#EE2529',
@@ -2250,6 +2300,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#333',
+    fontFamily: 'Montserrat',
   },
   pageBtnTextDisabled: {
     color: '#ccc',
@@ -2277,15 +2328,18 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
     fontWeight: '500',
+    fontFamily: 'Montserrat',
   },
   activePageNumberText: {
     color: '#fff',
     fontWeight: '700',
+    fontFamily: 'Montserrat',
   },
   paginationEllipsis: {
     color: '#666',
     fontSize: 16,
     paddingHorizontal: 5,
+    fontFamily: 'Montserrat',
   },
   descInfoBox: {
     backgroundColor: '#F7F7F7',
@@ -2297,6 +2351,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#6E6E6E',
     lineHeight: 18,
+    fontFamily: 'Montserrat',
   },
 });
 

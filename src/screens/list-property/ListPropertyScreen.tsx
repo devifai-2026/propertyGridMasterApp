@@ -9,6 +9,7 @@ import {
   Platform,
   useWindowDimensions,
   ImageBackground,
+  Image,
 } from 'react-native';
 import {
   User,
@@ -39,6 +40,7 @@ import LeaseDetails from './components/LeaseDetails';
 import FinancialDetails from './components/FinancialDetails';
 import { FONTS } from '../../constants/theme';
 import LocationDetails from './components/LocationDetails';
+import bulk from "../../assets/listProperty/bulk.png"
 
 const STEPS = [
   { id: 1, title: 'Personal Details', icon: User },
@@ -611,10 +613,10 @@ const ListPropertyScreen = () => {
               Bulk Upload
             </Text>
             <View style={styles.arrowBg}>
-              <ChevronRight
-                size={isMobile ? 14 : 16}
-                color="#EE2529"
-                strokeWidth={3}
+              <Image 
+                source={bulk} 
+                style={{ width: isMobile ? 14 : 15, height: isMobile ? 14 : 15 }} 
+                resizeMode="contain"
               />
             </View>
           </TouchableOpacity>
