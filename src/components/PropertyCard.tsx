@@ -25,9 +25,11 @@ import LinearGradient from 'react-native-linear-gradient';
 import { COLORS, FONTS } from '../constants/theme';
 import { useNavigation } from '../context/NavigationContext';
 import { useAuth } from '../context/AuthContext';
+import { useWishlist } from '../context/WishlistContext';
 import VerifiedSvg from './VerifiedSvg';
 import ShareIcon from './ShareIcon';
 import { usePropertyAPIs } from '../../helpers/hooks/propertyAPIs/usePropertyApis';
+declare const window: any;
 
 export interface Property {
   id: string;
@@ -72,12 +74,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 }) => {
   const { width: screenWidth } = useWindowDimensions();
   const isMobile = screenWidth < 768;
-  const { navigate } = useNavigation();
+  const { navigate, openLoginModal } = useNavigation();
   const { user } = useAuth();
-  const { toggleLikeProperty, checkIfLiked } = usePropertyAPIs();
+  const { toggleLike, likedPropertyIds } = useWishlist();
+  const { toggleLikeProperty } = usePropertyAPIs();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLocationExpanded, setIsLocationExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+
+  useEffect(() => {
+    setIsLiked(likedPropertyIds.has(item.id));
+  }, [likedPropertyIds, item.id]);
 
   const hasImages = item.images && item.images.length > 0;
   const imageCount = hasImages ? item.images!.length : 0;
@@ -92,16 +99,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     }
     return () => clearInterval(interval);
   }, [imageCount]);
-
-  useEffect(() => {
-    if (user && item.id) {
-      checkIfLiked(item.id, (data: any) => {
-        if (data) {
-          setIsLiked(!!data.isLiked);
-        }
-      });
-    }
-  }, [user, item.id]);
 
   const handlePrevImage = () => {
     setCurrentImageIndex(prev => (prev - 1 + imageCount) % imageCount);
@@ -123,14 +120,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
   const handleToggleLike = () => {
     if (!user) {
-      navigate('/login');
+      openLoginModal();
       return;
     }
-    toggleLikeProperty(item.id, (res: any) => {
-      if (res.success) {
-        setIsLiked(!isLiked);
-      }
-    });
+    toggleLike(item.id);
   };
 
   const handleShare = async () => {
@@ -243,7 +236,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           <TouchableOpacity style={styles.iconButton} onPress={handleShare}>
             <ShareIcon width={19.35} height={16.67} color={COLORS.white} />
           </TouchableOpacity>
-          {user && (
             <TouchableOpacity
               style={styles.iconButton}
               onPress={handleToggleLike}
@@ -255,7 +247,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 fill={isLiked ? COLORS.primary : 'transparent'}
               />
             </TouchableOpacity>
-          )}
         </View>
 
         {/* Overlay Bar for MNC Client and Compare */}
@@ -334,21 +325,25 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
               <Text style={styles.viewBtnText}>View</Text>
             </TouchableOpacity>
           )}
-          {user && (
-            <TouchableOpacity
-              onPress={handleEnquire}
-              style={styles.enquireBtnWrapper}
+          <TouchableOpacity
+            onPress={() => {
+              if (user) {
+                handleEnquire();
+              } else {
+                openLoginModal();
+              }
+            }}
+            style={styles.enquireBtnWrapper}
+          >
+            <LinearGradient
+              colors={['#EE2529', '#C73834']}
+              start={{ x: 0.0159, y: 0.5 }}
+              end={{ x: 0.972, y: 0.5 }}
+              style={styles.enquireBtnGradient}
             >
-              <LinearGradient
-                colors={['#EE2529', '#C73834']}
-                start={{ x: 0.0159, y: 0.5 }}
-                end={{ x: 0.972, y: 0.5 }}
-                style={styles.enquireBtnGradient}
-              >
-                <Text style={styles.enquireBtnText}>Enquire</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          )}
+              <Text style={styles.enquireBtnText}>Enquire</Text>
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
       </View>
       

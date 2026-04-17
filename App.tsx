@@ -15,6 +15,7 @@ import {
   useNavigation,
 } from './src/context/NavigationContext';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
+import { WishlistProvider } from './src/context/WishlistContext';
 import { ActivityIndicator } from 'react-native';
 import SignupScreen from './src/screens/auth/SignupScreen';
 import ProfileScreen from './src/screens/profile/ProfileScreen';
@@ -31,6 +32,8 @@ import NotFoundScreen from './src/screens/not-found/NotFoundScreen';
 import OfflineScreen from './src/screens/offline/OfflineScreen';
 import ErrorScreen from './src/screens/error/ErrorScreen';
 import ServerErrorScreen from './src/screens/error/ServerErrorScreen';
+
+declare const window: any;
 
 const AppContent = () => {
   const {
@@ -155,7 +158,9 @@ const App = () => {
   return (
     <AuthProvider>
       <NavigationProvider>
-        <AppContent />
+        <WishlistProvider>
+          <AppContent />
+        </WishlistProvider>
       </NavigationProvider>
     </AuthProvider>
   );

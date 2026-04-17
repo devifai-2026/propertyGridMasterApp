@@ -470,7 +470,13 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
                 paddingVertical: 0,
               },
             ]}
-            onPress={() => navigate('/list-property')}
+            onPress={() => {
+              if (isLoggedIn) {
+                navigate('/list-property');
+              } else {
+                openLoginModal();
+              }
+            }}
           >
             <ListPropertyIcon  />
             {!isMobile && (
