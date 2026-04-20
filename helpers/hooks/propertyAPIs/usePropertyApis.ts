@@ -313,6 +313,41 @@ export const usePropertyAPIs = () => {
     });
   };
 
+  const calculatePLG = (
+    payload: {
+      carpetArea: number;
+      purchasePrice: number;
+      monthlyRent: number;
+      securityDeposit: number;
+      rentEscalationPercent: number;
+      rentEscalationEveryHowManyYears: number;
+      leaseStartDate: string;
+      leaseTermYears: number;
+      propertyTax: number;
+      maintenancePerSqFtPerMonth: number;
+      insurance: number;
+      stampDutyPercent: number;
+      legalFees: number;
+      brokerage: number;
+      otherOneTimeCosts: number;
+      propertyType: string;
+    },
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.post({
+      route: '/v1/calculator/plg',
+      payload,
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data.data || data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   return {
     getProperties,
     getPropertyById,
@@ -332,6 +367,7 @@ export const usePropertyAPIs = () => {
     getMyInquiries,
     getInquiryById,
     getBrokerStats,
+    calculatePLG,
     loading,
   };
 };

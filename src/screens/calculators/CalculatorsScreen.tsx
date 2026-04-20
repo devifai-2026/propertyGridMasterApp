@@ -35,6 +35,7 @@ import EMIAnalytics from './components/EMI/EMIAnalytics';
 import PrincipleChart from './components/EMI/PrincipleChart';
 import CoverageAnalysis from './components/EMI/CoverageAnalysis';
 import LinearGradient from 'react-native-linear-gradient';
+import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
 
   const EMICalculatorIcon = ({ size = 20, color = '#767676' }) => (
   <Svg width={size} height={size * (30/37)} viewBox="0 0 37 30" fill="none">
@@ -469,6 +470,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
   const [results, setResults] = useState<any>(null);
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
+  const { calculatePLG, loading: plgLoading } = usePropertyAPIs();
 
   const calculateROIValues = () => {
     const purchasePrice = parseFloat(formData.purchasePrice.replace(/,/g, '')) || 0;
@@ -556,6 +558,80 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
 
   const handleCalculate = () => {
     calculateROIValues();
+
+    const purchasePrice = parseFloat(formData.purchasePrice.replace(/,/g, '')) || 0;
+    const monthlyRent = parseFloat(formData.monthlyRent.replace(/,/g, '')) || 0;
+    const leaseTermYears = parseFloat(formData.leaseTerm) || 0;
+
+    let leaseStartDate = formData.leaseStartDate;
+    if (leaseStartDate && leaseStartDate.includes('/')) {
+      const parts = leaseStartDate.split('/');
+      if (parts.length === 3) {
+        leaseStartDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+    }
+    if (!leaseStartDate) {
+      const today = new Date();
+      leaseStartDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    }
+
+    const resolvedLeaseTermYears = leaseTermYears || 1;
+
+    calculatePLG(
+      {
+        carpetArea: parseFloat(formData.carpetArea) || 0,
+        purchasePrice,
+        monthlyRent,
+        securityDeposit: parseFloat(formData.securityDeposit.replace(/,/g, '')) || 0,
+        rentEscalationPercent: (parseFloat(formData.rentEscalationPercent) || 0) / 100,
+        rentEscalationEveryHowManyYears: parseFloat(formData.rentEscalationEvery) || 3,
+        leaseStartDate,
+        leaseTermYears: resolvedLeaseTermYears,
+        propertyTax: parseFloat(formData.propertyTax.replace(/,/g, '')) || 0,
+        maintenancePerSqFtPerMonth: parseFloat(formData.maintenancePerSqft) || 0,
+        insurance: parseFloat(formData.insurance.replace(/,/g, '')) || 0,
+        stampDutyPercent: (parseFloat(formData.stampDuty) || 0) / 100,
+        legalFees: parseFloat(formData.legalFees.replace(/,/g, '')) || 0,
+        brokerage: parseFloat(formData.brokerage.replace(/,/g, '')) || 0,
+        otherOneTimeCosts: parseFloat(formData.otherCosts.replace(/,/g, '')) || 0,
+        propertyType:
+          formData.propertyType === 'Residential Space' ? 'Residential'
+          : formData.propertyType === 'Commercial Space' ? 'Commercial'
+          : formData.propertyType,
+      },
+      (data) => {
+        const annualGrossRent = (data?.inputs?.monthlyRent ?? 0) * 12;
+        const totalAnnualExpenses = data?.cashFlows?.totalExpenses ?? 0;
+        const annualNetIncome = data?.summary?.netOperatingIncome ?? 0;
+        const securityDepositInterest = data?.interimCalculations?.annualInterestOnDeposit ?? 0;
+        const totalInitialInvestment = data?.summary?.totalInitialInvestment ?? 0;
+        const roiPercent = data?.summary?.roiPercent ?? 0;
+        const totalCashFlows = data?.cashFlows?.totalCashFlows ?? 0;
+        const maintenanceCost = data?.interimCalculations?.maintenanceCost ?? 0;
+
+        setResults((prev: any) =>
+          prev
+            ? {
+                ...prev,
+                netYield: `${roiPercent.toFixed(2)}%`,
+                totalInvestment: totalInitialInvestment,
+                cashFlow: `₹${(totalCashFlows / 100000).toFixed(2)} Lakhs`,
+                annualGrossRent,
+                totalAnnualExpenses,
+                annualNetIncome,
+                securityDepositInterest,
+                totalAnnualReturn: annualNetIncome + securityDepositInterest,
+                propertyPrice: data?.inputs?.purchasePrice ?? prev.propertyPrice,
+                annualMaintenance: maintenanceCost,
+                plgData: data,
+              }
+            : null,
+        );
+      },
+      (error) => {
+        console.error('PLG calculation error:', error);
+      },
+    );
   };
 
   return (
@@ -746,7 +822,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             />
           </View>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
-            <LabelWithIcon label="Lease Term (Months) *" />
+            <LabelWithIcon label="Lease Term (Years) *" />
             <TextInput
               style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
               placeholder="10"
@@ -868,7 +944,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
       </View>
 
       {/* Calculate Button */}
-      <TouchableOpacity onPress={handleCalculate} style={{ alignSelf: 'center' }}>
+      <TouchableOpacity onPress={handleCalculate} style={{ alignSelf: 'center' }} disabled={plgLoading}>
         <LinearGradient
           colors={['#EE2529', '#C73834']}
           style={styles.calculateBtn}
@@ -876,7 +952,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
           end={{ x: 1, y: 0 }}
         >
           <Text style={styles.calculateBtnText}>
-            Calculate ROI & Rental Yield
+            {plgLoading ? 'Calculating...' : 'Calculate ROI & Rental Yield'}
           </Text>
         </LinearGradient>
       </TouchableOpacity>
