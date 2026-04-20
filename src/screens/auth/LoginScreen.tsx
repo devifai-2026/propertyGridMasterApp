@@ -16,12 +16,19 @@ import {
   useWindowDimensions,
   Dimensions,
 } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 import LinearGradient from 'react-native-linear-gradient';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
 import { COLORS } from '../../constants/theme';
 import { allowedRoles } from '../../../helpers/allowedRoles';
+
+const CrossIcon = ({ size = 18, color = "#EE2529" }: { size?: number, color?: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 18 18" fill="none">
+    <Path d="M0.498101 0.498088C-0.166034 1.16222 -0.166034 2.23897 0.498101 2.90311L6.59498 8.99996L0.498101 15.0969C-0.166034 15.761 -0.166034 16.8379 0.498101 17.5019C1.16222 18.166 2.23899 18.166 2.9031 17.5019L8.99997 11.4049L15.097 17.5019C15.761 18.166 16.8379 18.166 17.5019 17.5019C18.166 16.8379 18.166 15.761 17.5019 15.0969L11.405 8.99996L17.5019 2.90313C18.166 2.23901 18.166 1.16224 17.5019 0.498123C16.8377 -0.166012 15.761 -0.166012 15.097 0.498123L8.99997 6.59497L2.9031 0.498088C2.23899 -0.166029 1.16222 -0.166029 0.498101 0.498088Z" fill={color}/>
+  </Svg>
+);
 
 const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
   const [phone, setPhone] = useState('');
@@ -217,7 +224,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
             onPress={handleClose}
             style={styles.closeButton}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-            <Text style={styles.closeButtonText}>✕</Text>
+            <CrossIcon size={18} />
           </TouchableOpacity>
         </View>
       </View>
@@ -340,10 +347,12 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
               {/* Resend OTP + Contact Support links */}
               <View style={styles.resendContainer}>
                 <TouchableOpacity onPress={handleResendOtp}>
-                  <Text style={styles.resendLink}>Resend OTP</Text>
+                  <Text style={styles.resendLink}>
+                    Didn’t received OTP? <Text style={styles.resendLinkAction}>Click to resend OTP.</Text>
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => { /* open support */ }}>
-                  <Text style={styles.resendLink}>Contact Support</Text>
+                   {/* <Text style={styles.resendLink}>Contact Support</Text> */}
                 </TouchableOpacity>
               </View>
 
@@ -437,8 +446,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoImage: {
-    width: 155,
-    height: 50,
+    width: 184,
+    height: 75,
   },
   closeButton: {
     width: 32,
@@ -450,6 +459,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     color: '#EE2529',
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
   divider: {
     height: 1,
@@ -465,10 +475,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   welcomeTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1A1A1A',
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#262626',
     textAlign: 'center',
+    fontFamily: 'Montserrat',
   },
 
   /* ── SUBTITLE CONTAINER ── */
@@ -480,14 +491,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   welcomeSubtitle: {
-    fontSize: 13,
-    color: '#9CA3AF',
+    fontSize: 18,
+    color: '#767676',
     textAlign: 'center',
     lineHeight: 18,
+    fontFamily: 'Montserrat',
   },
   verifyPhone: {
     fontWeight: '600',
     color: '#1F2937',
+    fontFamily: 'Montserrat',
   },
 
   /* ── FORM SECTION ── */
@@ -511,23 +524,26 @@ const styles = StyleSheet.create({
     marginBottom: 28
   },
   inputLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#374151',
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#000000',
     marginBottom: 8,
+    fontFamily: 'Montserrat',
   },
   required: {
     color: '#000000',
   },
   textInput: {
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: '#767676',
+    borderRadius: 5,
     paddingVertical: 12,
     paddingHorizontal: 14,
-    fontSize: 15,
-    color: '#1F2937',
+    fontSize: 18,
+    color: '#262626',
     backgroundColor: '#FFFFFF',
+    fontWeight: '400',
+    fontFamily: 'Montserrat',
   },
 
   /* ── Button row ── */
@@ -548,23 +564,24 @@ const styles = StyleSheet.create({
   btnOutline: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    borderRadius: 8,
+    borderColor: '#767676',
+    borderRadius: 5,
     paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.white,
   },
   btnOutlineText: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '600',
-    color: '#374151',
+    color: '#767676',
+    fontFamily: 'Montserrat',
   },
 
   /* Continue / Verify button */
   btnPrimary: {
     flex: 1,
-    borderRadius: 8,
+    borderRadius: 5,
     overflow: 'hidden',
   },
   btnGradient: {
@@ -573,26 +590,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   btnPrimaryText: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '600',
-    color: COLORS.white,
+    color: '#FFFFFF',
+    fontFamily: 'Montserrat',
   },
 
   /* Back button */
   btnBack: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
-    borderRadius: 8,
+   
+    borderRadius: 5,
     paddingVertical: 12,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#767676',
   },
   btnBackText: {
-    fontSize: 14,
+    fontSize: 18,
     fontWeight: '600',
-    color: '#374151',
+    color: '#767676',
+    fontFamily: 'Montserrat',
   },
 
   /* ── OTP inputs ── */
@@ -606,13 +625,14 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width > 768 ? 72 : 45,
     height: Dimensions.get('window').width > 768 ? 72 : 45,
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 10,
     textAlign: 'center',
     fontSize: 26,
     fontWeight: '600',
     borderWidth: 1.5,
     borderColor: '#E5E7EB',
     color: '#1F2937',
+    fontFamily: 'Montserrat',
   },
   otpInputError: {
     borderColor: '#EE2529',
@@ -628,10 +648,15 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   resendLink: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#1F2937',
+    fontSize: 18,
+    fontWeight: '400',
+    color: '#262626',
+    fontFamily: 'Montserrat',
+  },
+  resendLinkAction: {
     textDecorationLine: 'underline',
+    fontWeight: '400',
+     color: '#262626',
   },
 
   /* ── Error ── */
@@ -647,6 +672,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     textAlign: 'center',
     lineHeight: 18,
+    fontFamily: 'Montserrat',
   },
 });
 

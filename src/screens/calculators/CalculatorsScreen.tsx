@@ -1379,8 +1379,8 @@ const EMICalculatorView = () => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
-    minHeight: '100%',
-    paddingBottom: 40,
+    // minHeight: '100%',
+    // paddingBottom: 40,
   },
   heroSection: {
     padding: 20,

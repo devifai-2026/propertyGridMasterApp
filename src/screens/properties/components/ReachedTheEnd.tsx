@@ -13,11 +13,13 @@ import LinearGradient from 'react-native-linear-gradient';
 interface ReachedTheEndProps {
   propertyCount: number;
   onGoToTop: () => void;
+  onContactSupport?: () => void;
 }
 
 const ReachedTheEnd: React.FC<ReachedTheEndProps> = ({ 
   propertyCount = 5, 
-  onGoToTop 
+  onGoToTop,
+  onContactSupport
 }) => {
   const { width } = useWindowDimensions();
   const isSmallScreen = width < 768;
@@ -88,7 +90,10 @@ const ReachedTheEnd: React.FC<ReachedTheEndProps> = ({
               <Text style={styles.cardText}>
                 Let us know your exact requirements and we'll personally help you find the perfect property.
               </Text>
-              <TouchableOpacity style={styles.cardActionBtn}>
+              <TouchableOpacity 
+                style={styles.cardActionBtn}
+                onPress={onContactSupport}
+              >
                 <LinearGradient
                   colors={['#EE2529', '#C73834']}
                   start={{ x: 0, y: 0 }}

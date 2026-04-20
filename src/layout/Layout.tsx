@@ -544,9 +544,10 @@ interface LayoutProps {
   style?: any;
   onScroll?: (event: any) => void;
   scrollEventThrottle?: number;
+  scrollViewRef?: React.RefObject<ScrollView>;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, style, onScroll, scrollEventThrottle }) => {
+const Layout: React.FC<LayoutProps> = ({ children, style, onScroll, scrollEventThrottle, scrollViewRef }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isLoggedIn, user, logout } = useAuth();
   const { navigate, openLoginModal } = useNavigation();
@@ -572,6 +573,7 @@ const Layout: React.FC<LayoutProps> = ({ children, style, onScroll, scrollEventT
       />
 
       <ScrollView
+        ref={scrollViewRef}
         style={{ backgroundColor: 'transparent' }}
         onScroll={onScroll}
         scrollEventThrottle={scrollEventThrottle || 16}
