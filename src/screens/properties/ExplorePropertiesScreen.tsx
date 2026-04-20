@@ -13,7 +13,9 @@ import {
   Modal,
   useWindowDimensions,
   PanResponder,
+  ActivityIndicator,
 } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 import { useNavigation } from '../../context/NavigationContext';
 import {
   Heart,
@@ -54,6 +56,12 @@ const componentUnitTypes = [
   { id: 'Warehouse', label: 'Warehouse' },
 ];
 
+const CrossIcon = ({ size = 18, color = "#EE2529" }: { size?: number, color?: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 18 18" fill="none">
+    <Path d="M0.498101 0.498088C-0.166034 1.16222 -0.166034 2.23897 0.498101 2.90311L6.59498 8.99996L0.498101 15.0969C-0.166034 15.761 -0.166034 16.8379 0.498101 17.5019C1.16222 18.166 2.23899 18.166 2.9031 17.5019L8.99997 11.4049L15.097 17.5019C15.761 18.166 16.8379 18.166 17.5019 17.5019C18.166 16.8379 18.166 15.761 17.5019 15.0969L11.405 8.99996L17.5019 2.90313C18.166 2.23901 18.166 1.16224 17.5019 0.498123C16.8377 -0.166012 15.761 -0.166012 15.097 0.498123L8.99997 6.59497L2.9031 0.498088C2.23899 -0.166029 1.16222 -0.166029 0.498101 0.498088Z" fill={color}/>
+  </Svg>
+);
+
 const ExplorePropertiesScreen = () => {
   const { width } = useWindowDimensions();
   const { navigate } = useNavigation();
@@ -63,6 +71,8 @@ const ExplorePropertiesScreen = () => {
   const [currentImageIndices, setCurrentImageIndices] = useState<{
     [key: string]: number;
   }>({});
+
+  const scrollViewRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     // Parse query params from window.location.search if on Web
@@ -239,6 +249,8 @@ const ExplorePropertiesScreen = () => {
     tenure: '',
     city: '',
   });
+
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
 
   const [sliderWidth, setSliderWidth] = useState(0);
   const [sliderPercent, setSliderPercent] = useState(1);
@@ -1036,7 +1048,11 @@ const ExplorePropertiesScreen = () => {
   };
 
   return (
-    <Layout>
+    <Layout 
+      onScroll={handleScroll} 
+      scrollEventThrottle={16}
+      scrollViewRef={scrollViewRef}
+    >
       <View style={styles.container}>
         {/* Main Content */}
         <View style={styles.contentContainer}>
@@ -1085,7 +1101,7 @@ const ExplorePropertiesScreen = () => {
                       : 'Advance Filters'}
                   </Text>
                   {(width > 768 ? showDesktopFilters : showFilters) ? (
-                    <X size={16} color="#333" />
+                    <CrossIcon size={10} color="#767676" />
                   ) : (
                     <Image source={filter} style={{ width: 15, height: 14 }} />
                   )}
@@ -1099,8 +1115,21 @@ const ExplorePropertiesScreen = () => {
                   }}
                 >
                   <Text style={{ fontSize: 14, color: '#666', fontFamily: 'Montserrat' }}>Sort by:</Text>
-                  <TouchableOpacity style={styles.sortBtn}>
-                    <Text style={styles.sortBtnText}>A-Z</Text>
+                  <TouchableOpacity 
+                    style={styles.sortBtn}
+                    onPress={() => {
+                      const newDir = sortDirection === 'asc' ? 'desc' : 'asc';
+                      setSortDirection(newDir);
+                      setProperties(prev => [...prev].sort((a, b) => {
+                        return newDir === 'asc' 
+                          ? a.title.localeCompare(b.title) 
+                          : b.title.localeCompare(a.title);
+                      }));
+                    }}
+                  >
+                    <Text style={styles.sortBtnText}>
+                      {sortDirection === 'asc' ? 'Z-A' : 'A-Z'}
+                    </Text>
                     <ChevronDown size={14} color="#EE2529" />
                   </TouchableOpacity>
                 </View>
@@ -1119,8 +1148,13 @@ const ExplorePropertiesScreen = () => {
             </View>
           )}
 
-          {/* Content Area: Either show the No Results component OR the Filters + Results grid */}
-          {properties.length === 0 && !apiLoading ? (
+          {/* Content Area: Either show the Loading Spinner, No Results, or the Filters + Results grid */}
+          {apiLoading && properties.length === 0 ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#EE2529" />
+              <Text style={styles.loadingText}>Fetching Properties...</Text>
+            </View>
+          ) : properties.length === 0 && !apiLoading ? (
             <NoPropertiesFound onReset={handleResetFilters} />
           ) : (
             <>
@@ -1206,8 +1240,15 @@ const ExplorePropertiesScreen = () => {
                 </View>
               )}
 
-              <View style={{ backgroundColor: '#F2F2F2', paddingVertical: 40, width: '100%' }}>
-                <View style={[styles.gridContainer, { justifyContent: 'center' }]}>
+              <View style={{ backgroundColor: apiLoading ? '#fff' : '#F2F2F2', paddingVertical: 40, width: '100%', minHeight: 400, justifyContent: 'center' }}>
+                {apiLoading ? (
+                   <View style={styles.loadingContainer}>
+                     <ActivityIndicator size="large" color="#EE2529" />
+                     <Text style={styles.loadingText}>Loading...</Text>
+                   </View>
+                ) : (
+                  <>
+                    <View style={[styles.gridContainer, { justifyContent: 'center' }]}>
                 {properties.map((property, index) => {
                   // Special Card Logic (Index 7)
                   if (index === 7) {
@@ -1257,7 +1298,7 @@ const ExplorePropertiesScreen = () => {
                     />
                   );
                 })}
-              </View>
+                  </View>
 
               {/* Pagination Controls */}
               {pagination.totalPages > 1 && (
@@ -1348,12 +1389,17 @@ const ExplorePropertiesScreen = () => {
                 <ReachedTheEnd 
                   propertyCount={pagination.totalItems} 
                   onGoToTop={() => {
-                    if (typeof window !== 'undefined') {
+                    if (scrollViewRef.current) {
+                      scrollViewRef.current.scrollTo({ y: 0, animated: true });
+                    } else if (typeof window !== 'undefined') {
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }
                   }} 
+                  onContactSupport={() => navigate('/support')}
                 />
               )}
+                  </>
+                )}
               </View>
             </>
           )}
@@ -1370,7 +1416,7 @@ const ExplorePropertiesScreen = () => {
             <View style={styles.mobileFilterPanel}>
               <View style={styles.mobileFilterHeader}>
                 <TouchableOpacity onPress={toggleFilters}>
-                  <X size={24} color="#333" />
+                  <CrossIcon size={18} color="#333" />
                 </TouchableOpacity>
                 <Text style={styles.filterPanelTitle}>Advanced Filters</Text>
               </View>
@@ -1457,9 +1503,9 @@ const ExplorePropertiesScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingBottom: 40,
+    // paddingBottom: 40,
    
-    minHeight: '100%',
+    // minHeight: '100%',
   },
   stickyBanner: {
     backgroundColor: '#fff',
@@ -1870,14 +1916,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    width: 158,
+    width: 146,
     height: 32,
     gap: 14,
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#767676',
     paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingHorizontal: 4,
     borderRadius: 6,
   },
   filterToggleText: {
@@ -2351,6 +2397,19 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#6E6E6E',
     lineHeight: 18,
+    fontFamily: 'Montserrat',
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 100,
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    marginTop: 15,
+    fontSize: 16,
+    color: '#666',
     fontFamily: 'Montserrat',
   },
 });

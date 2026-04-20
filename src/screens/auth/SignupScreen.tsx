@@ -19,6 +19,7 @@ import {
   useWindowDimensions,
   Dimensions,
 } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 import LinearGradient from 'react-native-linear-gradient';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
@@ -27,6 +28,12 @@ import { getHeaders } from '../../../helpers/api/headers';
 import { BASE_URL } from '../../../helpers/environments';
 import { decodeResponseData } from '../../../helpers/api/decoder';
 import { COLORS } from '../../constants/theme';
+
+const CrossIcon = ({ size = 18, color = "#EE2529" }: { size?: number, color?: string }) => (
+  <Svg width={size} height={size} viewBox="0 0 18 18" fill="none">
+    <Path d="M0.498101 0.498088C-0.166034 1.16222 -0.166034 2.23897 0.498101 2.90311L6.59498 8.99996L0.498101 15.0969C-0.166034 15.761 -0.166034 16.8379 0.498101 17.5019C1.16222 18.166 2.23899 18.166 2.9031 17.5019L8.99997 11.4049L15.097 17.5019C15.761 18.166 16.8379 18.166 17.5019 17.5019C18.166 16.8379 18.166 15.761 17.5019 15.0969L11.405 8.99996L17.5019 2.90313C18.166 2.23901 18.166 1.16224 17.5019 0.498123C16.8377 -0.166012 15.761 -0.166012 15.097 0.498123L8.99997 6.59497L2.9031 0.498088C2.23899 -0.166029 1.16222 -0.166029 0.498101 0.498088Z" fill={color}/>
+  </Svg>
+);
 
 const SPECIALIZATION_OPTIONS = [
   'MNC Client',
@@ -43,6 +50,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
   // ── Screen navigation
   const [currentScreen, setCurrentScreen] = useState<Screen>('role');
   const [selectedRole, setSelectedRole] = useState<Role>(null);
+  const [hoveredRole, setHoveredRole] = useState<Role>(null);
 
   // ── Form state
   const [formData, setFormData] = useState({
@@ -370,7 +378,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
           style={styles.closeButton}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Text style={styles.closeButtonText}>✕</Text>
+          <CrossIcon size={18} />
         </TouchableOpacity>
       </View>
     </>
@@ -399,9 +407,11 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
           <TouchableOpacity
             style={[
               styles.roleCardWrapper,
-              selectedRole === 'owner_investor' && styles.roleCardActive,
+              (selectedRole === 'owner_investor' || hoveredRole === 'owner_investor') && styles.roleCardActive,
             ]}
             onPress={() => setSelectedRole('owner_investor')}
+            onMouseEnter={() => setHoveredRole('owner_investor')}
+            onMouseLeave={() => setHoveredRole(null)}
             activeOpacity={0.8}
           >
             <LinearGradient
@@ -433,9 +443,11 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
           <TouchableOpacity
             style={[
               styles.roleCardWrapper,
-              selectedRole === 'broker' && styles.roleCardActive,
+              (selectedRole === 'broker' || hoveredRole === 'broker') && styles.roleCardActive,
             ]}
             onPress={() => setSelectedRole('broker')}
+            onMouseEnter={() => setHoveredRole('broker')}
+            onMouseLeave={() => setHoveredRole(null)}
             activeOpacity={0.8}
           >
             <LinearGradient
@@ -572,7 +584,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
                 fieldErrors.firstName && styles.textInputError,
               ]}
               placeholder="Enter your first name"
-              // placeholderTextColor="#9CA3AF"
+              placeholderTextColor="#767676"
               value={formData.firstName}
               onChangeText={t => handleChange('firstName', t)}
               onFocus={() => setFocusedField('firstName')}
@@ -599,7 +611,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
                 fieldErrors.lastName && styles.textInputError,
               ]}
               placeholder="Enter your last name"
-              // placeholderTextColor="#9CA3AF"
+              placeholderTextColor="#767676"
               value={formData.lastName}
               onChangeText={t => handleChange('lastName', t)}
               onFocus={() => setFocusedField('lastName')}
@@ -629,7 +641,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               fieldErrors.phone && styles.textInputError,
             ]}
             placeholder="Enter your contact number"
-            // placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#767676"
             keyboardType="numeric"
             maxLength={10}
             value={formData.phone}
@@ -659,7 +671,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
                   focusedField === 'reraNumber' && styles.textInputFocused,
                 ]}
                 placeholder="Enter your RERA number"
-                // placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#767676"
                 value={formData.reraNumber}
                 onChangeText={t => handleChange('reraNumber', t)}
                 onFocus={() => setFocusedField('reraNumber')}
@@ -678,7 +690,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
                   fieldErrors.locality && styles.textInputError,
                 ]}
                 placeholder="Enter city of operation"
-                // placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#767676"
                 value={formData.locality}
                 onChangeText={t => handleChange('locality', t)}
                 onFocus={() => setFocusedField('locality')}
@@ -745,7 +757,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
                   fieldErrors.dealsClosed && styles.textInputError,
                 ]}
                 placeholder="Enter number of deals closed"
-                // placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#767676"
                 keyboardType="numeric"
                 value={formData.dealsClosed}
                 onChangeText={t =>
@@ -781,7 +793,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               fieldErrors.email && styles.textInputError,
             ]}
             placeholder="Enter your Email"
-            // placeholderTextColor="#9CA3AF"
+            placeholderTextColor="#767676"
             keyboardType="email-address"
             autoCapitalize="none"
             value={formData.email}
@@ -1029,8 +1041,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   card: {
-    width: Dimensions.get('window').width > 768 ? 673 : '94%',
-    height: Dimensions.get('window').width > 768 ? 645 : '90%',
+    width: Dimensions.get('window').width > 768 ? 580 : '94%',
+    height: Dimensions.get('window').width > 768 ? 600 : '90%',
     backgroundColor: COLORS.white,
     borderRadius: 24,
     overflow: 'hidden',
@@ -1049,10 +1061,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 14,
-    paddingHorizontal: Dimensions.get('window').width > 768 ? 48 : 12,
+    paddingHorizontal: Dimensions.get('window').width > 768 ? 30 : 12,
   },
-  logoContainer: { flexDirection: 'row', alignItems: 'center', height: 40 },
-  logoImage: { width: 120, height: 40 },
+  logoContainer: { flexDirection: 'row', alignItems: 'center', height: 75 },
+  logoImage: { width: 184, height: 75, resizeMode: 'contain' },
   closeButton: {
     width: 28,
     height: 28,
@@ -1064,6 +1076,7 @@ const styles = StyleSheet.create({
     color: '#EE2529',
     fontWeight: '600',
     lineHeight: 18,
+    fontFamily: 'Montserrat',
   },
   divider: {
     height: 1,
@@ -1075,9 +1088,9 @@ const styles = StyleSheet.create({
   /* ── Shared headings ── */
   headingBanner: {
     backgroundColor: '#FFFCF4',
-    marginHorizontal: -48,
+    marginHorizontal: -32,
     paddingVertical: 16,
-    paddingHorizontal: Dimensions.get('window').width > 768 ? 48 : 12,
+    paddingHorizontal: Dimensions.get('window').width > 768 ? 32 : 12,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 20,
@@ -1088,34 +1101,50 @@ const styles = StyleSheet.create({
     color: '#1A1A1A',
     textAlign: 'center',
     lineHeight: 24,
+    fontFamily: 'Montserrat',
   },
-  signUpBold: { fontWeight: '700' },
+  signUpBold: {
+    fontWeight: '700',
+    fontSize: 18,
+    color: '#262626',
+    fontFamily: 'Montserrat',
+  },
   screenSub: {
-    fontSize: 13,
-    color: '#6B7280',
+    fontSize: 18,
+    color: '#767676',
     lineHeight: 18,
     textAlign: 'center',
+    fontWeight: '400',
     marginBottom: 32,
+    fontFamily: 'Montserrat',
   },
 
   /* ── Role cards ── */
   roleCenter: { flex: 1, justifyContent: 'center' },
   roleRow: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 24,
     marginBottom: 36,
-    paddingHorizontal: Dimensions.get('window').width > 768 ? 48 : 12,
+    paddingHorizontal: Dimensions.get('window').width > 768 ? 32 : 12,
+    justifyContent: 'center',
   },
   roleCardWrapper: {
-    flex: 1,
-    borderRadius: 16,
+    width: 178.21,
+    height: 178.21,
+    borderRadius: 15,
+    backgroundColor: COLORS.white,
+    shadowColor: '#262626',
+    shadowOffset: { width: 5, height: 5 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 8,
   },
   roleCardActive: {
     shadowColor: '#EE2529',
-    shadowOffset: { width: 1.17, height: 4.69 },
-    shadowOpacity: 1,
-    shadowRadius: 2.35,
-    elevation: 6,
+    shadowOffset: { width: 1, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 4,
+    elevation: 10,
   },
   cornerAccent: {
     position: 'absolute',
@@ -1137,21 +1166,24 @@ const styles = StyleSheet.create({
     borderLeftWidth: 0,
     borderBottomRightRadius: 16,
   },
-  roleCard: { padding: 20, alignItems: 'center', borderRadius: 14 },
+  roleCard: { flex: 1, padding: 20, alignItems: 'center', borderRadius: 14 },
   roleIcon: { width: 48, height: 48, marginBottom: 12 },
   roleTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#1F2937',
+    fontSize: 24,
+    fontWeight: '600',
+    color: '#262626',
     textAlign: 'center',
-    marginBottom: 6,
+    marginBottom: 12,
     lineHeight: 18,
+    fontFamily: 'Montserrat',
   },
   roleDesc: {
-    fontSize: 12,
-    color: '#6B7280',
+    fontSize: 16,
+    color: '#767676',
     textAlign: 'center',
+    fontWeight: '400',
     lineHeight: 16,
+    fontFamily: 'Montserrat',
   },
 
   /* ── Buttons ── */
@@ -1159,29 +1191,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     marginTop: 48,
-    paddingHorizontal: Dimensions.get('window').width > 768 ? 48 : 12,
+    paddingHorizontal: Dimensions.get('window').width > 768 ? 32 : 12,
   },
   buttonRow_OTP:{
     flexDirection: 'row',
     gap: 12,
     marginTop: 48,
-    paddingHorizontal: Dimensions.get('window').width > 768 ? 48 : 12,
+    paddingHorizontal: Dimensions.get('window').width > 768 ? 32 : 12,
   },
   btnOutline: {
     flex: 1,
     borderWidth: 1.5,
     borderColor: '#D1D5DB',
-    borderRadius: 12,
+    borderRadius: 5,
     paddingVertical: 14,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: COLORS.white,
   },
   btnOutlineText: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '600',
-    color: '#374151',
+    color: '#767676',
     lineHeight: 18,
+    fontFamily: 'Montserrat',
   },
   btnPrimary: {
     flex: 1,
@@ -1194,10 +1227,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   btnPrimaryText: {
-    fontSize: 15,
+    fontSize: 18,
     fontWeight: '600',
-    color: COLORS.white,
+    color: '#FFFFFF',
     lineHeight: 18,
+    fontFamily: 'Montserrat',
   },
   buttonDisabled: { opacity: 0.5 },
 
@@ -1206,28 +1240,31 @@ const styles = StyleSheet.create({
     flexDirection: Dimensions.get('window').width > 768 ? 'row' : 'column',
     gap: Dimensions.get('window').width > 768 ? 16 : 32,
     marginBottom: 32,
-    paddingHorizontal: Dimensions.get('window').width > 768 ? 48 : 12,
+    paddingHorizontal: Dimensions.get('window').width > 768 ? 32 : 12,
   },
   nameField: { flex: 1 },
-  inputGroup: { marginBottom: 32, paddingHorizontal: Dimensions.get('window').width > 768 ? 48 : 12, },
+  inputGroup: { marginBottom: 32, paddingHorizontal: Dimensions.get('window').width > 768 ? 32 : 12, },
   inputLabel: {
-    fontSize: 13,
+    fontSize: 18,
     fontWeight: '600',
-    color: '#374151',
+    color: '#262626',
     marginBottom: 8,
     lineHeight: 16,
+    fontFamily: 'Montserrat',
   },
   required: { color: '#000000ff' },
   textInput: {
     borderWidth: 1.5,
-    borderColor: '#E5E7EB',
-    borderRadius: 10,
+    borderColor: '#767676',
+    borderRadius: 5,
     paddingHorizontal: 14,
     paddingVertical: 13,
-    fontSize: 15,
-    color: '#1F2937',
+    fontSize: 18,
+    color: '#262626',
     backgroundColor: COLORS.white,
+    fontWeight: '400',
     lineHeight: 18,
+    fontFamily: 'Montserrat',
   },
   textInputFocused: { borderColor: '#3B82F6', backgroundColor: COLORS.white },
   textInputError: { borderColor: '#EE2529' },
@@ -1256,6 +1293,7 @@ const styles = StyleSheet.create({
     color: '#EE2529',
     fontSize: 13,
     fontWeight: '500',
+    fontFamily: 'Montserrat',
   },
 
   /* ── Checkboxes ── */
@@ -1264,7 +1302,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 10,
     marginBottom: 14,
-    paddingHorizontal: Dimensions.get('window').width > 768 ? 48 : 12,
+    paddingHorizontal: Dimensions.get('window').width > 768 ? 32 : 12,
   },
   checkbox: {
     width: 18,
@@ -1278,12 +1316,12 @@ const styles = StyleSheet.create({
   },
   checkboxChecked: { backgroundColor: '#EE2529', borderColor: '#EE2529' },
   checkboxError: { borderColor: '#EE2529' },
-  checkmark: { color: COLORS.white, fontSize: 11, fontWeight: '700' },
-  checkLabel: { fontSize: 13, color: '#374151', lineHeight: 16, flex: 1 },
-  checkLink: { color: '#3B82F6', textDecorationLine: 'underline' },
+  checkmark: { color: COLORS.white, fontSize: 11, fontWeight: '700', fontFamily: 'Montserrat' },
+  checkLabel: { fontSize: 18, color: '#262626', lineHeight: 16, flex: 1, fontFamily: 'Montserrat' },
+  checkLink: { color: '#3B82F6', textDecorationLine: 'underline', fontFamily: 'Montserrat' },
 
   /* ── OTP ── */
-  phoneHighlight: { fontWeight: '700', color: '#1F2937' },
+  phoneHighlight: { fontWeight: '700', color: '#1F2937', fontFamily: 'Montserrat' },
   otpRow: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -1302,6 +1340,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1F2937',
     backgroundColor: '#F9FAFB',
+    fontFamily: 'Montserrat',
   },
   otpInputError: { borderColor: '#EE2529' },
   otpInputErrorFilled: { borderColor: '#EE2529', color: '#EE2529' },
@@ -1312,6 +1351,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     lineHeight: 18,
     paddingHorizontal: 8,
+    fontFamily: 'Montserrat',
   },
   otpResendText: {
     fontSize: 13,
@@ -1319,11 +1359,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 8,
     lineHeight: 18,
+    fontFamily: 'Montserrat',
   },
   otpResendLink: {
     color: '#1F2937',
     fontWeight: '500',
     textDecorationLine: 'underline',
+    fontFamily: 'Montserrat',
   },
   roleScrollContent: { flex: 1 },
   roleScreenContent: { flex: 1, justifyContent: 'space-between' },
@@ -1337,8 +1379,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   cardOtp: {
-    width: Dimensions.get('window').width > 768 ? 673 : '92%',
-    height: Dimensions.get('window').width > 768 ? 580 : 'auto',
+    width: Dimensions.get('window').width > 768 ? 540 : '92%',
+    height: Dimensions.get('window').width > 768 ? 540 : 'auto',
     borderRadius: 15,
   },
   tagsRow: {
@@ -1363,6 +1405,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#374151',
     fontWeight: '500',
+    fontFamily: 'Montserrat',
   },
   tagTextSelected: {
     color: '#8B6914',
@@ -1397,6 +1440,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#9CA3AF',
     textAlign: 'center',
+    fontFamily: 'Montserrat',
   },
 });
 
