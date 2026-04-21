@@ -231,7 +231,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
 
       {/* ── WELCOME / TITLE SECTION ── */}
       <View style={styles.welcomeContainer}>
-        <Text style={styles.welcomeTitle}>
+        <Text style={[styles.welcomeTitle, width < 480 && { fontSize: 18 }]}>
           {!otpSent ? 'Welcome' : 'Verify your Contact Number'}
         </Text>
       </View>
@@ -239,11 +239,11 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
       {/* ── SUBTITLE SECTION ── */}
       <View style={styles.subtitleContainer}>
         {!otpSent ? (
-          <Text style={styles.welcomeSubtitle}>
+          <Text style={[styles.welcomeSubtitle, width < 480 && { fontSize: 14 }]}>
             Sign in to your account to continue
           </Text>
         ) : (
-          <Text style={styles.welcomeSubtitle}>
+          <Text style={[styles.welcomeSubtitle, width < 480 && { fontSize: 14, lineHeight: 20 }]}>
             We sent a verification code to{' '}
             <Text style={styles.verifyPhone}>+91 .........</Text>
           </Text>
@@ -260,11 +260,11 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
             /* ══════ SCREEN 1: Phone entry ══════ */
             <>
               <View style={styles.inputGroup_phone}>
-                <Text style={styles.inputLabel}>
+                <Text style={[styles.inputLabel, width < 480 && { fontSize: 14 }]}>
                   Mobile Number <Text style={styles.required}>*</Text>
                 </Text>
                 <TextInput
-                  style={styles.textInput}
+                  style={[styles.textInput, width < 480 && { fontSize: 15, paddingVertical: 10 }]}
                   placeholder="Enter your contact number"
                   placeholderTextColor="#9CA3AF"
                   keyboardType="numeric"
@@ -286,7 +286,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
                     openSignupModal();
                   }}
                   disabled={apiLoading}>
-                  <Text style={styles.btnOutlineText}>
+                  <Text style={[styles.btnOutlineText, width < 480 && { fontSize: 13 }]} numberOfLines={1}>
                     {apiLoading ? 'Please wait...' : 'Sign Up'}
                   </Text>
                 </TouchableOpacity>
@@ -299,7 +299,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
                     start={{ x: 0, y: 0.5 }}
                     end={{ x: 1, y: 0.5 }}
                     style={styles.btnGradient}>
-                    <Text style={styles.btnPrimaryText}>
+                    <Text style={[styles.btnPrimaryText, width < 480 && { fontSize: 13 }]} numberOfLines={1}>
                       {apiLoading ? 'Sending...' : 'Continue'}
                     </Text>
                   </LinearGradient>
@@ -316,7 +316,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
             /* ══════ SCREEN 2: OTP entry ══════ */
             <>
               {/* OTP Boxes */}
-              <View style={styles.otpInputGroup}>
+              <View style={[styles.otpInputGroup, width < 400 && { gap: 6 }]}>
                 {[0, 1, 2, 3, 4, 5].map(index => (
                   <TextInput
                     key={index}
@@ -326,6 +326,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
                     style={[
                       styles.otpInput,
                       otpError && styles.otpInputError,
+                      width < 480 && { width: width < 380 ? 36 : 42, height: width < 380 ? 36 : 42, fontSize: width < 380 ? 18 : 22 },
                     ]}
                     maxLength={1}
                     keyboardType="number-pad"
@@ -347,8 +348,8 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
               {/* Resend OTP + Contact Support links */}
               <View style={styles.resendContainer}>
                 <TouchableOpacity onPress={handleResendOtp}>
-                  <Text style={styles.resendLink}>
-                    Didn’t received OTP? <Text style={styles.resendLinkAction}>Click to resend OTP.</Text>
+                  <Text style={[styles.resendLink, width < 480 && { fontSize: 13 }]}>
+                    Didn’t received OTP? <Text style={[styles.resendLinkAction, width < 480 && { fontSize: 13 }]}>Click to resend OTP.</Text>
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => { /* open support */ }}>
@@ -366,7 +367,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
                     setErrorMsg('');
                     setOtpError(false);
                   }}>
-                  <Text style={styles.btnBackText}>Back</Text>
+                  <Text style={[styles.btnBackText, width < 480 && { fontSize: 13 }]} numberOfLines={1}>Back</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -377,7 +378,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
                     start={{ x: 0, y: 0.5 }}
                     end={{ x: 1, y: 0.5 }}
                     style={styles.btnGradient}>
-                    <Text style={styles.btnPrimaryText}>
+                    <Text style={[styles.btnPrimaryText, width < 480 && { fontSize: 13 }]} numberOfLines={1}>
                       {apiLoading ? 'Verifying...' : 'Verify & Continue'}
                     </Text>
                   </LinearGradient>
