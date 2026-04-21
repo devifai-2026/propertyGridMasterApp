@@ -285,6 +285,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
       {/* Content Section */}
       <View style={styles.propContent}>
+        {isCompare && 
         <View style={styles.propDetailsRow}>
           <View style={styles.propDetailItem}>
             <Text style={styles.detailLabel}>
@@ -318,6 +319,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             </LinearGradient>
           </View>
         </View>
+        }
 
         <View style={styles.propActions}>
           {!noView && (
@@ -388,6 +390,7 @@ const styles = StyleSheet.create({
   headerTextGroup: {
     flex: 1,
     paddingRight: 110,
+    gap: 6,
   },
   propCategory: {
     fontFamily: 'Montserrat',

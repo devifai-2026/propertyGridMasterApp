@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
   useWindowDimensions,
   StyleSheet,
-  Alert,
   TouchableOpacity,
   Animated,
   Easing,
@@ -12,66 +11,8 @@ import {
 import { useNavigation } from '../../../context/NavigationContext';
 import { COLORS, FONTS } from '../../../constants/theme';
 import PropertyCard, { Property } from '../../../components/PropertyCard';
-import CompareBanner from './CompareBanner';
+import { useCompare } from '../../../context/CompareContext';
 import LinearGradient from 'react-native-linear-gradient';
-
-const FEATURED_PROPERTIES: Property[] = [
-  {
-    id: '1',
-    title: 'Residential Space',
-    location: 'Pune, Mundhva',
-    price: '₹36.8 Crore',
-    rent: '₹22.87 Lakhs',
-    tenure: '10 Yrs',
-    roi: '90.21%',
-    type: 'Residential',
-    images: [
-      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=1000',
-      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1000',
-    ],
-    badges: ['MNC Client'],
-    isVerified: 'completed',
-    verified: true,
-    raw: { userId: 'mock-user' },
-  },
-  {
-    id: '2',
-    title: 'Commercial Space',
-    location: 'Mumbai, Bandra',
-    price: '₹42.5 Crore',
-    rent: '₹28.50 Lakhs',
-    tenure: '8 Yrs',
-    roi: '90.21%',
-    type: 'Commercial',
-    images: [
-      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1000',
-      'https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&q=80&w=1000',
-    ],
-    badges: ['MNC Client'],
-    isVerified: 'completed',
-    verified: true,
-    raw: { userId: 'mock-user' },
-  },
-  {
-    id: '3',
-    title: 'Industrial Space',
-    location: 'Delhi, Noida',
-    price: '₹28.3 Crore',
-    rent: '₹18.90 Lakhs',
-    tenure: '12 Yrs',
-    roi: '90.21%',
-    type: 'Industrial',
-    images: [
-      'https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&q=80&w=1000',
-      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&q=80&w=1000',
-      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80&w=1000',
-    ],
-    badges: ['MNC Client'],
-    isVerified: 'completed',
-    verified: true,
-    raw: { userId: 'mock-user' },
-  },
-];
 
 const PropertyCardSkeleton = ({ width }: { width: number }) => {
   const pulseAnim = React.useRef(new Animated.Value(0.3)).current;
@@ -123,7 +64,7 @@ const PropertyCardSkeleton = ({ width }: { width: number }) => {
 const FeaturedSection = ({ properties, loading }: { properties: any[]; loading?: boolean }) => {
   const { width } = useWindowDimensions();
   const { navigate } = useNavigation();
-  const [selectedProperties, setSelectedProperties] = useState<Property[]>([]);
+  const { toggleCompare, isSelected: isCompareSelected } = useCompare();
   const isMobile = width < 768;
 
   const containerPadding = width < 768 ? 9 : 10;
@@ -165,32 +106,6 @@ const FeaturedSection = ({ properties, loading }: { properties: any[]; loading?:
       }))
       : [];
 
-  const handleToggleCompare = (property: Property) => {
-    setSelectedProperties(prev => {
-      const isSelected = prev.some(p => p.id === property.id);
-      if (isSelected) {
-        return prev.filter(p => p.id !== property.id);
-      } else {
-        if (prev.length >= 3) {
-          Alert.alert('Limit Reached', 'You can compare up to 3 properties.');
-          return prev;
-        }
-        return [...prev, property];
-      }
-    });
-  };
-
-  const handleClear = () => setSelectedProperties([]);
-  const handleRemove = (id: string) =>
-    setSelectedProperties(prev => prev.filter(p => p.id !== id));
-
-  const handleCompare = () => {
-    if (selectedProperties.length < 2) return;
-    const ids = selectedProperties.map(p => p.id).join(',');
-    // Navigate to compare screen with IDs
-    navigate(`/compare/${ids}`);
-  };
-
   const handleEnquire = () => {
     navigate('/explore-properties');
   };
@@ -199,23 +114,11 @@ const FeaturedSection = ({ properties, loading }: { properties: any[]; loading?:
     <View
       style={[styles.featuredSection, { paddingHorizontal: containerPadding }]}
     >
-      {selectedProperties.length > 0 && (
-        <View style={styles.stickyBannerWrapper}>
-          <CompareBanner
-            selectedProperties={selectedProperties}
-            onClear={handleClear}
-            onRemove={handleRemove}
-            onCompare={handleCompare}
-          />
-        </View>
-      )}
-
       <Text style={[styles.sectionTitle, { fontSize: isMobile ? 28 : 42 }]}>
         Featured Properties
       </Text>
       <View style={[styles.gridContainer, { gap }]}>
         {loading ? (
-          // Show 3 skeletons during loading
           [1, 2, 3].map((_, i) => (
             <PropertyCardSkeleton key={`skeleton-${i}`} width={cardWidth > 420 ? 420 : cardWidth} />
           ))
@@ -224,9 +127,9 @@ const FeaturedSection = ({ properties, loading }: { properties: any[]; loading?:
             <PropertyCard
               key={prop.id}
               item={prop}
-              isCompare={true} // Enable compare button
-              isSelected={selectedProperties.some(p => p.id === prop.id)}
-              onToggleCompare={handleToggleCompare}
+              isCompare={true}
+              isSelected={isCompareSelected(prop.id)}
+              onToggleCompare={toggleCompare}
               onView={id => navigate(`/propertyDetails/${id}`)}
               onEnquire={id => navigate(`/enquiry/${id}`)}
             />
@@ -267,14 +170,6 @@ const styles = StyleSheet.create({
     fontSize: 42,
     fontFamily:FONTS.avenir,
     // fontStyle: 'normal',
-  },
-  stickyBannerWrapper: {
-    position: 'absolute',
-    top: 0,
-    left: 20,
-    right: 20,
-    zIndex: 100,
-    alignItems: 'center',
   },
   gridContainer: {
     flexDirection: 'row',

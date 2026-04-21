@@ -17,6 +17,8 @@ import {
 } from './src/context/NavigationContext';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { WishlistProvider } from './src/context/WishlistContext';
+import { CompareProvider } from './src/context/CompareContext';
+import CompareBanner from './src/screens/dashboard/components/CompareBanner';
 import { ActivityIndicator } from 'react-native';
 import SignupScreen from './src/screens/auth/SignupScreen';
 import ProfileScreen from './src/screens/profile/ProfileScreen';
@@ -152,6 +154,7 @@ const AppContent = () => {
       {renderScreen()}
       {showLoginModal && <LoginScreen onClose={closeLoginModal} />}
       {showSignupModal && <SignupScreen onClose={closeSignupModal} />}
+      <CompareBanner />
     </View>
   );
 };
@@ -161,7 +164,9 @@ const App = () => {
     <AuthProvider>
       <NavigationProvider>
         <WishlistProvider>
-          <AppContent />
+          <CompareProvider>
+            <AppContent />
+          </CompareProvider>
         </WishlistProvider>
       </NavigationProvider>
     </AuthProvider>

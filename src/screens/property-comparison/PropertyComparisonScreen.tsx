@@ -57,7 +57,7 @@ interface ComparisonProperty {
 }
 
 const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
-  const { goBack } = useNavigation();
+  const { goBack, navigate } = useNavigation();
   const [properties, setProperties] = useState<ComparisonProperty[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -145,6 +145,12 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
       fetchProperties();
     }
   }, [propertyIds]);
+
+  useEffect(() => {
+    if (!loading && properties.length < 2) {
+      navigate('/');
+    }
+  }, [loading, properties.length]);
 
   const handleShare = async () => {
     try {

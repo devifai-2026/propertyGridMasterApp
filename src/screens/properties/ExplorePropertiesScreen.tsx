@@ -36,8 +36,8 @@ import LinearGradient from 'react-native-linear-gradient';
 
 import Layout from '../../layout/Layout';
 import PropertyCard, { Property } from '../../components/PropertyCard';
-import CompareBanner from '../dashboard/components/CompareBanner';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
+import { useCompare } from '../../context/CompareContext';
 import { COLORS } from '../../constants/theme';
 import NoPropertiesFound from './components/NoPropertiesFound';
 import ReachedTheEnd from './components/ReachedTheEnd';
@@ -66,8 +66,8 @@ const ExplorePropertiesScreen = () => {
   const { width } = useWindowDimensions();
   const { navigate } = useNavigation();
   const { getProperties, loading: apiLoading } = usePropertyAPIs();
+  const { toggleCompare, isSelected: isCompareSelected, selectedProperties } = useCompare();
   const [properties, setProperties] = useState<Property[]>([]);
-  const [selectedProperties, setSelectedProperties] = useState<Property[]>([]);
   const [currentImageIndices, setCurrentImageIndices] = useState<{
     [key: string]: number;
   }>({});
@@ -206,28 +206,6 @@ const ExplorePropertiesScreen = () => {
       queryString, // Passed here!
     );
   };
-
-  const handleCompareToggle = (property: Property) => {
-    setSelectedProperties(prev => {
-      const isSelected = prev.some(p => p.id === property.id);
-      if (isSelected) {
-        return prev.filter(p => p.id !== property.id);
-      } else {
-        if (prev.length < 3) {
-          return [...prev, property];
-        } else {
-          Alert.alert('Limit Reached', 'You can compare up to 3 properties.');
-          return prev;
-        }
-      }
-    });
-  };
-
-  const handleRemoveCompare = (id: string) => {
-    setSelectedProperties(prev => prev.filter(p => p.id !== id));
-  };
-
-  const handleClearCompare = () => setSelectedProperties([]);
 
   const handleCompare = () => {
     if (selectedProperties.length < 2) return;
@@ -1137,16 +1115,6 @@ const ExplorePropertiesScreen = () => {
             </View>
           </View>
           
-          {selectedProperties.length > 0 && (
-            <View style={styles.compareBannerContainer}>
-              <CompareBanner
-                selectedProperties={selectedProperties}
-                onClear={handleClearCompare}
-                onRemove={handleRemoveCompare}
-                onCompare={handleCompare}
-              />
-            </View>
-          )}
 
           {/* Content Area: Either show the Loading Spinner, No Results, or the Filters + Results grid */}
           {apiLoading && properties.length === 0 ? (
@@ -1290,10 +1258,8 @@ const ExplorePropertiesScreen = () => {
                       key={property.id}
                       item={property}
                       width={width > 768 ? '31.8%' : '100%'}
-                      isSelected={selectedProperties.some(
-                        p => p.id === property.id,
-                      )}
-                      onToggleCompare={handleCompareToggle}
+                      isSelected={isCompareSelected(property.id)}
+                      onToggleCompare={toggleCompare}
                       isCompare={true}
                     />
                   );
