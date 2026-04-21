@@ -47,8 +47,16 @@ export const NavigationProvider = ({ children }: { children: ReactNode }) => {
 
   const navigate = (path: string) => {
     setCurrentPath(path);
-    if (isWeb && typeof window !== 'undefined') {
-      window.history.pushState({}, '', path);
+    if (isWeb && typeof window !== 'undefined' && window.history) {
+      try {
+        // Use a safe wrapper for pushState as some browser extensions or 
+        // older libraries might monkey-patch this and cause crashes
+        window.history.pushState({}, '', path);
+      } catch (err) {
+        console.warn('Navigation history update failed:', err);
+        // Fallback: the path is already set in state, so the UI will update
+        // even if the URL doesn't change in the browser bar.
+      }
     }
   };
 

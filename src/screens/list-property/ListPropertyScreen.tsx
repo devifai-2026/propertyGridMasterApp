@@ -767,6 +767,7 @@ const ListPropertyScreen = () => {
                       styles.nextBtnText,
                       isMobile && styles.nextBtnTextMobile,
                     ]}
+                    numberOfLines={1}
                   >
                     {currentStep === 6
                       ? isEditMode
@@ -1027,7 +1028,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat',
   },
   nextBtnTextMobile: {
-    fontSize: 18,
+    fontSize: 14,
   },
   btnHidden: {
     opacity: 0,
