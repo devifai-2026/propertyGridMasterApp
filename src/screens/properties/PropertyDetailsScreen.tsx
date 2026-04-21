@@ -160,7 +160,7 @@ const PropertyDetailsScreen = () => {
             data.media && data.media.length > 0
               ? data.media.map((m: any) => m.fileUrl)
               : null,
-          badges: [data.tenantType, data.buildingGrade].filter(Boolean),
+          badges: [data.tenantType].filter(Boolean),
           isVerified: data.isVerified,
           verified:
             data.isVerified === 'partial' || data.isVerified === 'completed',
