@@ -313,6 +313,33 @@ export const usePropertyAPIs = () => {
     });
   };
 
+  const contactBroker = (
+    brokerId: string,
+    payload: {
+      fullName: string;
+      email: string;
+      phoneNumber: string;
+      propertyType: string;
+      budgetRange: string;
+      timeline: string;
+      additionalNotes?: string;
+    },
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.post({
+      route: `/v1/brokers/contact/${brokerId}`,
+      payload,
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   const calculatePLG = (
     payload: {
       carpetArea: number;
@@ -367,6 +394,7 @@ export const usePropertyAPIs = () => {
     getMyInquiries,
     getInquiryById,
     getBrokerStats,
+    contactBroker,
     calculatePLG,
     loading,
   };

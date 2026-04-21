@@ -147,7 +147,7 @@ const FeaturedSection = ({ properties, loading }: { properties: any[]; loading?:
           parseFloat(p.totalMonthlyRent) > 0
             ? `₹${p.totalMonthlyRent}`
             : parseFloat(p.rentPerSqftMonthly) > 0
-              ? `₹${p.rentPerSqftMonthly} / sq ft`
+              ? `₹${p.rentPerSqftMonthly}`
               : 'N/A',
         tenure: p.leaseDurationYears
           ? `${parseFloat(p.leaseDurationYears).toFixed(1)} Yrs`

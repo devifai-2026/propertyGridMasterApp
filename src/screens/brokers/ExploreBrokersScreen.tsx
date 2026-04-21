@@ -8,6 +8,7 @@ import {
   Image,
 } from 'react-native';
 import Layout from '../../layout/Layout';
+import { useNavigation } from '../../context/NavigationContext';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
 import BrokerHeader from './components/BrokerHeader';
 import BrokerCard from './components/BrokerCard';
@@ -20,10 +21,10 @@ const ExploreBrokersScreen = () => {
   const isMobile = width <= 600;
   const isDesktop = width > 1024;
 
+  const { navigate } = useNavigation();
   const { getBrokers, loading } = usePropertyAPIs();
   const [brokers, setBrokers] = useState<any[]>([]);
   const [sortBy, setSortBy] = useState('name_asc');
-  const [visibleContactId, setVisibleContactId] = useState<string | null>(null);
 
   const [pagination, setPagination] = useState({
     currentPage: 1,
@@ -117,12 +118,7 @@ const ExploreBrokersScreen = () => {
                     item={item}
                     isMobile={isMobile}
                     isDesktop={isDesktop}
-                    isVisibleContact={visibleContactId === item.id}
-                    onToggleContact={() =>
-                      setVisibleContactId(
-                        visibleContactId === item.id ? null : item.id,
-                      )
-                    }
+                    onContactBroker={() => navigate(`/contact-broker/${item.id}`)}
                   />
                 ))}
               </View>

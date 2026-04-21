@@ -5,6 +5,7 @@ import LoginScreen from './src/screens/auth/LoginScreen';
 import ExplorePropertiesScreen from './src/screens/properties/ExplorePropertiesScreen';
 import CalculatorsScreen from './src/screens/calculators/CalculatorsScreen';
 import ExploreBrokersScreen from './src/screens/brokers/ExploreBrokersScreen';
+import ContactBrokerScreen from './src/screens/brokers/ContactBrokerScreen';
 import InvestorsScreen from './src/screens/investors/InvestorsScreen';
 import ListPropertyScreen from './src/screens/list-property/ListPropertyScreen';
 import ContactUsScreen from './src/screens/contact-us/ContactUsScreen';
@@ -104,8 +105,9 @@ const AppContent = () => {
       case currentPath === '/calculators':
         return <CalculatorsScreen />;
       case currentPath === '/explore-brokers':
-      case currentPath.startsWith('/contact-brokers'):
         return <ExploreBrokersScreen />;
+      case currentPath.startsWith('/contact-broker/'):
+        return <ContactBrokerScreen />;
       case currentPath === '/my-prifile':
         return isLoggedIn ? <InvestorsScreen /> : <LoginScreen />;
       case currentPath === '/list-property':

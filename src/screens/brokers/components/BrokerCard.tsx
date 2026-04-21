@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Platform, Animated, Share } from 'react-native';
-import { MapPin, Phone, Mail, X } from 'lucide-react-native';
+import { MapPin } from 'lucide-react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import bottom from "../../../assets/ExploreBrokers/bottom.png";
 import top from "../../../assets/ExploreBrokers/top.png";
@@ -11,8 +11,7 @@ interface BrokerCardProps {
   item: any;
   isMobile: boolean;
   isDesktop: boolean;
-  isVisibleContact: boolean;
-  onToggleContact: () => void;
+  onContactBroker: () => void;
 }
 
 const capitalize = (str: string) => {
@@ -24,8 +23,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
   item,
   isMobile,
   isDesktop,
-  isVisibleContact,
-  onToggleContact,
+  onContactBroker,
 }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const flipAnimation = useRef(new Animated.Value(0)).current;
@@ -137,45 +135,22 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
               />
             </View>
 
-            {isVisibleContact ? (
-              <View style={styles.contactInfoContainer}>
-                <View style={styles.contactItem}>
-                  <Phone size={12} color="#EE2529" />
-                  <Text style={styles.contactInfoText}>{item.mobileNumber}</Text>
-                </View>
-                <View style={styles.contactItem}>
-                  <Mail size={12} color="#EE2529" />
-                  <Text style={styles.contactInfoText}>{item.email}</Text>
-                </View>
-                <TouchableOpacity
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    onToggleContact();
-                  }}
-                  style={styles.closeContactBtn}
-                >
-                  <X size={12} color="#EE2529" />
-                  <Text style={styles.hideContactText}>Close</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              <TouchableOpacity
-                onPress={(e) => {
-                  e.stopPropagation();
-                  onToggleContact();
-                }}
-                activeOpacity={0.8}
+            <TouchableOpacity
+              onPress={(e) => {
+                e.stopPropagation();
+                onContactBroker();
+              }}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={['#EE2529', '#C73834']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.contactBtn}
               >
-                <LinearGradient
-                  colors={['#EE2529', '#C73834']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.contactBtn}
-                >
-                  <Text style={styles.contactBtnText}>Contact Broker</Text>
-                </LinearGradient>
-              </TouchableOpacity>
-            )}
+                <Text style={styles.contactBtnText}>Contact Broker</Text>
+              </LinearGradient>
+            </TouchableOpacity>
           </View>
 
           {/* Right Section */}
@@ -184,7 +159,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
               styles.rightSection,
               !isMobile
                 ? { flex: 1, minHeight: '100%' }
-                : { width: '100%', marginTop: isVisibleContact ? 25 : 10 },
+                : { width: '100%', marginTop: 10 },
             ]}
           >
             <View>
@@ -264,7 +239,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
             <TouchableOpacity
               onPress={(e) => {
                 e.stopPropagation();
-                onToggleContact();
+                onContactBroker();
               }}
               activeOpacity={0.8}
             >
