@@ -704,14 +704,14 @@ const PropertyDetailsScreen = () => {
             {/* Gross Rental Yield - Red Theme */}
             <View style={[styles.col, { flex: isMobile ? undefined : 1, backgroundColor: '#FEF2F2', padding: 20, borderRadius: 16, borderWidth: 2, borderColor: '#FCA5A5', minHeight: isMobile ? undefined : 180 }]}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <Text style={{ fontSize: 18, color: '#111827', fontWeight: '800' }}>Gross Rental Yield</Text>
-                <Text style={{ fontSize: 24, fontWeight: '900', color: '#B91C1C' }}>
+                <Text style={{ fontSize: 16, color: '#111827', fontWeight: '800' }}>Gross Rental Yield</Text>
+                <Text style={{ fontSize: 20, fontWeight: '900', color: '#B91C1C' }}>
                   {property.raw.grossRentalYield ? `${property.raw.grossRentalYield}%` : 'N/A'}
                 </Text>
               </View>
-              <Text style={{ fontSize: 16, color: '#9CA3AF', fontWeight: '700', marginBottom: 12 }}>% Before expenses</Text>
-              <Text style={{ fontSize: 16, color: '#6B7280', lineHeight: 22, marginBottom: 4 }}>Return before expenses.</Text>
-              <Text style={{ fontSize: 16, color: '#6B7280', lineHeight: 22 }}>Higher % = stronger rental income.</Text>
+              <Text style={{ fontSize: 13, color: '#9CA3AF', fontWeight: '700', marginBottom: 12 }}>% Before expenses</Text>
+              <Text style={{ fontSize: 13, color: '#6B7280', lineHeight: 18, marginBottom: 4 }}>Return before expenses.</Text>
+              <Text style={{ fontSize: 13, color: '#6B7280', lineHeight: 18 }}>Higher % = stronger rental income.</Text>
             </View>
 
             {!isMobile && <View style={{ width: 14 }} />}
@@ -719,14 +719,14 @@ const PropertyDetailsScreen = () => {
             {/* Net Rental Yield - Blue Theme */}
             <View style={[styles.col, { flex: isMobile ? undefined : 1, backgroundColor: '#E0F2FE', padding: 20, borderRadius: 16, borderWidth: 2, borderColor: '#7DD3FC', minHeight: isMobile ? undefined : 180 }]}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <Text style={{ fontSize: 18, color: '#111827', fontWeight: '800' }}>Net Rental Yield</Text>
-                <Text style={{ fontSize: 24, fontWeight: '900', color: '#0369A1' }}>
+                <Text style={{ fontSize: 16, color: '#111827', fontWeight: '800' }}>Net Rental Yield</Text>
+                <Text style={{ fontSize: 20, fontWeight: '900', color: '#0369A1' }}>
                   {property.raw.netRentalYield ? `${property.raw.netRentalYield}%` : 'N/A'}
                 </Text>
               </View>
-              <Text style={{ fontSize: 16, color: '#7DD3FC', fontWeight: '700', marginBottom: 12 }}>% After all expenses</Text>
-              <Text style={{ fontSize: 16, color: '#0369A1', lineHeight: 22, marginBottom: 4 }}>Return after all expenses.</Text>
-              <Text style={{ fontSize: 16, color: '#0369A1', lineHeight: 22 }}>Shows your real profit.</Text>
+              <Text style={{ fontSize: 13, color: '#7DD3FC', fontWeight: '700', marginBottom: 12 }}>% After all expenses</Text>
+              <Text style={{ fontSize: 13, color: '#0369A1', lineHeight: 18, marginBottom: 4 }}>Return after all expenses.</Text>
+              <Text style={{ fontSize: 13, color: '#0369A1', lineHeight: 18 }}>Shows your real profit.</Text>
             </View>
           </View>
 
@@ -736,14 +736,14 @@ const PropertyDetailsScreen = () => {
             {/* Annual Cash Flow - Green Theme */}
             <View style={[styles.col, { flex: isMobile ? undefined : 1, backgroundColor: '#F0FDFA', padding: 20, borderRadius: 16, borderWidth: 2, borderColor: '#5EEAD4', minHeight: isMobile ? undefined : 180 }]}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <Text style={{ fontSize: 18, color: '#111827', fontWeight: '800' }}>Annual Cash Flow</Text>
-                <Text style={{ fontSize: 24, fontWeight: '900', color: '#0D9488' }}>
+                <Text style={{ fontSize: 16, color: '#111827', fontWeight: '800' }}>Annual Cash Flow</Text>
+                <Text style={{ fontSize: 20, fontWeight: '900', color: '#0D9488' }}>
                   {property.raw.annualGrossRent ? `₹${property.raw.annualGrossRent} L` : 'N/A'}
                 </Text>
               </View>
-              <Text style={{ fontSize: 16, color: '#5EEAD4', fontWeight: '700', marginBottom: 12 }}>$ Net annual income</Text>
-              <Text style={{ fontSize: 16, color: '#0D9488', lineHeight: 22, marginBottom: 4 }}>Net yearly income.</Text>
-              <Text style={{ fontSize: 16, color: '#0D9488', lineHeight: 22 }}>Money you can use or reinvest.</Text>
+              <Text style={{ fontSize: 13, color: '#5EEAD4', fontWeight: '700', marginBottom: 12 }}>$ Net annual income</Text>
+              <Text style={{ fontSize: 13, color: '#0D9488', lineHeight: 18, marginBottom: 4 }}>Net yearly income.</Text>
+              <Text style={{ fontSize: 13, color: '#0D9488', lineHeight: 18 }}>Money you can use or reinvest.</Text>
             </View>
 
             {!isMobile && <View style={{ width: 14 }} />}
@@ -751,14 +751,14 @@ const PropertyDetailsScreen = () => {
             {/* Payback Period - Yellow Theme */}
             <View style={[styles.col, { flex: isMobile ? undefined : 1, backgroundColor: '#FFFBEB', padding: 20, borderRadius: 16, borderWidth: 2, borderColor: '#FDE68A', minHeight: isMobile ? undefined : 180 }]}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                <Text style={{ fontSize: 18, color: '#111827', fontWeight: '800' }}>Payback Period</Text>
-                <Text style={{ fontSize: 24, fontWeight: '900', color: '#B45309' }}>
+                <Text style={{ fontSize: 16, color: '#111827', fontWeight: '800' }}>Payback Period</Text>
+                <Text style={{ fontSize: 20, fontWeight: '900', color: '#B45309' }}>
                   {property.raw.paybackPeriodYears ? `${property.raw.paybackPeriodYears} Yrs` : 'N/A'}
                 </Text>
               </View>
-              <Text style={{ fontSize: 16, color: '#FDE68A', fontWeight: '700', marginBottom: 12 }}>Time to break even</Text>
-              <Text style={{ fontSize: 16, color: '#B45309', lineHeight: 22, marginBottom: 4 }}>Years to recover cost.</Text>
-              <Text style={{ fontSize: 16, color: '#B45309', lineHeight: 22 }}>Shorter = quicker returns.</Text>
+              <Text style={{ fontSize: 13, color: '#FDE68A', fontWeight: '700', marginBottom: 12 }}>Time to break even</Text>
+              <Text style={{ fontSize: 13, color: '#B45309', lineHeight: 18, marginBottom: 4 }}>Years to recover cost.</Text>
+              <Text style={{ fontSize: 13, color: '#B45309', lineHeight: 18 }}>Shorter = quicker returns.</Text>
             </View>
           </View>
         </View>
@@ -770,25 +770,25 @@ const PropertyDetailsScreen = () => {
             <PropertyDetailsCard title="Investment Summary">
               <View style={{ gap: 20, marginTop: 10 }}>
                 <View style={{ flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', gap: isMobile ? 4 : 0 }}>
-                  <Text style={{ fontSize: 16, color: '#999' }}>Total Initial Investment (₹)</Text>
-                  <Text style={{ fontSize: 18, color: '#444', fontWeight: '700' }}>
+                  <Text style={{ fontSize: 14, color: '#999' }}>Total Initial Investment (₹)</Text>
+                  <Text style={{ fontSize: 15, color: '#444', fontWeight: '700' }}>
                     ₹{property.raw.sellingPrice ? (property.raw.sellingPrice * 100).toFixed(0) + ',00,000' : '48,52,500'}
                   </Text>
                 </View>
                 <View style={{ flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', gap: isMobile ? 4 : 0 }}>
-                  <Text style={{ fontSize: 16, color: '#999' }}>Gross Annual Rent (₹)</Text>
-                  <Text style={{ fontSize: 18, color: '#444', fontWeight: '700' }}>
+                  <Text style={{ fontSize: 14, color: '#999' }}>Gross Annual Rent (₹)</Text>
+                  <Text style={{ fontSize: 15, color: '#444', fontWeight: '700' }}>
                     ₹{property.raw.annualGrossRent ? property.raw.annualGrossRent + ' L' : '6,00,000'}
                   </Text>
                 </View>
                 <View style={{ flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', gap: isMobile ? 4 : 0 }}>
-                  <Text style={{ fontSize: 16, color: '#999' }}>Total Annual Expenses (₹)</Text>
-                  <Text style={{ fontSize: 18, color: '#444', fontWeight: '700' }}>₹65,000</Text>
+                  <Text style={{ fontSize: 14, color: '#999' }}>Total Annual Expenses (₹)</Text>
+                  <Text style={{ fontSize: 15, color: '#444', fontWeight: '700' }}>₹65,000</Text>
                 </View>
                 <View style={{ height: 1, backgroundColor: '#EEE', marginVertical: 4 }} />
                 <View style={{ flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', gap: isMobile ? 4 : 0 }}>
-                  <Text style={{ fontSize: 18, color: '#444', fontWeight: '700' }}>Net Annual Income (₹)</Text>
-                  <Text style={{ fontSize: 20, color: '#10B981', fontWeight: '800' }}>
+                  <Text style={{ fontSize: 15, color: '#444', fontWeight: '700' }}>Net Annual Income (₹)</Text>
+                  <Text style={{ fontSize: 18, color: '#10B981', fontWeight: '800' }}>
                     ₹{property.raw.annualGrossRent ? (property.raw.annualGrossRent - 0.65).toFixed(2) + ' L' : '5,35,000'}
                   </Text>
                 </View>
@@ -803,12 +803,12 @@ const PropertyDetailsScreen = () => {
             <PropertyDetailsCard title="Additional Income">
               <View style={{ gap: 20, marginTop: 10 }}>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={{ fontSize: 16, color: '#999' }}>Annual Interest on Security Deposit (₹)</Text>
-                  <Text style={{ fontSize: 18, color: '#10B981', fontWeight: '700' }}>₹25,500</Text>
+                  <Text style={{ fontSize: 14, color: '#999' }}>Annual Interest on Security Deposit (₹)</Text>
+                  <Text style={{ fontSize: 15, color: '#10B981', fontWeight: '700' }}>₹25,500</Text>
                 </View>
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
-                  <Text style={{ fontSize: 18, color: '#444', fontWeight: '700' }}>Total Annual Return (₹)</Text>
-                  <Text style={{ fontSize: 22, color: '#10B981', fontWeight: '800' }}>₹5,60,500</Text>
+                  <Text style={{ fontSize: 15, color: '#444', fontWeight: '700' }}>Total Annual Return (₹)</Text>
+                  <Text style={{ fontSize: 18, color: '#10B981', fontWeight: '800' }}>₹5,60,500</Text>
                 </View>
               </View>
             </PropertyDetailsCard>
@@ -816,7 +816,7 @@ const PropertyDetailsScreen = () => {
         </View>
 
         <View style={{ marginTop: 24 }}>
-          <Text style={{ fontSize: 24, color: '#EE2529', fontWeight: '800', marginBottom: 20 }}>Performance Analytics</Text>
+          <Text style={{ fontSize: 20, color: '#EE2529', fontWeight: '800', marginBottom: 20 }}>Performance Analytics</Text>
           
           <View style={[styles.row, isMobile && { flexDirection: 'column' }]}>
             {/* Annual Expense Breakdown - Simulated Chart */}
@@ -828,10 +828,10 @@ const PropertyDetailsScreen = () => {
                 
                 {/* Legend Labels Overlay */}
                 <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
-                  <Text style={{ position: 'absolute', top: 10, left: -20, color: '#F59E0B', fontSize: 14, fontWeight: '700' }}>Maintenance 46%</Text>
-                  <Text style={{ position: 'absolute', top: 20, right: -10, color: '#06B6D4', fontSize: 14, fontWeight: '700' }}>Property Tax 18%</Text>
-                  <Text style={{ position: 'absolute', bottom: 10, left: -10, color: '#B91C1C', fontSize: 14, fontWeight: '700' }}>Insurance 12%</Text>
-                  <Text style={{ position: 'absolute', bottom: 20, right: -20, color: '#0D9488', fontSize: 14, fontWeight: '700' }}>Other Expenses 23%</Text>
+                  <Text style={{ position: 'absolute', top: 10, left: -20, color: '#F59E0B', fontSize: 12, fontWeight: '700' }}>Maintenance 46%</Text>
+                  <Text style={{ position: 'absolute', top: 20, right: -10, color: '#06B6D4', fontSize: 12, fontWeight: '700' }}>Property Tax 18%</Text>
+                  <Text style={{ position: 'absolute', bottom: 10, left: -10, color: '#B91C1C', fontSize: 12, fontWeight: '700' }}>Insurance 12%</Text>
+                  <Text style={{ position: 'absolute', bottom: 20, right: -20, color: '#0D9488', fontSize: 12, fontWeight: '700' }}>Other Expenses 23%</Text>
                 </View>
               </View>
             </View>
@@ -859,7 +859,7 @@ const PropertyDetailsScreen = () => {
         </View>
         {/* Cash Flow Projections Chart Section */}
         <View style={{ marginTop: 24, backgroundColor: 'white', padding: 25, borderRadius: 16, elevation: 4 }}>
-          <Text style={{ fontSize: 20, color: '#444', fontWeight: '700', textAlign: 'center', marginBottom: 20 }}>Cash Flow Projections</Text>
+          <Text style={{ fontSize: 16, color: '#444', fontWeight: '700', textAlign: 'center', marginBottom: 20 }}>Cash Flow Projections</Text>
           <View style={{ height: 280, borderLeftWidth: 1, borderBottomWidth: 1, borderColor: '#CCC', paddingBottom: 25, paddingLeft: 10 }}>
             {/* Horizontal Grid lines */}
             {[0, 1, 2, 3, 4].map((i) => (
@@ -878,46 +878,46 @@ const PropertyDetailsScreen = () => {
             
             {/* Y-axis labels */}
             <View style={{ position: 'absolute', left: -55, height: '100%', justifyContent: 'space-between' }}>
-              <Text style={{ fontSize: 13, color: '#999' }}>+50L</Text>
-              <Text style={{ fontSize: 13, color: '#999' }}>+25L</Text>
-              <Text style={{ fontSize: 13, color: '#999' }}>0L</Text>
-              <Text style={{ fontSize: 13, color: '#999' }}>-25L</Text>
-              <Text style={{ fontSize: 13, color: '#999' }}>-50L</Text>
+              <Text style={{ fontSize: 11, color: '#999' }}>+50L</Text>
+              <Text style={{ fontSize: 11, color: '#999' }}>+25L</Text>
+              <Text style={{ fontSize: 11, color: '#999' }}>0L</Text>
+              <Text style={{ fontSize: 11, color: '#999' }}>-25L</Text>
+              <Text style={{ fontSize: 11, color: '#999' }}>-50L</Text>
             </View>
           </View>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15, paddingHorizontal: 10 }}>
-            {['Year 1', 'Year 3', 'Year 5', 'Year 7', 'Year 10'].map(y => <Text key={y} style={{ fontSize: 13, color: '#999' }}>{y}</Text>)}
+            {['Year 1', 'Year 3', 'Year 5', 'Year 7', 'Year 10'].map(y => <Text key={y} style={{ fontSize: 11, color: '#999' }}>{y}</Text>)}
           </View>
           
           <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 20, marginTop: 24, flexWrap: 'wrap' }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#0D9488' }} /><Text style={{ fontSize: 15, color: '#0D9488', fontWeight: '800' }}>Annual Cash Flow</Text></View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#B91C1C' }} /><Text style={{ fontSize: 15, color: '#B91C1C', fontWeight: '800' }}>Annual Rent</Text></View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#F59E0B' }} /><Text style={{ fontSize: 15, color: '#F59E0B', fontWeight: '800' }}>Cumulative Cash Flow</Text></View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#0D9488' }} /><Text style={{ fontSize: 13, color: '#0D9488', fontWeight: '800' }}>Annual Cash Flow</Text></View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#B91C1C' }} /><Text style={{ fontSize: 13, color: '#B91C1C', fontWeight: '800' }}>Annual Rent</Text></View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#F59E0B' }} /><Text style={{ fontSize: 13, color: '#F59E0B', fontWeight: '800' }}>Cumulative Cash Flow</Text></View>
           </View>
         </View>
 
         {/* Detailed Cashflow Projections */}
         <View style={{ marginTop: 24, backgroundColor: 'white', padding: 25, borderRadius: 16, elevation: 4 }}>
-          <Text style={{ fontSize: 20, color: '#444', fontWeight: '700', textAlign: 'center', marginBottom: 20 }}>Detailed Cashflow Projections</Text>
+          <Text style={{ fontSize: 16, color: '#444', fontWeight: '700', textAlign: 'center', marginBottom: 20 }}>Detailed Cashflow Projections</Text>
           <View style={{ borderTopWidth: 1, borderColor: '#EEE' }}>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               <View style={{ width: isMobile ? 600 : '100%' }}>
             <View style={{ flexDirection: 'row', paddingVertical: 15, backgroundColor: '#F9FAFB', borderBottomWidth: 1, borderColor: '#EEE' }}>
-              <Text style={{ flex: 0.5, fontSize: 15, fontWeight: '800', textAlign: 'center' }}>Year</Text>
-              <Text style={{ flex: 1, fontSize: 15, fontWeight: '800', textAlign: 'center' }}>Annual Rent</Text>
-              <Text style={{ flex: 1, fontSize: 15, fontWeight: '800', textAlign: 'center' }}>Net Flow</Text>
-              <Text style={{ flex: 1, fontSize: 15, fontWeight: '800', textAlign: 'center' }}>Cumulative</Text>
-              <Text style={{ flex: 0.8, fontSize: 15, fontWeight: '800', textAlign: 'center' }}>ROI %</Text>
+              <Text style={{ flex: 0.5, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>Year</Text>
+              <Text style={{ flex: 1, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>Annual Rent</Text>
+              <Text style={{ flex: 1, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>Net Flow</Text>
+              <Text style={{ flex: 1, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>Cumulative</Text>
+              <Text style={{ flex: 0.8, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>ROI %</Text>
             </View>
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(yr => (
               <View key={yr} style={{ flexDirection: 'row', paddingVertical: 14, borderBottomWidth: 1, borderColor: '#EEE' }}>
-                <Text style={{ flex: 0.5, fontSize: 14, textAlign: 'center', color: '#666' }}>{yr}</Text>
-                <Text style={{ flex: 1, fontSize: 14, textAlign: 'center', color: '#444' }}>₹6,00,000</Text>
-                <Text style={{ flex: 1, fontSize: 14, textAlign: 'center', color: '#0D9488', fontWeight: '700' }}>+₹5,35,000</Text>
-                <Text style={{ flex: 1, fontSize: 14, textAlign: 'center', color: yr < 7 ? '#B91C1C' : '#0D9488', fontWeight: '700' }}>
+                <Text style={{ flex: 0.5, fontSize: 12, textAlign: 'center', color: '#666' }}>{yr}</Text>
+                <Text style={{ flex: 1, fontSize: 12, textAlign: 'center', color: '#444' }}>₹6,00,000</Text>
+                <Text style={{ flex: 1, fontSize: 12, textAlign: 'center', color: '#0D9488', fontWeight: '700' }}>+₹5,35,000</Text>
+                <Text style={{ flex: 1, fontSize: 12, textAlign: 'center', color: yr < 7 ? '#B91C1C' : '#0D9488', fontWeight: '700' }}>
                   {yr < 7 ? `-₹${(10-yr)*5}L` : `+₹${(yr-7)*10}L`}
                 </Text>
-                <Text style={{ flex: 0.8, fontSize: 14, textAlign: 'center', color: '#444' }}>{(yr*6.4).toFixed(1)}%</Text>
+                <Text style={{ flex: 0.8, fontSize: 12, textAlign: 'center', color: '#444' }}>{(yr*6.4).toFixed(1)}%</Text>
               </View>
             ))}
               </View>
@@ -951,8 +951,8 @@ const PropertyDetailsScreen = () => {
             </PropertyDetailsCard>
 
             <PropertyDetailsCard title="Demand Drivers">
-              <Text style={{ fontSize: 13, color: '#999', marginBottom: 4 }}>Proximity to major IT campuses</Text>
-              <Text style={{ fontSize: 14, color: '#444', lineHeight: 20 }}>
+              <Text style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>Proximity to major IT campuses</Text>
+              <Text style={{ fontSize: 13, color: '#444', lineHeight: 18 }}>
                 Infosys, Wipro, TCS. High demand for Grade A office spaces. Growing tech hub with multinational presence.
               </Text>
             </PropertyDetailsCard>
@@ -969,8 +969,8 @@ const PropertyDetailsScreen = () => {
                 </View>
               </View>
               <View style={[styles.benchmarkNote, { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#F0F0F0' }]}>
-                <Text style={{ fontSize: 13, color: '#999', marginBottom: 6 }}>Competitive Advantage</Text>
-                <Text style={{ fontSize: 14, color: '#444', fontWeight: '600', lineHeight: 20 }}>
+                <Text style={{ fontSize: 12, color: '#999', marginBottom: 6 }}>Competitive Advantage</Text>
+                <Text style={{ fontSize: 13, color: '#444', fontWeight: '600', lineHeight: 18 }}>
                   This property's rent of ₹57/sq.ft is above the market average of ₹55/sq.ft, with a net yield of 7.43% exceeding the market cap rate of 6.5%.
                 </Text>
               </View>
@@ -983,37 +983,37 @@ const PropertyDetailsScreen = () => {
               <View style={styles.proximityItem}>
                 <View style={[styles.proximityIconLabel, { gap: 10 }]}>
                   <Plane size={18} color="#F7C952" />
-                  <Text style={{ fontSize: 15, color: '#444', fontWeight: '500' }}>Airport</Text>
+                  <Text style={{ fontSize: 13, color: '#444', fontWeight: '500' }}>Airport</Text>
                 </View>
                 <View style={[styles.distanceBadge, { backgroundColor: '#FEF9C3' }]}>
-                  <Text style={{ fontSize: 13, color: '#854D0E', fontWeight: '600' }}>12 km</Text>
+                  <Text style={{ fontSize: 11, color: '#854D0E', fontWeight: '600' }}>12 km</Text>
                 </View>
               </View>
               <View style={[styles.proximityItem, { marginTop: 12 }]}>
                 <View style={[styles.proximityIconLabel, { gap: 10 }]}>
                   <Train size={18} color="#F7C952" />
-                  <Text style={{ fontSize: 15, color: '#444', fontWeight: '500' }}>Metro Station</Text>
+                  <Text style={{ fontSize: 13, color: '#444', fontWeight: '500' }}>Metro Station</Text>
                 </View>
                 <View style={[styles.distanceBadge, { backgroundColor: '#FEF9C3' }]}>
-                  <Text style={{ fontSize: 13, color: '#854D0E', fontWeight: '600' }}>1.2 km</Text>
+                  <Text style={{ fontSize: 11, color: '#854D0E', fontWeight: '600' }}>1.2 km</Text>
                 </View>
               </View>
               <View style={[styles.proximityItem, { marginTop: 12 }]}>
                 <View style={[styles.proximityIconLabel, { gap: 10 }]}>
                   <MapPin size={18} color="#F7C952" />
-                  <Text style={{ fontSize: 15, color: '#444', fontWeight: '500' }}>Major Junction</Text>
+                  <Text style={{ fontSize: 13, color: '#444', fontWeight: '500' }}>Major Junction</Text>
                 </View>
                 <View style={[styles.distanceBadge, { backgroundColor: '#FEF9C3' }]}>
-                  <Text style={{ fontSize: 13, color: '#854D0E', fontWeight: '600' }}>3.5 km</Text>
+                  <Text style={{ fontSize: 11, color: '#854D0E', fontWeight: '600' }}>3.5 km</Text>
                 </View>
               </View>
             </PropertyDetailsCard>
 
             <PropertyDetailsCard title="Future Infrastructure">
               <View style={{ gap: 12 }}>
-                <Text style={{ fontSize: 14, color: '#444', fontWeight: '600' }}>• Pune Metro Line 3 extension planned (ETA 2027)</Text>
-                <Text style={{ fontSize: 14, color: '#444', fontWeight: '600' }}>• Ring Road expansion (ETA 2026)</Text>
-                <Text style={{ fontSize: 14, color: '#444', fontWeight: '600' }}>• New IT parks under development in the vicinity</Text>
+                <Text style={{ fontSize: 13, color: '#444', fontWeight: '600' }}>• Pune Metro Line 3 extension planned (ETA 2027)</Text>
+                <Text style={{ fontSize: 13, color: '#444', fontWeight: '600' }}>• Ring Road expansion (ETA 2026)</Text>
+                <Text style={{ fontSize: 13, color: '#444', fontWeight: '600' }}>• New IT parks under development in the vicinity</Text>
               </View>
             </PropertyDetailsCard>
           </View>
@@ -1166,11 +1166,7 @@ const PropertyDetailsScreen = () => {
                   backgroundColor: '#F9FAFB',
                   borderWidth: 1,
                   borderColor: '#E5E7EB',
-                  borderRadius: 12,
-                  padding: 16,
-                  fontSize: 14,
-                  color: '#374151',
-                  outlineStyle: 'none',
+
                   resize: 'none',
                   minHeight: 120,
                 } as any
@@ -1444,7 +1440,7 @@ const styles = StyleSheet.create({
     
   },
   tabText: {
-    fontSize: 18,
+    fontSize: 14,
     color: '#767676',
     fontWeight: 400,
     marginTop: 4,
@@ -1452,7 +1448,7 @@ const styles = StyleSheet.create({
   activeTabText: {
     color:'#EE2529',
     fontWeight:700,
-    fontSize:18,
+    fontSize:14,
   },
   activeTabIndicator: {
     position: 'absolute',
@@ -1496,7 +1492,7 @@ const styles = StyleSheet.create({
   },
   premiumText: {
     color: '#767676', 
-    fontSize: 18,
+    fontSize: 12,
     fontWeight: '500',
   },
   actionButtonsRow: {
@@ -1509,11 +1505,11 @@ const styles = StyleSheet.create({
     borderWidth: 2.5,
     borderColor: '#EEEEEE',
     borderRadius: 8,
-    paddingHorizontal: 28,
+    paddingHorizontal: 16,
     paddingVertical: 12,
-    gap: 12,
+    gap: 8,
     backgroundColor: COLORS.white,
-    minWidth: 200,
+    minWidth: 160,
     justifyContent: 'center',
     flexShrink: 0,
   },
@@ -1523,28 +1519,28 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   actionOutlineText: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#767676',
     fontWeight: 600,
     fontFamily:'Montserrat',
   },
   descriptionTitle: {
-    fontSize: 36,
+    fontSize: 28,
     fontWeight: '600',
     color: '#EE2529',
     marginBottom: 8,
   },
   descriptionTitleMobile: {
-    fontSize: 24,
+    fontSize: 20,
   },
   descriptionText: {
-    fontSize: 22,
+    fontSize: 16,
     color: COLORS.textSecondary,
-    lineHeight: 32,
+    lineHeight: 24,
   },
   descriptionTextMobile: {
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: 14,
+    lineHeight: 20,
   },
   gridContainer: {
     gap: width < 768 ? 12 : 16,
@@ -1564,7 +1560,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   cardTitle: {
-    fontSize: width < 768 ? 18 : 24,
+    fontSize: width < 768 ? 16 : 20,
     fontWeight: '700',
     color: '#EE2529',
     fontFamily: 'Montserrat',
@@ -1593,12 +1589,12 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   infoLabel: {
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.textSecondary,
     fontFamily: 'Montserrat',
   },
   infoValue: {
-    fontSize: 18,
+    fontSize: 15,
     color: COLORS.textDark,
     fontWeight: '600',
     fontFamily: 'Montserrat',
@@ -1625,15 +1621,15 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
   },
   assistanceTitle: {
-    fontSize: 26,
+    fontSize: 20,
     fontWeight: '600',
     color: '#EE2529',
     marginBottom: 12,
   },
   assistanceText: {
-    fontSize: 20,
+    fontSize: 15,
     color: '#4B5563',
-    lineHeight: 30,
+    lineHeight: 22,
     marginBottom: 24,
   },
   supportButton: {
@@ -1646,7 +1642,7 @@ const styles = StyleSheet.create({
   },
   supportButtonText: {
     color: '#767676',
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: '700',
   },
   hvacContainer: {
@@ -1796,9 +1792,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   noteText: {
-    fontSize: 18,
+    fontSize: 14,
     color: '#444',
-    lineHeight: 26,
+    lineHeight: 20,
     fontWeight: '500',
   },
   emptyNotesContainer: {
