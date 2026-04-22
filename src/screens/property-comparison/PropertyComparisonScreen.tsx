@@ -284,6 +284,7 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
                   prop.isVerified === 'completed',
                 raw: prop.raw,
               }}
+              iscomparePage={true}
               width="25%"
               onRemove={handleRemoveProperty}
               onView={() => {}}

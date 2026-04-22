@@ -58,6 +58,7 @@ interface PropertyCardProps {
   onView?: (id: string) => void;
   onEnquire?: (id: string) => void;
   style?: ViewStyle;
+  iscomparePage?: boolean;
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({
@@ -66,6 +67,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   isCompare = false,
   isSelected = false,
   noView = false,
+  iscomparePage = false,
   onToggleCompare,
   onRemove,
   onView,
@@ -99,14 +101,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
     }
     return () => clearInterval(interval);
   }, [imageCount]);
-
-  const handlePrevImage = () => {
-    setCurrentImageIndex(prev => (prev - 1 + imageCount) % imageCount);
-  };
-
-  const handleNextImage = () => {
-    setCurrentImageIndex(prev => (prev + 1) % imageCount);
-  };
 
   const handleView = () => {
     navigate(`/propertyDetails/${item.id}`);
@@ -285,7 +279,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
       {/* Content Section */}
       <View style={styles.propContent}>
-        {isCompare && 
+        {!iscomparePage && 
         <View style={styles.propDetailsRow}>
           <View style={styles.propDetailItem}>
             <Text style={styles.detailLabel}>
