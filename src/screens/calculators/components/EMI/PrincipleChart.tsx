@@ -110,7 +110,7 @@ const PrincipleChart = () => {
                   stroke="#f0f0f0"
                   strokeWidth="1"
                 />
-                <SvgText x={5} y={y + 4} fontSize="10" fill="#999">
+                <SvgText x={5} y={y + 4} fontSize="10" fill="#999" fontFamily="Montserrat">
                   {formatYAxis(val)}
                 </SvgText>
               </G>
@@ -130,6 +130,7 @@ const PrincipleChart = () => {
               fontSize="10"
               fill="#6b7280"
               textAnchor="middle"
+              fontFamily="Montserrat"
             >
               {item.year}
             </SvgText>
@@ -174,12 +175,14 @@ const styles = StyleSheet.create({
     color: '#1f2937',
     marginBottom: 5,
     textAlign: 'center',
+    fontFamily: 'Montserrat',
   },
   subtitle: {
     fontSize: 12,
     color: '#6B7280',
     marginBottom: 20,
     textAlign: 'center',
+    fontFamily: 'Montserrat',
   },
   legend: {
     flexDirection: 'row',
@@ -200,6 +203,7 @@ const styles = StyleSheet.create({
   legendText: {
     fontSize: 12,
     color: '#333',
+    fontFamily: 'Montserrat',
   },
 });
 

@@ -126,6 +126,7 @@ const styles = StyleSheet.create({
     color: '#262626',
     paddingHorizontal: 16,
     paddingTop: 16,
+    fontFamily: 'Montserrat',
   },
   tableWrapper: {
     paddingHorizontal: 16,
@@ -152,10 +153,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     fontSize: 14,
     textAlign: 'center',
+    fontFamily: 'Montserrat',
   },
   headerText: {
     fontWeight: '700',
     fontSize: 15,
+    fontFamily: 'Montserrat',
   },
   whiteRow: {
     backgroundColor: '#ffffff',
@@ -166,10 +169,12 @@ const styles = StyleSheet.create({
   green: {
     color: '#429482',
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
   red: {
     color: '#EE2529',
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
   buttonContainer: {
     flexDirection: isDesktop ? 'row' : 'column',
@@ -201,6 +206,7 @@ const styles = StyleSheet.create({
     color: '#767676',
     fontWeight: '600',
     fontSize: isDesktop ? 16 : 14,
+    fontFamily: 'Montserrat',
   },
 });
 

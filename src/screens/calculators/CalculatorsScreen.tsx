@@ -36,6 +36,7 @@ import PrincipleChart from './components/EMI/PrincipleChart';
 import CoverageAnalysis from './components/EMI/CoverageAnalysis';
 import LinearGradient from 'react-native-linear-gradient';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
+import { FONTS } from '../../constants/theme';
 
   const EMICalculatorIcon = ({ size = 20, color = '#767676' }) => (
   <Svg width={size} height={size * (30/37)} viewBox="0 0 37 30" fill="none">
@@ -339,7 +340,7 @@ const CalculatorHeader = ({ type }: { type: 'roi' | 'emi' }) => {
   return (
     <View style={styles.calcHeader}>
       <View style={styles.calcHeaderIconBox}>{headerData.icon}</View>
-      <Text style={[styles.calcTitle, !isDesktop && { fontSize: 24 }]}>{headerData.title}</Text>
+      <Text style={[styles.calcTitle, !isDesktop && { fontSize: 24 }, { fontFamily: FONTS.avenir }]}>{headerData.title}</Text>
       <Text style={[styles.calcSubtitle, !isDesktop && { fontSize: 14, height: 'auto' }]}>{headerData.subtitle}</Text>
     </View>
   );
@@ -1455,12 +1456,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 3,
     textAlign: 'center',
+    fontFamily:'Montserrat',
   },
   heroStatValue: {
     fontSize: 18,
     color: '#EE2529',
     fontWeight: 400,
     textAlign: 'center',
+    fontFamily: 'Montserrat',
   },
   badgeContainer: {
     backgroundColor: '#FFF3CA',
@@ -1469,17 +1472,20 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignSelf: 'flex-start',
     marginBottom: 8,
+    fontFamily:'Montserrat',
   },
   badgeText: {
     fontSize: 15,
     color: '#767676',
     fontWeight: 400,
+    fontFamily:'Montserrat',
   },
   heroTitle: {
     fontSize: 25,
     fontWeight: 'bold',
     color: '#262626',
     marginBottom: 4,
+    fontFamily:FONTS.avenir,
   },
   heroSubtitle: {
     fontSize: 18,
@@ -1488,6 +1494,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontWeight: 400,
     maxWidth: 800,
+    fontFamily:'Montserrat',
   },
   statsRow: {
     flexDirection: 'row',
@@ -1510,12 +1517,14 @@ const styles = StyleSheet.create({
     color: '#767676',
     marginBottom: 5,
     fontWeight: '600',
+    fontFamily:'Montserrat',
   },
   statValue: {
     fontSize: 12,
     color: '#EE2529',
     textAlign: 'center',
     fontWeight: 'bold',
+    fontFamily:'Montserrat',
   },
   heroImage: {
     // width: 1000,
@@ -1566,12 +1575,14 @@ const styles = StyleSheet.create({
     color: '#767676',
     fontWeight: 400,
     lineHeight:24,
+    fontFamily:'Montserrat',
   },
   activeTabText: {
     fontSize: 24,
     color: '#EE2529',
     fontWeight: 700,
     lineHeight:24,
+    fontFamily: 'Montserrat',
   },
   activeIndicator: {
     position: 'absolute',
@@ -1599,6 +1610,7 @@ const styles = StyleSheet.create({
     marginTop:10,
     color: '#333',
     textAlign: 'center',
+    fontFamily: FONTS.avenir,
   },
   sectionCard: {
     backgroundColor: '#fff',
@@ -1619,7 +1631,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     elevation: 4,
    
-   
   },
   sectionHeaderRow: {
     flexDirection: 'row',
@@ -1633,12 +1644,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#EE2529',
     marginBottom: 8,
+    fontFamily:'Montserrat',
   },
   sectionNote: {
     color: '#6B7280',
     fontSize: 16,
     lineHeight: 18,
     marginBottom: 16,
+    fontFamily:'Montserrat',
   },
   toggleRow: {
     flexDirection: 'row',
@@ -1677,10 +1690,12 @@ const styles = StyleSheet.create({
     color: '#4B5563',
     fontWeight: '600',
     flex: 0.45,
+    fontFamily:'Montserrat',
   },
   inputRight: {
     flex: 0.55,
     textAlign: 'right',
+    fontFamily: 'Montserrat',
   },
   label: {
     fontSize: 18,
@@ -1732,6 +1747,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     borderWidth: 1,
     borderColor: '#eee',
+    fontFamily:'Montserrat',
   },
   activeTypeBtn: {
     backgroundColor: '#FFF3CA',
@@ -1741,9 +1757,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
   activeTypeBtnText: {
     color: '#d62d2d',
+    fontFamily: 'Montserrat',
   },
   calculateBtn: {
     paddingVertical: 12,
@@ -1867,7 +1885,7 @@ const styles = StyleSheet.create({
     color: '#767676',
     fontWeight: '600',
     textAlign: 'center',
-    
+    fontFamily: 'Montserrat',
   },
   alertBox: {
     marginTop: 15,
@@ -1918,6 +1936,7 @@ const styles = StyleSheet.create({
     color: '#767676',
     textAlign: 'center',
     maxWidth: '85%',
+    fontFamily: 'Montserrat',
     marginBottom: 4,
     height:28,
   },

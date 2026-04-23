@@ -12,6 +12,7 @@ import ContactCards from './components/ContactCards';
 import ContactForm from './components/ContactForm';
 import Layout from '../../layout/Layout';
 import bgBanner from "../../assets/Banner/bannerBg.png"
+import { FONTS } from '../../constants/theme';
 
 const ContactUsScreen = () => {
   const { width, height } = useWindowDimensions();
@@ -139,7 +140,7 @@ const styles = StyleSheet.create({
     color: '#262626',
     marginBottom: 20,
     lineHeight: 48,
-    fontFamily:'Montserrat',
+    fontFamily:FONTS.avenir,
   },
   subtitle: {
     fontSize: 18,

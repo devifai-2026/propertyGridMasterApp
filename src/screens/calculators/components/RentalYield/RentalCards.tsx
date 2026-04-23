@@ -138,12 +138,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
 
   subText: {
     fontSize: 14,
     color: '#6B7280',
     marginTop: 4,
+    fontFamily: 'Montserrat',
   },
 
   redCard: {
@@ -166,6 +168,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#C73834',
     marginTop: 4,
+    fontFamily: 'Montserrat',
   },
 
   blueValue: {
@@ -173,6 +176,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#26BFCC',
     marginTop: 4,
+    fontFamily: 'Montserrat',
   },
 
   greenValue: {
@@ -180,6 +184,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#429482',
     marginTop: 4,
+    fontFamily: 'Montserrat',
   },
 
   yellowValue: {
@@ -187,5 +192,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#F7C952',
     marginTop: 4,
+    fontFamily: 'Montserrat',
   },
 });

@@ -259,6 +259,32 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
           </Text>
         </View>
 
+        {/* Comparison Header Bar */}
+        <View style={styles.comparisonHeaderBar}>
+          <View style={styles.headerBarItem}>
+            <Text style={styles.headerBarTitle}>Property Comparison</Text>
+            <Text style={styles.headerBarSubtitle}>Compare key metrics of properties</Text>
+          </View>
+          
+          {properties.map((prop) => (
+            <React.Fragment key={prop.propertyId}>
+              <View style={styles.headerBarDivider} />
+              <View style={[styles.headerBarItem, styles.centerAlign]}>
+                <Text style={[styles.headerBarTitle, styles.textCenter]}>{prop.title}</Text>
+                <Text style={[styles.headerBarSubtitle, styles.textCenter]}>{prop.clientType}</Text>
+              </View>
+            </React.Fragment>
+          ))}
+
+          {/* Fill empty slots if less than 3 properties */}
+          {[...Array(3 - properties.length)].map((_, i) => (
+            <React.Fragment key={`empty-bar-${i}`}>
+              <View style={styles.headerBarDivider} />
+              <View style={styles.headerBarItem} />
+            </React.Fragment>
+          ))}
+        </View>
+
         {/* Property Cards Row */}
         <View style={styles.cardsRow}>
           <View style={styles.propertyHeaderLabel}>
@@ -461,8 +487,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
     paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.divider,
+   
   },
   backButton: {
     marginRight: 10,
@@ -721,6 +746,50 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.textSecondary,
     fontWeight: '600',
+  },
+  // Comparison Header Bar Styles
+  comparisonHeaderBar: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#EDECEC',
+    paddingVertical: 20,
+    marginBottom: 30,
+    alignItems: 'center',
+    // Top shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  headerBarItem: {
+    flex: 1,
+    paddingHorizontal: 25,
+    justifyContent: 'center',
+  },
+  centerAlign: {
+    alignItems: 'center',
+  },
+  textCenter: {
+    textAlign: 'center',
+  },
+  headerBarDivider: {
+    width: 1,
+    height: '70%',
+    backgroundColor: '#EDECEC',
+  },
+  headerBarTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#262626',
+    marginBottom: 4,
+    fontFamily: 'Montserrat',
+  },
+  headerBarSubtitle: {
+    fontSize: 14,
+    color: '#767676',
+    fontFamily: 'Montserrat',
   },
 });
 

@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#EE2529',
     marginBottom: 20,
+    fontFamily: 'Montserrat',
   },
   spaceY: {
     gap: isDesktop ? 15 : 2,
@@ -124,24 +125,29 @@ const styles = StyleSheet.create({
     color: '#767676',
     marginRight: 10,
     flexShrink: 1,
+    fontFamily: 'Montserrat',
   },
   labelBold: {
     fontSize: 18,
     color: '#000',
     fontWeight: 'bold',
+    fontFamily: 'Montserrat',
   },
   labelDark: {
     fontSize: 18,
     color: '#000',
+    fontFamily: 'Montserrat',
   },
   value: {
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: 'Montserrat',
   },
   valueGreen: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#429482',
+    fontFamily: 'Montserrat',
   },
   divider: {
     height: 1,

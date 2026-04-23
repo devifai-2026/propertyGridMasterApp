@@ -18,7 +18,7 @@ import {
 import { useNavigation } from '../context/NavigationContext';
 import { useAuth } from '../context/AuthContext';
 import Footer from './Footer';
-import { COLORS } from '../constants/theme';
+import { COLORS, FONTS } from '../constants/theme';
 
 // --- Components ---
 
@@ -51,6 +51,7 @@ import {
   MessageSquare,
   ChevronDown,
 } from 'lucide-react-native';
+import logo from "../../src/assets/Navbar/logo.png"
 
 import Svg, { Circle, Path, Line } from 'react-native-svg';
 
@@ -172,11 +173,17 @@ const SideMenu: React.FC<SideMenuProps> = ({
                   </View>
                 </TouchableOpacity>
               ) : (
-                <Image
-                  source={require('../assets/Navbar/Preleasegrid logo 1.png')}
-                  style={{ width: 150, height: 45 }}
-                  resizeMode="contain"
-                />
+                <View style={styles.logoWrapper}>
+                  <Image
+                    source={logo}
+                    style={styles.logoIcon}
+                    resizeMode="contain"
+                  />
+                  <View style={styles.logoTextWrapper}>
+                    <Text style={styles.logoTextPrelease}>prelease</Text>
+                    <Text style={styles.logoTextGrid}>grid</Text>
+                  </View>
+                </View>
               )}
               <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
                 <X size={24} color={COLORS.textDark} />
@@ -374,11 +381,17 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
           style={styles.logoContainer}
           onPress={() => navigate('/dashboard')}
         >
-          <Image
-            source={require('../assets/Navbar/Preleasegrid logo 1.png')}
-            style={[styles.logoImage, !isMobile && { width: 184, height: 75 }]}
-            resizeMode="contain"
-          />
+          <View style={styles.logoWrapper}>
+            <Image
+              source={logo}
+              style={[styles.logoIcon, !isMobile && { width: 66, height: 66 }]}
+              resizeMode="contain"
+            />
+            <View style={styles.logoTextWrapper}>
+              <Text style={[styles.logoTextPrelease, !isMobile && { fontSize: 26, lineHeight: 26 }]}>prelease</Text>
+              <Text style={[styles.logoTextGrid, !isMobile && { fontSize: 20, lineHeight: 20 }]}>grid</Text>
+            </View>
+          </View>
         </TouchableOpacity>
 
         {!isMobile && (
@@ -649,9 +662,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  logoImage: {
-    height: 48,
-    width: 200,
+  logoWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  logoIcon: {
+    height: 35,
+    width: 35,
+  },
+  logoTextWrapper: {
+    justifyContent: 'center',
+  },
+  logoTextPrelease: {
+    fontFamily: FONTS.avenir,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#000000',
+    lineHeight: 16,
+  },
+  logoTextGrid: {
+    fontFamily: FONTS.avenir,
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#000000',
+    lineHeight: 12,
+    letterSpacing: 1,
   },
   navLinks: {
     flexDirection: 'row',

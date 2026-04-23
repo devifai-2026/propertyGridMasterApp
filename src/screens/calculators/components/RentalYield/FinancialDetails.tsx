@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: "600",
     marginBottom: 18,
+    fontFamily: "Montserrat",
   },
   flexWrap: {
     flexDirection: "row",
@@ -121,14 +122,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "700",
     marginBottom: 6,
+    fontFamily: "Montserrat",
   },
   value: {
     fontSize: 24,
     fontWeight: "800",
     marginBottom: 4,
+    fontFamily: "Montserrat",
   },
   subtext: {
     color: "#767676",
     fontSize: 16,
+    fontFamily: "Montserrat",
   },
 });

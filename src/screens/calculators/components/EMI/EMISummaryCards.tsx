@@ -186,14 +186,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: '#000000',
+    fontFamily: 'Montserrat',
   },
   resultCardValue: {
     fontSize: 20,
     fontWeight: '700',
+    fontFamily: 'Montserrat',
   },
   resultCardSubtitle: {
     fontSize: 14,
     color: '#6B7280',
+    fontFamily: 'Montserrat',
   },
   descContainer: {
     gap: 8,
@@ -202,6 +205,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B7280',
     lineHeight: 18,
+    fontFamily: 'Montserrat',
   },
 
   // Bottom 2 Summary Cards
@@ -226,6 +230,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#EE2529',
     marginBottom: 12,
+    fontFamily: 'Montserrat',
   },
   summaryContent: {
     gap: 20,
@@ -240,11 +245,13 @@ const styles = StyleSheet.create({
     color: '#767676',
     marginRight: 16,
     flexShrink: 1,
+    fontFamily: 'Montserrat',
   },
   summaryValue: {
     fontSize: 18,
     fontWeight: '600',
     color: '#000000',
+    fontFamily: 'Montserrat',
   },
   dividerLine: {
     height: 1,
@@ -261,10 +268,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#000000',
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
   summaryValueTotal: {
     fontSize: 18,
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
 });
 
