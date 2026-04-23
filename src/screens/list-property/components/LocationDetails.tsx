@@ -14,6 +14,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { ChevronDown, Plus, X, Trash2, AlertTriangle } from 'lucide-react-native';
+import InputError from '../../../components/common/InputError';
 import LinearGradient from 'react-native-linear-gradient';
 import CustomDropdown from './CustomDropdown';
 
@@ -260,12 +261,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
             onChangeText={v => handleInputChange('microMarket', v)}
             onBlur={(e: any) => handleBlur('microMarket', e.nativeEvent.text)}
           />
-          {touched.microMarket && errors.microMarket && (
-            <View style={styles.errorRow}>
-              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
-              <Text style={styles.errorText}>{errors.microMarket}</Text>
-            </View>
-          )}
+          <InputError message={errors.microMarket} visible={touched.microMarket && !!errors.microMarket} />
         </View>
 
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
@@ -285,12 +281,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
               error={touched.state && !!errors.state}
               searchable
             />
-            {touched.state && errors.state && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
-                <Text style={styles.errorText}>{errors.state}</Text>
-              </View>
-            )}
+            <InputError message={errors.state} visible={touched.state && !!errors.state} />
           </View>
 
           <View style={styles.fieldContainer}>
@@ -314,12 +305,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
               error={touched.city && !!errors.city}
               searchable
             />
-            {touched.city && errors.city && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.city}</Text>
-              </View>
-            )}
+            <InputError message={errors.city} visible={touched.city && !!errors.city} />
           </View>
         </View>
 
@@ -518,24 +504,7 @@ const styles = StyleSheet.create({
   labelSmallMobile: {
     fontSize: 12,
   },
-  errorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 6,
-    paddingLeft: 12,
-  },
-  errorIcon: {
-    color: '#EE2529',
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  errorText: {
-    color: '#EE2529',
-    fontSize: 13,
-    fontWeight: '500',
-    fontFamily: 'Montserrat',
-  },
+
   inputWrapper: {
     position: 'relative',
     justifyContent: 'center',

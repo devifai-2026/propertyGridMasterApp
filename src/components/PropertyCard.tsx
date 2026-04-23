@@ -184,7 +184,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
         {/* Verified Badge */}
         {(item.isVerified === 'partial' || item.isVerified === 'completed') && (
           <View style={styles.verifiedBadgeContainer}>
-            <VerifiedSvg width={100} height={28} />
+            <VerifiedSvg width={90} height={24} />
             <View style={styles.verifiedTextOverlay}>
               <Text style={styles.verifiedText}>
                 {item.isVerified === 'completed' ? 'Verified' : 'Partial'}
@@ -371,24 +371,24 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderWidth: 1,
     borderColor: '#f0f0f0',
-    width: 420,
+    width: 340,
     maxWidth: '100%',
   },
   propHeader: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
   headerTextGroup: {
     flex: 1,
-    paddingRight: 110,
+    paddingRight: 90,
     gap: 6,
   },
   propCategory: {
     fontFamily: 'Montserrat',
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: '400',
     color: '#262626',
     marginBottom: 2,
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   propLocationText: {
-    fontSize: 16,
+    fontSize: 14,
     color: '#262626',
     fontWeight: '400',
     fontFamily:'Montserrat',
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0,
   },
   propImageContainer: {
-    height: 277,
+    height: 240,
     width: '100%',
     position: 'relative',
     backgroundColor: '#f9f9f9',
@@ -478,8 +478,8 @@ const styles = StyleSheet.create({
   iconButton: {
     backgroundColor: '#2626268A',
     borderRadius: 100,
-    width: 32,
-    height: 32,
+    width: 28,
+    height: 28,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -544,13 +544,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   propContent: {
-    paddingHorizontal: 26,
-    paddingVertical: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
   },
   propDetailsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     marginBottom: 20,
   },
   propDetailItem: {
@@ -559,17 +559,17 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontFamily: 'Montserrat',
-    fontSize: 16,
+    fontSize: 14,
     color: '#767676',
     fontWeight: '400',
-    lineHeight: 22,
+    lineHeight: 20,
     paddingBottom: 4
   },
   detailValue: {
     fontFamily: 'Montserrat',
     color: '#262626',
     fontWeight: '600',
-    fontSize: 18,
+    fontSize: 16,
     textAlign: 'center',
   },
   roiCardContainer: {
@@ -579,8 +579,8 @@ const styles = StyleSheet.create({
   shadowOpacity: 0.1,
   shadowRadius: 2,
   elevation: 2, // Lower elevation for Android
-  width: 97,
-  height: 78,
+  width: 85,
+  height: 70,
   overflow: 'hidden',
   borderWidth: 0,
 },
@@ -589,11 +589,11 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 80,
+    flex: 1,
   },
   roiLabel: {
     fontFamily: 'Montserrat',
-    fontSize: 24,
+    fontSize: 20,
     color: '#262626',
     fontWeight: '600',
     marginBottom: 2,
@@ -605,13 +605,13 @@ const styles = StyleSheet.create({
   },
   roiValueText: {
     fontFamily: 'Montserrat',
-    fontSize: 22,
+    fontSize: 18,
     color: '#EE2529',
     fontWeight: '600',
   },
   percentageSymbol: {
     fontFamily: 'Montserrat',
-    fontSize: 16,
+    fontSize: 14,
     color: '#EE2529',
     fontWeight: '600',
     marginLeft: 1,
@@ -625,8 +625,8 @@ const styles = StyleSheet.create({
   },
   viewBtn: {
     flex: 1,
-    maxWidth: 80,
-    paddingVertical: 12,
+    maxWidth: 70,
+    paddingVertical: 10,
     borderWidth: 1.2,
     borderColor: '#888',
     borderRadius: 5,
@@ -641,12 +641,12 @@ const styles = StyleSheet.create({
   },
   enquireBtnWrapper: {
     flex: 1,
-    maxWidth: 100,
+    maxWidth: 90,
     borderRadius: 5,
     overflow: 'hidden',
   },
  enquireBtnGradient : {
-    paddingVertical: 12,
+    paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },

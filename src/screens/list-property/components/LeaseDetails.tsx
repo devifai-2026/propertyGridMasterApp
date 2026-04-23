@@ -14,6 +14,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { ChevronDown, Info, AlertTriangle } from 'lucide-react-native';
+import InputError from '../../../components/common/InputError';
 import CustomDropdown from './CustomDropdown';
 import CustomDatePicker from './CustomDatePicker';
 
@@ -202,12 +203,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
             onBlur={() => handleBlur('tenantType')}
             error={touched.tenantType && !!errors.tenantType}
           />
-          {touched.tenantType && errors.tenantType && (
-            <View style={styles.errorRow}>
-              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-              <Text style={styles.errorText}>{errors.tenantType}</Text>
-            </View>
-          )}
+            <InputError message={errors.tenantType} visible={touched.tenantType && !!errors.tenantType} />
         </View>
 
         <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Lease Duration & Terms</Text>
@@ -221,12 +217,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
               placeholder="YYYY-MM-DD"
               error={touched.leaseStartDate && !!errors.leaseStartDate}
             />
-            {touched.leaseStartDate && errors.leaseStartDate && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.leaseStartDate}</Text>
-              </View>
-            )}
+            <InputError message={errors.leaseStartDate} visible={touched.leaseStartDate && !!errors.leaseStartDate} />
           </View>
           <View style={styles.fieldContainer}>
             <Text style={[styles.label, isMobile && styles.labelMobile]}>Lease End Date *</Text>
@@ -237,12 +228,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
               placeholder="YYYY-MM-DD"
               error={touched.leaseExpiryDate && !!errors.leaseExpiryDate}
             />
-            {touched.leaseExpiryDate && errors.leaseExpiryDate && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.leaseExpiryDate}</Text>
-              </View>
-            )}
+            <InputError message={errors.leaseExpiryDate} visible={touched.leaseExpiryDate && !!errors.leaseExpiryDate} />
           </View>
         </View>
 
@@ -284,12 +270,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                 handleBlur('leaseDuration', e.nativeEvent.text)
               }
             />
-            {touched.leaseDuration && errors.leaseDuration && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.leaseDuration}</Text>
-              </View>
-            )}
+            <InputError message={errors.leaseDuration} visible={touched.leaseDuration && !!errors.leaseDuration} />
           </View>
         </View>
 
@@ -398,12 +379,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                   handleBlur('rentPerSqFt', e.nativeEvent.text)
                 }
               />
-              {touched.rentPerSqFt && errors.rentPerSqFt && (
-                <View style={styles.errorRow}>
-                  <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                  <Text style={styles.errorText}>{errors.rentPerSqFt}</Text>
-                </View>
-              )}
+              <InputError message={errors.rentPerSqFt} visible={touched.rentPerSqFt && !!errors.rentPerSqFt} />
             </View>
           ) : (
             <View style={styles.fieldContainer}>
@@ -424,12 +400,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                   handleBlur('totalMonthlyRent', e.nativeEvent.text)
                 }
               />
-               {touched.totalMonthlyRent && errors.totalMonthlyRent && (
-                <View style={styles.errorRow}>
-                  <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                  <Text style={styles.errorText}>{errors.totalMonthlyRent}</Text>
-                </View>
-              )}
+               <InputError message={errors.totalMonthlyRent} visible={touched.totalMonthlyRent && !!errors.totalMonthlyRent} />
             </View>
           )}
 
@@ -454,15 +425,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                   handleBlur('securityDepositMonths', e.nativeEvent.text)
                 }
               />
-              {touched.securityDepositMonths &&
-                errors.securityDepositMonths && (
-                  <View style={styles.errorRow}>
-                    <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                    <Text style={styles.errorText}>
-                      {errors.securityDepositMonths}
-                    </Text>
-                  </View>
-                )}
+              <InputError message={errors.securityDepositMonths} visible={touched.securityDepositMonths && !!errors.securityDepositMonths} />
             </View>
           ) : (
             <View style={styles.fieldContainer}>
@@ -485,15 +448,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                   handleBlur('securityDepositAmount', e.nativeEvent.text)
                 }
               />
-              {touched.securityDepositAmount &&
-                errors.securityDepositAmount && (
-                  <View style={styles.errorRow}>
-                    <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                    <Text style={styles.errorText}>
-                      {errors.securityDepositAmount}
-                    </Text>
-                  </View>
-                )}
+              <InputError message={errors.securityDepositAmount} visible={touched.securityDepositAmount && !!errors.securityDepositAmount} />
             </View>
           )}
         </View>
@@ -518,12 +473,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                 handleBlur('escalationFrequency', e.nativeEvent.text)
               }
             />
-            {touched.escalationFrequency && errors.escalationFrequency && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.escalationFrequency}</Text>
-              </View>
-            )}
+            <InputError message={errors.escalationFrequency} visible={touched.escalationFrequency && !!errors.escalationFrequency} />
           </View>
           <View style={styles.fieldContainer}>
             <Text style={[styles.label, isMobile && styles.labelMobile]}>Annual Escalation (%) *</Text>
@@ -543,14 +493,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                 handleBlur('escalationPercentage', e.nativeEvent.text)
               }
             />
-            {touched.escalationPercentage && errors.escalationPercentage && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>
-                  {errors.escalationPercentage}
-                </Text>
-              </View>
-            )}
+            <InputError message={errors.escalationPercentage} visible={touched.escalationPercentage && !!errors.escalationPercentage} />
           </View>
         </View>
 
@@ -567,12 +510,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
             onBlur={() => handleBlur('maintenanceScope')}
             error={touched.maintenanceScope && !!errors.maintenanceScope}
           />
-          {touched.maintenanceScope && errors.maintenanceScope && (
-            <View style={styles.errorRow}>
-              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-              <Text style={styles.errorText}>{errors.maintenanceScope}</Text>
-            </View>
-          )}
+            <InputError message={errors.maintenanceScope} visible={touched.maintenanceScope && !!errors.maintenanceScope} />
         </View>
 
         {formData.maintenanceScope !== '' && (
@@ -667,25 +605,7 @@ const styles = StyleSheet.create({
   labelMobile: {
     fontSize: 14,
   },
-  errorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 6,
-    paddingLeft: 12,
-  },
-  errorIcon: {
-    color: '#EE2529',
-    fontSize: 10,
-    fontWeight: '700',
-    fontFamily: 'Montserrat',
-  },
-  errorText: {
-    color: '#EE2529',
-    fontSize: 13,
-    fontWeight: '500',
-    fontFamily: 'Montserrat',
-  },
+
   inputWrapper: {
     position: 'relative',
     justifyContent: 'center',

@@ -241,7 +241,7 @@ const ListPropertyScreen = () => {
       if (finalData.propertyType)
         apiFormData.append('propertyType', finalData.propertyType);
       if (finalData.carpetArea)
-        apiFormData.append('carpetAreaSqft', finalData.carpetArea);
+        apiFormData.append('carpetArea', finalData.carpetArea);
       if (finalData.builtYear)
         apiFormData.append('completionYear', finalData.builtYear);
       if (finalData.lastRefurbished)
@@ -252,8 +252,8 @@ const ListPropertyScreen = () => {
         apiFormData.append('buildingGrade', finalData.buildingGrade);
 
       // Parking
-      apiFormData.append('parkingSlots', finalData.fourWheelerParkings || '0');
-      apiFormData.append('parkingRatio', finalData.twoWheelerParkings || '0');
+      apiFormData.append('parkingFourWheeler', finalData.fourWheelerParkings || '0');
+      apiFormData.append('parkingTwoWheeler', finalData.twoWheelerParkings || '0');
 
       // Infrastructure
       if (finalData.powerBackup)

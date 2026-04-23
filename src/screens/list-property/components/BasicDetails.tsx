@@ -15,6 +15,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { Upload, AlertTriangle } from 'lucide-react-native';
+import InputError from '../../../components/common/InputError';
 import { launchImageLibrary } from 'react-native-image-picker';
 import CustomDropdown from './CustomDropdown';
 import CustomMultiSelect from './CustomMultiSelect';
@@ -245,12 +246,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
             onBlur={() => handleBlur('propertyType')}
             error={touched.propertyType && !!errors.propertyType}
           />
-          {touched.propertyType && errors.propertyType && (
-            <View style={styles.errorRow}>
-              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-              <Text style={styles.errorText}>{errors.propertyType}</Text>
-            </View>
-          )}
+            <InputError message={errors.propertyType} visible={touched.propertyType && !!errors.propertyType} />
         </View>
 
         <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
@@ -276,12 +272,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
                 <Text style={[styles.unitText, isMobile && styles.unitTextMobile]}>Sq. Ft.</Text>
               </View>
             </View>
-            {touched.carpetArea && errors.carpetArea && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.carpetArea}</Text>
-              </View>
-            )}
+            <InputError message={errors.carpetArea} visible={touched.carpetArea && !!errors.carpetArea} />
           </View>
 
           <View style={styles.fieldContainer}>
@@ -298,12 +289,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
               onChangeText={v => handleInputChange('builtYear', v)}
               onBlur={(e: any) => handleBlur('builtYear', e.nativeEvent.text)}
             />
-            {touched.builtYear && errors.builtYear && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.builtYear}</Text>
-              </View>
-            )}
+            <InputError message={errors.builtYear} visible={touched.builtYear && !!errors.builtYear} />
           </View>
         </View>
 
@@ -321,12 +307,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
               onBlur={() => handleBlur('buildingGrade')}
               error={touched.buildingGrade && !!errors.buildingGrade}
             />
-            {touched.buildingGrade && errors.buildingGrade && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.buildingGrade}</Text>
-              </View>
-            )}
+            <InputError message={errors.buildingGrade} visible={touched.buildingGrade && !!errors.buildingGrade} />
           </View>
 
           <View style={styles.fieldContainer}>
@@ -342,12 +323,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
               onBlur={() => handleBlur('ownership')}
               error={touched.ownership && !!errors.ownership}
             />
-            {touched.ownership && errors.ownership && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.ownership}</Text>
-              </View>
-            )}
+            <InputError message={errors.ownership} visible={touched.ownership && !!errors.ownership} />
           </View>
         </View>
 
@@ -371,12 +347,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
                 handleBlur('fourWheelerParkings', e.nativeEvent.text)
               }
             />
-            {touched.fourWheelerParkings && errors.fourWheelerParkings && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.fourWheelerParkings}</Text>
-              </View>
-            )}
+            <InputError message={errors.fourWheelerParkings} visible={touched.fourWheelerParkings && !!errors.fourWheelerParkings} />
           </View>
           <View style={styles.fieldContainer}>
             <Text style={[styles.label, isMobile && styles.labelMobile]}>2 Wheeler Parkings *</Text>
@@ -396,12 +367,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
                 handleBlur('twoWheelerParkings', e.nativeEvent.text)
               }
             />
-            {touched.twoWheelerParkings && errors.twoWheelerParkings && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.twoWheelerParkings}</Text>
-              </View>
-            )}
+            <InputError message={errors.twoWheelerParkings} visible={touched.twoWheelerParkings && !!errors.twoWheelerParkings} />
           </View>
         </View>
 
@@ -420,12 +386,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
               onBlur={() => handleBlur('furnishingStatus')}
               error={touched.furnishingStatus && !!errors.furnishingStatus}
             />
-            {touched.furnishingStatus && errors.furnishingStatus && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.furnishingStatus}</Text>
-              </View>
-            )}
+            <InputError message={errors.furnishingStatus} visible={touched.furnishingStatus && !!errors.furnishingStatus} />
           </View>
           <View style={styles.fieldContainer}>
             <Text style={[styles.label, isMobile && styles.labelMobile]}>Number of Lifts</Text>
@@ -634,25 +595,7 @@ const styles = StyleSheet.create({
   labelMobile: {
     fontSize: 14,
   },
-  errorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 6,
-    paddingLeft: 12,
-  },
-  errorIcon: {
-    color: '#EE2529',
-    fontSize: 10,
-    fontWeight: '700',
-    fontFamily: 'Montserrat',
-  },
-  errorText: {
-    color: '#EE2529',
-    fontSize: 13,
-    fontWeight: '500',
-    fontFamily: 'Montserrat',
-  },
+
   inputWrapper: {
     position: 'relative',
     justifyContent: 'center',

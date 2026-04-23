@@ -14,6 +14,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { Plus, X, AlertTriangle } from 'lucide-react-native';
+import InputError from '../../../components/common/InputError';
 import CustomDropdown from './CustomDropdown';
 
 interface LegalDetailsProps {
@@ -189,12 +190,7 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
               onBlur={() => handleBlur('titleStatus')}
               error={touched.titleStatus && !!errors.titleStatus}
             />
-            {touched.titleStatus && errors.titleStatus && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
-                <Text style={styles.errorText}>{errors.titleStatus}</Text>
-              </View>
-            )}
+            <InputError message={errors.titleStatus} visible={touched.titleStatus && !!errors.titleStatus} />
           </View>
 
           <View style={styles.fieldContainer}>
@@ -212,14 +208,7 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
                 touched.occupancyCertificate && !!errors.occupancyCertificate
               }
             />
-            {touched.occupancyCertificate && errors.occupancyCertificate && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>
-                  {errors.occupancyCertificate}
-                </Text>
-              </View>
-            )}
+            <InputError message={errors.occupancyCertificate} visible={touched.occupancyCertificate && !!errors.occupancyCertificate} />
           </View>
         </View>
 
@@ -237,12 +226,7 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
               onBlur={() => handleBlur('leaseRegistration')}
               error={touched.leaseRegistration && !!errors.leaseRegistration}
             />
-            {touched.leaseRegistration && errors.leaseRegistration && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.leaseRegistration}</Text>
-              </View>
-            )}
+            <InputError message={errors.leaseRegistration} visible={touched.leaseRegistration && !!errors.leaseRegistration} />
           </View>
           {!isSmallScreen && <View style={styles.fieldContainer} />}
         </View>
@@ -290,12 +274,7 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
               <Text style={[styles.radioLabel, isMobile && styles.radioLabelMobile]}>No</Text>
             </TouchableOpacity>
           </View>
-          {touched.pendingLitigations && errors.pendingLitigations && (
-            <View style={styles.errorRow}>
-              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
-              <Text style={styles.errorText}>{errors.pendingLitigations}</Text>
-            </View>
-          )}
+          <InputError message={errors.pendingLitigations} visible={touched.pendingLitigations && !!errors.pendingLitigations} />
         </View>
 
         {formData.pendingLitigations === 'yes' && (
@@ -319,12 +298,7 @@ const LegalDetails = forwardRef<any, LegalDetailsProps>(
                 handleBlur('litigationNote', e.nativeEvent.text)
               }
             />
-            {touched.litigationNote && errors.litigationNote && (
-              <View style={styles.errorRow}>
-              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.litigationNote}</Text>
-              </View>
-            )}
+            <InputError message={errors.litigationNote} visible={touched.litigationNote && !!errors.litigationNote} />
           </View>
         )}
 
@@ -439,25 +413,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     fontFamily: 'Montserrat',
   },
-  errorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 6,
-    paddingLeft: 12,
-  },
-  errorIcon: {
-    color: '#EE2529',
-    fontSize: 10,
-    fontWeight: '700',
-    fontFamily: 'Montserrat',
-  },
-  errorText: {
-    color: '#EE2529',
-    fontSize: 16,
-    fontWeight: '500',
-    fontFamily: 'Montserrat',
-  },
+
   inputWrapper: {
     position: 'relative',
     justifyContent: 'center',

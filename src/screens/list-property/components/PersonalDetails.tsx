@@ -17,6 +17,7 @@ import {
   Alert,
 } from 'react-native';
 import { AlertTriangle } from 'lucide-react-native';
+import InputError from '../../../components/common/InputError';
 
 import { useAuth } from '../../../context/AuthContext';
 import { useAuthAPIs } from '../../../../helpers/hooks/authAPIs/useAuthAPIs';
@@ -53,7 +54,6 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
           ? userRoleLower
           : '') ||
         '',
-      otp: initialData?.otp || '',
       agreeTerms: initialData?.agreeTerms || false,
       agreePrivacy: initialData?.agreePrivacy || false,
     });
@@ -70,28 +70,20 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
           agreeTerms: initialData.agreeTerms ?? prev.agreeTerms,
           agreePrivacy: initialData.agreePrivacy ?? prev.agreePrivacy,
         }));
-        if (initialData.mobile) {
-          setIsOtpVerified(true);
-        }
+
       }
     }, [initialData]);
 
-    const [otpSent, setOtpSent] = useState(false);
-    const [isOtpVerified, setIsOtpVerified] = useState(!!initialData?.mobile);
-    const [verificationId, setVerificationId] = useState('');
     const [errors, setErrors] = useState<any>({});
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [touched, setTouched] = useState<any>({});
 
-    const { sendOtp, verifyOtp, loading: apiLoading } = useAuthAPIs();
-
-    // Refs for OTP inputs
-    const otpInputRefs = useRef<Array<TextInput | null>>([]);
+    const { loading: apiLoading } = useAuthAPIs();
 
     useEffect(() => {
       const isValid = !!validateFormSilently();
       onFormValid(isValid);
-    }, [formData, otpSent, isOtpVerified]);
+    }, [formData]);
 
     const validateFormSilently = () => {
       const mobileNumber = formData.mobile.replace(/\D/g, '');
@@ -106,7 +98,6 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
         mobileNumber.length === 10 &&
         /^[6-9]\d{9}$/.test(mobileNumber) &&
         formData.listUnder !== '' &&
-        isOtpVerified &&
         formData.agreeTerms &&
         formData.agreePrivacy
       );
@@ -144,12 +135,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
           if (!value) return 'Please select Broker or Owner';
           return '';
 
-        case 'otp':
-          if (otpSent && !isOtpVerified) {
-            if (!value) return 'OTP is required';
-            if (!/^\d{6}$/.test(value)) return 'OTP must be 6 digits';
-          }
-          return '';
+
 
         case 'agreeTerms':
           if (!value) return 'Please agree to terms & conditions';
@@ -193,101 +179,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
       setErrors((prev: any) => ({ ...prev, [name]: error }));
     };
 
-    const handleSendOtp = () => {
-      const mobileNumber = formData.mobile.replace(/\D/g, '');
-      const mobileError = validateField('mobile', formData.mobile);
 
-      if (!mobileError && mobileNumber.length === 10) {
-        sendOtp(
-          { mobileNumber },
-          (response: any) => {
-            if (response.success) {
-              setVerificationId(response.data.verificationId);
-              setOtpSent(true);
-              // Auto-focus first OTP input after a short delay
-              setTimeout(() => {
-                otpInputRefs.current[0]?.focus();
-              }, 100);
-              Alert.alert(
-                'OTP Sent',
-                'A 6-digit OTP has been sent to your mobile number',
-              );
-            } else {
-              Alert.alert('Error', response.message || 'Failed to send OTP');
-            }
-          },
-          (error: any) => {
-            Alert.alert(
-              'Error',
-              error?.response?.data?.message || 'Failed to send OTP',
-            );
-          },
-        );
-      } else {
-        setErrors((prev: any) => ({
-          ...prev,
-          mobile:
-            mobileError || 'Please enter a valid mobile number to send OTP',
-        }));
-      }
-    };
-
-    const handleVerifyOtp = () => {
-      if (formData.otp.length === 6) {
-        verifyOtp(
-          { otp: formData.otp, verificationId },
-          (response: any) => {
-            if (response.success) {
-              setIsOtpVerified(true);
-              Alert.alert('Success', 'Mobile number verified successfully');
-            } else {
-              Alert.alert('Error', response.message || 'Verification failed');
-            }
-          },
-          (error: any) => {
-            Alert.alert(
-              'Error',
-              error?.response?.data?.message || 'Verification failed',
-            );
-          },
-        );
-      } else {
-        Alert.alert('Error', 'Please enter the complete 6-digit OTP');
-      }
-    };
-
-    const handleOtpChange = (text: string, index: number) => {
-      // Only allow digits
-      const digit = text.replace(/[^0-9]/g, '');
-
-      const newOtp = formData.otp.split('');
-      newOtp[index] = digit;
-      handleChange('otp', newOtp.join(''));
-
-      // Auto-focus next input if digit entered
-      if (digit && index < 5) {
-        otpInputRefs.current[index + 1]?.focus();
-      }
-
-      // Auto-verify when 6th digit is entered
-      if (digit && index === 5) {
-        // We delay slightly to let the UI update
-        setTimeout(() => {
-          handleVerifyOtp();
-        }, 100);
-      }
-    };
-
-    const handleOtpKeyPress = (e: any, index: number) => {
-      // Handle backspace on empty field - move to previous input
-      if (
-        e.nativeEvent.key === 'Backspace' &&
-        !formData.otp[index] &&
-        index > 0
-      ) {
-        otpInputRefs.current[index - 1]?.focus();
-      }
-    };
 
     const handleSubmit = () => {
       setIsSubmitted(true);
@@ -298,7 +190,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
       setTouched(allTouched);
 
       if (validateFormSilently()) {
-        onNext({ ...formData, verificationId });
+        onNext(formData);
       }
     };
 
@@ -306,7 +198,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
       submit: handleSubmit,
     }));
 
-    const mobileNumberRaw = formData.mobile.replace(/\D/g, '');
+
 
     return (
       <View style={styles.container}>
@@ -331,12 +223,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
               placeholderTextColor="#999"
               onBlur={(e: any) => handleBlur('firstName', e.nativeEvent.text)}
             />
-            {touched.firstName && errors.firstName && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.firstName}</Text>
-              </View>
-            )}
+            <InputError message={errors.firstName} visible={touched.firstName && !!errors.firstName} />
           </View>
 
           <View style={styles.fieldContainer}>
@@ -353,12 +240,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
               placeholderTextColor="#999"
               onBlur={(e: any) => handleBlur('lastName', e.nativeEvent.text)}
             />
-            {touched.lastName && errors.lastName && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.lastName}</Text>
-              </View>
-            )}
+            <InputError message={errors.lastName} visible={touched.lastName && !!errors.lastName} />
           </View>
         </View>
 
@@ -378,12 +260,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
               keyboardType="email-address"
               onBlur={(e: any) => handleBlur('email', e.nativeEvent.text)}
             />
-            {touched.email && errors.email && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
-                <Text style={styles.errorText}>{errors.email}</Text>
-              </View>
-            )}
+            <InputError message={errors.email} visible={touched.email && !!errors.email} />
           </View>
 
           <View style={styles.fieldContainer}>
@@ -462,12 +339,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
                 </Text>
               </TouchableOpacity>
             </View>
-            {touched.listUnder && errors.listUnder && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
-                <Text style={styles.errorText}>{errors.listUnder}</Text>
-              </View>
-            )}
+            <InputError message={errors.listUnder} visible={touched.listUnder && !!errors.listUnder} />
           </View>
         </View>
 
@@ -494,110 +366,13 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
                 keyboardType="phone-pad"
                 maxLength={11}
                 onBlur={(e: any) => handleBlur('mobile', e.nativeEvent.text)}
-                editable={!isOtpVerified}
               />
-              <TouchableOpacity
-                style={[
-                  styles.otpBtn,
-                  isMobile && styles.otpBtnMobile,
-                  (mobileNumberRaw.length !== 10 ||
-                    (otpSent && isOtpVerified)) &&
-                    styles.otpBtnDisabled,
-                ]}
-                onPress={handleSendOtp}
-                disabled={
-                  mobileNumberRaw.length !== 10 || (otpSent && isOtpVerified)
-                }
-              >
-                <Text
-                  style={[
-                    styles.otpBtnText,
-                    isMobile && styles.otpBtnTextMobile,
-                  ]}
-                >
-                  {isOtpVerified
-                    ? 'Verified'
-                    : otpSent
-                    ? 'Resend OTP'
-                    : 'Send OTP'}
-                </Text>
-              </TouchableOpacity>
             </View>
-            {touched.mobile && errors.mobile && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
-                <Text style={styles.errorText}>{errors.mobile}</Text>
-              </View>
-            )}
+            <InputError message={errors.mobile} visible={touched.mobile && !!errors.mobile} />
           </View>
-
-          {otpSent ? (
-            <View style={styles.fieldContainer}>
-              <Text style={[styles.label, isMobile && styles.labelMobile]}>OTP *</Text>
-              <View
-                style={[
-                  styles.otpInputGroup,
-                  isMobile && styles.otpInputGroupMobile,
-                ]}
-              >
-                {[0, 1, 2, 3, 4, 5].map(index => (
-                  <TextInput
-                    key={index}
-                    ref={ref => {
-                      otpInputRefs.current[index] = ref;
-                    }}
-                    style={[
-                      styles.otpInput,
-                      isMobile && styles.otpInputMobile,
-                      touched.otp && errors.otp && styles.inputError,
-                    ]}
-                    maxLength={1}
-                    keyboardType="number-pad"
-                    value={formData.otp[index] || ''}
-                    onChangeText={text => handleOtpChange(text, index)}
-                    onKeyPress={e => handleOtpKeyPress(e, index)}
-                    selectTextOnFocus
-                    autoComplete="one-time-code"
-                    editable={!isOtpVerified}
-                  />
-                ))}
-                {!isOtpVerified && formData.otp.length === 6 && (
-                  <TouchableOpacity
-                    style={styles.verifyBtn}
-                    onPress={handleVerifyOtp}
-                    disabled={apiLoading}
-                  >
-                    <Text style={styles.verifyBtnText}>
-                      {apiLoading ? '...' : 'Verify'}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-              {isOtpVerified && (
-                <Text style={styles.verifiedText}>✓ Verified</Text>
-              )}
-              {touched.otp && errors.otp && !isOtpVerified && (
-                <View style={styles.errorRow}>
-                  <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                  <Text style={styles.errorText}>{errors.otp}</Text>
-                </View>
-              )}
-            </View>
-          ) : (
-            <View style={styles.fieldContainer} />
-          )}
         </View>
 
-        {!isOtpVerified && (
-          <View style={styles.otpHelpWrapper}>
-            <Text style={[styles.otpHelpText, isMobile && styles.otpHelpTextMobile]}>
-              Didn’t received OTP?{' '}
-              <Text style={styles.resendLink} onPress={handleSendOtp}>
-                Click to resend OTP.
-              </Text>
-            </Text>
-          </View>
-        )}
+
 
         <View style={styles.checkboxSection}>
           <TouchableOpacity
@@ -617,14 +392,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
               <Text style={styles.linkText}>terms & conditions</Text>
             </Text>
           </TouchableOpacity>
-          {isSubmitted && !formData.agreeTerms && (
-            <View style={styles.errorRow}>
-              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
-              <Text style={styles.errorText}>
-                Please agree to terms & conditions
-              </Text>
-            </View>
-          )}
+          <InputError message="Please agree to terms & conditions" visible={isSubmitted && !formData.agreeTerms} />
 
           <TouchableOpacity
             style={styles.checkboxRow}
@@ -642,14 +410,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
               I agree to the <Text style={styles.linkText}>Privacy Policy</Text>
             </Text>
           </TouchableOpacity>
-          {isSubmitted && !formData.agreePrivacy && (
-            <View style={styles.errorRow}>
-              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
-              <Text style={styles.errorText}>
-                Please agree to Privacy Policy
-              </Text>
-            </View>
-          )}
+          <InputError message="Please agree to Privacy Policy" visible={isSubmitted && !formData.agreePrivacy} />
         </View>
       </View>
     );
@@ -714,24 +475,7 @@ const styles = StyleSheet.create({
   inputError: {
     borderColor: '#EE2529',
   },
-  errorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 6,
-    paddingLeft: 12,
-  },
-  errorIcon: {
-    color: '#EE2529',
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  errorText: {
-    color: '#EE2529',
-    fontSize: 13,
-    fontWeight: '500',
-    fontFamily: 'Montserrat',
-  },
+
   radioGroup: {
     flexDirection: 'row',
     gap: 24,
@@ -799,73 +543,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     justifyContent: 'center',
   },
-  otpBtnMobile: {
-    paddingHorizontal: 10,
-    height: 34,
-  },
-  otpBtnDisabled: {
-    backgroundColor: '#CCC',
-  },
-  otpBtnText: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: '600',
-    fontFamily: 'Montserrat',
-  },
-  otpBtnTextMobile: {
-    fontSize: 13,
-  },
-  otpInputGroup: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  otpInputGroupMobile: {
-    gap: 8,
-    justifyContent: 'center',
-  },
-  otpInput: {
-    width: 48,
-    height: 48,
-    backgroundColor: '#F2F2F2',
-    borderRadius: 8,
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '700',
-    borderWidth: 1,
-    borderColor: '#CCC',
-    fontFamily: 'Montserrat',
-  },
-  otpInputMobile: {
-    width: 42,
-    height: 44,
-    fontSize: 18,
-  },
-  loadingIndicator: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#FFF',
-    marginLeft: 8,
-  },
-  verifiedText: {
-    color: '#4CAF50',
-    fontSize: 12,
-    fontWeight: '700',
-    marginTop: 4,
-  },
-  verifyBtn: {
-    backgroundColor: '#EE2529',
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    justifyContent: 'center',
-    height: 48,
-  },
-  verifyBtnText: {
-    color: '#FFF',
-    fontSize: 12,
-    fontWeight: '700',
-    fontFamily: 'Montserrat',
-  },
+
   checkboxSection: {
     gap: 12,
     marginTop: 8,
@@ -918,27 +596,7 @@ const styles = StyleSheet.create({
   radioLabelDisabled: {
     color: '#6b7280',
   },
-  otpHelpWrapper: {
-    width: '100%',
-    alignItems: 'center',
-    paddingVertical: 12,
-    zIndex: 10,
-  },
-  otpHelpText: {
-    fontSize: 18,
-    color: '#333',
-    fontWeight: '500',
-    fontFamily: 'Montserrat',
-  },
-  otpHelpTextMobile: {
-    fontSize: 14,
-  },
-  resendLink: {
-    color: '#000',
-    fontWeight: '500',
-    textDecorationLine: 'underline',
-    fontFamily: 'Montserrat',
-  },
+
 });
 
 export default PersonalDetails;

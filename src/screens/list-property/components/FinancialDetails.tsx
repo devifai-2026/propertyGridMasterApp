@@ -14,6 +14,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { Info, AlertTriangle } from 'lucide-react-native';
+import InputError from '../../../components/common/InputError';
 
 interface FinancialDetailsProps {
   onNext: (data: any) => void;
@@ -155,12 +156,7 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
             onChangeText={v => handleInputChange('sellingPrice', v)}
             onBlur={() => handleBlur('sellingPrice')}
           />
-          {touched.sellingPrice && errors.sellingPrice && (
-            <View style={styles.errorRow}>
-              <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
-              <Text style={styles.errorText}>{errors.sellingPrice}</Text>
-            </View>
-          )}
+          <InputError message={errors.sellingPrice} visible={touched.sellingPrice && !!errors.sellingPrice} />
         </View>
 
         <Text style={[styles.subHeader, isMobile && styles.subHeaderMobile]}>Annual Operating Costs</Text>
@@ -179,12 +175,7 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
               onChangeText={v => handleInputChange('propertyTax', v)}
               onBlur={() => handleBlur('propertyTax')}
             />
-            {touched.propertyTax && errors.propertyTax && (
-              <View style={styles.errorRow}>
-                <AlertTriangle size={12} color="#EE2529" strokeWidth={3} />
-                <Text style={styles.errorText}>{errors.propertyTax}</Text>
-              </View>
-            )}
+            <InputError message={errors.propertyTax} visible={touched.propertyTax && !!errors.propertyTax} />
           </View>
           <View style={styles.fieldContainer}>
             <Text style={[styles.label, isMobile && styles.labelMobile]}>Insurance (Annual) *</Text>
@@ -200,12 +191,7 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
               onChangeText={v => handleInputChange('insurance', v)}
               onBlur={() => handleBlur('insurance')}
             />
-            {touched.insurance && errors.insurance && (
-              <View style={styles.errorRow}>
-              <AlertTriangle size={14} fill="#EE2529" color="#FFF" />
-                <Text style={styles.errorText}>{errors.insurance}</Text>
-              </View>
-            )}
+            <InputError message={errors.insurance} visible={touched.insurance && !!errors.insurance} />
           </View>
         </View>
 
@@ -334,24 +320,7 @@ const styles = StyleSheet.create({
   labelMobile: {
     fontSize: 14,
   },
-  errorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 6,
-    paddingLeft: 12,
-  },
-  errorIcon: {
-    color: '#EE2529',
-    fontSize: 10,
-    fontWeight: '700',
-  },
-  errorText: {
-    color: '#EE2529',
-    fontSize: 13,
-    fontWeight: '500',
-    fontFamily: 'Montserrat',
-  },
+
   input: {
     backgroundColor: '#F2F2F2',
     height: 44,

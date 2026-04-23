@@ -9,7 +9,8 @@ import {
   useWindowDimensions,
   ActivityIndicator,
 } from 'react-native';
-import { ChevronDown, Phone, Mail } from 'lucide-react-native';
+import { ChevronDown, Phone, Mail, CheckCircle2 } from 'lucide-react-native';
+import InputError from '../../components/common/InputError';
 import LinearGradient from 'react-native-linear-gradient';
 import Layout from '../../layout/Layout';
 import { useNavigation } from '../../context/NavigationContext';
@@ -119,6 +120,7 @@ const ContactBrokerScreen = () => {
     additionalNotes: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const set = (key: string, val: string) => {
     setForm(prev => ({ ...prev, [key]: val }));
@@ -151,7 +153,7 @@ const ContactBrokerScreen = () => {
         additionalNotes: form.additionalNotes,
       },
       () => {
-        navigate('/explore-brokers');
+        setIsSuccess(true);
       },
       err => {
         console.error('Contact broker error:', err);
@@ -162,7 +164,57 @@ const ContactBrokerScreen = () => {
   return (
     <Layout>
       <View style={styles.bgWrapper}>
-        <ScrollView
+        {isSuccess ? (
+          <View style={styles.successContainer}>
+            <LinearGradient
+              colors={['#FFF3CA', '#FFE8A3']}
+              style={styles.successIconCircle}
+            >
+              <CheckCircle2 size={60} color="#EE2529" strokeWidth={2.5} />
+            </LinearGradient>
+
+            <Text style={styles.successTitle}>Query Submitted Successfully!</Text>
+            <Text style={styles.successSubtitle}>
+              Thank you for reaching out. Our expert broker will analyze your
+              requirements and get in touch with you shortly.
+            </Text>
+
+            <View style={styles.successActionRow}>
+              <TouchableOpacity
+                style={styles.submitAnotherBtn}
+                onPress={() => {
+                  setForm({
+                    fullName: user?.name || '',
+                    email: user?.email || '',
+                    phoneNumber: user?.mobileNumber || user?.mobile || '',
+                    propertyType: '',
+                    budgetRange: '',
+                    timeline: '',
+                    additionalNotes: '',
+                  });
+                  setIsSuccess(false);
+                }}
+              >
+                <Text style={styles.submitAnotherBtnText}>Submit Another</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => navigate('/explore-brokers')}
+                activeOpacity={0.85}
+              >
+                <LinearGradient
+                  colors={['#EE2529', '#C73834']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.doneBtn}
+                >
+                  <Text style={styles.doneBtnText}>Done</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : (
+          <ScrollView
           contentContainerStyle={[
             styles.page,
             { paddingHorizontal: isMobile ? 16 : 40 },
@@ -210,9 +262,7 @@ const ContactBrokerScreen = () => {
                 value={form.fullName}
                 onChangeText={t => set('fullName', t)}
               />
-              {errors.fullName ? (
-                <Text style={styles.errorText}>{errors.fullName}</Text>
-              ) : null}
+              <InputError message={errors.fullName} visible={!!errors.fullName} />
             </View>
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Email Address</Text>
@@ -225,9 +275,7 @@ const ContactBrokerScreen = () => {
                 value={form.email}
                 onChangeText={t => set('email', t)}
               />
-              {errors.email ? (
-                <Text style={styles.errorText}>{errors.email}</Text>
-              ) : null}
+              <InputError message={errors.email} visible={!!errors.email} />
             </View>
           </View>
 
@@ -241,9 +289,7 @@ const ContactBrokerScreen = () => {
               value={form.phoneNumber}
               onChangeText={t => set('phoneNumber', t)}
             />
-            {errors.phoneNumber ? (
-              <Text style={styles.errorText}>{errors.phoneNumber}</Text>
-            ) : null}
+            <InputError message={errors.phoneNumber} visible={!!errors.phoneNumber} />
           </View>
 
           {/* Property Requirements */}
@@ -260,9 +306,7 @@ const ContactBrokerScreen = () => {
               onSelect={v => set('propertyType', v)}
               zIndex={30}
             />
-            {errors.propertyType ? (
-              <Text style={styles.errorText}>{errors.propertyType}</Text>
-            ) : null}
+            <InputError message={errors.propertyType} visible={!!errors.propertyType} />
           </View>
 
           <View
@@ -281,9 +325,7 @@ const ContactBrokerScreen = () => {
                 onSelect={v => set('budgetRange', v)}
                 zIndex={22}
               />
-              {errors.budgetRange ? (
-                <Text style={styles.errorText}>{errors.budgetRange}</Text>
-              ) : null}
+              <InputError message={errors.budgetRange} visible={!!errors.budgetRange} />
             </View>
             <View style={[styles.inputGroup, { zIndex: 20 }]}>
               <Text style={styles.label}>When are you looking to invest? *</Text>
@@ -294,9 +336,7 @@ const ContactBrokerScreen = () => {
                 onSelect={v => set('timeline', v)}
                 zIndex={20}
               />
-              {errors.timeline ? (
-                <Text style={styles.errorText}>{errors.timeline}</Text>
-              ) : null}
+              <InputError message={errors.timeline} visible={!!errors.timeline} />
             </View>
           </View>
 
@@ -398,6 +438,7 @@ const ContactBrokerScreen = () => {
           </View>
         </View>
       </ScrollView>
+      )}
       </View>
     </Layout>
   );
@@ -511,12 +552,7 @@ const styles = StyleSheet.create({
     minHeight: 100,
     paddingTop: 12,
   },
-  errorText: {
-    fontSize: 12,
-    color: '#EE2529',
-    marginTop: 4,
-    fontFamily: 'Montserrat',
-  },
+
   dropdownWrapper: {
     position: 'relative',
   },
@@ -643,6 +679,78 @@ const styles = StyleSheet.create({
     color: '#888',
     fontFamily: 'Montserrat',
     marginBottom: 8,
+  },
+  successContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+    maxWidth: 600,
+    alignSelf: 'center',
+    width: '100%',
+  },
+  successIconCircle: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 32,
+    shadowColor: '#EE2529',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  successTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#EE2529',
+    fontFamily: 'Montserrat',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  successSubtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    fontFamily: 'Montserrat',
+    lineHeight: 24,
+    marginBottom: 40,
+    maxWidth: 450,
+  },
+  successActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  submitAnotherBtn: {
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: '#EE2529',
+    minWidth: 160,
+    alignItems: 'center',
+  },
+  submitAnotherBtnText: {
+    color: '#EE2529',
+    fontSize: 16,
+    fontWeight: '700',
+    fontFamily: 'Montserrat',
+  },
+  doneBtn: {
+    paddingVertical: 14,
+    paddingHorizontal: 40,
+    borderRadius: 8,
+    minWidth: 160,
+    alignItems: 'center',
+  },
+  doneBtnText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '700',
+    fontFamily: 'Montserrat',
   },
   verticalDivider: {
     width: 1,

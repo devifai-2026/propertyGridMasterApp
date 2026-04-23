@@ -188,7 +188,7 @@ const ExplorePropertiesScreen = () => {
             item.media && item.media.length > 0
               ? item.media.map((m: any) => m.fileUrl)
               : null,
-          badges: [item.tenantType, item.buildingGrade].filter(Boolean),
+          badges: [item.tenantType].filter(Boolean),
           isVerified: item.isVerified,
           verified:
             item.isVerified === 'partial' || item.isVerified === 'completed',
