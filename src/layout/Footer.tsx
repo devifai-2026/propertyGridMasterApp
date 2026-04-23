@@ -185,11 +185,9 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
   },
   contentWrapper: {
-    // maxWidth: 1280,
-    width: '100%',           // ← was '90%', now full width
-    // paddingHorizontal: 52,   // ← was 20, reduced side padding like image 2
-    paddingLeft: 188,
-    paddingRight: 80
+    width: '100%',
+    paddingLeft: 85,
+    paddingRight: 85,
   },
   contentWrapperMobile: {
     width: '100%',
@@ -197,18 +195,17 @@ const styles = StyleSheet.create({
   },
   topSection: {
     flexDirection: 'row',
+    justifyContent: 'space-between', // Added this to justify content between
     alignItems: 'flex-start',
     marginBottom: 36,
     flexWrap: 'wrap',
-    // marginLeft: 30,          // ← negative margin to offset column padding
   },
   topSectionMobile: {
     flexDirection: 'column',
     gap: 32,
   },
   logoColumn: {
-    // width: '25%',            // ← slightly narrower to give links more room
-    paddingRight: 125,
+    // Removed paddingRight to allow space-between to work properly
   },
   logoColumnMobile: {
     width: '100%',
@@ -216,11 +213,11 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   logo: {
-    width: 550,              // ← larger to match image 2
-    height: 120,             // ← taller to show full logo icon + text
+    width: 550,
+    height: 120,
   },
   linksColumn: {
-    flex: 1,
+    // Removed flex: 1 to allow columns to take their natural width
     paddingRight: 8,
   },
   linksColumnMobile: {
@@ -230,24 +227,24 @@ const styles = StyleSheet.create({
   },
   columnTitle: {
     color: '#FFFFFF',
-    fontSize: 18,            // ← slightly larger to match image 2
+    fontSize: 18,
     fontWeight: '700',
     marginBottom: 20,
     fontFamily: 'Montserrat',
   },
   linkItem: {
-    marginBottom: 14,        // ← slightly more spacing like image 2
+    marginBottom: 14,
   },
   linkText: {
     color: '#9CA3AF',
-    fontSize: 14,            // ← slightly larger
+    fontSize: 14,
     fontFamily: 'Montserrat',
     lineHeight: 22,
   },
   dropdownWrapper: {
     marginTop: 4,
     zIndex: 10,
-    width : 200
+    width: 200,
   },
   dropdownTrigger: {
     flexDirection: 'row',
@@ -259,7 +256,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 10,
     backgroundColor: '#FFFFFF',
-    width: '100%',           // ← full column width like image 2
+    width: '100%',
   },
   dropdownTriggerText: {
     color: '#374151',
@@ -302,8 +299,8 @@ const styles = StyleSheet.create({
   },
   descriptionText: {
     color: '#9CA3AF',
-    fontSize: 14,            // ← slightly larger to match image 2
-    lineHeight: 26,          // ← more line height like image 2
+    fontSize: 14,
+    lineHeight: 26,
     marginBottom: 28,
     fontFamily: 'Montserrat',
   },
@@ -321,19 +318,19 @@ const styles = StyleSheet.create({
   },
   copyrightLabel: {
     color: '#9CA3AF',
-    fontSize: 14,            // ← slightly larger
+    fontSize: 14,
     fontFamily: 'Montserrat',
   },
   socialIcons: {
     flexDirection: 'row',
-    gap: 16,                 // ← more gap between icons like image 2
+    gap: 16,
     alignItems: 'center',
   },
   iconContainer: {
     padding: 2,
   },
   socialIcon: {
-    width: 30,               // ← larger icons like image 2
+    width: 30,
     height: 30,
   },
 });

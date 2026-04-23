@@ -818,7 +818,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: 'center',
     lineHeight: 64,
-    fontFamily: FONTS.main,
+    fontFamily: FONTS.avenir,
   },
   heroTitleMobile: {
     fontSize: 22,

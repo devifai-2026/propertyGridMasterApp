@@ -1129,8 +1129,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   roleCardWrapper: {
-    width: 178.21,
-    height: 178.21,
+    width: 182.21,
+    height: 198.21,
     borderRadius: 15,
     backgroundColor: COLORS.white,
     shadowColor: '#262626',
@@ -1174,7 +1174,7 @@ const styles = StyleSheet.create({
     color: '#262626',
     textAlign: 'center',
     marginBottom: 12,
-    lineHeight: 18,
+    lineHeight: 26,
     fontFamily: 'Montserrat',
   },
   roleDesc: {
@@ -1182,7 +1182,7 @@ const styles = StyleSheet.create({
     color: '#767676',
     textAlign: 'center',
     fontWeight: '400',
-    lineHeight: 16,
+    lineHeight: 20,
     fontFamily: 'Montserrat',
   },
 

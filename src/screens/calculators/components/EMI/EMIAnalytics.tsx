@@ -84,6 +84,9 @@ const EMIAnalytics: React.FC = () => {
     color: (opacity = 1) => `rgba(34,211,238, ${opacity})`,
     labelColor: () => '#555',
     style: { borderRadius: 16 },
+    propsForLabels: {
+      fontFamily: 'Montserrat',
+    },
   };
 
   /* -------------------- UI -------------------- */
@@ -199,6 +202,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#dc2626',
     textAlign: 'center',
+    fontFamily: 'Montserrat',
   },
   grid: {
     flexDirection: 'row',
@@ -237,11 +241,13 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     textAlign: 'center',
     color: '#1f2937',
+    fontFamily: 'Montserrat',
   },
   cardSubtitle: {
     fontSize: 14,
     color: '#6b7280',
     marginBottom: 16,
     textAlign: 'center',
+    fontFamily: 'Montserrat',
   },
 });

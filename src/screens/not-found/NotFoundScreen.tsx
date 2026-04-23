@@ -11,6 +11,7 @@ import { useNavigation } from '../../context/NavigationContext';
 import { Home } from 'lucide-react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Layout from '../../layout/Layout';
+import { FONTS } from '../../constants/theme';
 
 const NotFoundScreen = () => {
   const { width, height } = useWindowDimensions();
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
     fontSize: 150,
     fontWeight: '800',
     color: '#EE2529',
-    fontFamily: 'Montserrat',
+    fontFamily: FONTS.avenir,
     lineHeight: 160,
   },
   title: {

@@ -182,6 +182,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 20,
     color: '#262626',
+    fontFamily: 'Montserrat',
   },
   tableBody: {
     width: '100%',
@@ -203,16 +204,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     fontSize: 16,
     textAlign: 'center',
+    fontFamily: 'Montserrat',
   },
   headerText: {
     fontWeight: '700',
     fontSize: 18,
+    fontFamily: 'Montserrat',
   },
   red: {
     color: '#C73834',
+    fontFamily: 'Montserrat',
   },
   green: {
     color: '#429482',
+    fontFamily: 'Montserrat',
   },
   buttonContainer: {
     flexDirection: isDesktop ? 'row' : 'column',
@@ -242,5 +247,6 @@ const styles = StyleSheet.create({
     color: '#767676',
     fontWeight: '600',
     fontSize: isDesktop ? 16 : 14,
+    fontFamily: 'Montserrat',
   },
 });

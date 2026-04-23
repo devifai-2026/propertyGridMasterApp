@@ -38,7 +38,7 @@ import Layout from '../../layout/Layout';
 import PropertyCard, { Property } from '../../components/PropertyCard';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
 import { useCompare } from '../../context/CompareContext';
-import { COLORS } from '../../constants/theme';
+import { COLORS, FONTS } from '../../constants/theme';
 import NoPropertiesFound from './components/NoPropertiesFound';
 import ReachedTheEnd from './components/ReachedTheEnd';
 import filter from "../../assets/ExploreProperties/filter.png"
@@ -1939,7 +1939,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#EE2529',
-    fontFamily: 'Montserrat',
+    fontFamily: FONTS.avenir,
   },
   filterTabs: {
     flexDirection: 'row',

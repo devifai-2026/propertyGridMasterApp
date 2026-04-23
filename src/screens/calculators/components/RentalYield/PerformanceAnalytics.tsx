@@ -134,6 +134,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#EE2529',
     marginBottom: 20,
+    fontFamily: 'Montserrat',
   },
   wrapper: {
     flexDirection: 'column',
@@ -162,5 +163,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 16,
     color: '#262626',
+    fontFamily: 'Montserrat',
   },
 });

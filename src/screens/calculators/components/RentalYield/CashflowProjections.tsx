@@ -100,6 +100,7 @@ const CashflowProjections = ({ data }: CashFlowProjectionsProps) => {
             labelColor: () => '#767676',
             propsForLabels: {
               fontSize: isDesktop ? 12 : 10,
+              fontFamily: 'Montserrat',
             },
             propsForDots: {
               r: isDesktop ? '6' : '4',
@@ -155,6 +156,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 16,
     color: '#262626',
+    fontFamily: 'Montserrat',
   },
   chart: {
     borderRadius: 16,
@@ -175,6 +177,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
   // Outline button with visible border
   buttonOutline: {
@@ -186,5 +189,6 @@ const styles = StyleSheet.create({
     color: '#20B2AA',
     fontSize: 16,
     fontWeight: '600',
+    fontFamily: 'Montserrat',
   },
 });
