@@ -222,7 +222,7 @@ const CalculatorsScreen = () => {
         <View
           style={[
             styles.tabsContainer,
-            !isDesktop && { width: '100%' },
+            !isDesktop && { width: '94%', alignSelf: 'center', marginHorizontal: 0 },
             isDesktop && { width: '90%', maxWidth: 1600, alignSelf: 'center' },
           ]}
         >
@@ -240,7 +240,7 @@ const CalculatorsScreen = () => {
               style={[
                 styles.tabText,
                 activeTab === 'roi' && styles.activeTabText,
-                !isDesktop && { fontSize: 13, lineHeight: 18 }
+                !isDesktop && { fontSize: 11, lineHeight: 14, textAlign: 'center', paddingHorizontal: 4 }
               ]}
             >
               ROI & Rental Yield Calculator
@@ -258,7 +258,7 @@ const CalculatorsScreen = () => {
       color={activeTab === 'emi' ? '#fff' : '#767676'}
     />
   </View>
-  <Text style={[styles.tabText, activeTab === 'emi' && styles.activeTabText, !isDesktop && { fontSize: 13, lineHeight: 18 }]}>
+  <Text style={[styles.tabText, activeTab === 'emi' && styles.activeTabText, !isDesktop && { fontSize: 11, lineHeight: 14, textAlign: 'center', paddingHorizontal: 4 }]}>
     EMI Calculator
   </Text>
   {activeTab === 'emi' && <View style={[styles.activeIndicator, !isDesktop && { width: '100%' }]} />}

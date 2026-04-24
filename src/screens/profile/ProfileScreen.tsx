@@ -55,7 +55,7 @@ const ProfileScreen = () => {
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
-      navigate('/login');
+      navigate('/dashboard');
     } else if (isLoggedIn) {
       // Fetch available roles for switching
       getAvailableRoles((res: any) => {
@@ -72,7 +72,7 @@ const ProfileScreen = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/dashboard');
   };
 
   const handleSwitchRole = async (role: string) => {

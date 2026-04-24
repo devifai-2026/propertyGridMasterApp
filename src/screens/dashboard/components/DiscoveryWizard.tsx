@@ -338,7 +338,10 @@ const DiscoveryWizard = () => {
             end={{ x: 1, y: 0 }}
             style={styles.showPropertiesBtn}
           >
-            <Text style={[styles.showPropertiesText, isMobile && { fontSize: 12 }]}>
+            <Text 
+              numberOfLines={1}
+              style={[styles.showPropertiesText, isMobile && { fontSize: 12 }]}
+            >
               Show Properties
             </Text>
           </LinearGradient>
@@ -569,7 +572,7 @@ cityOptionInner: {
   },
   showPropertiesBtn: {
     height: 48,
-    minWidth: isDesktop ? 180 : 120,
+    minWidth: isDesktop ? 180 : 150,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
@@ -585,6 +588,7 @@ cityOptionInner: {
     color: '#FFFFFF',
     fontSize: 18,
     fontWeight: '600',
+    whiteSpace: 'nowrap' as any,
   },
   
 });

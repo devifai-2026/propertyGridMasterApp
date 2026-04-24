@@ -373,7 +373,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
         style={[
           styles.headerContent,
           isMobile
-            ? { paddingLeft: 0, paddingRight: 60 }
+            ? { paddingLeft: 30, paddingRight: 30 }
             : { paddingLeft: 60, paddingRight: 80, height: 90 },
         ]}
       >
@@ -536,6 +536,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
                   onPress={() => {
                     setIsLogoutMenuVisible(false);
                     logout();
+                    navigate('/dashboard');
                   }}
                 >
                   <LogOut size={18} color={COLORS.primary} />

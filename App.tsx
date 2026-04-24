@@ -74,7 +74,7 @@ const AppContent = () => {
 
   React.useEffect(() => {
     if (!isLoading && isPrivate && !isLoggedIn) {
-      navigate('/login');
+      navigate('/dashboard');
     }
   }, [currentPath, isLoggedIn, isLoading, isPrivate]);
 
@@ -111,7 +111,9 @@ const AppContent = () => {
       case currentPath.startsWith('/contact-broker/'):
         return <ContactBrokerScreen />;
       case currentPath === '/my-prifile':
-        return isLoggedIn ? <InvestorsScreen /> : <LoginScreen />;
+        return isLoggedIn ? <InvestorsScreen /> : <Dashboard />;
+      case currentPath === '/login':
+        return <LoginScreen />;
       case currentPath === '/list-property':
       case currentPath.startsWith('/list-property/'):
         return <ListPropertyScreen />;
