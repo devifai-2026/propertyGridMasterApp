@@ -553,7 +553,7 @@ cityOptionInner: {
     marginTop: 30,
   },
   skipBtn: {
-    height: 52,
+    height: 48,
     minWidth: 91,
     justifyContent: 'center',
     alignItems: 'center',
