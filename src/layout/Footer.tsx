@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -7,34 +7,27 @@ import {
   StyleSheet,
   useWindowDimensions,
 } from 'react-native';
-import { ChevronDown } from 'lucide-react-native';
 import { useNavigation } from '../context/NavigationContext';
 import instagram from '../assets/Footer/Instagram.png';
 import linkedin from '../assets/Footer/linkedin.png';
-import youtube from '../assets/Footer/youtube.png';
-
-const errorPages = [
-  { code: '404', title: 'Page Not Found' },
-  { code: '500', title: 'Internal Server Error' },
-  { code: '503', title: 'Service Unavailable' },
-  { code: '403', title: 'Forbidden' },
-];
 
 const Footer = () => {
   const { width } = useWindowDimensions();
   const { navigate } = useNavigation();
-  const [errorPagesOpen, setErrorPagesOpen] = useState(false);
   const isMobile = width < 768;
+  const isTablet = width >= 768 && width < 1024;
+  const isDesktop = width >= 1024;
 
   const handleNavigate = (path: string) => {
     navigate(path);
   };
-
-  if (isMobile) return null;
-
   return (
     <View style={styles.footerContainer}>
-      <View style={[styles.contentWrapper, isMobile && styles.contentWrapperMobile]}>
+      <View style={[
+        styles.contentWrapper,
+        isTablet && styles.contentWrapperTablet,
+        isMobile && styles.contentWrapperMobile
+      ]}>
         {/* Top Section: Logo + 3 columns */}
         <View style={[styles.topSection, isMobile && styles.topSectionMobile]}>
           {/* Logo (image) */}
@@ -42,7 +35,11 @@ const Footer = () => {
             <TouchableOpacity onPress={() => handleNavigate('/')}>
               <Image
                 source={require('../assets/Footer/logo.png')}
-                style={styles.logo}
+                style={[
+                  styles.logo,
+                  isMobile && styles.logoMobile,
+                  isTablet && styles.logoTablet
+                ]}
                 resizeMode="contain"
               />
             </TouchableOpacity>
@@ -50,7 +47,7 @@ const Footer = () => {
 
           {/* Quick Links */}
           <View style={[styles.linksColumn, isMobile && styles.linksColumnMobile]}>
-            <Text style={styles.columnTitle}>Quick Links</Text>
+            <Text style={[styles.columnTitle, isMobile && { textAlign: 'center' }]}>Quick Links</Text>
             {[
               { label: 'Explore Properties', path: '/explore-properties' },
               { label: 'Calculators', path: '/calculators' },
@@ -61,14 +58,14 @@ const Footer = () => {
                 onPress={() => handleNavigate(item.path)}
                 style={styles.linkItem}
               >
-                <Text style={styles.linkText}>{item.label}</Text>
+                <Text style={[styles.linkText, isMobile && { textAlign: 'center' }]}>{item.label}</Text>
               </TouchableOpacity>
             ))}
           </View>
 
           {/* Resources */}
           <View style={[styles.linksColumn, isMobile && styles.linksColumnMobile]}>
-            <Text style={styles.columnTitle}>Resources</Text>
+            <Text style={[styles.columnTitle, isMobile && { textAlign: 'center' }]}>Resources</Text>
             {[
               { label: 'Blogs', path: '/blogs' },
               { label: 'How it Works', path: '/how-it-works' },
@@ -79,59 +76,26 @@ const Footer = () => {
                 onPress={() => handleNavigate(item.path)}
                 style={styles.linkItem}
               >
-                <Text style={styles.linkText}>{item.label}</Text>
+                <Text style={[styles.linkText, isMobile && { textAlign: 'center' }]}>{item.label}</Text>
               </TouchableOpacity>
             ))}
           </View>
 
           {/* Legal + Error Pages Dropdown */}
           <View style={[styles.linksColumn, isMobile && styles.linksColumnMobile]}>
-            <Text style={styles.columnTitle}>Legal</Text>
+            <Text style={[styles.columnTitle, isMobile && { textAlign: 'center' }]}>Legal</Text>
             <TouchableOpacity
               onPress={() => handleNavigate('/privacy-policy')}
               style={styles.linkItem}
             >
-              <Text style={styles.linkText}>Privacy Policy</Text>
+              <Text style={[styles.linkText, isMobile && { textAlign: 'center' }]}>Privacy Policy</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => handleNavigate('/terms-of-service')}
               style={styles.linkItem}
             >
-              <Text style={styles.linkText}>Terms of Service</Text>
+              <Text style={[styles.linkText, isMobile && { textAlign: 'center' }]}>Terms of Service</Text>
             </TouchableOpacity>
-
-            {/* Error Pages Dropdown */}
-            <View style={styles.dropdownWrapper}>
-              <TouchableOpacity
-                onPress={() => setErrorPagesOpen(!errorPagesOpen)}
-                style={styles.dropdownTrigger}
-              >
-                <Text style={styles.dropdownTriggerText}>Error Pages</Text>
-                <ChevronDown
-                  size={16}
-                  color="#6B7280"
-                  style={{
-                    transform: [{ rotate: errorPagesOpen ? '180deg' : '0deg' }],
-                  }}
-                />
-              </TouchableOpacity>
-
-              {errorPagesOpen && (
-                <View style={styles.dropdownMenu}>
-                  {errorPages.map((page) => (
-                    <TouchableOpacity
-                      key={page.code}
-                      onPress={() => handleNavigate('/error-pages')}
-                      style={styles.dropdownItem}
-                    >
-                      <Text style={styles.dropdownItemText}>
-                        {page.code} – {page.title}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            </View>
           </View>
         </View>
 
@@ -140,21 +104,6 @@ const Footer = () => {
 
         {/* Bottom Section */}
         <View style={styles.bottomSection}>
-          <Text style={styles.descriptionText}>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            varius enim in eros elementum tristique. Duis cursus, mi quis viverra
-            ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat
-            .Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            varius enim in eros elementum tristique. Duis cursus, mi quis viverra
-            ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat
-            .Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-            varius enim in eros elementum tristique. Duis cursus, mi quis viverra
-            ornare, eros dolor interdum nulla, ut commodo diam libero vitae erat .Lorem
-            ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim
-            in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros
-            dolor interdum nulla, ut commodo diam libero vitae erat .
-          </Text>
-
           <View style={[styles.footerBottomRow, isMobile && styles.footerBottomRowMobile]}>
             <Text style={styles.copyrightLabel}>
               © 2025 PreLeaseGrid |{'  '}All Rights Reserved
@@ -165,9 +114,6 @@ const Footer = () => {
               </TouchableOpacity>
               <TouchableOpacity style={styles.iconContainer}>
                 <Image source={linkedin} style={styles.socialIcon} resizeMode="contain" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.iconContainer}>
-                <Image source={youtube} style={styles.socialIcon} resizeMode="contain" />
               </TouchableOpacity>
             </View>
           </View>
@@ -191,7 +137,11 @@ const styles = StyleSheet.create({
   },
   contentWrapperMobile: {
     width: '100%',
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
+  },
+  contentWrapperTablet: {
+    width: '100%',
+    paddingHorizontal: 40,
   },
   topSection: {
     flexDirection: 'row',
@@ -202,6 +152,7 @@ const styles = StyleSheet.create({
   },
   topSectionMobile: {
     flexDirection: 'column',
+    alignItems: 'center',
     gap: 32,
   },
   logoColumn: {
@@ -211,19 +162,29 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingRight: 0,
     marginBottom: 8,
+    alignItems: 'center',
   },
   logo: {
-    width: 550,
-    height: 120,
+    width: 400,
+    height: 80,
+  },
+  logoTablet: {
+    width: 300,
+    height: 60,
+  },
+  logoMobile: {
+    width: 240,
+    height: 50,
   },
   linksColumn: {
-    // Removed flex: 1 to allow columns to take their natural width
     paddingRight: 8,
+    minWidth: 160,
   },
   linksColumnMobile: {
     width: '100%',
     paddingRight: 0,
-    marginBottom: 8,
+    marginBottom: 24,
+    alignItems: 'center',
   },
   columnTitle: {
     color: '#FFFFFF',
@@ -314,12 +275,15 @@ const styles = StyleSheet.create({
   },
   footerBottomRowMobile: {
     flexDirection: 'column',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    textAlign: 'center',
+    gap: 20,
   },
   copyrightLabel: {
     color: '#9CA3AF',
     fontSize: 14,
     fontFamily: 'Montserrat',
+    textAlign: 'center',
   },
   socialIcons: {
     flexDirection: 'row',
