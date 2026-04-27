@@ -10,8 +10,8 @@ import {
   Platform,
 } from 'react-native';
 
-const { width } = Dimensions.get('window');
-const isDesktop = width >= 768;
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const IS_DESKTOP_INITIAL = SCREEN_WIDTH >= 768;
 import { COLORS, FONTS } from '../../../constants/theme';
 import { useNavigation } from '../../../context/NavigationContext';
 import LinearGradient from 'react-native-linear-gradient';
@@ -60,7 +60,7 @@ const StepCard = ({
         style={[
           styles.stepCard,
           active && styles.stepCardActive,
-          { width: isMobile ? 85 : 125, height: isMobile ? 95 : 125 },
+          { width: isMobile ? 80 : 110, height: isMobile ? 90 : 110 },
         ]}
         onPress={onPress}
         activeOpacity={0.7}
@@ -84,7 +84,7 @@ const StepCard = ({
         style={[
           styles.stepProgressIndicator,
           active && styles.stepProgressIndicatorActive,
-          { width: isMobile ? 85 : 125 },
+          { width: isMobile ? 80 : 110 },
         ]}
       />
     </View>
@@ -102,7 +102,7 @@ const WizardOption = ({ label, isSelected, onPress, isMobile, width }: any) => {
       end={{ x: 0, y: 1 }}
       style={[
         styles.cityOption,
-        isMobile && { width: (width - (isMobile ? 160 : 120)) / 2 },
+        isMobile && { width: Math.min((width - 60) / 2, 160) },
         isSelected && styles.cityOptionSelected,
         (isHovered && !isSelected) && {
           shadowColor: COLORS.primary,
@@ -436,8 +436,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#EE2529',
   },
   wizardContentCard: {
-    width: '40%',
-    maxWidth: 900,
+    width: '90%',
+    maxWidth: 600,
     backgroundColor: '#FFF',
     borderRadius: 20,
     paddingHorizontal: 30,
@@ -486,7 +486,7 @@ const styles = StyleSheet.create({
     color: '#1A1A1A',
     marginBottom: 20,
     textAlign: 'center',
-    marginTop: isDesktop ? 10 : 25,
+    marginTop: IS_DESKTOP_INITIAL ? 10 : 25,
   },
   wizardSubtext: {
     fontFamily: FONTS.main,
@@ -500,15 +500,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: isDesktop ? 30 : 10,
-    marginBottom: isDesktop ? 40 : 20,
-    width: isDesktop ? 550 : '100%',
-    height: isDesktop ? 300 : 'auto',
+    gap: IS_DESKTOP_INITIAL ? 30 : 10,
+    marginBottom: IS_DESKTOP_INITIAL ? 40 : 20,
+    width: IS_DESKTOP_INITIAL ? 550 : '100%',
+    height: IS_DESKTOP_INITIAL ? 300 : 'auto',
     maxWidth: 550,
   },
   cityOption: {
   width: 130,
-  height: isDesktop ? 130 : 90,
+  height: IS_DESKTOP_INITIAL ? 130 : 90,
   borderRadius: 15,
   alignItems: 'center',
   justifyContent: 'center',
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
   shadowOpacity: 0.25,
   shadowRadius: 4,
   elevation: 3,
-  marginBottom: isDesktop ? 0 : 10,
+  marginBottom: IS_DESKTOP_INITIAL ? 0 : 10,
 },
 cityOptionInner: {
   width: '100%',
@@ -572,11 +572,11 @@ cityOptionInner: {
   },
   showPropertiesBtn: {
     height: 48,
-    minWidth: isDesktop ? 180 : 150,
+    minWidth: IS_DESKTOP_INITIAL ? 180 : 150,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 8,
-    paddingHorizontal: isDesktop ? 30 : 10,
+    paddingHorizontal: IS_DESKTOP_INITIAL ? 30 : 10,
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,

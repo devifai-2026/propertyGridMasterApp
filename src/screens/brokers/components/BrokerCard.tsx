@@ -92,7 +92,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
     <TouchableOpacity 
       activeOpacity={1} 
       onPress={flipCard}
-      style={[styles.cardContainer, { width: isDesktop ? '49.3%' : '100%' }]}
+      style={[styles.cardContainer, { width: isDesktop ? '48.5%' : '100%' }]}
     >
       {/* Front Side */}
       <Animated.View style={[styles.card, frontAnimatedStyle, { width: '100%' }]}>
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#fff',
-    height: 391,
+    minHeight: 391,
     borderRadius: 24,
     shadowColor: '#000',
     shadowOffset: { width: 10, height: 10 },
@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   backAgentName: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '600',
     color: '#EE2529',
     fontFamily: 'Montserrat',
@@ -340,7 +340,7 @@ const styles = StyleSheet.create({
     marginVertical: 15,
   },
   backDescription: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#444',
     lineHeight: 28,
     fontWeight: '400',
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   brokerCompany: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: '600',
     color: '#EE2529',
     marginBottom: 20,
@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   agentName: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '600',
     color: '#EE2529',
     marginBottom: 8,
@@ -468,13 +468,13 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   locationText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#666',
     fontWeight: '400',
     fontFamily: 'Montserrat',
   },
   reraText: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#666',
     fontWeight: '400',
     marginLeft: 10,
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   specLabel: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '400',
     color: '#666',
     marginRight: 5,
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
   },
   tagText: {
-    fontSize: 18,
+    fontSize: 14,
     color: '#333',
     fontWeight: '400',
     fontFamily: 'Montserrat',
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat',
   },
   statLabel: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#767676',
     fontWeight: '400',
     fontFamily: 'Montserrat',
