@@ -88,6 +88,31 @@ const RentalDetailsCashflow = ({ data }: RentalDetailsCashflowProps) => {
 
   const cashFlowDetails = calculateDetailedCashflow();
 
+  const handleDownloadReport = () => {
+    const details = calculateDetailedCashflow();
+    const headers = ['Year', 'Annual Rent', 'EMI Paid', 'Principal', 'Interest', 'Balance', 'Annual Expenses', 'Net Cash Flow'];
+    let csv = 'Property Investment Detailed Cashflow Report\n';
+    csv += `Generated: ${new Date().toLocaleDateString('en-IN')}\n\n`;
+    csv += headers.join(',') + '\n';
+    details.forEach(row => {
+      csv += [row.year, row.annualRent, row.emiPaid, row.principal, row.interest, row.balance, row.annualExpenses, row.netCashFlow].join(',') + '\n';
+    });
+
+    if (Platform.OS === 'web') {
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'property-cashflow-report.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } else {
+      Share.share({ message: csv, title: 'Property Cashflow Report' });
+    }
+  };
+
   const handleShare = async () => {
     try {
       await Share.share({
@@ -151,7 +176,7 @@ const RentalDetailsCashflow = ({ data }: RentalDetailsCashflowProps) => {
       {/* Buttons */}
       {/* Buttons */}
            <View style={[styles.buttonContainer, isDesktop && { marginTop: 30 }]}>
-             <TouchableOpacity style={styles.button}>
+             <TouchableOpacity style={styles.button} onPress={handleDownloadReport}>
                <Image source={download} style={styles.buttonIcon} />
                <Text style={styles.buttonText}>Download Report</Text>
              </TouchableOpacity>

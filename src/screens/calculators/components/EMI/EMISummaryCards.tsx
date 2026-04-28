@@ -30,8 +30,8 @@ const EMISummaryCards = ({ data }: EMISummaryCardsProps) => {
     return val.toLocaleString('en-IN', { maximumFractionDigits: 0 });
   };
 
-  const monthlyRent = 50000; // Placeholder or from data if I add it to results
-  const rentCoverage = data?.monthlyEMI ? ((monthlyRent / data.monthlyEMI) * 100).toFixed(1) : '0';
+  const monthlyRent = data?.monthlyRent || 0;
+  const rentCoverage = data?.monthlyEMI && data.monthlyEMI > 0 ? ((monthlyRent / data.monthlyEMI) * 100).toFixed(1) : '0';
   const monthlyCashFlow = data?.monthlyEMI ? (monthlyRent - data.monthlyEMI) : 0;
 
   return (
@@ -84,7 +84,11 @@ const EMISummaryCards = ({ data }: EMISummaryCardsProps) => {
             <Text style={styles.resultCardTitle}>Payback Period</Text>
             <Calendar size={24} color="#F7C952" />
           </View>
-          <Text style={[styles.resultCardValue, { color: '#F7C952' }]}>9.1 years</Text>
+          <Text style={[styles.resultCardValue, { color: '#F7C952' }]}>
+            {data?.propertyPrice && monthlyCashFlow > 0
+              ? `${(data.propertyPrice / (monthlyCashFlow * 12)).toFixed(1)} years`
+              : 'N/A'}
+          </Text>
           <Text style={styles.resultCardSubtitle}>Time to break even</Text>
           <View style={styles.descContainer}>
             <Text style={styles.resultCardDesc}>Years to recover cost.</Text>
@@ -129,7 +133,7 @@ const EMISummaryCards = ({ data }: EMISummaryCardsProps) => {
             </View>
             <View style={styles.summaryItem}>
               <Text style={styles.summaryLabel}>Monthly Rental Income (₹)</Text>
-              <Text style={styles.summaryValue}>{formatCurrency(monthlyRent)}</Text>
+              <Text style={styles.summaryValue}>{formatCurrency(data?.monthlyRent)}</Text>
             </View>
           </View>
           <View style={styles.dividerLine} />

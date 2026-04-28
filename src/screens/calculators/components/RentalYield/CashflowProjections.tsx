@@ -6,6 +6,8 @@ import {
   useWindowDimensions,
   ScrollView,
   TouchableOpacity,
+  Share,
+  Platform,
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 
@@ -56,6 +58,30 @@ const CashflowProjections = ({ data }: CashFlowProjectionsProps) => {
 
   const cashFlowData = calculateProjections();
   const labels = cashFlowData.map(item => item.year);
+
+  const handleDownloadProjections = () => {
+    const headers = ['Year', 'Annual Cash Flow (L)', 'Annual Rent (L)', 'Cumulative Cash Flow (L)'];
+    let csv = '10-Year Cash Flow Projections\n';
+    csv += `Generated: ${new Date().toLocaleDateString('en-IN')}\n\n`;
+    csv += headers.join(',') + '\n';
+    cashFlowData.forEach(row => {
+      csv += [row.year, row.annualCashFlow, row.annualRent, row.cumulativeCashFlow].join(',') + '\n';
+    });
+
+    if (Platform.OS === 'web') {
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'cashflow-projections.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } else {
+      Share.share({ message: csv, title: '10-Year Cashflow Projections' });
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -120,8 +146,7 @@ const CashflowProjections = ({ data }: CashFlowProjectionsProps) => {
           }}
         />
 
-        {/* Example Button with visible border */}
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handleDownloadProjections}>
           <Text style={styles.buttonText}>Download Projections</Text>
         </TouchableOpacity>
 

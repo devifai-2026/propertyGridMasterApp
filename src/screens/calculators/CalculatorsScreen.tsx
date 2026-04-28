@@ -346,14 +346,52 @@ const CalculatorHeader = ({ type }: { type: 'roi' | 'emi' }) => {
   );
 };
 
-const BalanceLeaseTenureAlert = () => {
+const computeLeaseBalance = (leaseStartDate: string, leaseTermYears: number) => {
+  if (!leaseStartDate || !leaseTermYears) return null;
+  let dateStr = leaseStartDate;
+  if (dateStr.includes('/')) {
+    const parts = dateStr.split('/');
+    if (parts.length === 3) {
+      dateStr = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    }
+  }
+  const start = new Date(dateStr);
+  if (isNaN(start.getTime())) return null;
+  const end = new Date(start);
+  end.setFullYear(end.getFullYear() + leaseTermYears);
+  const now = new Date();
+  const diffMs = end.getTime() - now.getTime();
+  if (diffMs <= 0) return { years: 0, months: 0, days: 0 };
+  const msPerDay = 86400000;
+  const totalDays = Math.floor(diffMs / msPerDay);
+  const years = Math.floor(totalDays / 365);
+  const remaining = totalDays - years * 365;
+  const months = Math.floor(remaining / 30);
+  const days = remaining - months * 30;
+  return { years, months, days };
+};
+
+const BalanceLeaseTenureAlert = ({
+  leaseStartDate,
+  leaseTerm,
+}: {
+  leaseStartDate?: string;
+  leaseTerm?: string;
+}) => {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
+  const leaseTermYears = parseFloat(leaseTerm || '') || 0;
+  const balance = leaseStartDate && leaseTermYears
+    ? computeLeaseBalance(leaseStartDate, leaseTermYears)
+    : null;
+  const balanceLabel = balance
+    ? `${balance.years} year${balance.years !== 1 ? 's' : ''} ${balance.months} month${balance.months !== 1 ? 's' : ''} ${balance.days} day${balance.days !== 1 ? 's' : ''}`
+    : 'Enter lease date & term above';
   return (
     <View style={styles.alertBox}>
       <Text style={[styles.alertTitle, !isDesktop && { fontSize: 16, lineHeight: 22 }]}>
         Balance Lease Tenure:{' '}
-        <Text style={[styles.alertValue, !isDesktop && { fontSize: 18 }]}>10 years 9 months 2 days</Text>
+        <Text style={[styles.alertValue, !isDesktop && { fontSize: 18 }]}>{balanceLabel}</Text>
       </Text>
       <Text style={[styles.alertSubtitle, !isDesktop && { fontSize: 13 }]}>
         Typically defined as the period from the expiry of the initial lease term
@@ -445,26 +483,26 @@ const Dropdown = ({
 const RentalYieldCalculator = ({ activeTab }: any) => {
   const [formData, setFormData] = useState({
     propertyType: 'Residential Space',
-    carpetArea: '',
-    purchasePrice: '',
+    carpetArea: '5000',
+    purchasePrice: '45000000',
     loanAmount: '',
     interestRate: '',
     loanTenure: '',
     downPayment: '',
-    monthlyRent: '',
-    securityDeposit: '',
-    rentEscalationEvery: '',
-    rentEscalationPercent: '',
-    leaseStartDate: '',
-    leaseTerm: '',
-    propertyTax: '',
-    insurance: '',
-    maintenancePerSqft: '',
-    maintenanceLumpSum: '',
-    stampDuty: '',
-    brokerage: '',
-    legalFees: '',
-    otherCosts: '',
+    monthlyRent: '50000',
+    securityDeposit: '300000',
+    rentEscalationEvery: '3',
+    rentEscalationPercent: '8',
+    leaseStartDate: '01/01/2024',
+    leaseTerm: '10',
+    propertyTax: '12000',
+    insurance: '8000',
+    maintenancePerSqft: '5',
+    maintenanceLumpSum: '15000',
+    stampDuty: '7',
+    brokerage: '67500',
+    legalFees: '35000',
+    otherCosts: '25000',
   });
 
   const [includeLoan, setIncludeLoan] = useState(false);
@@ -835,7 +873,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
           </View>
         </View>
 
-        <BalanceLeaseTenureAlert />
+        <BalanceLeaseTenureAlert leaseStartDate={formData.leaseStartDate} leaseTerm={formData.leaseTerm} />
       </View>
 
       {/* Recurring Expenses (Annual) */}
@@ -977,26 +1015,26 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
 const EMICalculatorView = () => {
   const [formData, setFormData] = useState({
     propertyType: 'Residential Space',
-    carpetArea: '',
-    purchasePrice: '',
-    loanAmount: '',
-    downPayment: '',
-    interestRate: '',
-    loanTenure: '',
-    monthlyRent: '',
-    securityDeposit: '',
+    carpetArea: '5000',
+    purchasePrice: '45000000',
+    loanAmount: '31500000',
+    downPayment: '13500000',
+    interestRate: '9.5',
+    loanTenure: '20',
+    monthlyRent: '50000',
+    securityDeposit: '300000',
     daysCalculation: '',
-    rentEscalation: '',
-    leaseStartDate: '',
-    leaseTerm: '',
-    propertyTax: '',
-    maintenance: '',
-    insurance: '',
-    maintenanceLumpsum: '',
-    stampDuty: '',
-    legalFees: '',
-    brokerage: '',
-    otherCosts: '',
+    rentEscalation: '8',
+    leaseStartDate: '01/01/2024',
+    leaseTerm: '10',
+    propertyTax: '12000',
+    maintenance: '5',
+    insurance: '8000',
+    maintenanceLumpsum: '15000',
+    stampDuty: '7',
+    legalFees: '35000',
+    brokerage: '67500',
+    otherCosts: '25000',
   });
 
   const [includeLoan, setIncludeLoan] = useState(true);
@@ -1026,8 +1064,10 @@ const EMICalculatorView = () => {
       loanTenure: formData.loanTenure,
       downPayment: parseFloat(formData.downPayment.replace(/,/g, '')) || 0,
       propertyPrice: parseFloat(formData.purchasePrice.replace(/,/g, '')) || 0,
-      principalPaid: loanAmount, // For charts
+      principalPaid: loanAmount,
       interestPaid: totalInterest,
+      monthlyRent: parseFloat(formData.monthlyRent.replace(/,/g, '')) || 0,
+      rentEscalationPercent: parseFloat(formData.rentEscalation) || 8,
     });
   };
 
@@ -1241,7 +1281,7 @@ const EMICalculatorView = () => {
           </View>
         </View>
 
-        <BalanceLeaseTenureAlert />
+        <BalanceLeaseTenureAlert leaseStartDate={formData.leaseStartDate} leaseTerm={formData.leaseTerm} />
       </View>
 
       {/* Recurring Expenses */}

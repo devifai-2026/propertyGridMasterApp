@@ -7,18 +7,24 @@ import Svg, {
   Line as SvgLine,
 } from 'react-native-svg';
 
-const PrincipleChart = () => {
+interface PrincipleChartProps {
+  data?: {
+    loanAmount?: number;
+    interestRate?: string;
+    loanTenure?: string;
+  };
+}
+
+const PrincipleChart = ({ data }: PrincipleChartProps) => {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
   const isTablet = width >= 768 && width < 1024;
-  
-  // Conditionally adjust chart width based on parent padding/layout
+
   const chartWidth = isDesktop ? 600 : isTablet ? width - 80 : width - 60;
 
-  // Calculate amortization schedule for 20 years loan
-  const loanAmount = 315000;
-  const interestRate = 9.5;
-  const years = 20;
+  const loanAmount = data?.loanAmount || 0;
+  const interestRate = parseFloat(data?.interestRate || '0') || 0;
+  const years = Math.min(parseFloat(data?.loanTenure || '10') || 10, 10);
 
   const calculateAmortization = () => {
     const principal = loanAmount;
@@ -55,34 +61,44 @@ const PrincipleChart = () => {
     return data;
   };
 
-  const data = calculateAmortization();
+  const amortData = calculateAmortization();
 
   const chartHeight = 220;
   const padding = 50;
-  const maxValue = 100000;
+  const maxValue = amortData.length > 0
+    ? Math.max(...amortData.map(d => d.interest + d.principal), 1)
+    : 100000;
 
   const getY = (val: number) => chartHeight - (val / maxValue) * chartHeight + 10;
-  const getX = (index: number) => padding + (index / (data.length - 1)) * (chartWidth - padding - 10);
+  const getX = (index: number) => padding + (index / (amortData.length - 1)) * (chartWidth - padding - 10);
 
   // Create path for interest (top area)
-  let interestPath = `M ${getX(0)} ${getY(data[0].interest + data[0].principal)}`;
-  data.forEach((item, i) => {
+  let interestPath = amortData.length > 0
+    ? `M ${getX(0)} ${getY(amortData[0].interest + amortData[0].principal)}`
+    : '';
+  amortData.forEach((item, i) => {
     if (i > 0) interestPath += ` L ${getX(i)} ${getY(item.interest + item.principal)}`;
   });
-  interestPath += ` L ${getX(data.length - 1)} ${getY(data[data.length - 1].principal)}`;
-  for (let i = data.length - 1; i >= 0; i--) {
-    interestPath += ` L ${getX(i)} ${getY(data[i].principal)}`;
+  if (amortData.length > 0) {
+    interestPath += ` L ${getX(amortData.length - 1)} ${getY(amortData[amortData.length - 1].principal)}`;
+    for (let i = amortData.length - 1; i >= 0; i--) {
+      interestPath += ` L ${getX(i)} ${getY(amortData[i].principal)}`;
+    }
+    interestPath += ' Z';
   }
-  interestPath += ' Z';
 
   // Create path for principal (bottom area)
-  let principalPath = `M ${getX(0)} ${getY(data[0].principal)}`;
-  data.forEach((item, i) => {
+  let principalPath = amortData.length > 0
+    ? `M ${getX(0)} ${getY(amortData[0].principal)}`
+    : '';
+  amortData.forEach((item, i) => {
     if (i > 0) principalPath += ` L ${getX(i)} ${getY(item.principal)}`;
   });
-  principalPath += ` L ${getX(data.length - 1)} ${chartHeight + 10} L ${getX(0)} ${chartHeight + 10} Z`;
+  if (amortData.length > 0) {
+    principalPath += ` L ${getX(amortData.length - 1)} ${chartHeight + 10} L ${getX(0)} ${chartHeight + 10} Z`;
+  }
 
-  const yAxisTicks = [0, 30000, 50000, 80000, 100000];
+  const yAxisTicks = [0, Math.round(maxValue * 0.25), Math.round(maxValue * 0.5), Math.round(maxValue * 0.75), maxValue];
   const formatYAxis = (val: number) => {
     const lakhValue = val / 100000;
     return `₹${lakhValue.toFixed(1)}L`;
@@ -122,7 +138,7 @@ const PrincipleChart = () => {
           <Path d={interestPath} fill="#C73834" opacity={0.9} stroke="#C73834" strokeWidth={2} />
 
           {/* X-axis labels */}
-          {data.map((item, i) => (
+          {amortData.map((item, i) => (
             <SvgText
               key={i}
               x={getX(i)}
