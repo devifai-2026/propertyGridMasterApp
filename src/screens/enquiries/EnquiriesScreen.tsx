@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
-  Alert,
   Platform,
 } from 'react-native';
 import { Check, ChevronLeft } from 'lucide-react-native';
@@ -19,6 +18,8 @@ import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/useProperty
 import { useAuth } from '../../context/AuthContext';
 import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
 import Layout from '../../layout/Layout';
+import Popup from '../../components/common/Popup';
+
 
 const { width } = Dimensions.get('window');
 const isDesktop = width > 900;
@@ -48,6 +49,23 @@ const EnquiriesScreen = () => {
   const [verificationId, setVerificationId] = useState('');
   const [isVerified, setIsVerified] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+
+  // Popup state
+  const [popup, setPopup] = useState({
+    visible: false,
+    title: '',
+    message: '',
+    type: 'error' as 'error' | 'success' | 'info',
+  });
+
+  const showPopup = (title: string, message: string, type: 'error' | 'success' | 'info' = 'error') => {
+    setPopup({ visible: true, title, message, type });
+  };
+
+  const hidePopup = () => {
+    setPopup(prev => ({ ...prev, visible: false }));
+  };
+
 
   useEffect(() => {
     if (user) {
@@ -127,38 +145,40 @@ const EnquiriesScreen = () => {
             setTimeout(() => {
               otpInputRefs.current[0]?.focus();
             }, 100);
-            Alert.alert(
+            showPopup(
               'OTP Sent',
               'A 6-digit OTP has been sent to your mobile number',
+              'success'
             );
           } else {
-            Alert.alert('Error', res.message || 'Failed to send OTP');
+            showPopup('Error', res.message || 'Failed to send OTP');
           }
         },
         (err: any) => {
-          Alert.alert(
+          showPopup(
             'Error',
-            err?.response?.data?.message || 'Failed to send OTP',
+            err?.response?.data?.message || 'Failed to send OTP'
           );
         },
       );
     } else {
-      Alert.alert(
+      showPopup(
         'Invalid Phone',
-        'Please enter a valid 10-digit phone number',
+        'Please enter a valid 10-digit phone number'
       );
     }
   };
 
+
   const handleVerifyOTP = (otpValue?: string) => {
     const code = otpValue || formData.otp;
     if (code.length !== 6) {
-      Alert.alert('Error', 'Please enter a 6-digit OTP');
+      showPopup('Error', 'Please enter a 6-digit OTP');
       return;
     }
 
     if (!verificationId) {
-      Alert.alert('Error', 'Please send OTP first');
+      showPopup('Error', 'Please send OTP first');
       return;
     }
 
@@ -167,49 +187,54 @@ const EnquiriesScreen = () => {
       (res: any) => {
         if (res.success) {
           setIsVerified(true);
-          Alert.alert('Verified', 'Mobile number verified successfully!');
+          showPopup('Verified', 'Mobile number verified successfully!', 'success');
         } else {
-          Alert.alert('Error', res.message || 'Invalid OTP');
+          showPopup('Error', res.message || 'Invalid OTP');
         }
       },
       (err: any) => {
         console.error('OTP Verify Error:', err);
-        Alert.alert('Error', err?.response?.data?.message || 'Invalid OTP');
+        showPopup('Error', err?.response?.data?.message || 'Invalid OTP');
       },
     );
   };
 
-  const handleSubmit = () => {
 
+  const handleSubmit = () => {
     if (!user) {
-      Alert.alert(
+      showPopup(
         'Authentication Required',
-        'Please login to submit an enquiry.',
+        'Please login to submit an enquiry.'
       );
       navigate('/login');
       return;
     }
 
+    const errors: string[] = [];
+
     if (!formData.question.trim()) {
-      Alert.alert('Error', 'Please enter your inquiry question.');
-      return;
+      errors.push('Please enter your inquiry question.');
     }
 
-    const isProfileMobile = user && formData.phone === user.mobileNumber;
-    if (!isVerified && !isProfileMobile) {
-      Alert.alert('Error', 'Please verify your phone number first.');
-      return;
+    if (!isVerified) {
+      errors.push('Please verify your phone number first.');
     }
+
 
     if (!formData.termsAccepted) {
-      Alert.alert('Error', 'Please agree to the terms & conditions.');
-      return;
+      errors.push('Please agree to the terms & conditions.');
     }
 
     if (!formData.privacyAccepted) {
-      Alert.alert('Error', 'Please agree to the Privacy Policy.');
+      errors.push('Please agree to the Privacy Policy.');
+    }
+
+    if (errors.length > 0) {
+      showPopup('Validation Errors', errors as any);
       return;
     }
+
+
 
     const payload = {
       inquiry: formData.question,
@@ -222,23 +247,27 @@ const EnquiriesScreen = () => {
       propertyId,
       payload,
       () => {
-        Alert.alert(
+        showPopup(
           'Success',
           user?.role === 'Broker' || user?.role === 'Investor'
             ? 'Property assigned successfully!'
             : 'Enquiry submitted successfully!',
+          'success'
         );
-        navigate('/dashboard');
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
       },
       err => {
         console.error('API Error:', err);
-        Alert.alert(
+        showPopup(
           'Error',
-          err?.response?.data?.message || 'Failed to submit enquiry',
+          err?.response?.data?.message || 'Failed to submit enquiry'
         );
       },
     );
   };
+
 
   return (
     <Layout>
@@ -570,9 +599,17 @@ const EnquiriesScreen = () => {
         </View>
         <View style={{ height: 40 }} />
       </ScrollView>
+      <Popup
+        visible={popup.visible}
+        onClose={hidePopup}
+        title={popup.title}
+        message={popup.message}
+        type={popup.type}
+      />
     </Layout>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
