@@ -458,7 +458,21 @@ const EnquiriesScreen = () => {
                 </View>
               </View>
 
-            
+              <View style={styles.inputGroup}>
+                <Text style={styles.label}>
+                  Any specific question? <Text style={styles.required}>*</Text>
+                </Text>
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  placeholder="Type your question here..."
+                  multiline
+                  numberOfLines={4}
+                  value={formData.question}
+                  onChangeText={v => handleInputChange('question', v)}
+                  textAlignVertical="top"
+                />
+              </View>
+
               {/* Checkboxes */}
               <TouchableOpacity
                 style={styles.checkboxContainer}
@@ -691,6 +705,10 @@ const styles = StyleSheet.create({
     fontSize: isDesktop ? 18 : 16,
     color: COLORS.textDark,
     fontFamily: FONTS.main,
+  },
+  textArea: {
+    height: isDesktop ? 150 : 100,
+    paddingTop: 16,
   },
   phoneInputContainer: {
     flexDirection: 'row',
