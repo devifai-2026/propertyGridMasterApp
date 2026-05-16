@@ -561,7 +561,51 @@ interface LayoutProps {
   scrollViewRef?: React.RefObject<ScrollView>;
 }
 
+const BottomNav = () => {
+  const { navigate, currentPath } = useNavigation();
+
+  const navItems = [
+    { label: 'Home', icon: Home, path: '/dashboard' },
+    { label: 'Calculators', icon: Calculator, path: '/calculators' },
+    { label: 'Brokers', icon: Users, path: '/explore-brokers' },
+  ];
+
+  return (
+    <View style={styles.bottomNavContainer}>
+      {navItems.map((item) => {
+        const isActive = 
+          currentPath === item.path || 
+          (item.path === '/dashboard' && currentPath === '/');
+        const Icon = item.icon;
+        return (
+          <TouchableOpacity
+            key={item.path}
+            style={styles.bottomNavItem}
+            onPress={() => navigate(item.path)}
+          >
+            <Icon
+              size={24}
+              color={isActive ? COLORS.primary : COLORS.textSecondary}
+              strokeWidth={isActive ? 2.5 : 2}
+            />
+            <Text
+              style={[
+                styles.bottomNavText,
+                isActive && styles.bottomNavTextActive,
+              ]}
+            >
+              {item.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
+    </View>
+  );
+};
+
 const Layout: React.FC<LayoutProps> = ({ children, style, onScroll, scrollEventThrottle, scrollViewRef }) => {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isLoggedIn, user, logout } = useAuth();
   const { navigate, openLoginModal } = useNavigation();
@@ -594,11 +638,14 @@ const Layout: React.FC<LayoutProps> = ({ children, style, onScroll, scrollEventT
         contentContainerStyle={[
           styles.scrollContent,
           { paddingTop: Platform.OS === 'web' ? 120 : 100 },
+          // isMobile && { paddingBottom: 100 }
         ]}
       >
         {children}
         <Footer />
       </ScrollView>
+
+      {/* {isMobile && <BottomNav />} */}
     </SafeAreaView>
   );
 };
@@ -1052,6 +1099,50 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#eee',
     marginVertical: 4,
+  },
+  bottomNavContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 70,
+    backgroundColor: COLORS.white,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: COLORS.divider,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 0, // Handle iOS safe area
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: -3 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+      },
+      android: {
+        elevation: 20,
+      },
+      web: {
+        boxShadow: '0 -4px 20px rgba(0,0,0,0.08)',
+      },
+    }),
+  },
+  bottomNavItem: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+  },
+  bottomNavText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: COLORS.textSecondary,
+    fontFamily: 'Montserrat',
+  },
+  bottomNavTextActive: {
+    color: COLORS.primary,
+    fontWeight: '700',
   },
 });
 
