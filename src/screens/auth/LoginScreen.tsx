@@ -38,6 +38,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
   const [errorMsg, setErrorMsg] = useState('');
   const [otpError, setOtpError] = useState(false);
   const [modalVisible, setModalVisible] = useState(true);
+  const [isResending, setIsResending] = useState(false);
   const { login } = useAuth();
   const { login: authenticate, sendOtp, loading: apiLoading } = useAuthAPIs();
   const { openSignupModal, closeLoginModal } = useNavigation();
@@ -132,9 +133,11 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
     setOtp('');
     setOtpError(false);
     setErrorMsg('');
+    setIsResending(true);
     sendOtp(
       { mobileNumber: phone },
       (response: any) => {
+        setIsResending(false);
         if (response.success) {
           setVerificationId(response.data.verificationId);
           setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
@@ -145,6 +148,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
         }
       },
       (error: any) => {
+        setIsResending(false);
         setErrorMsg(
           'Having trouble receiving your OTP? Please check your mobile number. If the issue persists, contact our support team',
         );
@@ -245,7 +249,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
         ) : (
           <Text style={[styles.welcomeSubtitle, width < 480 && { fontSize: 14, lineHeight: 20 }]}>
             We sent a verification code to{' '}
-            <Text style={styles.verifyPhone}>+91 .........</Text>
+            <Text style={styles.verifyPhone}>+91 {phone}</Text>
           </Text>
         )}
       </View>
@@ -347,9 +351,9 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
 
               {/* Resend OTP + Contact Support links */}
               <View style={styles.resendContainer}>
-                <TouchableOpacity onPress={handleResendOtp}>
+                <TouchableOpacity onPress={handleResendOtp} disabled={isResending}>
                   <Text style={[styles.resendLink, width < 480 && { fontSize: 13 }]}>
-                    Didn’t received OTP? <Text style={[styles.resendLinkAction, width < 480 && { fontSize: 13 }]}>Click to resend OTP.</Text>
+                    Didn’t received OTP? <Text style={[styles.resendLinkAction, width < 480 && { fontSize: 13 }]}>{isResending ? 'Resending...' : 'Click to resend OTP.'}</Text>
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => { /* open support */ }}>
@@ -379,7 +383,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
                     end={{ x: 1, y: 0.5 }}
                     style={styles.btnGradient}>
                     <Text style={[styles.btnPrimaryText, width < 480 && { fontSize: 13 }]} numberOfLines={1}>
-                      {apiLoading ? 'Verifying...' : 'Verify & Continue'}
+                      {apiLoading && !isResending ? 'Verifying...' : 'Verify & Continue'}
                     </Text>
                   </LinearGradient>
                 </TouchableOpacity>

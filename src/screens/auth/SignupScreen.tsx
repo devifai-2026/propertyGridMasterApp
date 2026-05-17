@@ -80,6 +80,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
   const [verificationId, setVerificationId] = useState('');
   const [otpError, setOtpError] = useState('');
   const [otpFilled, setOtpFilled] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
   // ── Profile photo (broker only)
   const [profilePhotoFile, setProfilePhotoFile] = useState<any>(null);
@@ -249,9 +250,11 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
     setOtp('');
     setOtpError('');
     setOtpFilled(false);
+    setIsResending(true);
     sendOtp(
       { mobileNumber: formData.phone },
       (response: any) => {
+        setIsResending(false);
         if (response.success) {
           setVerificationId(response.data.verificationId);
           setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
@@ -260,6 +263,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
         }
       },
       (error: any) => {
+        setIsResending(false);
         setOtpError(error?.response?.data?.message || 'Failed to resend OTP');
       },
     );
@@ -410,8 +414,10 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               (selectedRole === 'owner_investor' || hoveredRole === 'owner_investor') && styles.roleCardActive,
             ]}
             onPress={() => setSelectedRole('owner_investor')}
-            onMouseEnter={() => setHoveredRole('owner_investor')}
-            onMouseLeave={() => setHoveredRole(null)}
+            {...({
+              onMouseEnter: () => setHoveredRole('owner_investor'),
+              onMouseLeave: () => setHoveredRole(null),
+            } as any)}
             activeOpacity={0.8}
           >
             <LinearGradient
@@ -446,8 +452,10 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
               (selectedRole === 'broker' || hoveredRole === 'broker') && styles.roleCardActive,
             ]}
             onPress={() => setSelectedRole('broker')}
-            onMouseEnter={() => setHoveredRole('broker')}
-            onMouseLeave={() => setHoveredRole(null)}
+            {...({
+              onMouseEnter: () => setHoveredRole('broker'),
+              onMouseLeave: () => setHoveredRole(null),
+            } as any)}
             activeOpacity={0.8}
           >
             <LinearGradient
@@ -928,7 +936,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
       </View>
       <Text style={[styles.screenSub, styles.otpScreenSub]}>
         We sent a verification code to{' '}
-        <Text style={styles.phoneHighlight}>+91 ........</Text>
+        <Text style={styles.phoneHighlight}>+91 {formData.phone}</Text>
       </Text>
 
       <View style={styles.otpRow}>
@@ -958,8 +966,8 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
       </View>
 
       <View style={styles.otpResendRow}>
-        <Text style={styles.otpResendLink} onPress={handleResendOtp}>
-          Resend OTP
+        <Text style={[styles.otpResendLink, isResending && { opacity: 0.5 }]} onPress={isResending ? undefined : handleResendOtp}>
+          {isResending ? 'Resending...' : 'Resend OTP'}
         </Text>
         <Text style={styles.otpResendLink}>Contact Support</Text>
       </View>
@@ -983,7 +991,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
             style={styles.btnGradient}
           >
             <Text style={styles.btnPrimaryText}>
-              {apiLoading ? 'Verifying...' : 'Verify & Continue'}
+              {apiLoading && !isResending ? 'Verifying...' : 'Verify & Continue'}
             </Text>
           </LinearGradient>
         </TouchableOpacity>

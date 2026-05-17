@@ -126,11 +126,11 @@ const ListPropertyScreen = () => {
             propertyType: data.propertyType,
             builtYear: String(data.completionYear || ''),
             buildingGrade: data.buildingGrade,
-            carpetArea: String(data.carpetArea || ''),
+            carpetArea: data.carpetArea != null ? String(data.carpetArea) : '',
             lastRefurbished: String(data.lastRefurbishedYear || ''),
             ownership: data.ownershipType,
-            fourWheelerParkings: String(data.parkingFourWheeler || ''),
-            twoWheelerParkings: String(data.parkingTwoWheeler || ''),
+            fourWheelerParkings: data.parkingFourWheeler != null ? String(data.parkingFourWheeler) : '',
+            twoWheelerParkings: data.parkingTwoWheeler != null ? String(data.parkingTwoWheeler) : '',
             powerBackup: data.powerBackup,
             numLifts: String(data.numberOfLifts || ''),
             hvacType: data.hvacType,
@@ -222,6 +222,11 @@ const ListPropertyScreen = () => {
           Alert.alert('Error', 'Failed to fetch property details.');
         },
       );
+    } else {
+      setCurrentStep(1);
+      setFormData({});
+      setIsFormValid(false);
+      setErrorMessage(null);
     }
   }, [propertyId, isEditMode]);
 
@@ -768,6 +773,7 @@ const ListPropertyScreen = () => {
                       isMobile && styles.nextBtnTextMobile,
                     ]}
                     numberOfLines={1}
+                    adjustsFontSizeToFit
                   >
                     {currentStep === 6
                       ? isEditMode
@@ -1014,7 +1020,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#EE2529',
     flex: 0,
     flexGrow: 1,
-    maxWidth: 150,
+    maxWidth: 250,
     marginLeft: 16,
   },
   nextBtnDisabled: {
