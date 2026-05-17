@@ -41,6 +41,7 @@ import { useCompare } from '../../context/CompareContext';
 import { COLORS, FONTS } from '../../constants/theme';
 import NoPropertiesFound from './components/NoPropertiesFound';
 import ReachedTheEnd from './components/ReachedTheEnd';
+import FeaturedSection from '../dashboard/components/FeaturedSection';
 import filter from "../../assets/ExploreProperties/filter.png"
 
 declare const window: any;
@@ -66,11 +67,21 @@ const ExplorePropertiesScreen = () => {
   const { width } = useWindowDimensions();
   const { navigate } = useNavigation();
   const { getProperties, loading: apiLoading } = usePropertyAPIs();
+  const { getProperties: getFeatured, loading: featuredLoading } = usePropertyAPIs();
   const { toggleCompare, isSelected: isCompareSelected, selectedProperties } = useCompare();
   const [properties, setProperties] = useState<Property[]>([]);
+  const [featuredProperties, setFeaturedProperties] = useState<any[]>([]);
   const [currentImageIndices, setCurrentImageIndices] = useState<{
     [key: string]: number;
   }>({});
+
+  useEffect(() => {
+    getFeatured(
+      data => setFeaturedProperties(data),
+      error => console.error('Error fetching featured properties:', error),
+      'isVerified=completed&limit=3'
+    );
+  }, []);
 
   const scrollViewRef = useRef<ScrollView>(null);
 
@@ -96,6 +107,7 @@ const ExplorePropertiesScreen = () => {
       const propertyTypes = params.get('propertyTypes');
       const minROI = params.get('minROI');
       const minTenure = params.get('minTenure');
+      const proximity = params.get('proximity');
 
       if (city) {
         initialFilters.city = city;
@@ -118,6 +130,10 @@ const ExplorePropertiesScreen = () => {
       }
       if (minTenure) {
         initialFilters.tenure = minTenure;
+        hasParams = true;
+      }
+      if (proximity) {
+        initialFilters.proximity = proximity.split(',');
         hasParams = true;
       }
     }
@@ -170,6 +186,11 @@ const ExplorePropertiesScreen = () => {
     // Tenure
     if (activeFilters.tenure)
       queryParams.push(`minTenure=${activeFilters.tenure}`);
+
+    // Proximity
+    if (activeFilters.proximity?.length > 0) {
+      queryParams.push(`proximity=${activeFilters.proximity.join(',')}`);
+    }
 
     const queryString = queryParams.join('&');
 
@@ -1027,9 +1048,9 @@ const ExplorePropertiesScreen = () => {
 
   return (
     <Layout 
-      onScroll={handleScroll} 
+      onScroll={handleScroll as any} 
       scrollEventThrottle={16}
-      scrollViewRef={scrollViewRef}
+      scrollViewRef={scrollViewRef as any}
     >
       <View style={styles.container}>
         {/* Main Content */}
@@ -1116,6 +1137,88 @@ const ExplorePropertiesScreen = () => {
           </View>
           
 
+          {/* Desktop Filter Panel */}
+          {showDesktopFilters && width > 768 && (
+            <View style={styles.desktopFilterPanel}>
+              <View style={styles.filterPanelHeader}>
+                <Filter size={24} color="#EE2529" />
+                <Text style={styles.filterPanelTitle}>Advanced Filters</Text>
+              </View>
+
+              <View style={styles.filterTabs}>
+                {['location', 'pricing', 'unit', 'rent', 'roi', 'tenure'].map(
+                  tab => (
+                    <TouchableOpacity
+                      key={tab}
+                      style={[
+                        styles.filterTabItem,
+                        activeTab === tab && styles.activeFilterTab,
+                      ]}
+                      onPress={() => setActiveTab(tab as any)}
+                    >
+                      <Text
+                        style={[
+                          styles.filterTabText,
+                          activeTab === tab && styles.activeFilterTabText,
+                        ]}
+                      >
+                        {tab === 'location'
+                          ? 'Location\nProximity'
+                          : tab === 'pricing'
+                          ? 'Pricing'
+                          : tab === 'unit'
+                          ? 'Type of Unit'
+                          : tab === 'rent'
+                          ? 'Annual Rent\nAchieved'
+                          : tab === 'roi'
+                          ? 'ROI'
+                          : 'Tenure Left'}
+                      </Text>
+                    </TouchableOpacity>
+                  ),
+                )}
+              </View>
+
+              <View style={styles.infoBox}>
+                <Info size={12} color="#262626" />
+                <Text style={styles.infoText}>
+                  This information is certified from the person listing the
+                  property
+                </Text>
+              </View>
+
+              <View style={styles.filterContentArea}>
+                {renderFilterContent()}
+              </View>
+
+              <View style={styles.filterFooter}>
+                <TouchableOpacity
+                  onPress={handleResetFilters}
+                  style={styles.resetFilterBtn}
+                >
+                  <Text style={[styles.btnText, { color: '#666' }]}>
+                    Reset Filters
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleApplyFilters}
+                  activeOpacity={0.8}
+                >
+                  <LinearGradient
+                    colors={['#EE2529', '#C73834']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={styles.applyFilterBtn}
+                  >
+                    <Text style={[styles.btnText, { color: '#fff' }]}>
+                      Apply Filters
+                    </Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
           {/* Content Area: Either show the Loading Spinner, No Results, or the Filters + Results grid */}
           {apiLoading && properties.length === 0 ? (
             <View style={styles.loadingContainer}>
@@ -1123,91 +1226,12 @@ const ExplorePropertiesScreen = () => {
               <Text style={styles.loadingText}>Fetching Properties...</Text>
             </View>
           ) : properties.length === 0 && !apiLoading ? (
-            <NoPropertiesFound onReset={handleResetFilters} />
+            <>
+              <NoPropertiesFound onReset={handleResetFilters} />
+              <FeaturedSection properties={featuredProperties} loading={featuredLoading} />
+            </>
           ) : (
             <>
-              {/* Desktop Filter Panel */}
-              {showDesktopFilters && width > 768 && (
-                <View style={styles.desktopFilterPanel}>
-                  <View style={styles.filterPanelHeader}>
-                    <Filter size={24} color="#EE2529" />
-                    <Text style={styles.filterPanelTitle}>Advanced Filters</Text>
-                  </View>
-
-                  <View style={styles.filterTabs}>
-                    {['location', 'pricing', 'unit', 'rent', 'roi', 'tenure'].map(
-                      tab => (
-                        <TouchableOpacity
-                          key={tab}
-                          style={[
-                            styles.filterTabItem,
-                            activeTab === tab && styles.activeFilterTab,
-                          ]}
-                          onPress={() => setActiveTab(tab as any)}
-                        >
-                          <Text
-                            style={[
-                              styles.filterTabText,
-                              activeTab === tab && styles.activeFilterTabText,
-                            ]}
-                          >
-                            {tab === 'location'
-                              ? 'Location\nProximity'
-                              : tab === 'pricing'
-                              ? 'Pricing'
-                              : tab === 'unit'
-                              ? 'Type of Unit'
-                              : tab === 'rent'
-                              ? 'Annual Rent\nAchieved'
-                              : tab === 'roi'
-                              ? 'ROI'
-                              : 'Tenure Left'}
-                          </Text>
-                        </TouchableOpacity>
-                      ),
-                    )}
-                  </View>
-
-                  <View style={styles.infoBox}>
-                    <Info size={12} color="#262626" />
-                    <Text style={styles.infoText}>
-                      This information is certified from the person listing the
-                      property
-                    </Text>
-                  </View>
-
-                  <View style={styles.filterContentArea}>
-                    {renderFilterContent()}
-                  </View>
-
-                  <View style={styles.filterFooter}>
-                    <TouchableOpacity
-                      onPress={handleResetFilters}
-                      style={styles.resetFilterBtn}
-                    >
-                      <Text style={[styles.btnText, { color: '#666' }]}>
-                        Reset Filters
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={handleApplyFilters}
-                      activeOpacity={0.8}
-                    >
-                      <LinearGradient
-                        colors={['#EE2529', '#C73834']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.applyFilterBtn}
-                      >
-                        <Text style={[styles.btnText, { color: '#fff' }]}>
-                          Apply Filters
-                        </Text>
-                      </LinearGradient>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              )}
-
               <View style={{ backgroundColor: apiLoading ? '#fff' : '#F2F2F2', paddingVertical: 40, width: '100%', minHeight: 400, justifyContent: 'center' }}>
                 {apiLoading ? (
                    <View style={styles.loadingContainer}>
