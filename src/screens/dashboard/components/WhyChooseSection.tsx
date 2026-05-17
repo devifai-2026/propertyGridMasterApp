@@ -16,28 +16,28 @@ const FEATURES = [
     image: require('../../../assets/WhyChoose/one.png'),
     title: 'Platform Verified Every property authenticated',
     description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae ert.',
+      'Every property undergoes a rigorous 150 point due to diligence check before listing .',
   },
   {
     id: '2',
     image: require('../../../assets/WhyChoose/two.png'),
-    title: '12-18% Returns Guaranteed rental income',
+    title: '12-18% Returns',
     description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae ert.',
+      'Our properties are selected for their high rental yields and capital appreciation potentials .',
   },
   {
     id: '3',
     image: require('../../../assets/WhyChoose/three.png'),
-    title: 'Pre-Leased Only Immediate cash flow',
+    title: 'Pre-Leased Cash flow',
     description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae ert.',
+      'Start earning from day one with properties already occupied by credit-worthy tenants .',
   },
   {
     id: '4',
     image: require('../../../assets/WhyChoose/four.png'),
-    title: 'Premium Tenants Corporate & MNC leases',
+    title: 'Premium Tenants',
     description:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse varius enim in eros elementum tristique. Duis cursus, mi quis viverra ornare, eros dolor interdum nulla, ut commodo diam libero vitae ert.',
+      'Invest in spaces leased to Fortune 500 companies and leading Indian corporations',
   },
 ];
 
@@ -129,7 +129,7 @@ const WhyChooseSection = () => {
               end={{ x: 1, y: 0 }}
               style={styles.exploreBtn}
             >
-              <Text style={styles.exploreBtnText}>Explore more</Text>
+              <Text style={styles.exploreBtnText}>Explore Properties</Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>

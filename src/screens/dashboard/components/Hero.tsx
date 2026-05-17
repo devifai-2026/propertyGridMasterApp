@@ -56,7 +56,7 @@ const Hero = () => {
           },
         ]}
       >
-      PreleaseGrid offers carefully curated pre-leased properties designed to deliver steady, reliable income — with verified assets, trusted tenants, and zero management hassle.
+      Curated, income-active properties backed by active leases and established tenants, delivering dependable rental yield with complete transparency.
       </Text>
 
       <TouchableOpacity

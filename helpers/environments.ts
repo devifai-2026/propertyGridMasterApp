@@ -1,6 +1,6 @@
 // const baseUrl = "http://172.20.10.14:8000/api";
-// const baseUrl = "http://localhost:3000/api";
-const baseUrl = "https://pre-release-production.up.railway.app/api";
+const baseUrl = "http://localhost:3000/api";
+// const baseUrl = "https://pre-release-production.up.railway.app/api";
 const ENV_CONFIG = {
   dev: {
     BASE_URL: baseUrl,
