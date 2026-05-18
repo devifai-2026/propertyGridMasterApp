@@ -27,6 +27,135 @@ interface BasicDetailsProps {
   initialData?: any;
 }
 
+interface YearPickerProps {
+  value: string;
+  onChange: (year: string) => void;
+  error?: boolean;
+  placeholder?: string;
+  onBlur?: () => void;
+}
+
+const YearPicker: React.FC<YearPickerProps> = ({
+  value,
+  onChange,
+  error,
+  placeholder = 'Select Year',
+  onBlur,
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const currentYear = new Date().getFullYear();
+  const maxYear = currentYear + 5;
+  const initialBaseYear = value && /^\d{4}$/.test(value) ? parseInt(value, 10) : currentYear;
+  const [baseYear, setBaseYear] = useState(initialBaseYear);
+
+  useEffect(() => {
+    if (value && /^\d{4}$/.test(value)) {
+      setBaseYear(parseInt(value, 10));
+    }
+  }, [value]);
+
+  const startYear = baseYear - 5;
+  const years = Array.from({ length: 12 }, (_, i) => startYear + i);
+
+  const handlePrevRange = () => {
+    setBaseYear(prev => prev - 12);
+  };
+
+  const handleNextRange = () => {
+    setBaseYear(prev => prev + 12);
+  };
+
+  const handleSelectYear = (year: number) => {
+    onChange(year.toString());
+    setIsOpen(false);
+  };
+
+  useEffect(() => {
+    if (Platform.OS === 'web' && isOpen) {
+      const handleOutsideClick = () => {
+        setIsOpen(false);
+        if (onBlur) onBlur();
+      };
+      const win = (globalThis as any).window;
+      if (win) {
+        win.addEventListener('click', handleOutsideClick);
+        return () => {
+          win.removeEventListener('click', handleOutsideClick);
+        };
+      }
+    }
+  }, [isOpen]);
+
+  const selectedYearInt = value ? parseInt(value, 10) : null;
+  const isNextDisabled = baseYear >= maxYear;
+
+  return (
+    <View style={[styles.pickerContainer, { zIndex: isOpen ? 10000 : 1 }]} {...(Platform.OS === 'web' ? { onClick: (e: any) => e.stopPropagation() } : {})}>
+      <TouchableOpacity onPress={() => setIsOpen(prev => !prev)} activeOpacity={0.8}>
+        <TextInput
+          style={[
+            styles.pickerInput,
+            error && styles.inputError,
+            Platform.OS === 'web' && { cursor: 'pointer' }
+          ]}
+          value={value}
+          editable={false}
+          pointerEvents="none"
+          placeholder={placeholder}
+          placeholderTextColor="#999"
+        />
+      </TouchableOpacity>
+      {isOpen && (
+        <View style={styles.pickerPopover}>
+          <View style={styles.pickerHeader}>
+            <TouchableOpacity style={styles.pickerArrowBtn} onPress={handlePrevRange}>
+              <Text style={styles.pickerArrowText}>‹</Text>
+            </TouchableOpacity>
+            <Text style={styles.pickerHeaderTitle}>{baseYear}</Text>
+            <TouchableOpacity 
+              style={styles.pickerArrowBtn} 
+              onPress={handleNextRange}
+              disabled={isNextDisabled}
+            >
+              <Text style={[styles.pickerArrowText, isNextDisabled && { opacity: 0.3 }]}>›</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.pickerGrid}>
+            {years.map(yr => {
+              const isSelected = selectedYearInt === yr;
+              const isDisabled = yr > maxYear;
+              return (
+                <TouchableOpacity
+                  key={yr}
+                  disabled={isDisabled}
+                  style={[
+                    styles.pickerGridItem,
+                    isSelected && styles.pickerGridItemActive,
+                    isDisabled && { opacity: 0.3 }
+                  ]}
+                  onPress={() => handleSelectYear(yr)}
+                >
+                  <Text
+                    style={[
+                      styles.pickerGridItemText,
+                      isSelected && styles.pickerGridItemTextActive,
+                      isDisabled && { color: '#9CA3AF' }
+                    ]}
+                  >
+                    {yr}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+      )}
+    </View>
+  );
+};
+
+
 const BasicDetails = forwardRef<any, BasicDetailsProps>(
   ({ onNext, onFormValid, initialData }, ref) => {
     const { width } = useWindowDimensions();
@@ -258,7 +387,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
             <InputError message={errors.propertyType} visible={touched.propertyType && !!errors.propertyType} />
         </View>
 
-        <View style={[styles.row, isSmallScreen && styles.rowColumn]}>
+        <View style={[styles.row, isSmallScreen && styles.rowColumn, { zIndex: 100, position: 'relative' }]}>
           <View style={styles.fieldContainer}>
             <Text style={[styles.label, isMobile && styles.labelMobile]}>Carpet Area *</Text>
             <View style={styles.areaInputGroup}>
@@ -286,10 +415,9 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
 
           <View style={styles.fieldContainer}>
             <Text style={[styles.label, isMobile && styles.labelMobile]}>Completion Year *</Text>
-            <CustomDropdown
+            <YearPicker
               placeholder="Select Year"
               value={formData.builtYear}
-              options={completionYearOptions}
               onChange={v => {
                 handleInputChange('builtYear', v);
                 handleBlur('builtYear', v);
@@ -686,6 +814,87 @@ const styles = StyleSheet.create({
     color: '#999',
     marginTop: 4,
     fontFamily: 'Montserrat',
+  },
+  pickerContainer: {
+    position: 'relative',
+    width: '100%',
+  },
+  pickerInput: {
+    backgroundColor: '#F2F2F2',
+    height: 44,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    fontSize: 18,
+    color: '#333',
+    borderWidth: 1,
+    borderColor: '#eee',
+    fontFamily: 'Montserrat',
+  },
+  pickerPopover: {
+    position: 'absolute',
+    top: 48,
+    left: 0,
+    width: 280,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#D2D6DC',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 5,
+    zIndex: 1100,
+    padding: 12,
+  },
+  pickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+    paddingBottom: 8,
+    marginBottom: 8,
+  },
+  pickerArrowBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+  },
+  pickerArrowText: {
+    fontSize: 22,
+    fontWeight: '600',
+    color: '#4B5563',
+  },
+  pickerHeaderTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#374151',
+    fontFamily: 'Montserrat',
+  },
+  pickerGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 8,
+  },
+  pickerGridItem: {
+    width: '30%',
+    aspectRatio: 1.8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 6,
+  },
+  pickerGridItemActive: {
+    backgroundColor: '#E5E7EB',
+  },
+  pickerGridItemText: {
+    fontSize: 14,
+    color: '#4B5563',
+    fontFamily: 'Montserrat',
+    fontWeight: '500',
+  },
+  pickerGridItemTextActive: {
+    color: '#EE2529',
+    fontWeight: '700',
   },
 });
 

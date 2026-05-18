@@ -51,7 +51,7 @@ const componentUnitTypes = [
   { id: 'Retail', label: 'Retail' },
   { id: 'Mixed-Use', label: 'Mixed-Use' },
   { id: 'Commercial', label: 'Commercial' },
-  { id: 'Office Space', label: 'Office Space' },
+  { id: 'Offices', label: 'Offices' },
   { id: 'Hospitality', label: 'Hospitality' },
   { id: 'Industrial', label: 'Industrial' },
   { id: 'Warehouse', label: 'Warehouse' },
