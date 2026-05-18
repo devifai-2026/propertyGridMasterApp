@@ -89,7 +89,11 @@ const EnquiriesScreen = () => {
   }, [propertyId]);
 
   const handleInputChange = (name: string, value: any) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    let sanitizedValue = value;
+    if (name === 'phone') {
+      sanitizedValue = value.replace(/[^0-9]/g, '');
+    }
+    setFormData(prev => ({ ...prev, [name]: sanitizedValue }));
     if (name === 'phone') {
       setIsVerified(false);
       setOtpSent(false);

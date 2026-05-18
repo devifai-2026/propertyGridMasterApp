@@ -28,6 +28,10 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
     const isSmallScreen = width < 768;
     const isMobile = width < 480;
 
+    const filterNumeric = (val: string) => {
+      return val.replace(/[^0-9]/g, '');
+    };
+
     useImperativeHandle(ref, () => ({
       submit: () => {
         onNext(formData);
@@ -153,7 +157,7 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
             placeholder="Enter Property Selling Price"
             keyboardType="numeric"
             value={formData.sellingPrice}
-            onChangeText={v => handleInputChange('sellingPrice', v)}
+            onChangeText={v => handleInputChange('sellingPrice', filterNumeric(v))}
             onBlur={() => handleBlur('sellingPrice')}
           />
           <InputError message={errors.sellingPrice} visible={touched.sellingPrice && !!errors.sellingPrice} />
@@ -172,7 +176,7 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
               placeholder="0"
               keyboardType="numeric"
               value={formData.propertyTax}
-              onChangeText={v => handleInputChange('propertyTax', v)}
+              onChangeText={v => handleInputChange('propertyTax', filterNumeric(v))}
               onBlur={() => handleBlur('propertyTax')}
             />
             <InputError message={errors.propertyTax} visible={touched.propertyTax && !!errors.propertyTax} />
@@ -188,7 +192,7 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
               placeholder="0"
               keyboardType="numeric"
               value={formData.insurance}
-              onChangeText={v => handleInputChange('insurance', v)}
+              onChangeText={v => handleInputChange('insurance', filterNumeric(v))}
               onBlur={() => handleBlur('insurance')}
             />
             <InputError message={errors.insurance} visible={touched.insurance && !!errors.insurance} />
@@ -202,7 +206,7 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
             placeholder="0"
             keyboardType="numeric"
             value={formData.otherCosts}
-            onChangeText={v => handleInputChange('otherCosts', v)}
+            onChangeText={v => handleInputChange('otherCosts', filterNumeric(v))}
           />
         </View>
 
@@ -219,7 +223,7 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
             placeholder="Enter Additional Income"
             keyboardType="numeric"
             value={formData.additionalIncome}
-            onChangeText={v => handleInputChange('additionalIncome', v)}
+            onChangeText={v => handleInputChange('additionalIncome', filterNumeric(v))}
           />
           <Text style={styles.helpText}>
             Any additional income from parking, advertisements, etc.

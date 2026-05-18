@@ -46,6 +46,15 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
       value: (currentYear - i).toString(),
     }));
 
+    const completionYearOptions = Array.from({ length: (currentYear + 5) - 1980 + 1 }, (_, i) => {
+      const year = (currentYear + 5 - i).toString();
+      return { label: year, value: year };
+    });
+
+    const filterNumeric = (val: string) => {
+      return val.replace(/[^0-9]/g, '');
+    };
+
     const propertyTypeOptions = [
       { label: 'Residential', value: 'Residential' },
       { label: 'Retail', value: 'Retail' },
@@ -173,8 +182,8 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
           if (!value) return 'Completion Year is required';
           if (!/^\d{4}$/.test(value)) return 'Please enter a valid year';
           const year = parseInt(value);
-          if (year < 1900 || year > currentYear)
-            return `Year must be between 1900 and ${currentYear}`;
+          if (year < 1900 || year > currentYear + 5)
+            return `Year must be between 1900 and ${currentYear + 5}`;
           return '';
         case 'buildingGrade':
           return !value ? 'Building Grade is required' : '';
@@ -263,7 +272,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
                 placeholder="Area"
                 keyboardType="numeric"
                 value={formData.carpetArea}
-                onChangeText={v => handleInputChange('carpetArea', v)}
+                onChangeText={v => handleInputChange('carpetArea', filterNumeric(v))}
                 onBlur={(e: any) =>
                   handleBlur('carpetArea', e.nativeEvent.text)
                 }
@@ -277,17 +286,16 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
 
           <View style={styles.fieldContainer}>
             <Text style={[styles.label, isMobile && styles.labelMobile]}>Completion Year *</Text>
-            <TextInput
-              style={[
-                styles.input,
-                isMobile && styles.inputMobile,
-                touched.builtYear && errors.builtYear && styles.inputError,
-              ]}
-              placeholder="Year"
-              keyboardType="numeric"
+            <CustomDropdown
+              placeholder="Select Year"
               value={formData.builtYear}
-              onChangeText={v => handleInputChange('builtYear', v)}
-              onBlur={(e: any) => handleBlur('builtYear', e.nativeEvent.text)}
+              options={completionYearOptions}
+              onChange={v => {
+                handleInputChange('builtYear', v);
+                handleBlur('builtYear', v);
+              }}
+              onBlur={() => handleBlur('builtYear')}
+              error={touched.builtYear && !!errors.builtYear}
             />
             <InputError message={errors.builtYear} visible={touched.builtYear && !!errors.builtYear} />
           </View>
@@ -342,7 +350,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
               placeholder="Slots"
               keyboardType="numeric"
               value={formData.fourWheelerParkings}
-              onChangeText={v => handleInputChange('fourWheelerParkings', v)}
+              onChangeText={v => handleInputChange('fourWheelerParkings', filterNumeric(v))}
               onBlur={(e: any) =>
                 handleBlur('fourWheelerParkings', e.nativeEvent.text)
               }
@@ -362,7 +370,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
               placeholder="Slots"
               keyboardType="numeric"
               value={formData.twoWheelerParkings}
-              onChangeText={v => handleInputChange('twoWheelerParkings', v)}
+              onChangeText={v => handleInputChange('twoWheelerParkings', filterNumeric(v))}
               onBlur={(e: any) =>
                 handleBlur('twoWheelerParkings', e.nativeEvent.text)
               }
@@ -391,12 +399,20 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
           <View style={styles.fieldContainer}>
             <Text style={[styles.label, isMobile && styles.labelMobile]}>Number of Lifts</Text>
             <TextInput
-              style={[styles.input, isMobile && styles.inputMobile]}
+              style={[
+                styles.input,
+                isMobile && styles.inputMobile,
+                touched.numLifts && errors.numLifts && styles.inputError,
+              ]}
               placeholder="0"
               keyboardType="numeric"
               value={formData.numLifts}
-              onChangeText={v => handleInputChange('numLifts', v)}
+              onChangeText={v => handleInputChange('numLifts', filterNumeric(v))}
+              onBlur={(e: any) =>
+                handleBlur('numLifts', e.nativeEvent.text)
+              }
             />
+            <InputError message={errors.numLifts} visible={touched.numLifts && !!errors.numLifts} />
           </View>
         </View>
 

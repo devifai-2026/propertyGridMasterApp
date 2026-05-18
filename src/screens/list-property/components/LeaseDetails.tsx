@@ -43,6 +43,10 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
     const isSmallScreen = width < 768;
     const isMobile = width < 480;
 
+    const filterNumeric = (val: string) => {
+      return val.replace(/[^0-9]/g, '');
+    };
+
     useImperativeHandle(ref, () => ({
       submit: () => {
         onNext(formData);
@@ -241,14 +245,14 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                 placeholder="Years"
                 keyboardType="numeric"
                 value={formData.lockInYears}
-                onChangeText={v => handleInputChange('lockInYears', v)}
+                onChangeText={v => handleInputChange('lockInYears', filterNumeric(v))}
               />
               <TextInput
                 style={[styles.input, isMobile && styles.inputMobile, { flex: 1 }]}
                 placeholder="Months"
                 keyboardType="numeric"
                 value={formData.lockInMonths}
-                onChangeText={v => handleInputChange('lockInMonths', v)}
+                onChangeText={v => handleInputChange('lockInMonths', filterNumeric(v))}
               />
             </View>
           </View>
@@ -265,7 +269,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
               placeholder="0"
               keyboardType="numeric"
               value={formData.leaseDuration}
-              onChangeText={v => handleInputChange('leaseDuration', v)}
+              onChangeText={v => handleInputChange('leaseDuration', filterNumeric(v))}
               onBlur={(e: any) =>
                 handleBlur('leaseDuration', e.nativeEvent.text)
               }
@@ -374,7 +378,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                 placeholder="0.00"
                 keyboardType="numeric"
                 value={formData.rentPerSqFt}
-                onChangeText={v => handleInputChange('rentPerSqFt', v)}
+                onChangeText={v => handleInputChange('rentPerSqFt', filterNumeric(v))}
                 onBlur={(e: any) =>
                   handleBlur('rentPerSqFt', e.nativeEvent.text)
                 }
@@ -395,7 +399,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                 placeholder="0.00"
                 keyboardType="numeric"
                 value={formData.totalMonthlyRent}
-                onChangeText={v => handleInputChange('totalMonthlyRent', v)}
+                onChangeText={v => handleInputChange('totalMonthlyRent', filterNumeric(v))}
                 onBlur={(e: any) =>
                   handleBlur('totalMonthlyRent', e.nativeEvent.text)
                 }
@@ -419,7 +423,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                 keyboardType="numeric"
                 value={formData.securityDepositMonths}
                 onChangeText={v =>
-                  handleInputChange('securityDepositMonths', v)
+                  handleInputChange('securityDepositMonths', filterNumeric(v))
                 }
                 onBlur={(e: any) =>
                   handleBlur('securityDepositMonths', e.nativeEvent.text)
@@ -442,7 +446,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                 keyboardType="numeric"
                 value={formData.securityDepositAmount}
                 onChangeText={v =>
-                  handleInputChange('securityDepositAmount', v)
+                  handleInputChange('securityDepositAmount', filterNumeric(v))
                 }
                 onBlur={(e: any) =>
                   handleBlur('securityDepositAmount', e.nativeEvent.text)
@@ -468,7 +472,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
               placeholder="Every X years"
               keyboardType="numeric"
               value={formData.escalationFrequency}
-              onChangeText={v => handleInputChange('escalationFrequency', v)}
+              onChangeText={v => handleInputChange('escalationFrequency', filterNumeric(v))}
               onBlur={(e: any) =>
                 handleBlur('escalationFrequency', e.nativeEvent.text)
               }
@@ -488,7 +492,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
               placeholder="0 %"
               keyboardType="numeric"
               value={formData.escalationPercentage}
-              onChangeText={v => handleInputChange('escalationPercentage', v)}
+              onChangeText={v => handleInputChange('escalationPercentage', filterNumeric(v))}
               onBlur={(e: any) =>
                 handleBlur('escalationPercentage', e.nativeEvent.text)
               }
@@ -541,7 +545,7 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                 placeholder="0.00"
                 keyboardType="numeric"
                 value={formData.maintenanceAmount}
-                onChangeText={v => handleInputChange('maintenanceAmount', v)}
+                onChangeText={v => handleInputChange('maintenanceAmount', filterNumeric(v))}
               />
             </View>
           </View>
