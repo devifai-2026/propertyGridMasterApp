@@ -660,9 +660,9 @@ const styles = StyleSheet.create({
   },
   // Header Styles
   headerContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.10)', // Reduced opacity from 0.75
+    backgroundColor: Platform.OS === 'web' ? 'rgba(255, 255, 255, 0.10)' : 'rgba(255, 255, 255, 0.95)', // Reduced opacity from 0.75
     borderWidth: 1,
-    borderColor: 'rgba(230, 230, 230, 0.2)',
+    borderColor: Platform.OS === 'web' ? 'rgba(230, 230, 230, 0.2)' : 'rgba(230, 230, 230, 0.8)',
     height: 70,
     justifyContent: 'center',
     zIndex: 1000,

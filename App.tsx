@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Platform } from 'react-native';
 import Dashboard from './src/screens/dashboard/Dashboard';
 import LoginScreen from './src/screens/auth/LoginScreen';
 import ExplorePropertiesScreen from './src/screens/properties/ExplorePropertiesScreen';
@@ -52,19 +52,20 @@ const AppContent = () => {
 
   React.useEffect(() => {
     // Basic network status detection for Web
-    if (typeof window !== 'undefined' && 'navigator' in window) {
+    if (Platform.OS === 'web' && typeof window !== 'undefined' && 'navigator' in window) {
       const handleOnline = () => setIsOnline(true);
       const handleOffline = () => setIsOnline(false);
 
-      window.addEventListener('online', handleOnline);
-      window.addEventListener('offline', handleOffline);
+      if (typeof window.addEventListener === 'function') {
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+        setIsOnline(window.navigator.onLine);
 
-      setIsOnline(window.navigator.onLine);
-
-      return () => {
-        window.removeEventListener('online', handleOnline);
-        window.removeEventListener('offline', handleOffline);
-      };
+        return () => {
+          window.removeEventListener('online', handleOnline);
+          window.removeEventListener('offline', handleOffline);
+        };
+      }
     }
   }, []);
 

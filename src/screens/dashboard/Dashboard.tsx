@@ -53,7 +53,7 @@ const Dashboard = () => {
           } as any}
         />
       )}
-      <Layout style={{ backgroundColor: 'transparent' }}>
+      <Layout style={{ backgroundColor: Platform.OS === 'web' ? 'transparent' : 'white' }}>
         <Animated.View
           style={{
             opacity: fadeAnim,

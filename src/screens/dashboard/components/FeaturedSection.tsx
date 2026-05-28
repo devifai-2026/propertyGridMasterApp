@@ -127,6 +127,7 @@ const FeaturedSection = ({ properties, loading }: { properties: any[]; loading?:
             <PropertyCard
               key={prop.id}
               item={prop}
+              width={cardWidth > 420 ? 420 : cardWidth}
               isCompare={true}
               isSelected={isCompareSelected(prop.id)}
               onToggleCompare={toggleCompare}

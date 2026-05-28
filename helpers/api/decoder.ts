@@ -16,9 +16,21 @@ export const decodeResponseData = (encodedData: any): any => {
 
     // Handle if encodedData is an object with indices like {"0": "e", "1": "J", ...}
     if (typeof encodedData === 'object' && !Array.isArray(encodedData)) {
-      base64String = Object.values(encodedData).join('');
+      if (encodedData["0"] === "e" && encodedData["1"] === "J") {
+        base64String = Object.values(encodedData).join('');
+      } else {
+        return encodedData;
+      }
     } else if (typeof encodedData === 'string') {
-      base64String = encodedData;
+      if (encodedData.startsWith('eJ')) {
+        base64String = encodedData;
+      } else {
+        try {
+          return JSON.parse(encodedData);
+        } catch {
+          return encodedData;
+        }
+      }
     } else {
       return encodedData;
     }
@@ -27,13 +39,12 @@ export const decodeResponseData = (encodedData: any): any => {
     const binaryData = Buffer.from(base64String, 'base64');
 
     // 2. Decompress using Zlib (Inflate)
-    // Note: pako.inflate is compatible with zlib.deflate used on the backend
     const decompressedData = pako.inflate(binaryData, { to: 'string' });
 
     // 3. Parse JSON
     return JSON.parse(decompressedData);
   } catch (error) {
-    console.error('Decoding response data failed:', error);
+    console.warn('Decoding response data failed:', error);
     return encodedData;
   }
 };
