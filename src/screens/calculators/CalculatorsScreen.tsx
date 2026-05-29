@@ -133,7 +133,7 @@ const CalculatorsScreen = () => {
             <View
               style={[
                 styles.heroTextContainer,
-                !isDesktop && { marginRight: 0, marginTop: 10 },
+                !isDesktop && { marginRight: 0, marginTop: 10, flex: undefined },
               ]}
             >
               <View style={isDesktop ? { flexDirection: 'row', gap: 20, alignItems: 'center', marginBottom: 20 } : { alignItems: 'center' }}>
@@ -154,14 +154,14 @@ const CalculatorsScreen = () => {
 
               <Text style={[styles.heroSubtitle, !isDesktop && { fontSize: 16, lineHeight: 20, textAlign: 'center' }]}>
                 Make data-driven decisions with comprehensive ROI analysis, loan
-                coverage <br /> insights, and detailed cash flow projections for your
+                coverage {'\n'}insights, and detailed cash flow projections for your
                 real estate investments
               </Text>
 
-              <View style={[styles.heroStatsRow, !isDesktop && { justifyContent: 'flex-start', gap: 12 }]}>
-                <View style={[styles.heroStatCard, !isDesktop && { minWidth: '47%', flex: 1, maxWidth: '48%' }]}>
+              <View style={[styles.heroStatsRow, !isDesktop && { justifyContent: 'space-between', gap: 8, marginTop: 12 }]}>
+                <View style={[styles.heroStatCard, !isDesktop && { width: '48%', minWidth: undefined, flex: undefined }]}>
                   <LinearGradient
-                    colors={['rgba(242, 242, 242, 0.1)', 'rgba(255, 255, 255, 0.1)']}
+                    colors={['#F2F2F2', '#FFFFFF']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     locations={[0.0761, 0.7484]}
@@ -172,9 +172,9 @@ const CalculatorsScreen = () => {
                   </LinearGradient>
                 </View>
 
-                <View style={[styles.heroStatCard, !isDesktop && { minWidth: '47%', flex: 1, maxWidth: '48%' }]}>
+                <View style={[styles.heroStatCard, !isDesktop && { width: '48%', minWidth: undefined, flex: undefined }]}>
                   <LinearGradient
-                    colors={['rgba(242, 242, 242, 0.1)', 'rgba(255, 255, 255, 0.1)']}
+                    colors={['#F2F2F2', '#FFFFFF']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     locations={[0.0761, 0.7484]}
@@ -185,9 +185,9 @@ const CalculatorsScreen = () => {
                   </LinearGradient>
                 </View>
 
-                <View style={[styles.heroStatCard, !isDesktop && { minWidth: '47%', flex: 1, maxWidth: '48%' }]}>
+                <View style={[styles.heroStatCard, !isDesktop && { width: '100%', minWidth: undefined, flex: undefined, marginTop: 8 }]}>
                   <LinearGradient
-                    colors={['rgba(242, 242, 242, 0.1)', 'rgba(255, 255, 255, 0.1)']}
+                    colors={['#F2F2F2', '#FFFFFF']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     locations={[0.0761, 0.7484]}
@@ -674,9 +674,8 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
   };
 
   return (
-    <ScrollView
+    <View
       style={[styles.calcContainer, !isDesktop && { maxWidth: '90%', paddingHorizontal: 0 }]}
-      showsVerticalScrollIndicator={false}
     >
       <CalculatorHeader type="roi" />
 
@@ -1007,7 +1006,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
           <RentalDetailsCashflow data={results} />
         </>
       )}
-    </ScrollView>
+    </View>
   );
 };
 
@@ -1084,9 +1083,8 @@ const EMICalculatorView = () => {
   };
 
   return (
-    <ScrollView
+    <View
       style={[styles.calcContainer, !isDesktop && { maxWidth: '90%', paddingHorizontal: 0 }]}
-      showsVerticalScrollIndicator={false}
     >
       <CalculatorHeader type="emi" />
 
@@ -1413,7 +1411,7 @@ const EMICalculatorView = () => {
           <CoverageAnalysis data={results} />
         </>
       )}
-    </ScrollView>
+    </View>
   );
 };
 
@@ -1436,7 +1434,7 @@ const styles = StyleSheet.create({
     bottom: 0, // Ensure full vertical coverage
     resizeMode: 'cover',
     opacity: 1,
-    minHeight: 593
+    minHeight: isDesktop ? 593 : 420,
   },
   heroContent: {
     flexDirection: 'row',
@@ -1474,24 +1472,23 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   heroStatCard: {
-   borderRadius: 12,
-  minWidth: 173,
-  overflow: 'hidden',      // ← critical for gradient to respect borderRadius
-  shadowColor: '#000',
-  shadowOpacity: 0.10,
-  shadowRadius: 10,
-  elevation: 3,
-  // backgroundColor: '#fff'
-   backgroundImage: 'linear-gradient(to right, #F2F2F2, rgba(255, 255, 255, 0.6))' as any,
+    borderRadius: 12,
+    minWidth: isDesktop ? 173 : undefined,
+    backgroundColor: '#fff',
+    overflow: 'hidden',      // ← critical for gradient to respect borderRadius
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
   },
   heroStatCardGradient: {
-  padding: 26,
-  flex: 1,
-  alignItems: 'center',
-  justifyContent: 'center',
-},
+    padding: isDesktop ? 26 : 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   heroStatLabel: {
-    fontSize: 16,
+    fontSize: isDesktop ? 16 : 13,
     color: '#767676',
     fontWeight: '600',
     marginBottom: 3,
@@ -1499,9 +1496,9 @@ const styles = StyleSheet.create({
     fontFamily:'Montserrat',
   },
   heroStatValue: {
-    fontSize: 18,
+    fontSize: isDesktop ? 18 : 14,
     color: '#EE2529',
-    fontWeight: 400,
+    fontWeight: '400',
     textAlign: 'center',
     fontFamily: 'Montserrat',
   },
