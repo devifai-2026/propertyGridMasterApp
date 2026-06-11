@@ -1,0 +1,18 @@
+# Render Blueprint — web static site for the React Native web build.
+# Declared as a Node static site so Render does NOT run Ruby/bundler for the
+# iOS Gemfile (which is irrelevant to the web build and was failing on Ruby 2.6.10).
+services:
+  - type: web
+    name: propertyGridMasterApp
+    runtime: static
+    branch: production
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: NODE_VERSION
+        value: 22.11.0
+      # SPA: serve index.html for client-side routes (so /my-profile, /blog/:slug etc. work)
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
