@@ -1,13 +1,10 @@
-// const baseUrl = "http://172.20.10.14:8000/api";
-// const baseUrl = "http://localhost:3000/api";
-// const baseUrl = "https://pre-release-production.up.railway.app/api";
-const baseUrl = "http://localhost:3000/api";
+// Note: baseUrl ends with "/api" — the API layer appends "/v1".
 const ENV_CONFIG = {
   dev: {
-    BASE_URL: baseUrl,
+    BASE_URL: "http://localhost:3000/api",
   },
   prod: {
-    BASE_URL: baseUrl,
+    BASE_URL: "https://pre-lease-server-1.onrender.com/api",
   },
 };
 
