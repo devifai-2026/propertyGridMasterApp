@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Platform, Animated, Share } from 'react-native';
 import { MapPin } from 'lucide-react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import { useAuth } from '../../../context/AuthContext';
 import bottom from "../../../assets/ExploreBrokers/bottom.png";
 import top from "../../../assets/ExploreBrokers/top.png";
 import share from "../../../assets/Calculator/share.png"
@@ -27,6 +28,10 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
 }) => {
   const [isFlipped, setIsFlipped] = useState(false);
   const flipAnimation = useRef(new Animated.Value(0)).current;
+  // "This is me" → the logged-in user is viewing their own broker profile.
+  const { user } = useAuth();
+  const brokerUserId = item?.id || item?.userId;
+  const isOwnProfile = !!user?.userId && !!brokerUserId && user.userId === brokerUserId;
 
   const flipCard = () => {
     if (isFlipped) {
@@ -139,22 +144,28 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
               />
             </View>
 
-            <TouchableOpacity
-              onPress={(e) => {
-                e.stopPropagation();
-                onContactBroker();
-              }}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={['#EE2529', '#C73834']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.contactBtn}
+            {isOwnProfile ? (
+              <View style={styles.ownProfileBadge}>
+                <Text style={styles.ownProfileText}>This is your profile</Text>
+              </View>
+            ) : (
+              <TouchableOpacity
+                onPress={(e) => {
+                  e.stopPropagation();
+                  onContactBroker();
+                }}
+                activeOpacity={0.8}
               >
-                <Text style={styles.contactBtnText}>Contact Broker</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+                <LinearGradient
+                  colors={['#EE2529', '#C73834']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.contactBtn}
+                >
+                  <Text style={styles.contactBtnText}>Contact Broker</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            )}
           </View>
 
           {/* Right Section */}
@@ -240,22 +251,28 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
           </Text>
           
           <View style={styles.backFooter}>
-            <TouchableOpacity
-              onPress={(e) => {
-                e.stopPropagation();
-                onContactBroker();
-              }}
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={['#EE2529', '#C73834']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={[styles.backContactBtn, isMobile && { paddingVertical: 8, paddingHorizontal: 12 }]}
+            {isOwnProfile ? (
+              <View style={styles.ownProfileBadge}>
+                <Text style={styles.ownProfileText}>This is your profile</Text>
+              </View>
+            ) : (
+              <TouchableOpacity
+                onPress={(e) => {
+                  e.stopPropagation();
+                  onContactBroker();
+                }}
+                activeOpacity={0.8}
               >
-                <Text style={[styles.backContactBtnText, isMobile && { fontSize: 13 }]}>Contact Broker</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+                <LinearGradient
+                  colors={['#EE2529', '#C73834']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={[styles.backContactBtn, isMobile && { paddingVertical: 8, paddingHorizontal: 12 }]}
+                >
+                  <Text style={[styles.backContactBtnText, isMobile && { fontSize: 13 }]}>Contact Broker</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            )}
             
             <TouchableOpacity 
               style={[styles.shareBtn, isMobile && { paddingVertical: 6, paddingHorizontal: 10 }]}
@@ -401,6 +418,20 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginBottom: 20,
     backgroundColor: '#f5f5f5',
+  },
+  ownProfileBadge: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    alignItems: 'center',
+  },
+  ownProfileText: {
+    color: '#6B7280',
+    fontWeight: '700',
+    fontSize: 13,
   },
   contactBtn: {
     paddingVertical: 12,
