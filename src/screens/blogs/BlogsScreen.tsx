@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,9 +10,12 @@ import {
   Platform,
   TextInput,
   ImageBackground,
+  ActivityIndicator,
 } from 'react-native';
 import Layout from '../../layout/Layout';
 import { COLORS } from '../../constants/theme';
+import { useNavigation } from '../../context/NavigationContext';
+import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
 import {
   Clock,
   User,
@@ -22,9 +25,9 @@ import {
   Mail,
   ChevronRight,
   TrendingUp,
+  AlertCircle,
 } from 'lucide-react-native';
 
-// --- Dummy Data ---
 const BLOG_CATEGORIES = [
   'All',
   'Market Trends',
@@ -34,88 +37,42 @@ const BLOG_CATEGORIES = [
   'Residential',
 ];
 
-const BLOG_POSTS = [
-  {
-    id: '1',
-    title: 'The Future of Commercial Real Estate in India: 2026 Outlook',
-    excerpt:
-      'Explore the emerging trends shaping the commercial property landscape, from sustainable workspaces to the rise of Tier-2 cities.',
-    author: 'Rajesh Kumar',
-    date: 'Oct 15, 2025',
-    readTime: '5 min read',
-    category: 'Market Trends',
-    image:
-      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2670&auto=format&fit=crop',
-    featured: true,
-  },
-  {
-    id: '2',
-    title: 'Pre-Leased Properties: A Safe Haven for Investors?',
-    excerpt:
-      'Why high-net-worth individuals are shifting their portfolios towards pre-leased assets offering steady rental yields.',
-    author: 'Sarah Jenkins',
-    date: 'Oct 12, 2025',
-    readTime: '4 min read',
-    category: 'Investment',
-    image:
-      'https://images.unsplash.com/photo-1460472178825-e5240623afd5?q=80&w=2669&auto=format&fit=crop',
-    featured: false,
-  },
-  {
-    id: '3',
-    title: 'Navigating Property Taxes: A Comprehensive Guide',
-    excerpt:
-      'Understanding the nuances of GST, stamp duty, and registration charges when buying commercial property.',
-    author: 'Amit Singh',
-    date: 'Oct 08, 2025',
-    readTime: '7 min read',
-    category: 'Legal',
-    image:
-      'https://images.unsplash.com/photo-1554224155-9844c6331906?q=80&w=2672&auto=format&fit=crop',
-    featured: false,
-  },
-  {
-    id: '4',
-    title: 'Co-Working Spaces: The New Norm?',
-    excerpt:
-      'How the hybrid work culture is driving the demand for flexible office spaces across metro cities.',
-    author: 'Priya Mehta',
-    date: 'Oct 05, 2025',
-    readTime: '3 min read',
-    category: 'Commercial',
-    image:
-      'https://images.unsplash.com/photo-1524758631624-e2822e304c36?q=80&w=2670&auto=format&fit=crop',
-    featured: false,
-  },
-  {
-    id: '5',
-    title: 'Residential vs. Commercial: Where to Put Your Money?',
-    excerpt:
-      'A comparative analysis of rental yields, capital appreciation, and risk factors in both sectors.',
-    author: 'Vikram Malhotra',
-    date: 'Sept 28, 2025',
-    readTime: '6 min read',
-    category: 'Investment',
-    image:
-      'https://images.unsplash.com/photo-1448630360428-65456885c650?q=80&w=2667&auto=format&fit=crop',
-    featured: false,
-  },
-  {
-    id: '6',
-    title: 'Sustainable Architecture: Green Buildings Explained',
-    excerpt:
-      'Why "Green Certification" is becoming a critical factor for tenant retention and asset valuation.',
-    author: 'Nisha Gupta',
-    date: 'Sept 22, 2025',
-    readTime: '5 min read',
-    category: 'Market Trends',
-    image:
-      'https://images.unsplash.com/photo-1518780664697-55e3ad937233?q=80&w=2565&auto=format&fit=crop',
-    featured: false,
-  },
-];
+// Formats an ISO date string into a readable label e.g. "Oct 15, 2025".
+const formatBlogDate = (value?: string) => {
+  if (!value) return '';
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+};
 
-const BlogCard = ({ item, width }: { item: any; width: number }) => {
+// Maps a raw blog object from the API into the shape the cards render.
+const mapBlog = (blog: any) => ({
+  id: blog.blogId,
+  slug: blog.slug,
+  title: blog.title,
+  excerpt: blog.excerpt,
+  body: blog.body,
+  author: blog.author,
+  category: blog.category,
+  readTime: blog.readTime,
+  image: blog.imageUrl,
+  featured: blog.isFeatured,
+  date: formatBlogDate(blog.publishedAt || blog.createdAt),
+});
+
+const BlogCard = ({
+  item,
+  width,
+  onPress,
+}: {
+  item: any;
+  width: number;
+  onPress?: () => void;
+}) => {
   const isDesktop = width >= 1024;
   const isTablet = width >= 768 && width < 1024;
 
@@ -125,7 +82,10 @@ const BlogCard = ({ item, width }: { item: any; width: number }) => {
   else if (isTablet) cardWidth = '48%'; // 2 columns
 
   return (
-    <TouchableOpacity style={[styles.card, { width: cardWidth }]}>
+    <TouchableOpacity
+      style={[styles.card, { width: cardWidth }]}
+      onPress={onPress}
+    >
       <View style={styles.cardImageContainer}>
         <Image source={{ uri: item.image }} style={styles.cardImage} />
         <View style={styles.categoryBadge}>
@@ -171,11 +131,20 @@ const BlogCard = ({ item, width }: { item: any; width: number }) => {
   );
 };
 
-const FeaturedBlog = ({ item, width }: { item: any; width: number }) => {
+const FeaturedBlog = ({
+  item,
+  width,
+  onPress,
+}: {
+  item: any;
+  width: number;
+  onPress?: () => void;
+}) => {
   const isMobile = width < 768;
   return (
     <TouchableOpacity
       style={[styles.featuredContainer, { height: isMobile ? 500 : 450 }]}
+      onPress={onPress}
     >
       <ImageBackground
         source={{ uri: item.image }}
@@ -273,15 +242,36 @@ const NewsletterSection = () => {
 
 const BlogsScreen = () => {
   const { width } = useWindowDimensions();
+  const { navigate } = useNavigation();
+  const { getBlogs, loading } = usePropertyAPIs();
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [posts, setPosts] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredPosts = BLOG_POSTS.filter(
+  useEffect(() => {
+    setError(null);
+    getBlogs(
+      data => {
+        const list = Array.isArray(data) ? data : [];
+        setPosts(list.map(mapBlog));
+      },
+      err => {
+        console.error('Error fetching blogs:', err);
+        setError('We could not load the articles. Please try again.');
+      },
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const openBlog = (slug: string) => navigate(`/blog/${slug}`);
+
+  const filteredPosts = posts.filter(
     post =>
       !post.featured &&
       (selectedCategory === 'All' || post.category === selectedCategory),
   );
 
-  const featuredPost = BLOG_POSTS.find(post => post.featured);
+  const featuredPost = posts.find(post => post.featured);
 
   return (
     <Layout>
@@ -332,44 +322,63 @@ const BlogsScreen = () => {
 
           {/* Content */}
           <View style={styles.contentSection}>
-            {/* Featured Post */}
-            {featuredPost && selectedCategory === 'All' && (
-              <View style={styles.featuredSection}>
-                <FeaturedBlog item={featuredPost} width={width} />
+            {loading ? (
+              <View style={styles.statusState}>
+                <ActivityIndicator size="large" color={COLORS.primary} />
+                <Text style={styles.emptyText}>Loading articles...</Text>
               </View>
-            )}
-
-            {/* Latest Posts Grid */}
-            <View style={styles.gridHeader}>
-              <Text style={styles.gridTitle}>Latest Articles</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            <View style={styles.gridContainer}>
-              {filteredPosts.map(post => (
-                <BlogCard key={post.id} item={post} width={width} />
-              ))}
-            </View>
-
-            {filteredPosts.length === 0 && (
-              <View style={styles.emptyState}>
-                <Search size={48} color={COLORS.divider} />
-                <Text style={styles.emptyText}>No articles found.</Text>
-                <TouchableOpacity
-                  style={styles.clearFilterBtn}
-                  onPress={() => setSelectedCategory('All')}
-                >
-                  <Text style={styles.clearFilterText}>View All Articles</Text>
-                </TouchableOpacity>
+            ) : error ? (
+              <View style={styles.statusState}>
+                <AlertCircle size={48} color={COLORS.primary} />
+                <Text style={styles.emptyText}>{error}</Text>
               </View>
-            )}
+            ) : (
+              <>
+                {/* Featured Post */}
+                {featuredPost && selectedCategory === 'All' && (
+                  <View style={styles.featuredSection}>
+                    <FeaturedBlog
+                      item={featuredPost}
+                      width={width}
+                      onPress={() => openBlog(featuredPost.slug)}
+                    />
+                  </View>
+                )}
 
-            {/* Load More Button (Dummy) */}
-            {filteredPosts.length > 0 && (
-              <TouchableOpacity style={styles.loadMoreBtn}>
-                <Text style={styles.loadMoreText}>Load More Articles</Text>
-                <ChevronRight size={16} color={COLORS.textSecondary} />
-              </TouchableOpacity>
+                {/* Latest Posts Grid */}
+                <View style={styles.gridHeader}>
+                  <Text style={styles.gridTitle}>Latest Articles</Text>
+                  <View style={styles.dividerLine} />
+                </View>
+
+                <View style={styles.gridContainer}>
+                  {filteredPosts.map(post => (
+                    <BlogCard
+                      key={post.id}
+                      item={post}
+                      width={width}
+                      onPress={() => openBlog(post.slug)}
+                    />
+                  ))}
+                </View>
+
+                {filteredPosts.length === 0 && (
+                  <View style={styles.emptyState}>
+                    <Search size={48} color={COLORS.divider} />
+                    <Text style={styles.emptyText}>No articles found.</Text>
+                    {selectedCategory !== 'All' && (
+                      <TouchableOpacity
+                        style={styles.clearFilterBtn}
+                        onPress={() => setSelectedCategory('All')}
+                      >
+                        <Text style={styles.clearFilterText}>
+                          View All Articles
+                        </Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                )}
+              </>
             )}
           </View>
         </View>
@@ -815,6 +824,13 @@ const styles = StyleSheet.create({
     padding: 60,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  statusState: {
+    width: '100%',
+    padding: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 16,
   },
   emptyText: {
     marginTop: 10,

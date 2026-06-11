@@ -608,6 +608,9 @@ const ListPropertyScreen = () => {
               styles.bulkUploadBtn,
               isMobile && styles.bulkUploadBtnMobile,
             ]}
+            onPress={() =>
+              Alert.alert('Bulk Upload', 'Bulk upload coming soon.')
+            }
           >
             <Text
               style={[
@@ -695,7 +698,7 @@ const ListPropertyScreen = () => {
                 errorMessage.includes('complete your profile')) && (
                 <TouchableOpacity
                   style={styles.errorActionBtn}
-                  onPress={() => navigate('/my-prifile')}
+                  onPress={() => navigate('/my-dashboard')}
                 >
                   <Text style={styles.errorActionText}>Go to Profile</Text>
                 </TouchableOpacity>

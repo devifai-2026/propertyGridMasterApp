@@ -27,6 +27,7 @@ import PropertyComparisonScreen from './src/screens/property-comparison/Property
 import PropertyDetailsScreen from './src/screens/properties/PropertyDetailsScreen';
 import EnquiriesScreen from './src/screens/enquiries/EnquiriesScreen';
 import BlogsScreen from './src/screens/blogs/BlogsScreen';
+import BlogDetailScreen from './src/screens/blogs/BlogDetailScreen';
 import PrivacyPolicyScreen from './src/screens/legal/PrivacyPolicyScreen';
 import TermsOfServiceScreen from './src/screens/legal/TermsOfServiceScreen';
 import NotesScreen from './src/screens/notes/NotesScreen';
@@ -70,7 +71,7 @@ const AppContent = () => {
   }, []);
 
   // Redirect to login if accessing private pages while not logged in
-  const privatePages = ['/my-prifile', '/my-profile'];
+  const privatePages = ['/my-dashboard', '/my-profile'];
   const isPrivate = privatePages.some(page => currentPath.startsWith(page));
 
   React.useEffect(() => {
@@ -111,7 +112,7 @@ const AppContent = () => {
         return <ExploreBrokersScreen />;
       case currentPath.startsWith('/contact-broker/'):
         return <ContactBrokerScreen />;
-      case currentPath === '/my-prifile':
+      case currentPath === '/my-dashboard':
         return isLoggedIn ? <InvestorsScreen /> : <Dashboard />;
       case currentPath === '/login':
         return <LoginScreen />;
@@ -135,6 +136,8 @@ const AppContent = () => {
         return <EnquiriesScreen />;
       case currentPath.startsWith('/enquiry-details/'):
         return <EnquiryDetailsScreen />;
+      case currentPath.startsWith('/blog/'):
+        return <BlogDetailScreen />;
       case currentPath === '/blogs':
         return <BlogsScreen />;
       case currentPath === '/privacy-policy':

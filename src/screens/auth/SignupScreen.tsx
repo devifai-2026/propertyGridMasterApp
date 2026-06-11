@@ -275,6 +275,11 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
       setOtpError('Please enter the complete OTP');
       return;
     }
+    // NOTE: The backend signup `joinType` only supports "investor" and "broker".
+    // There is no self-signup path for a standalone "Owner" role, so the
+    // "Owner/Investor" UI card intentionally maps to joinType: 'investor'
+    // (roleName: 'Investor'). Do not map this to "Owner" until the backend
+    // exposes an owner self-registration endpoint.
     register(
       {
         mobileNumber: formData.phone,
@@ -343,7 +348,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
                 console.error('[Photo upload error]', err);
               }
             }
-            navigate('/my-prifile');
+            navigate('/my-dashboard');
           } else {
             openLoginModal();
           }

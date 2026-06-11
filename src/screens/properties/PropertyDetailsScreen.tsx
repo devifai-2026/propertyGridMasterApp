@@ -22,7 +22,6 @@ import {
   Download,
   Plane,
   Train,
-  ChevronDown,
   MessageSquare,
   Clock,
   User,
@@ -37,13 +36,14 @@ import PropertyCard, { Property } from '../../components/PropertyCard';
 // Missing dashboard components will be defined locally below to prevent tab crash
 import RentalCards from '../calculators/components/RentalYield/RentalCards';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
+import { formatINR } from '../../../helpers/formatPrice';
+import { formatDate, formatDateTime, formatTenureYears } from '../../../helpers/formatDate';
 import DownloadIcon from "../../assets/propertyDetails/download.svg"
 import ShareIcon from "../../assets/propertyDetails/share.svg"
 import bannerBg from "../../assets/Banner/bannerBg.png"
 import propertDetails from "../../assets/propertyDetails/propertyDetails.png"
 import leaseDetails from "../../assets/propertyDetails/leaseDetails.png"
 import location from "../../assets/propertyDetails/locationDetails.png"
-import faqs from "../../assets/propertyDetails/faq.png"
 import squaresBg from "../../assets/propertyDetails/squaresbg.png"
  
 
@@ -94,8 +94,8 @@ const IncomeTrackerCard = ({ data }: { data: any }) => (
         <View key={index} style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8, borderBottomWidth: index === data.labels.length - 1 ? 0 : 1, borderBottomColor: '#F5F5F5' }}>
           <Text style={{ fontSize: 15, color: '#666' }}>{label}</Text>
           <View style={{ alignItems: 'flex-end' }}>
-            <Text style={{ fontSize: 16, fontWeight: '700', color: COLORS.textDark }}>₹{data.received[index]} L</Text>
-            <Text style={{ fontSize: 12, color: '#999' }}>Expected: ₹{data.expected[index]} L</Text>
+            <Text style={{ fontSize: 16, fontWeight: '700', color: COLORS.textDark }}>{formatINR((data.received[index] ?? 0) * 100000)}</Text>
+            <Text style={{ fontSize: 12, color: '#999' }}>Expected: {formatINR((data.expected[index] ?? 0) * 100000)}</Text>
           </View>
         </View>
       ))}
@@ -151,9 +151,9 @@ const PropertyDetailsScreen = () => {
           id: data.propertyId,
           title: `${data.propertyType} Space`,
           location: `${data.city}, ${data.state}`,
-          price: `₹${data.sellingPrice} Cr`,
-          rent: data.annualGrossRent ? `₹${data.annualGrossRent} L` : 'N/A',
-          tenure: `${data.tenureLeftYears || 0} Yrs`,
+          price: formatINR(data.sellingPrice),
+          rent: formatINR(data.annualGrossRent),
+          tenure: formatTenureYears(data.tenureLeftYears, data.leaseEndDate),
           roi: data.netRentalYield ? `${data.netRentalYield}%` : 'N/A',
           type: data.propertyType,
           images:
@@ -197,7 +197,6 @@ const PropertyDetailsScreen = () => {
   }, [propertyId, isAddedByUser]);
 
   const [activeTab, setActiveTab] = useState('property');
-  const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   useEffect(() => {
     if (activeTab === 'notes' && propertyId) {
@@ -250,7 +249,6 @@ const PropertyDetailsScreen = () => {
     ...(isAddedByUser
       ? [{ id: 'notes', label: 'Notes', icon: <MessageSquare /> }]
       : []),
-    { id: 'faqs', label: 'FAQs', icon: faqs },
   ];
 
   // Only show full screen loading if we don't have property data yet
@@ -332,7 +330,7 @@ const PropertyDetailsScreen = () => {
                   />
                   <InfoRow
                     label="Price"
-                    value={`₹${property.raw.sellingPrice} Cr`}
+                    value={formatINR(property.raw.sellingPrice)}
                   />
                   <InfoRow
                     label="Building Grade"
@@ -468,7 +466,7 @@ const PropertyDetailsScreen = () => {
       location: 'Pune',
       tenant: 'AP Realtors',
       expiryDate: '15/12/2025',
-      annualRent: '₹2,65,00,000',
+      annualRent: formatINR(26500000),
     },
     {
       id: '2',
@@ -476,7 +474,7 @@ const PropertyDetailsScreen = () => {
       location: 'Mumbai',
       tenant: 'Global Innovations',
       expiryDate: '20/12/2025',
-      annualRent: '₹2,55,00,000',
+      annualRent: formatINR(25500000),
     },
   ];
 
@@ -502,21 +500,25 @@ const PropertyDetailsScreen = () => {
                 <View style={styles.col}>
                   <InfoRow
                     label="Total Monthly Rent"
-                    value={`₹${property.raw.totalMonthlyRent}`}
+                    value={formatINR(property.raw.totalMonthlyRent)}
                   />
                   <InfoRow
                     label="Rent per sq ft (Monthly)"
-                    value={`₹${property.raw.rentPerSqftMonthly}`}
+                    value={formatINR(property.raw.rentPerSqftMonthly)}
                   />
                 </View>
                 <View style={styles.col}>
                   <InfoRow
                     label="Security Deposit"
-                    value={`${property.raw.securityDepositMonths} months`}
+                    value={
+                      property.raw.securityDepositMonths != null
+                        ? `${property.raw.securityDepositMonths} months`
+                        : 'N/A'
+                    }
                   />
                   <InfoRow
                     label="Security Deposit Amount"
-                    value={`₹${property.raw.securityDepositAmount}`}
+                    value={formatINR(property.raw.securityDepositAmount)}
                   />
                 </View>
               </View>
@@ -537,21 +539,28 @@ const PropertyDetailsScreen = () => {
                 <View style={styles.col}>
                   <InfoRow
                     label="Lease Start Date"
-                    value={property.raw.leaseStartDate || 'N/A'}
+                    value={formatDate(property.raw.leaseStartDate)}
                   />
                   <InfoRow
                     label="Lock-in Period"
-                    value={`${property.raw.lockInPeriodYears} Yrs ${property.raw.lockInPeriodMonths} Months`}
+                    value={
+                      property.raw.lockInPeriodYears != null ||
+                      property.raw.lockInPeriodMonths != null
+                        ? `${property.raw.lockInPeriodYears ?? 0} Yrs ${
+                            property.raw.lockInPeriodMonths ?? 0
+                          } Months`
+                        : 'N/A'
+                    }
                   />
                 </View>
                 <View style={styles.col}>
                   <InfoRow
                     label="Lease Expiry Date"
-                    value={property.raw.leaseEndDate || 'N/A'}
+                    value={formatDate(property.raw.leaseEndDate)}
                   />
                   <InfoRow
                     label="Lease Duration"
-                    value={`${property.raw.leaseDurationYears} Yrs`}
+                    value={formatTenureYears(property.raw.leaseDurationYears)}
                   />
                 </View>
               </View>
@@ -562,13 +571,21 @@ const PropertyDetailsScreen = () => {
                 <View style={styles.col}>
                   <InfoRow
                     label="Escalation Rate"
-                    value={`${property.raw.annualEscalationPercent}%`}
+                    value={
+                      property.raw.annualEscalationPercent != null
+                        ? `${property.raw.annualEscalationPercent}%`
+                        : 'N/A'
+                    }
                   />
                 </View>
                 <View style={styles.col}>
                   <InfoRow
                     label="Escalation Frequency"
-                    value={`Every ${property.raw.escalationFrequencyYears} Yrs`}
+                    value={
+                      property.raw.escalationFrequencyYears != null
+                        ? `Every ${property.raw.escalationFrequencyYears} Yrs`
+                        : 'N/A'
+                    }
                   />
                 </View>
               </View>
@@ -579,7 +596,66 @@ const PropertyDetailsScreen = () => {
     </View>
   );
 
-  const renderAnalyticsContent = () => (
+  const renderAnalyticsContent = () => {
+    const raw = property.raw || {};
+    const plg = raw.plgMetrics || {};
+    const plgDetail = plg.plgDetail || {};
+    const plgSummary = plgDetail.summary || {};
+    const plgExpenses = plgDetail.expenses || {};
+    const plgCashFlows = plgDetail.cashFlows || {};
+
+    const toNum = (v: any): number | null => {
+      if (v === null || v === undefined || v === '') return null;
+      const n = typeof v === 'string' ? parseFloat(v) : v;
+      return typeof n === 'number' && isFinite(n) ? n : null;
+    };
+
+    // --- Real financial values (no fabricated literals) ---
+    const totalInitialInvestment = toNum(plgSummary.totalInitialInvestment);
+    const grossAnnualRent =
+      toNum(raw.annualGrossRent) ?? toNum(plg.annualGrossRent);
+
+    // Total annual expenses: prefer backend-computed totalExpenses, else compute
+    // from the real recurring-expense fields. maintenanceAmount is treated as an
+    // annual figure here; if absent we fall back to maintenance per sqft * area * 12.
+    const propertyTaxAnnual = toNum(raw.propertyTaxAnnual);
+    const insuranceAnnual = toNum(raw.insuranceAnnual);
+    const maintenanceAmount = toNum(raw.maintenanceAmount);
+    const computedRecurringExpenses = (() => {
+      const parts = [propertyTaxAnnual, insuranceAnnual, maintenanceAmount].filter(
+        (v): v is number => v !== null,
+      );
+      if (parts.length === 0) return null;
+      return parts.reduce((a, b) => a + b, 0);
+    })();
+    const totalAnnualExpenses =
+      toNum(plgExpenses.totalExpenses) ?? computedRecurringExpenses;
+
+    // Net annual income: prefer backend NOI, else gross rent - expenses.
+    const netAnnualIncome =
+      toNum(plgSummary.netOperatingIncome) ??
+      (grossAnnualRent !== null
+        ? grossAnnualRent - (totalAnnualExpenses ?? 0)
+        : null);
+
+    // Interest on security deposit: prefer backend cashFlows, else 6.5% of deposit.
+    const securityDepositAmount = toNum(raw.securityDepositAmount);
+    const annualInterestOnDeposit =
+      toNum(plgCashFlows.annualInterestOnDeposit) ??
+      (securityDepositAmount !== null ? securityDepositAmount * 0.065 : null);
+
+    // Total annual return = net income + deposit interest (only when we have data).
+    const totalAnnualReturn =
+      netAnnualIncome !== null
+        ? netAnnualIncome + (annualInterestOnDeposit ?? 0)
+        : null;
+
+    const grossRentalYield =
+      toNum(raw.grossRentalYield) ?? toNum(plg.grossRentalYield);
+    const netRentalYield =
+      toNum(raw.netRentalYield) ?? toNum(plg.netRentalYield);
+
+    return (
     <View style={[styles.tabContent, isMobile && styles.tabContentMobile]}>
       <View style={styles.detailsHeader}>
         <Text style={[styles.descriptionTitle, isMobile && styles.descriptionTitleMobile]}>Property Investment ROI Analytics</Text>
@@ -604,7 +680,7 @@ const PropertyDetailsScreen = () => {
                 <View style={styles.col}>
                   <InfoRow
                     label="Property cost (₹)"
-                    value={`₹${property.raw.sellingPrice} Cr`}
+                    value={formatINR(property.raw.sellingPrice)}
                   />
                 </View>
               </View>
@@ -615,21 +691,21 @@ const PropertyDetailsScreen = () => {
                 <View style={styles.col}>
                   <InfoRow
                     label="Property Tax (₹)"
-                    value={`₹${property.raw.propertyTaxAnnual || 0} L`}
+                    value={formatINR(property.raw.propertyTaxAnnual)}
                   />
                   <InfoRow
                     label="Maintenance per sq.ft(₹)"
-                    value={`₹${property.raw.maintenancePerSqft || 0}`}
+                    value={formatINR(property.raw.maintenancePerSqft)}
                   />
                 </View>
                 <View style={styles.col}>
                   <InfoRow
                     label="Insurance (₹)"
-                    value={`₹${property.raw.insuranceAnnual || 0} L`}
+                    value={formatINR(property.raw.insuranceAnnual)}
                   />
                   <InfoRow
                     label="Maintenance Lump sum(₹)"
-                    value={`₹${property.raw.maintenanceLumpSum || 0} L`}
+                    value={formatINR(property.raw.maintenanceLumpSum)}
                   />
                 </View>
               </View>
@@ -643,7 +719,7 @@ const PropertyDetailsScreen = () => {
                 <View style={styles.col}>
                   <InfoRow
                     label="Monthly Rent (₹)"
-                    value={`₹${property.raw.totalMonthlyRent || 0}`}
+                    value={formatINR(property.raw.totalMonthlyRent)}
                   />
                   <InfoRow
                     label="Rent Escalation every(yrs)"
@@ -651,13 +727,13 @@ const PropertyDetailsScreen = () => {
                   />
                   <InfoRow
                     label="Lease Start Date"
-                    value={property.raw.leaseStartDate || 'N/A'}
+                    value={formatDate(property.raw.leaseStartDate)}
                   />
                 </View>
                 <View style={styles.col}>
                   <InfoRow
                     label="Security Deposit (₹)"
-                    value={`₹${property.raw.securityDepositAmount || 0} L`}
+                    value={formatINR(property.raw.securityDepositAmount)}
                   />
                   <InfoRow
                     label="Rent Escalation(% per year)"
@@ -676,7 +752,7 @@ const PropertyDetailsScreen = () => {
                 <View style={styles.col}>
                   <InfoRow
                     label="Legal Fees (₹)"
-                    value={`₹${property.raw.legalFees || 0} L`}
+                    value={formatINR(property.raw.legalFees)}
                   />
                   <InfoRow
                     label="Stamp Duty (% of Price)"
@@ -686,11 +762,11 @@ const PropertyDetailsScreen = () => {
                 <View style={styles.col}>
                   <InfoRow
                     label="Brokerage (₹)"
-                    value={`₹${property.raw.brokerage || 0} L`}
+                    value={formatINR(property.raw.brokerage)}
                   />
                   <InfoRow
                     label="Other One-time Costs (₹)"
-                    value={`₹${property.raw.otherOneTimeCosts || 0} L`}
+                    value={formatINR(property.raw.otherOneTimeCosts)}
                   />
                 </View>
               </View>
@@ -738,7 +814,7 @@ const PropertyDetailsScreen = () => {
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
                 <Text style={{ fontSize: 16, color: '#111827', fontWeight: '800' }}>Annual Cash Flow</Text>
                 <Text style={{ fontSize: 20, fontWeight: '900', color: '#0D9488' }}>
-                  {property.raw.annualGrossRent ? `₹${property.raw.annualGrossRent} L` : 'N/A'}
+                  {formatINR(property.raw.annualGrossRent)}
                 </Text>
               </View>
               <Text style={{ fontSize: 13, color: '#5EEAD4', fontWeight: '700', marginBottom: 12 }}>$ Net annual income</Text>
@@ -770,26 +846,32 @@ const PropertyDetailsScreen = () => {
             <PropertyDetailsCard title="Investment Summary">
               <View style={{ gap: 20, marginTop: 10 }}>
                 <View style={{ flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', gap: isMobile ? 4 : 0 }}>
-                  <Text style={{ fontSize: 14, color: '#999' }}>Total Initial Investment (₹)</Text>
+                  <Text style={{ fontSize: 14, color: '#999' }}>Total Initial Investment</Text>
                   <Text style={{ fontSize: 15, color: '#444', fontWeight: '700' }}>
-                    ₹{property.raw.sellingPrice ? (property.raw.sellingPrice * 100).toFixed(0) + ',00,000' : '48,52,500'}
+                    {totalInitialInvestment !== null
+                      ? formatINR(totalInitialInvestment)
+                      : formatINR(raw.sellingPrice)}
                   </Text>
                 </View>
                 <View style={{ flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', gap: isMobile ? 4 : 0 }}>
-                  <Text style={{ fontSize: 14, color: '#999' }}>Gross Annual Rent (₹)</Text>
+                  <Text style={{ fontSize: 14, color: '#999' }}>Gross Annual Rent</Text>
                   <Text style={{ fontSize: 15, color: '#444', fontWeight: '700' }}>
-                    ₹{property.raw.annualGrossRent ? property.raw.annualGrossRent + ' L' : '6,00,000'}
+                    {grossAnnualRent !== null ? formatINR(grossAnnualRent) : 'N/A'}
                   </Text>
                 </View>
-                <View style={{ flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', gap: isMobile ? 4 : 0 }}>
-                  <Text style={{ fontSize: 14, color: '#999' }}>Total Annual Expenses (₹)</Text>
-                  <Text style={{ fontSize: 15, color: '#444', fontWeight: '700' }}>₹65,000</Text>
-                </View>
+                {totalAnnualExpenses !== null && totalAnnualExpenses > 0 && (
+                  <View style={{ flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', gap: isMobile ? 4 : 0 }}>
+                    <Text style={{ fontSize: 14, color: '#999' }}>Total Annual Expenses</Text>
+                    <Text style={{ fontSize: 15, color: '#444', fontWeight: '700' }}>
+                      {formatINR(totalAnnualExpenses)}
+                    </Text>
+                  </View>
+                )}
                 <View style={{ height: 1, backgroundColor: '#EEE', marginVertical: 4 }} />
                 <View style={{ flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', gap: isMobile ? 4 : 0 }}>
-                  <Text style={{ fontSize: 15, color: '#444', fontWeight: '700' }}>Net Annual Income (₹)</Text>
+                  <Text style={{ fontSize: 15, color: '#444', fontWeight: '700' }}>Net Annual Income</Text>
                   <Text style={{ fontSize: 18, color: '#10B981', fontWeight: '800' }}>
-                    ₹{property.raw.annualGrossRent ? (property.raw.annualGrossRent - 0.65).toFixed(2) + ' L' : '5,35,000'}
+                    {netAnnualIncome !== null ? formatINR(netAnnualIncome) : 'N/A'}
                   </Text>
                 </View>
               </View>
@@ -798,135 +880,106 @@ const PropertyDetailsScreen = () => {
 
           {!isMobile && <View style={{ width: 14 }} />}
 
-          {/* Additional Income */}
-          <View style={[styles.col, { flex: isMobile ? undefined : 1 }]}>
-            <PropertyDetailsCard title="Additional Income">
-              <View style={{ gap: 20, marginTop: 10 }}>
+          {/* Additional Income - only render when we have real deposit interest data */}
+          {annualInterestOnDeposit !== null && annualInterestOnDeposit > 0 && (
+            <View style={[styles.col, { flex: isMobile ? undefined : 1 }]}>
+              <PropertyDetailsCard title="Additional Income">
+                <View style={{ gap: 20, marginTop: 10 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                    <Text style={{ fontSize: 14, color: '#999' }}>Annual Interest on Security Deposit</Text>
+                    <Text style={{ fontSize: 15, color: '#10B981', fontWeight: '700' }}>
+                      {formatINR(annualInterestOnDeposit)}
+                    </Text>
+                  </View>
+                  {totalAnnualReturn !== null && (
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
+                      <Text style={{ fontSize: 15, color: '#444', fontWeight: '700' }}>Total Annual Return</Text>
+                      <Text style={{ fontSize: 18, color: '#10B981', fontWeight: '800' }}>
+                        {formatINR(totalAnnualReturn)}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </PropertyDetailsCard>
+            </View>
+          )}
+        </View>
+
+        {/* Performance Analytics - only the Rental Yield Comparison is backed by
+            real data (grossRentalYield / netRentalYield). The fabricated expense
+            pie chart, fabricated cash-flow line chart, and fabricated 10-year
+            projection table were removed: the API returns no per-year cashflow
+            array or expense-category breakdown to render them truthfully. */}
+        {(grossRentalYield !== null || netRentalYield !== null) && (
+          <View style={{ marginTop: 24 }}>
+            <Text style={{ fontSize: 20, color: '#EE2529', fontWeight: '800', marginBottom: 20 }}>Performance Analytics</Text>
+
+            <View style={[styles.row, isMobile && { flexDirection: 'column' }]}>
+              {/* Rental Yield Comparison - bar heights derived from REAL yields */}
+              <View style={[styles.col, { flex: 1, backgroundColor: 'white', padding: 20, borderRadius: 16, elevation: 4 }]}>
+                <Text style={{ fontSize: 18, color: '#444', fontWeight: '700', textAlign: 'center', marginBottom: 20 }}>Rental Yield Comparison</Text>
+                {(() => {
+                  const maxYield = Math.max(grossRentalYield ?? 0, netRentalYield ?? 0, 0.0001);
+                  const maxBarHeight = 160;
+                  const grossH = grossRentalYield !== null ? Math.max(4, (grossRentalYield / maxYield) * maxBarHeight) : 0;
+                  const netH = netRentalYield !== null ? Math.max(4, (netRentalYield / maxYield) * maxBarHeight) : 0;
+                  return (
+                    <View style={{ height: 200, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', paddingBottom: 20, borderBottomWidth: 1, borderLeftWidth: 1, borderColor: '#CCC' }}>
+                      <View style={{ alignItems: 'center' }}>
+                        <Text style={{ fontSize: 13, color: '#B91C1C', fontWeight: '800', marginBottom: 6 }}>
+                          {grossRentalYield !== null ? `${grossRentalYield}%` : 'N/A'}
+                        </Text>
+                        <View style={{ width: 60, height: grossH, backgroundColor: '#B91C1C', borderRadius: 4 }} />
+                      </View>
+                      <View style={{ alignItems: 'center' }}>
+                        <Text style={{ fontSize: 13, color: '#06B6D4', fontWeight: '800', marginBottom: 6 }}>
+                          {netRentalYield !== null ? `${netRentalYield}%` : 'N/A'}
+                        </Text>
+                        <View style={{ width: 60, height: netH, backgroundColor: '#06B6D4', borderRadius: 4 }} />
+                      </View>
+                    </View>
+                  );
+                })()}
+                <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 10 }}>
+                  <Text style={{ fontSize: 15, color: '#B91C1C', fontWeight: '800' }}>Gross Yield</Text>
+                  <Text style={{ fontSize: 15, color: '#06B6D4', fontWeight: '800' }}>Net Yield</Text>
+                </View>
+              </View>
+            </View>
+          </View>
+        )}
+
+        {/* Cash Flow (Remaining Lease) - aggregate figures from real plgDetail.cashFlows.
+            The backend returns aggregate cash-flow totals for the remaining lease,
+            NOT a year-by-year projection, so only the real totals are shown. */}
+        {toNum(plgCashFlows.totalCashFlows) !== null && (
+          <View style={{ marginTop: 24, backgroundColor: 'white', padding: 25, borderRadius: 16, elevation: 4 }}>
+            <Text style={{ fontSize: 16, color: '#444', fontWeight: '700', textAlign: 'center', marginBottom: 20 }}>Cash Flow (Remaining Lease)</Text>
+            <View style={{ gap: 16 }}>
+              {toNum(plgCashFlows.balanceRentalCashFlowCurrentYear) !== null && (
                 <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                  <Text style={{ fontSize: 14, color: '#999' }}>Annual Interest on Security Deposit (₹)</Text>
-                  <Text style={{ fontSize: 15, color: '#10B981', fontWeight: '700' }}>₹25,500</Text>
+                  <Text style={{ fontSize: 14, color: '#999' }}>Balance Rental Cash Flow (Current Year)</Text>
+                  <Text style={{ fontSize: 15, color: '#444', fontWeight: '700' }}>{formatINR(plgCashFlows.balanceRentalCashFlowCurrentYear)}</Text>
                 </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 8 }}>
-                  <Text style={{ fontSize: 15, color: '#444', fontWeight: '700' }}>Total Annual Return (₹)</Text>
-                  <Text style={{ fontSize: 18, color: '#10B981', fontWeight: '800' }}>₹5,60,500</Text>
+              )}
+              {toNum(plgCashFlows.annualCashFlowFromRentNextYears) !== null && (
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  <Text style={{ fontSize: 14, color: '#999' }}>Annual Cash Flow From Rent (Next Years)</Text>
+                  <Text style={{ fontSize: 15, color: '#444', fontWeight: '700' }}>{formatINR(plgCashFlows.annualCashFlowFromRentNextYears)}</Text>
                 </View>
-              </View>
-            </PropertyDetailsCard>
-          </View>
-        </View>
-
-        <View style={{ marginTop: 24 }}>
-          <Text style={{ fontSize: 20, color: '#EE2529', fontWeight: '800', marginBottom: 20 }}>Performance Analytics</Text>
-          
-          <View style={[styles.row, isMobile && { flexDirection: 'column' }]}>
-            {/* Annual Expense Breakdown - Simulated Chart */}
-            <View style={[styles.col, { flex: 1, backgroundColor: 'white', padding: 20, borderRadius: 16, elevation: 4 }]}>
-              <Text style={{ fontSize: 18, color: '#444', fontWeight: '700', textAlign: 'center', marginBottom: 20 }}>Annual Expense Breakdown</Text>
-              <View style={{ height: 200, alignItems: 'center', justifyContent: 'center' }}>
-                {/* Visual Simulation of Pie Chart */}
-                <View style={{ width: 160, height: 160, borderRadius: 80, borderWidth: 30, borderColor: '#F59E0B', borderRightColor: '#06B6D4', borderBottomColor: '#0D9488', borderLeftColor: '#B91C1C' }} />
-                
-                {/* Legend Labels Overlay */}
-                <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}>
-                  <Text style={{ position: 'absolute', top: 10, left: -20, color: '#F59E0B', fontSize: 12, fontWeight: '700' }}>Maintenance 46%</Text>
-                  <Text style={{ position: 'absolute', top: 20, right: -10, color: '#06B6D4', fontSize: 12, fontWeight: '700' }}>Property Tax 18%</Text>
-                  <Text style={{ position: 'absolute', bottom: 10, left: -10, color: '#B91C1C', fontSize: 12, fontWeight: '700' }}>Insurance 12%</Text>
-                  <Text style={{ position: 'absolute', bottom: 20, right: -20, color: '#0D9488', fontSize: 12, fontWeight: '700' }}>Other Expenses 23%</Text>
-                </View>
-              </View>
-            </View>
-
-            {!isMobile && <View style={{ width: 14 }} />}
-
-            {/* Rental Yield Comparison - Simulated Chart */}
-            <View style={[styles.col, { flex: 1, backgroundColor: 'white', padding: 20, borderRadius: 16, elevation: 4 }]}>
-              <Text style={{ fontSize: 18, color: '#444', fontWeight: '700', textAlign: 'center', marginBottom: 20 }}>Rental Yield Comparison</Text>
-              <View style={{ height: 200, flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-around', paddingBottom: 20, borderBottomWidth: 1, borderLeftWidth: 1, borderColor: '#CCC' }}>
-                <View style={{ width: 60, height: 120, backgroundColor: '#B91C1C', borderRadius: 4 }} />
-                <View style={{ width: 60, height: 100, backgroundColor: '#06B6D4', borderRadius: 4 }} />
-                
-                {/* Horizontal Guide Lines */}
-                <View style={{ position: 'absolute', width: '100%', height: 1, backgroundColor: '#EEE', bottom: 60, borderStyle: 'dashed' }} />
-                <View style={{ position: 'absolute', width: '100%', height: 1, backgroundColor: '#EEE', bottom: 120, borderStyle: 'dashed' }} />
-                <View style={{ position: 'absolute', width: '100%', height: 1, backgroundColor: '#EEE', bottom: 180, borderStyle: 'dashed' }} />
-              </View>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginTop: 10 }}>
-                <Text style={{ fontSize: 15, color: '#B91C1C', fontWeight: '800' }}>Gross Yield</Text>
-                <Text style={{ fontSize: 15, color: '#06B6D4', fontWeight: '800' }}>Net Yield</Text>
+              )}
+              <View style={{ height: 1, backgroundColor: '#EEE', marginVertical: 4 }} />
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Text style={{ fontSize: 15, color: '#444', fontWeight: '700' }}>Total Cash Flows</Text>
+                <Text style={{ fontSize: 18, color: '#10B981', fontWeight: '800' }}>{formatINR(plgCashFlows.totalCashFlows)}</Text>
               </View>
             </View>
           </View>
-        </View>
-        {/* Cash Flow Projections Chart Section */}
-        <View style={{ marginTop: 24, backgroundColor: 'white', padding: 25, borderRadius: 16, elevation: 4 }}>
-          <Text style={{ fontSize: 16, color: '#444', fontWeight: '700', textAlign: 'center', marginBottom: 20 }}>Cash Flow Projections</Text>
-          <View style={{ height: 280, borderLeftWidth: 1, borderBottomWidth: 1, borderColor: '#CCC', paddingBottom: 25, paddingLeft: 10 }}>
-            {/* Horizontal Grid lines */}
-            {[0, 1, 2, 3, 4].map((i) => (
-              <View key={i} style={{ position: 'absolute', width: '100%', height: 1, backgroundColor: '#EEE', bottom: 50 * i, borderStyle: 'dashed' }} />
-            ))}
-            
-            {/* Simulation of Line Chart Lines */}
-            {/* Cumulative Cash Flow (Yellow) */}
-            <View style={{ position: 'absolute', width: '90%', height: 2, backgroundColor: '#F59E0B', bottom: 100, left: 10, transform: [{ rotate: '-12deg' }] }} />
-            
-            {/* Annual Rent (Red) */}
-            <View style={{ position: 'absolute', width: '90%', height: 2, backgroundColor: '#B91C1C', bottom: 150, left: 10, transform: [{ rotate: '-2deg' }] }} />
-            
-            {/* Annual Cash Flow (Teal) */}
-            <View style={{ position: 'absolute', width: '90%', height: 2, backgroundColor: '#0D9488', bottom: 140, left: 10, transform: [{ rotate: '-2deg' }] }} />
-            
-            {/* Y-axis labels */}
-            <View style={{ position: 'absolute', left: -55, height: '100%', justifyContent: 'space-between' }}>
-              <Text style={{ fontSize: 11, color: '#999' }}>+50L</Text>
-              <Text style={{ fontSize: 11, color: '#999' }}>+25L</Text>
-              <Text style={{ fontSize: 11, color: '#999' }}>0L</Text>
-              <Text style={{ fontSize: 11, color: '#999' }}>-25L</Text>
-              <Text style={{ fontSize: 11, color: '#999' }}>-50L</Text>
-            </View>
-          </View>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15, paddingHorizontal: 10 }}>
-            {['Year 1', 'Year 3', 'Year 5', 'Year 7', 'Year 10'].map(y => <Text key={y} style={{ fontSize: 11, color: '#999' }}>{y}</Text>)}
-          </View>
-          
-          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 20, marginTop: 24, flexWrap: 'wrap' }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#0D9488' }} /><Text style={{ fontSize: 13, color: '#0D9488', fontWeight: '800' }}>Annual Cash Flow</Text></View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#B91C1C' }} /><Text style={{ fontSize: 13, color: '#B91C1C', fontWeight: '800' }}>Annual Rent</Text></View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}><View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#F59E0B' }} /><Text style={{ fontSize: 13, color: '#F59E0B', fontWeight: '800' }}>Cumulative Cash Flow</Text></View>
-          </View>
-        </View>
-
-        {/* Detailed Cashflow Projections */}
-        <View style={{ marginTop: 24, backgroundColor: 'white', padding: 25, borderRadius: 16, elevation: 4 }}>
-          <Text style={{ fontSize: 16, color: '#444', fontWeight: '700', textAlign: 'center', marginBottom: 20 }}>Detailed Cashflow Projections</Text>
-          <View style={{ borderTopWidth: 1, borderColor: '#EEE' }}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              <View style={{ width: isMobile ? 600 : '100%' }}>
-            <View style={{ flexDirection: 'row', paddingVertical: 15, backgroundColor: '#F9FAFB', borderBottomWidth: 1, borderColor: '#EEE' }}>
-              <Text style={{ flex: 0.5, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>Year</Text>
-              <Text style={{ flex: 1, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>Annual Rent</Text>
-              <Text style={{ flex: 1, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>Net Flow</Text>
-              <Text style={{ flex: 1, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>Cumulative</Text>
-              <Text style={{ flex: 0.8, fontSize: 13, fontWeight: '800', textAlign: 'center' }}>ROI %</Text>
-            </View>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(yr => (
-              <View key={yr} style={{ flexDirection: 'row', paddingVertical: 14, borderBottomWidth: 1, borderColor: '#EEE' }}>
-                <Text style={{ flex: 0.5, fontSize: 12, textAlign: 'center', color: '#666' }}>{yr}</Text>
-                <Text style={{ flex: 1, fontSize: 12, textAlign: 'center', color: '#444' }}>₹6,00,000</Text>
-                <Text style={{ flex: 1, fontSize: 12, textAlign: 'center', color: '#0D9488', fontWeight: '700' }}>+₹5,35,000</Text>
-                <Text style={{ flex: 1, fontSize: 12, textAlign: 'center', color: yr < 7 ? '#B91C1C' : '#0D9488', fontWeight: '700' }}>
-                  {yr < 7 ? `-₹${(10-yr)*5}L` : `+₹${(yr-7)*10}L`}
-                </Text>
-                <Text style={{ flex: 0.8, fontSize: 12, textAlign: 'center', color: '#444' }}>{(yr*6.4).toFixed(1)}%</Text>
-              </View>
-            ))}
-              </View>
-            </ScrollView>
-          </View>
-        </View>
+        )}
       </View>
     </View>
-  );
+    );
+  };
 
   const renderLocationContent = () => (
     <View style={[styles.tabContent, isMobile && styles.tabContentMobile]}>
@@ -950,150 +1003,52 @@ const PropertyDetailsScreen = () => {
               </View>
             </PropertyDetailsCard>
 
-            <PropertyDetailsCard title="Demand Drivers">
-              <Text style={{ fontSize: 12, color: '#999', marginBottom: 4 }}>Proximity to major IT campuses</Text>
-              <Text style={{ fontSize: 13, color: '#444', lineHeight: 18 }}>
-                Infosys, Wipro, TCS. High demand for Grade A office spaces. Growing tech hub with multinational presence.
-              </Text>
-            </PropertyDetailsCard>
-
-            <PropertyDetailsCard title="Market Benchmark Data">
-              <View style={[styles.row, isMobile && { flexDirection: 'column', gap: 12 }]}>
-                <View style={styles.col}>
-                  <InfoRow label="Market Min Rent" value="₹45/sq.ft" />
-                  <InfoRow label="Market Max Rent" value="₹70/sq.ft" />
-                </View>
-                <View style={styles.col}>
-                  <InfoRow label="Market Avg Rent" value="₹55/sq.ft" />
-                  <InfoRow label="Market Cap Rate" value="6.5%" />
-                </View>
-              </View>
-              <View style={[styles.benchmarkNote, { marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: '#F0F0F0' }]}>
-                <Text style={{ fontSize: 12, color: '#999', marginBottom: 6 }}>Competitive Advantage</Text>
-                <Text style={{ fontSize: 13, color: '#444', fontWeight: '600', lineHeight: 18 }}>
-                  This property's rent of ₹57/sq.ft is above the market average of ₹55/sq.ft, with a net yield of 7.43% exceeding the market cap rate of 6.5%.
-                </Text>
-              </View>
-            </PropertyDetailsCard>
           </View>
 
-          {/* Right Column */}
+          {/* Right Column - Connectivity bound to REAL property.connectivity data.
+              Fabricated "Demand Drivers", "Market Benchmark Data" and
+              "Future Infrastructure" sections were removed (no backend source). */}
           <View style={styles.col}>
-            <PropertyDetailsCard title="Proximity">
-              <View style={styles.proximityItem}>
-                <View style={[styles.proximityIconLabel, { gap: 10 }]}>
-                  <Plane size={18} color="#F7C952" />
-                  <Text style={{ fontSize: 13, color: '#444', fontWeight: '500' }}>Airport</Text>
-                </View>
-                <View style={[styles.distanceBadge, { backgroundColor: '#FEF9C3' }]}>
-                  <Text style={{ fontSize: 11, color: '#854D0E', fontWeight: '600' }}>12 km</Text>
-                </View>
-              </View>
-              <View style={[styles.proximityItem, { marginTop: 12 }]}>
-                <View style={[styles.proximityIconLabel, { gap: 10 }]}>
-                  <Train size={18} color="#F7C952" />
-                  <Text style={{ fontSize: 13, color: '#444', fontWeight: '500' }}>Metro Station</Text>
-                </View>
-                <View style={[styles.distanceBadge, { backgroundColor: '#FEF9C3' }]}>
-                  <Text style={{ fontSize: 11, color: '#854D0E', fontWeight: '600' }}>1.2 km</Text>
-                </View>
-              </View>
-              <View style={[styles.proximityItem, { marginTop: 12 }]}>
-                <View style={[styles.proximityIconLabel, { gap: 10 }]}>
-                  <MapPin size={18} color="#F7C952" />
-                  <Text style={{ fontSize: 13, color: '#444', fontWeight: '500' }}>Major Junction</Text>
-                </View>
-                <View style={[styles.distanceBadge, { backgroundColor: '#FEF9C3' }]}>
-                  <Text style={{ fontSize: 11, color: '#854D0E', fontWeight: '600' }}>3.5 km</Text>
-                </View>
-              </View>
-            </PropertyDetailsCard>
-
-            <PropertyDetailsCard title="Future Infrastructure">
-              <View style={{ gap: 12 }}>
-                <Text style={{ fontSize: 13, color: '#444', fontWeight: '600' }}>• Pune Metro Line 3 extension planned (ETA 2027)</Text>
-                <Text style={{ fontSize: 13, color: '#444', fontWeight: '600' }}>• Ring Road expansion (ETA 2026)</Text>
-                <Text style={{ fontSize: 13, color: '#444', fontWeight: '600' }}>• New IT parks under development in the vicinity</Text>
-              </View>
-            </PropertyDetailsCard>
+            {Array.isArray(property.raw.connectivity) &&
+              property.raw.connectivity.filter((c: any) => c && c.name).length > 0 && (
+                <PropertyDetailsCard title="Connectivity">
+                  {property.raw.connectivity
+                    .filter((c: any) => c && c.name)
+                    .map((c: any, idx: number) => {
+                      const type = (c.connectivityType || '').toLowerCase();
+                      const ConnIcon = type.includes('airport')
+                        ? Plane
+                        : type.includes('metro') || type.includes('train') || type.includes('station') || type.includes('rail')
+                          ? Train
+                          : MapPin;
+                      const distance = c.distanceKm !== null && c.distanceKm !== undefined && c.distanceKm !== ''
+                        ? `${c.distanceKm} km`
+                        : 'N/A';
+                      return (
+                        <View
+                          key={c.connectivityId ?? idx}
+                          style={[styles.proximityItem, idx > 0 && { marginTop: 12 }]}
+                        >
+                          <View style={[styles.proximityIconLabel, { gap: 10 }]}>
+                            <ConnIcon size={18} color="#F7C952" />
+                            <Text style={{ fontSize: 13, color: '#444', fontWeight: '500' }}>
+                              {c.name}
+                              {c.connectivityType ? ` (${c.connectivityType})` : ''}
+                            </Text>
+                          </View>
+                          <View style={[styles.distanceBadge, { backgroundColor: '#FEF9C3' }]}>
+                            <Text style={{ fontSize: 11, color: '#854D0E', fontWeight: '600' }}>{distance}</Text>
+                          </View>
+                        </View>
+                      );
+                    })}
+                </PropertyDetailsCard>
+              )}
           </View>
         </View>
       </View>
     </View>
   );
-
-  const renderFAQContent = () => {
-    const faqs = [
-      {
-        id: 1,
-        q: 'Can we schedule a virtual tour?',
-        a: 'Yes, we offer virtual tours for all our listed properties. You can schedule one through our support team.',
-      },
-      {
-        id: 2,
-        q: 'What are the property tax rates?',
-        a: 'For this property in Pune, the annual property tax is approximately 0.3% to 0.5% of the market value.',
-      },
-      {
-        id: 3,
-        q: 'Are there any association fees?',
-        a: 'Yes, the monthly maintenance fee is ₹15,000 covering security and common area maintenance.',
-      },
-      {
-        id: 4,
-        q: 'What school district is it in?',
-        a: 'Located in PMC area with access to reputed CBSE/ICSE schools.',
-      },
-    ];
-
-    return (
-      <View style={[styles.tabContent, isMobile && styles.tabContentMobile]}>
-        <View style={styles.detailsHeader}>
-          <Text style={[styles.descriptionTitle, isMobile && styles.descriptionTitleMobile]}>
-            Frequently Asked Questions
-          </Text>
-          <Text style={[styles.descriptionText, isMobile && styles.descriptionTextMobile]}>
-            Get answers to common stakeholder questions
-          </Text>
-        </View>
-
-        <View style={styles.faqList}>
-          {faqs.map(faq => {
-            const isOpen = activeFaq === faq.id;
-            return (
-              <View
-                key={faq.id}
-                style={[styles.faqItem, isOpen && styles.faqItemOpen]}
-              >
-                <TouchableOpacity
-                  style={styles.faqHeader}
-                  onPress={() => setActiveFaq(isOpen ? null : faq.id)}
-                >
-                  <Text
-                    style={[styles.faqQuestion, isOpen && styles.faqTextActive]}
-                  >
-                    {faq.q}
-                  </Text>
-                  <ChevronDown
-                    size={20}
-                    color={isOpen ? COLORS.primary : COLORS.textDark}
-                    style={{
-                      transform: [{ rotate: isOpen ? '180deg' : '0deg' }],
-                    }}
-                  />
-                </TouchableOpacity>
-                {isOpen && (
-                  <View style={styles.faqAnswerContainer}>
-                    <Text style={[styles.descriptionText, isMobile && styles.descriptionTextMobile]}>{faq.a}</Text>
-                  </View>
-                )}
-              </View>
-            );
-          })}
-        </View>
-      </View>
-    );
-  };
 
   const handleAddNote = () => {
     if (!newNote.trim() || !propertyId) return;
@@ -1232,7 +1187,7 @@ const PropertyDetailsScreen = () => {
                   <View style={styles.noteTimeContainer}>
                     <Clock size={12} color={COLORS.textSecondary} />
                     <Text style={styles.noteTime}>
-                      {new Date(note.createdAt).toLocaleString()}
+                      {formatDateTime(note.createdAt)}
                     </Text>
                   </View>
                 </View>
@@ -1369,7 +1324,6 @@ const PropertyDetailsScreen = () => {
             {activeTab === 'lease' && renderLeaseContent()}
             {activeTab === 'analytics' && renderAnalyticsContent()}
             {activeTab === 'location' && renderLocationContent()}
-            {activeTab === 'faqs' && renderFAQContent()}
             {activeTab === 'notes' && renderNotesContent()}
           </View>
         </View>

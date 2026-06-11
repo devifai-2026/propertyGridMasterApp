@@ -13,7 +13,7 @@ import {
   ScrollView,
   useWindowDimensions,
 } from 'react-native';
-import { ChevronDown, Plus, X, Trash2, AlertTriangle } from 'lucide-react-native';
+import { Plus, Trash2 } from 'lucide-react-native';
 import InputError from '../../../components/common/InputError';
 import LinearGradient from 'react-native-linear-gradient';
 import CustomDropdown from './CustomDropdown';
@@ -70,7 +70,7 @@ const CITY_BY_STATE: any = {
   Haryana: ['Gurgaon', 'Faridabad', 'Hisar', 'Panipat'],
   'Himachal Pradesh': ['Shimla', 'Manali', 'Kangra'],
   Jharkhand: ['Ranchi', 'Jamshedpur', 'Dhanbad'],
-  Karnataka: ['Bangalore', 'Mysore', 'Pune', 'Mangalore', 'Belgaum'],
+  Karnataka: ['Bangalore', 'Mysore', 'Mangalore', 'Belgaum'],
   Kerala: ['Kochi', 'Thiruvananthapuram', 'Kozhikode'],
   'Madhya Pradesh': ['Indore', 'Bhopal', 'Jabalpur'],
   Maharashtra: ['Mumbai', 'Pune', 'Nagpur', 'Thane', 'Aurangabad'],
@@ -84,7 +84,7 @@ const CITY_BY_STATE: any = {
   Rajasthan: ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota'],
   Sikkim: ['Gangtok'],
   'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai', 'Salem'],
-  Telangana: ['Hyderabad', 'Secundrabad', 'Warangal'],
+  Telangana: ['Hyderabad', 'Secunderabad', 'Warangal'],
   Tripura: ['Agartala'],
   'Uttar Pradesh': ['Lucknow', 'Noida', 'Ghaziabad', 'Kanpur', 'Varanasi'],
   Uttarakhand: ['Dehradun', 'Haridwar', 'Nainital'],
@@ -260,6 +260,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
             value={formData.microMarket}
             onChangeText={v => handleInputChange('microMarket', v)}
             onBlur={(e: any) => handleBlur('microMarket', e.nativeEvent.text)}
+            maxLength={100}
           />
           <InputError message={errors.microMarket} visible={touched.microMarket && !!errors.microMarket} />
         </View>
@@ -339,6 +340,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
                   onChangeText={v =>
                     handleConnectivityChange(item.id, 'name', v)
                   }
+                  maxLength={100}
                 />
               </View>
               <View style={styles.fieldContainer}>
@@ -385,6 +387,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
             textAlignVertical="top"
             value={formData.demandDrivers}
             onChangeText={v => handleInputChange('demandDrivers', v)}
+            maxLength={2000}
           />
         </View>
 
@@ -399,6 +402,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
             textAlignVertical="top"
             value={formData.futureInfrastructure}
             onChangeText={v => handleInputChange('futureInfrastructure', v)}
+            maxLength={2000}
           />
         </View>
 
@@ -418,6 +422,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
                 placeholder="Enter Question"
                 value={faq.question}
                 onChangeText={v => handleFaqChange(faq.id, 'question', v)}
+                maxLength={200}
               />
             </View>
             <View style={styles.fieldContainer}>
@@ -429,6 +434,7 @@ const LocationDetails = forwardRef<any, LocationDetailsProps>(
                 textAlignVertical="top"
                 value={faq.answer}
                 onChangeText={v => handleFaqChange(faq.id, 'answer', v)}
+                maxLength={1000}
               />
             </View>
           </View>

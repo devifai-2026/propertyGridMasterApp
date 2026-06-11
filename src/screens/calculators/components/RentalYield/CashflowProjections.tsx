@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Share,
   Platform,
+  Alert,
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 
@@ -31,9 +32,9 @@ const CashflowProjections = ({ data }: CashFlowProjectionsProps) => {
   const calculateProjections = () => {
     const projections = [];
     let currentRent = data?.annualGrossRent || 0;
-    // Default values if data was from results state which might not have every key yet
-    const escalationEvery = 3; 
-    const escalationPercent = 8;
+    // Respect user-provided escalation inputs, falling back to sensible defaults
+    const escalationEvery = data?.rentEscalationEvery ?? 3;
+    const escalationPercent = data?.rentEscalationPercent ?? 8;
     const annualExpenses = data?.totalAnnualExpenses || 0;
     const totalInvestment = data?.totalInvestment || 1; // avoid div by zero
     
@@ -150,7 +151,15 @@ const CashflowProjections = ({ data }: CashFlowProjectionsProps) => {
           <Text style={styles.buttonText}>Download Projections</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.button, styles.buttonOutline]}>
+        <TouchableOpacity
+          style={[styles.button, styles.buttonOutline]}
+          onPress={() =>
+            Alert.alert(
+              'Detailed Report',
+              'A detailed downloadable report is coming soon. Use "Download Projections" to export the data as CSV.',
+            )
+          }
+        >
           <Text style={styles.buttonOutlineText}>View Detailed Report</Text>
         </TouchableOpacity>
       </View>

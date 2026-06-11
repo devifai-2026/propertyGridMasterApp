@@ -15,6 +15,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { COLORS, FONTS } from '../../constants/theme';
 import { useNavigation } from '../../context/NavigationContext';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
+import { formatINR } from '../../../helpers/formatPrice';
 import { useAuth } from '../../context/AuthContext';
 import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
 import Layout from '../../layout/Layout';
@@ -215,9 +216,16 @@ const EnquiriesScreen = () => {
     }
 
     const errors: string[] = [];
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!formData.question.trim()) {
       errors.push('Please enter your inquiry question.');
+    }
+
+    if (!formData.email.trim()) {
+      errors.push('Please enter your email address.');
+    } else if (!emailRegex.test(formData.email.trim())) {
+      errors.push('Please enter a valid email address.');
     }
 
     if (!isVerified) {
@@ -327,7 +335,7 @@ const EnquiriesScreen = () => {
                 <View style={styles.infoCol}>
                   <Text style={styles.infoLabel}>Cost</Text>
                   <Text style={styles.infoValue}>
-                    ₹{property.sellingPrice} Cr
+                    {formatINR(property.sellingPrice)}
                   </Text>
                 </View>
               </View>

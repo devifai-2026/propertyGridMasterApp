@@ -37,6 +37,8 @@ import LinearGradient from 'react-native-linear-gradient';
 import Layout from '../../layout/Layout';
 import PropertyCard, { Property } from '../../components/PropertyCard';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
+import { formatINR } from '../../../helpers/formatPrice';
+import { formatTenureYears } from '../../../helpers/formatDate';
 import { useCompare } from '../../context/CompareContext';
 import { COLORS, FONTS } from '../../constants/theme';
 import NoPropertiesFound from './components/NoPropertiesFound';
@@ -200,9 +202,9 @@ const ExplorePropertiesScreen = () => {
           id: item.propertyId.toString(),
           title: `${item.propertyType} Space`,
           location: `${item.city}, ${item.state}`,
-          price: `₹${item.sellingPrice ?? 0} Cr`,
-          rent: item.annualGrossRent ? `₹${item.annualGrossRent} L` : 'N/A',
-          tenure: `${item.tenureLeftYears || 0} Yrs`,
+          price: formatINR(item.sellingPrice),
+          rent: formatINR(item.annualGrossRent),
+          tenure: formatTenureYears(item.tenureLeftYears, item.leaseEndDate),
           roi: item.netRentalYield ? `${item.netRentalYield}%` : 'N/A',
           type: item.propertyType,
           images:
@@ -1127,7 +1129,7 @@ const ExplorePropertiesScreen = () => {
                     }}
                   >
                     <Text style={styles.sortBtnText}>
-                      {sortDirection === 'asc' ? 'Z-A' : 'A-Z'}
+                      {sortDirection === 'asc' ? 'A-Z' : 'Z-A'}
                     </Text>
                     <ChevronDown size={14} color="#EE2529" />
                   </TouchableOpacity>
@@ -1242,9 +1244,10 @@ const ExplorePropertiesScreen = () => {
                   <>
                     <View style={[styles.gridContainer, { justifyContent: 'center' }]}>
                 {properties.map((property, index) => {
-                  // Special Card Logic (Index 7)
-                  if (index === 7) {
-                    return (
+                  // Inject the "Need assistance" promo as an ADDITIONAL card after
+                  // index 7 — it must not replace the real property at that slot.
+                  const promoCard =
+                    index === 7 ? (
                       <View
                         key="special"
                         style={[
@@ -1274,18 +1277,19 @@ const ExplorePropertiesScreen = () => {
                           </Text>
                         </TouchableOpacity>
                       </View>
-                    );
-                  }
+                    ) : null;
 
                   return (
-                    <PropertyCard
-                      key={property.id}
-                      item={property}
-                      width={width > 768 ? '31.8%' : '100%'}
-                      isSelected={isCompareSelected(property.id)}
-                      onToggleCompare={toggleCompare}
-                      isCompare={true}
-                    />
+                    <React.Fragment key={property.id}>
+                      <PropertyCard
+                        item={property}
+                        width={width > 768 ? '31.8%' : '100%'}
+                        isSelected={isCompareSelected(property.id)}
+                        onToggleCompare={toggleCompare}
+                        isCompare={true}
+                      />
+                      {promoCard}
+                    </React.Fragment>
                   );
                 })}
                   </View>

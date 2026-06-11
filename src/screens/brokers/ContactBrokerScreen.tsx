@@ -246,10 +246,19 @@ const ContactBrokerScreen = () => {
 
   const validate = () => {
     const next: Record<string, string> = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[6-9]\d{9}$/;
+
     if (!form.fullName.trim()) next.fullName = 'Full name is required';
-    if (!form.email.trim()) next.email = 'Email is required';
+    if (!form.email.trim()) {
+      next.email = 'Email is required';
+    } else if (!emailRegex.test(form.email.trim())) {
+      next.email = 'Please enter a valid email address';
+    }
     if (!form.phoneNumber.trim()) {
       next.phoneNumber = 'Phone number is required';
+    } else if (!phoneRegex.test(form.phoneNumber.replace(/\D/g, ''))) {
+      next.phoneNumber = 'Please enter a valid 10-digit mobile number';
     } else if (!isVerified) {
       next.phoneNumber = 'Please verify your phone number first';
     }

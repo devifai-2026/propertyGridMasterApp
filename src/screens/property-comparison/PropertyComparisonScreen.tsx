@@ -9,10 +9,13 @@ import {
   ActivityIndicator,
   Share,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '../../context/NavigationContext';
 import Layout from '../../layout/Layout';
 import { COLORS } from '../../constants/theme';
+import { formatINR } from '../../../helpers/formatPrice';
+import { formatTenureYears } from '../../../helpers/formatDate';
 import {
   MapPin,
   ChevronLeft,
@@ -76,15 +79,12 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
             propertyId: data.propertyId,
             title: data.basicInfo?.propertyType || 'Property',
             location: `${data.location?.city}, ${data.location?.state}`,
-            cost: data.financial?.sellingPrice
-              ? `₹${data.financial.sellingPrice} Cr`
-              : 'N/A',
-            rent: data.rental?.totalMonthlyRent
-              ? `₹${data.rental.totalMonthlyRent}`
-              : 'N/A',
-            tenure: data.leaseDetails?.leaseDurationYears
-              ? `${data.leaseDetails.leaseDurationYears} Yrs`
-              : 'N/A',
+            cost: formatINR(data.financial?.sellingPrice),
+            rent: formatINR(data.rental?.totalMonthlyRent),
+            tenure: formatTenureYears(
+              data.leaseDetails?.leaseDurationYears,
+              data.leaseDetails?.leaseEndDate,
+            ),
             roi: data.financial?.grossRentalYield
               ? `${data.financial.grossRentalYield}%`
               : 'N/A',
@@ -110,21 +110,20 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
               data.leaseDetails.lockInPeriod.years > 0
                 ? `${data.leaseDetails.lockInPeriod.years} Yrs`
                 : 'N/A',
-            securityDeposit: data.rental?.securityDeposit?.amount
-              ? `₹${data.rental.securityDeposit.amount}`
-              : '₹0.00',
+            securityDeposit: formatINR(data.rental?.securityDeposit?.amount),
             escalation:
               data.escalationAndMaintenance?.annualEscalationPercent &&
               data.escalationAndMaintenance.annualEscalationPercent !== 'N/A'
                 ? `${data.escalationAndMaintenance.annualEscalationPercent}%`
                 : 'N/A',
-            maintenance: data.escalationAndMaintenance?.maintenanceAmount
-              ? `₹${data.escalationAndMaintenance.maintenanceAmount}`
-              : '₹0.00',
+            maintenance: formatINR(
+              data.escalationAndMaintenance?.maintenanceAmount,
+            ),
             additionalIncome:
-              data.financial?.additionalIncomeAnnual === '0.00'
-                ? '₹0.00'
-                : data.financial?.additionalIncomeAnnual || 'Nil',
+              data.financial?.additionalIncomeAnnual &&
+              parseFloat(data.financial.additionalIncomeAnnual) > 0
+                ? formatINR(data.financial.additionalIncomeAnnual)
+                : 'Nil',
             occupancyCertificate:
               typeof data.legal?.occupancyCertificate === 'string'
                 ? data.legal.occupancyCertificate.toLowerCase().includes('yes')
@@ -453,9 +452,12 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
         <View style={styles.actionButtons}>
           <TouchableOpacity
             style={styles.actionBtn}
-            onPress={() => {
-              /* Download */
-            }}
+            onPress={() =>
+              Alert.alert(
+                'Download Report',
+                'Report download is coming soon.',
+              )
+            }
           >
             <Image source={download} style={{ width: 16, height: 16 }} />
             <Text style={styles.actionBtnText}>Download Report</Text>

@@ -13,8 +13,9 @@ import {
   ScrollView,
   useWindowDimensions,
 } from 'react-native';
-import { Info, AlertTriangle } from 'lucide-react-native';
+import { Info } from 'lucide-react-native';
 import InputError from '../../../components/common/InputError';
+import { formatINR } from '../../../../helpers/formatPrice';
 
 interface FinancialDetailsProps {
   onNext: (data: any) => void;
@@ -28,8 +29,13 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
     const isSmallScreen = width < 768;
     const isMobile = width < 480;
 
-    const filterNumeric = (val: string) => {
-      return val.replace(/[^0-9]/g, '');
+    // Allows digits and a single decimal point (money fields need decimals).
+    const filterDecimal = (val: string) => {
+      const cleaned = val.replace(/[^0-9.]/g, '');
+      const parts = cleaned.split('.');
+      if (parts.length <= 1) return cleaned;
+      // Keep only the first decimal point.
+      return `${parts[0]}.${parts.slice(1).join('')}`;
     };
 
     useImperativeHandle(ref, () => ({
@@ -109,7 +115,7 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
 
       setMetrics(prev => ({
         ...prev,
-        annualOperatingCosts: `₹${opCosts.toLocaleString()}`,
+        annualOperatingCosts: formatINR(opCosts),
       }));
     };
 
@@ -157,8 +163,9 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
             placeholder="Enter Property Selling Price"
             keyboardType="numeric"
             value={formData.sellingPrice}
-            onChangeText={v => handleInputChange('sellingPrice', filterNumeric(v))}
+            onChangeText={v => handleInputChange('sellingPrice', filterDecimal(v))}
             onBlur={() => handleBlur('sellingPrice')}
+            maxLength={15}
           />
           <InputError message={errors.sellingPrice} visible={touched.sellingPrice && !!errors.sellingPrice} />
         </View>
@@ -176,8 +183,9 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
               placeholder="0"
               keyboardType="numeric"
               value={formData.propertyTax}
-              onChangeText={v => handleInputChange('propertyTax', filterNumeric(v))}
+              onChangeText={v => handleInputChange('propertyTax', filterDecimal(v))}
               onBlur={() => handleBlur('propertyTax')}
+              maxLength={15}
             />
             <InputError message={errors.propertyTax} visible={touched.propertyTax && !!errors.propertyTax} />
           </View>
@@ -192,8 +200,9 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
               placeholder="0"
               keyboardType="numeric"
               value={formData.insurance}
-              onChangeText={v => handleInputChange('insurance', filterNumeric(v))}
+              onChangeText={v => handleInputChange('insurance', filterDecimal(v))}
               onBlur={() => handleBlur('insurance')}
+              maxLength={15}
             />
             <InputError message={errors.insurance} visible={touched.insurance && !!errors.insurance} />
           </View>
@@ -206,7 +215,8 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
             placeholder="0"
             keyboardType="numeric"
             value={formData.otherCosts}
-            onChangeText={v => handleInputChange('otherCosts', filterNumeric(v))}
+            onChangeText={v => handleInputChange('otherCosts', filterDecimal(v))}
+            maxLength={15}
           />
         </View>
 
@@ -223,7 +233,8 @@ const FinancialDetails = forwardRef<any, FinancialDetailsProps>(
             placeholder="Enter Additional Income"
             keyboardType="numeric"
             value={formData.additionalIncome}
-            onChangeText={v => handleInputChange('additionalIncome', filterNumeric(v))}
+            onChangeText={v => handleInputChange('additionalIncome', filterDecimal(v))}
+            maxLength={15}
           />
           <Text style={styles.helpText}>
             Any additional income from parking, advertisements, etc.

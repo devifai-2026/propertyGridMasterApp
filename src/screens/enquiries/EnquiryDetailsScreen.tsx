@@ -18,6 +18,8 @@ import {
   MessageSquare,
 } from 'lucide-react-native';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
+import { formatINR } from '../../../helpers/formatPrice';
+import { formatDateTime } from '../../../helpers/formatDate';
 import { useNavigation } from '../../context/NavigationContext';
 import { COLORS } from '../../constants/theme';
 import Layout from '../../layout/Layout';
@@ -80,7 +82,7 @@ const EnquiryDetailsScreen = () => {
             <View style={styles.inquiryContext}>
                <View style={styles.dateBadge}>
                   <Text style={styles.dateText}>
-                    Submitted on {new Date(inquiry.createdAt).toLocaleDateString()} at {new Date(inquiry.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    Submitted on {formatDateTime(inquiry.createdAt)}
                   </Text>
                </View>
             </View>
@@ -117,7 +119,7 @@ const EnquiryDetailsScreen = () => {
                     <View style={styles.priceRow}>
                         <View>
                             <Text style={styles.priceLabel}>Selling Price</Text>
-                            <Text style={styles.priceValue}>₹{inquiry.property?.sellingPrice} Cr</Text>
+                            <Text style={styles.priceValue}>{formatINR(inquiry.property?.sellingPrice)}</Text>
                         </View>
                         <TouchableOpacity 
                             style={styles.externalLink}

@@ -31,6 +31,18 @@ import ShareIcon from './ShareIcon';
 import { usePropertyAPIs } from '../../helpers/hooks/propertyAPIs/usePropertyApis';
 declare const window: any;
 
+/**
+ * Guard a display string against raw null/undefined leaking into the UI.
+ * Callers should already pass formatted values (formatINR/formatTenureYears),
+ * but this catches the literal "null"/"undefined" strings and empty values.
+ */
+const safeValue = (v: any): string => {
+  if (v === null || v === undefined) return 'N/A';
+  const s = String(v).trim();
+  if (s === '' || s === 'null' || s === 'undefined' || s === 'NaN') return 'N/A';
+  return s;
+};
+
 export interface Property {
   id: string;
   title: string;
@@ -284,16 +296,15 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
           <View style={styles.propDetailItem}>
             <Text style={styles.detailLabel}>
               Cost:{' '}
-              <Text style={styles.detailValue}>
-                {item.price !== 'null' && item?.price ? item?.price : '0'}
-              </Text>
+              <Text style={styles.detailValue}>{safeValue(item.price)}</Text>
             </Text>
             <Text style={styles.detailLabel}>
-              Annual Rent : <Text style={styles.detailValue}>{item.rent}</Text>
+              Annual Rent :{' '}
+              <Text style={styles.detailValue}>{safeValue(item.rent)}</Text>
             </Text>
             <Text style={styles.detailLabel}>
               Tenure Left :{' '}
-              <Text style={styles.detailValue}>{item.tenure}</Text>
+              <Text style={styles.detailValue}>{safeValue(item.tenure)}</Text>
             </Text>
           </View>
 
@@ -307,8 +318,18 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
             >
               <Text style={styles.roiLabel}>ROI</Text>
               <View style={styles.roiValueContainer}>
-                <Text style={styles.roiValueText}>{item.roi}</Text>
-                <Text style={styles.percentageSymbol}>%</Text>
+                {(() => {
+                  // The "%" symbol is rendered by the UI, so strip any "%" the value
+                  // may already carry to avoid a double "%". Hide the symbol for N/A.
+                  const raw = String(item.roi ?? '').replace(/%/g, '').trim();
+                  const isNum = raw !== '' && raw.toUpperCase() !== 'N/A';
+                  return (
+                    <>
+                      <Text style={styles.roiValueText}>{isNum ? raw : 'N/A'}</Text>
+                      {isNum && <Text style={styles.percentageSymbol}>%</Text>}
+                    </>
+                  );
+                })()}
               </View>
             </LinearGradient>
           </View>

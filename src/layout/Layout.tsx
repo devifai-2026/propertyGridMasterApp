@@ -133,7 +133,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
                 <TouchableOpacity
                   style={styles.menuUserInfo}
                   onPress={() => {
-                    navigate('/my-prifile');
+                    navigate('/my-profile');
                     onClose();
                   }}
                 >
@@ -237,7 +237,7 @@ const SideMenu: React.FC<SideMenuProps> = ({
               <TouchableOpacity
                 style={styles.menuItem}
                 onPress={() => {
-                  navigate('/my-prifile');
+                  navigate('/my-dashboard');
                   onClose();
                 }}
               >
@@ -365,7 +365,28 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
   const { navigate, currentPath, openLoginModal } = useNavigation();
   const { isLoggedIn, user, logout } = useAuth();
   const [isLogoutMenuVisible, setIsLogoutMenuVisible] = useState(false);
+  // Measured position of the profile trigger so the popover anchors right under it.
+  const profileBtnRef = React.useRef<any>(null);
+  const [menuAnchor, setMenuAnchor] = useState<{ top: number; right: number }>({
+    top: 78,
+    right: 24,
+  });
   const isMobile = width < 768;
+
+  const openProfileMenu = () => {
+    const node = profileBtnRef.current;
+    if (node && typeof node.measureInWindow === 'function') {
+      node.measureInWindow((x: number, y: number, w: number, h: number) => {
+        setMenuAnchor({
+          top: y + h + 8, // just below the button
+          right: Math.max(8, width - (x + w)), // align popover's right edge to button's right edge
+        });
+        setIsLogoutMenuVisible(true);
+      });
+    } else {
+      setIsLogoutMenuVisible(v => !v);
+    }
+  };
 
   return (
     <View style={[styles.headerContainer, !isMobile && { height: 90 }]}>
@@ -441,8 +462,9 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
 
           {isLoggedIn ? (
             <TouchableOpacity
+              ref={profileBtnRef}
               style={[styles.profileBtn, isMobile && styles.profileBtnMobile]}
-              onPress={() => setIsLogoutMenuVisible(!isLogoutMenuVisible)}
+              onPress={openProfileMenu}
             >
               <View style={styles.profileCircle}>
                 {user?.profilePhoto || user?.profileImage ? (
@@ -515,14 +537,21 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
               <View
                 style={[
                   styles.logoutPopover,
-                  { right: isMobile ? '5%' : '5%', top: 75 },
+                  {
+                    // Anchored to the measured position of the profile trigger
+                    // (its actual on-screen location), so it always drops down
+                    // directly under the button regardless of header width.
+                    top: menuAnchor.top,
+                    right: menuAnchor.right,
+                    maxWidth: Math.min(180, width - 24),
+                  },
                 ]}
               >
                 <TouchableOpacity
                   style={styles.popoverItem}
                   onPress={() => {
                     setIsLogoutMenuVisible(false);
-                    navigate('/my-prifile');
+                    navigate('/my-profile');
                   }}
                 >
                   <UserIcon size={18} color="#666" />

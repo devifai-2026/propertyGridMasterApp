@@ -12,14 +12,20 @@ import { WifiOff, RotateCw } from 'lucide-react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '../../context/NavigationContext';
 
+declare const window: any;
+
 const OfflineScreen = () => {
   const { width, height } = useWindowDimensions();
   const { navigate } = useNavigation();
   const isSmallScreen = width < 768;
 
   const handleRetry = () => {
-    // In a real app, check navigator.onLine or NetInfo
-    console.log('Retrying connection...');
+    // On web, reload to re-check connectivity; native falls back to re-navigating home.
+    if (typeof window !== 'undefined' && window.location?.reload) {
+      window.location.reload();
+    } else {
+      navigate('/dashboard');
+    }
   };
 
   return (

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import PropertyCard, { Property } from '../../../components/PropertyCard';
 import { usePropertyAPIs } from '../../../../helpers/hooks/propertyAPIs/usePropertyApis';
+import { formatINR } from '../../../../helpers/formatPrice';
+import { formatTenureYears } from '../../../../helpers/formatDate';
 import { ActivityIndicator } from 'react-native';
 import { COLORS } from '../../../constants/theme';
 
@@ -16,9 +18,9 @@ const WishlistTab = () => {
           id: item.propertyId,
           title: `${item.propertyType} Space`,
           location: `${item.city}, ${item.state}`,
-          price: `₹${item.sellingPrice} Cr`,
-          rent: item.annualGrossRent ? `₹${item.annualGrossRent} L` : 'N/A',
-          tenure: `${item.tenureLeftYears || 0} Yrs`,
+          price: formatINR(item.sellingPrice),
+          rent: formatINR(item.annualGrossRent),
+          tenure: formatTenureYears(item.tenureLeftYears, item.leaseEndDate),
           roi: item.netRentalYield ? `${item.netRentalYield}%` : 'N/A',
           type: item.propertyType,
           images:

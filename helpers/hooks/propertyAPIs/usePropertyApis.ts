@@ -375,9 +375,124 @@ export const usePropertyAPIs = () => {
     });
   };
 
+  const getBlogs = (
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: '/v1/blogs',
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data.data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
+  const getBlogBySlug = (
+    slug: string,
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: `/v1/blogs/${slug}`,
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data.data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
+  const getNotifications = (
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: '/v1/admin/notifications',
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data.data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
+  const markAllNotificationsRead = (
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.patch({
+      route: '/v1/admin/notifications/read-all',
+      payload: {},
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
+  const markNotificationRead = (
+    id: string,
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.patch({
+      route: `/v1/admin/notifications/${id}/read`,
+      payload: {},
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
+  const createSupportRequest = (
+    payload: {
+      name: string;
+      email: string;
+      phone: string;
+      subject: string;
+      message: string;
+    },
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    // Works for guest or logged-in users: request.ts/getHeaders() auto-attaches
+    // the auth header when a token is present, so no special handling needed.
+    apiCall.post({
+      route: '/v1/support-requests',
+      payload,
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   return {
     getProperties,
     getPropertyById,
+    getBlogs,
+    getBlogBySlug,
+    getNotifications,
+    markAllNotificationsRead,
+    markNotificationRead,
     getOwnerNotes,
     getPropertyNotesForOwner,
     addOwnerNote,
@@ -396,6 +511,7 @@ export const usePropertyAPIs = () => {
     getBrokerStats,
     contactBroker,
     calculatePLG,
+    createSupportRequest,
     loading,
   };
 };

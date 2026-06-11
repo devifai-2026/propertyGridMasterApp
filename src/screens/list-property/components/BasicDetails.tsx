@@ -631,6 +631,7 @@ const BasicDetails = forwardRef<any, BasicDetailsProps>(
             textAlignVertical="top"
             value={formData.propertyDescription}
             onChangeText={v => handleInputChange('propertyDescription', v)}
+            maxLength={2000}
           />
         </View>
 

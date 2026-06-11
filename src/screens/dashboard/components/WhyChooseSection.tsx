@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { COLORS, FONTS } from '../../../constants/theme';
 import LinearGradient from 'react-native-linear-gradient';
+import { useNavigation } from '../../../context/NavigationContext';
 
 const FEATURES = [
   {
@@ -57,11 +58,11 @@ const FeatureItem = ({ item }: { item: (typeof FEATURES)[0] }) => {
 
 const WhyChooseSection = () => {
   const { width } = useWindowDimensions();
+  const { navigate } = useNavigation();
   const isMobile = width < 900;
 
   const handleExplorePress = () => {
-    // Add your navigation logic here
-    console.log('Explore more pressed');
+    navigate('/explore-properties');
   };
 
   return (

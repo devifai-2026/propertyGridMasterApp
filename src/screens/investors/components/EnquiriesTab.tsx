@@ -8,6 +8,8 @@ import {
   Dimensions,
 } from 'react-native';
 import { usePropertyAPIs } from '../../../../helpers/hooks/propertyAPIs/usePropertyApis';
+import { formatINR } from '../../../../helpers/formatPrice';
+import { formatDate } from '../../../../helpers/formatDate';
 import { useNavigation } from '../../../context/NavigationContext';
 import { COLORS } from '../../../constants/theme';
 import { ActivityIndicator } from 'react-native';
@@ -71,7 +73,7 @@ const EnquiriesTab = ({ roleType }: { roleType?: 'investor' | 'broker' }) => {
             enquiries.map(item => (
               <View key={item.id} style={[styles.tableRow, styles.tableDataRow]}>
                 <Text style={[styles.tableDataText, { flex: 1 }]}>
-                  {new Date(item.createdAt).toLocaleDateString()}
+                  {formatDate(item.createdAt)}
                 </Text>
                 <Text style={[styles.tableDataText, { flex: 1.5 }]}>
                   {item.property?.propertyType} Space
@@ -83,7 +85,7 @@ const EnquiriesTab = ({ roleType }: { roleType?: 'investor' | 'broker' }) => {
                   {item.inquirer?.firstName} {item.inquirer?.lastName}
                 </Text>
                 <Text style={[styles.tableDataText, { flex: 1 }]}>
-                  ₹{item.property?.sellingPrice} Cr
+                  {formatINR(item.property?.sellingPrice)}
                 </Text>
                 <TouchableOpacity
                   style={styles.viewButton}

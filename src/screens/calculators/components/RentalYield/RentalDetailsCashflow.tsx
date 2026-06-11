@@ -50,8 +50,8 @@ const RentalDetailsCashflow = ({ data }: RentalDetailsCashflowProps) => {
   const calculateDetailedCashflow = () => {
     const details = [];
     let currentRent = data?.annualGrossRent || 0;
-    const escalationEvery = 3;
-    const escalationPercent = 8;
+    const escalationEvery = data?.rentEscalationEvery ?? 3;
+    const escalationPercent = data?.rentEscalationPercent ?? 8;
     const annualExpenses = data?.totalAnnualExpenses || 0;
     const monthlyEMI = data?.monthlyEMI || 0;
     const annualEMI = monthlyEMI * 12;

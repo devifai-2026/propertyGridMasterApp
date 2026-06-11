@@ -127,9 +127,13 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
             ]}
           >
             <View style={{ alignItems: isMobile ? 'center' : 'flex-start' }}>
-              <Text style={styles.brokerCompany}>{capitalize(item.name) || "APJ Realtors"}</Text>
+              <Text style={styles.brokerCompany}>{capitalize(item.name) || 'N/A'}</Text>
               <Image
-                source={require('../../../assets/ExploreBrokers/cardImg.png')}
+                source={
+                  item.profilePhoto
+                    ? { uri: item.profilePhoto }
+                    : require('../../../assets/ExploreBrokers/cardImg.png')
+                }
                 style={styles.brokerImage}
                 resizeMode="cover"
               />
@@ -169,7 +173,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
                   { fontSize: isMobile ? 24 : 32, textAlign: !isMobile ? 'left' : 'center' },
                 ]}
               >
-                {capitalize(item.agentName) || "Rajendra P"}
+                {capitalize(item.agentName) || 'N/A'}
               </Text>
               <View
                 style={[
@@ -178,8 +182,8 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
                 ]}
               >
                 <MapPin size={isMobile ? 14 : 18} color="#EE2529" />
-                <Text style={[styles.locationText, isMobile && { fontSize: 14 }]}>{item.location || "Pune"}</Text>
-                <Text style={[styles.reraText, isMobile && { fontSize: 14 }]}>RERA : {item.rera || "123456789"}</Text>
+                <Text style={[styles.locationText, isMobile && { fontSize: 14 }]}>{item.location || 'N/A'}</Text>
+                <Text style={[styles.reraText, isMobile && { fontSize: 14 }]}>RERA : {item.rera || 'N/A'}</Text>
               </View>
 
               <View style={styles.divider} />
@@ -193,7 +197,7 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
                 >
                   Specializes In:
                 </Text>
-                {(item.tags && item.tags.length > 0 ? item.tags : ['MNC Client', 'Industrial', 'Residential', 'Commercial', 'Office Lease']).map((tag: any, idx: number) => (
+                {(item.tags && item.tags.length > 0 ? item.tags : []).map((tag: any, idx: number) => (
                   <View key={idx} style={styles.tag}>
                     <Text style={[styles.tagText, isMobile && { fontSize: 14 }]}>{tag}</Text>
                   </View>
@@ -203,11 +207,11 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
 
             <View style={styles.statsColumn}>
               <View style={styles.statLine}>
-                <Text style={[styles.statHighlight, isMobile && { fontSize: 16 }]}>{item.propertiesListed || 7}</Text>
+                <Text style={[styles.statHighlight, isMobile && { fontSize: 16 }]}>{item.propertiesListed ?? 0}</Text>
                 <Text style={[styles.statLabel, isMobile && { fontSize: 14 }]}>Properties Listed</Text>
               </View>
               <View style={styles.statLine}>
-                <Text style={[styles.statHighlight, isMobile && { fontSize: 16 }]}>{item.dealsClosed || 45}</Text>
+                <Text style={[styles.statHighlight, isMobile && { fontSize: 16 }]}>{item.dealsClosed ?? 0}</Text>
                 <Text style={[styles.statLabel, isMobile && { fontSize: 14 }]}>Deals Closed</Text>
               </View>
             </View>
@@ -225,14 +229,14 @@ const BrokerCard: React.FC<BrokerCardProps> = ({
         
         <View style={[styles.cardContentBack, { padding: isMobile ? 12 : 30 }]}>
           <View style={[styles.backHeader, isMobile && { flexDirection: 'column', gap: 5, alignItems: 'flex-start' }]}>
-            <Text style={[styles.backAgentName, isMobile && { fontSize: 20 }]}>{capitalize(item.agentName) || "Rajendra P"}</Text>
-            <Text style={[styles.backCompany, isMobile && { fontSize: 14 }]}>{capitalize(item.name) || "APJ Realtors"}</Text>
+            <Text style={[styles.backAgentName, isMobile && { fontSize: 20 }]}>{capitalize(item.agentName) || 'N/A'}</Text>
+            <Text style={[styles.backCompany, isMobile && { fontSize: 14 }]}>{capitalize(item.name) || 'N/A'}</Text>
           </View>
-          
+
           <View style={[styles.backDivider, isMobile && { marginVertical: 10 }]} />
-          
+
           <Text style={[styles.backDescription, isMobile && { fontSize: 13, lineHeight: 18 }]}>
-            {item.description || `${item.name || "APJ Realtors"} is a dynamic real estate firm dedicated to helping clients find their perfect property. Whether you're buying, selling, or investing, our expert team combines market insight with personalized service to ensure a smooth and successful experience. At APJ, we make your real estate journey our top priority`}
+            {item.description || 'N/A'}
           </Text>
           
           <View style={styles.backFooter}>

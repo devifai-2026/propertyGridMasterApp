@@ -12,6 +12,7 @@ import PropertyCard, { Property } from '../../../components/PropertyCard';
 import { useAuth } from '../../../context/AuthContext';
 import { COLORS } from '../../../constants/theme';
 import { usePropertyAPIs } from '../../../../helpers/hooks/propertyAPIs/usePropertyApis';
+import { formatINR, formatTenureYears } from '../../../../helpers';
 
 const { width } = Dimensions.get('window');
 const isDesktop = width > 1024;
@@ -46,9 +47,9 @@ const PortfolioTab = () => {
           id: item.propertyId,
           title: item.propertyType || 'Property',
           location: `${item.microMarket || ''}, ${item.city || ''}`.trim() || 'N/A',
-          price: item.sellingPrice ? `₹${item.sellingPrice}` : 'N/A',
-          rent: item.annualGrossRent ? `₹${item.annualGrossRent}` : 'N/A',
-          tenure: item.leaseEndDate ? `${new Date(item.leaseEndDate).toLocaleDateString()}` : 'N/A',
+          price: formatINR(item.sellingPrice),
+          rent: formatINR(item.annualGrossRent),
+          tenure: formatTenureYears(item.tenureLeftYears, item.leaseEndDate),
           roi: item.grossRentalYield ? `${item.grossRentalYield}%` : 'N/A',
           type: item.propertyType || 'N/A',
           images: item.media?.length > 0 ? item.media.map((m: any) => m.fileUrl) : null,

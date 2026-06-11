@@ -13,6 +13,8 @@ import { COLORS, FONTS } from '../../../constants/theme';
 import PropertyCard, { Property } from '../../../components/PropertyCard';
 import { useCompare } from '../../../context/CompareContext';
 import LinearGradient from 'react-native-linear-gradient';
+import { formatINR } from '../../../../helpers/formatPrice';
+import { formatTenureYears } from '../../../../helpers/formatDate';
 
 const PropertyCardSkeleton = ({ width }: { width: number }) => {
   const pulseAnim = React.useRef(new Animated.Value(0.3)).current;
@@ -83,16 +85,14 @@ const FeaturedSection = ({ properties, loading }: { properties: any[]; loading?:
         id: p.propertyId,
         title: p.propertyType || 'Property',
         location: `${p.city || ''}, ${p.state || ''}`,
-        price: p.sellingPrice ? `₹${p.sellingPrice} Cr` : 'N/A',
+        price: formatINR(p.sellingPrice),
         rent:
           parseFloat(p.totalMonthlyRent) > 0
-            ? `₹${p.totalMonthlyRent}`
+            ? formatINR(p.totalMonthlyRent)
             : parseFloat(p.rentPerSqftMonthly) > 0
-              ? `₹${p.rentPerSqftMonthly}`
+              ? formatINR(p.rentPerSqftMonthly)
               : 'N/A',
-        tenure: p.leaseDurationYears
-          ? `${parseFloat(p.leaseDurationYears).toFixed(1)} Yrs`
-          : 'N/A',
+        tenure: formatTenureYears(p.leaseDurationYears, p.leaseEndDate),
         roi: p.grossRentalYield ? `${p.grossRentalYield}%` : 'N/A',
         type: p.propertyType,
         images:

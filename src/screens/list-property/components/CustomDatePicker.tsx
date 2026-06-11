@@ -58,7 +58,11 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
     );
   }
 
-  // Fallback for native: Displays value with an icon (interactive picker would require native library)
+  // TODO(native): This is a display-only fallback on iOS/Android — it shows the
+  // value with a calendar icon but has no interactive picker, which blocks
+  // list-property Step 4 on mobile. Wire up a native date picker (e.g.
+  // @react-native-community/datetimepicker) before shipping the native build.
+  // Web already uses the native <input type="date"> above.
   return (
     <View style={[styles.container, error && styles.errorBorder]}>
       <Text style={[styles.text, isMobile && styles.textMobile, !value && styles.placeholder]}>

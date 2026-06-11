@@ -206,6 +206,10 @@ const DiscoveryWizard = () => {
     if (selections.roi)
       queryParams.push(`minROI=${selections.roi.value || selections.roi}`);
     if (selections.type) queryParams.push(`propertyTypes=${selections.type}`);
+    if (selections.tenant)
+      queryParams.push(
+        `tenantType=${selections.tenant.value || selections.tenant}`,
+      );
     if (selections.budget) {
       queryParams.push(
         `minPrice=${selections.budget.value?.min || selections.budget.min || 0

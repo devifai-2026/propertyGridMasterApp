@@ -60,7 +60,12 @@ const ProfileScreen = () => {
       // Fetch available roles for switching
       getAvailableRoles((res: any) => {
         if (res.success && Array.isArray(res.data)) {
-          setAvailableRoles(res.data);
+          // API returns objects {roleName, isAcquired, ...}; the UI renders role
+          // NAMES (strings). Normalize so we never render an object as a React child.
+          const names = res.data
+            .map((r: any) => (typeof r === 'string' ? r : r?.roleName))
+            .filter(Boolean);
+          setAvailableRoles(names);
         }
       });
     }
@@ -212,6 +217,16 @@ const ProfileScreen = () => {
               <Text style={styles.roleText}>{user?.role || 'Investor'}</Text>
             </View>
           </View>
+
+          {/* Quick link to the investor dashboard (properties invested/enquired) */}
+          <TouchableOpacity
+            style={styles.dashboardBtn}
+            onPress={() => navigate('/my-dashboard')}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.dashboardBtnText}>View My Dashboard</Text>
+            <ChevronRight size={20} color="#FFF" />
+          </TouchableOpacity>
 
           {/* Details Section */}
           <View style={styles.section}>
@@ -509,6 +524,21 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.primary,
     textTransform: 'uppercase',
+  },
+  dashboardBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: COLORS.primary,
+    paddingVertical: 14,
+    borderRadius: 12,
+    marginBottom: 24,
+  },
+  dashboardBtnText: {
+    color: '#FFF',
+    fontSize: 15,
+    fontWeight: '700',
   },
   section: {
     marginBottom: 24,

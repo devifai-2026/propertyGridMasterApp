@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   ImageBackground,
+  Alert,
 } from 'react-native';
 import { Building2, ArrowUp, Bell, PhoneCall, Lightbulb } from 'lucide-react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -14,15 +15,25 @@ interface ReachedTheEndProps {
   propertyCount: number;
   onGoToTop: () => void;
   onContactSupport?: () => void;
+  onSetUpAlerts?: () => void;
 }
 
-const ReachedTheEnd: React.FC<ReachedTheEndProps> = ({ 
-  propertyCount = 5, 
+const ReachedTheEnd: React.FC<ReachedTheEndProps> = ({
+  propertyCount = 5,
   onGoToTop,
-  onContactSupport
+  onContactSupport,
+  onSetUpAlerts
 }) => {
   const { width } = useWindowDimensions();
   const isSmallScreen = width < 768;
+
+  const handleSetUpAlerts =
+    onSetUpAlerts ||
+    (() =>
+      Alert.alert(
+        'Set Up Alerts',
+        "We'll notify you when new properties match your criteria. This feature is coming soon.",
+      ));
 
   return (
     <View style={styles.container}>
@@ -69,7 +80,10 @@ const ReachedTheEnd: React.FC<ReachedTheEndProps> = ({
               <Text style={styles.cardText}>
                 Be the first to know when new properties matching your preferences are listed.
               </Text>
-              <TouchableOpacity style={styles.cardActionBtn}>
+              <TouchableOpacity
+                style={styles.cardActionBtn}
+                onPress={handleSetUpAlerts}
+              >
                 <LinearGradient
                   colors={['#EE2529', '#C73834']}
                   start={{ x: 0, y: 0 }}

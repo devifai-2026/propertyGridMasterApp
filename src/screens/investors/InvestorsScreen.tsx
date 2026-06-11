@@ -23,6 +23,9 @@ import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
 import { decodeResponseData } from '../../../helpers/api/decoder';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
 import PropertyCard, { Property } from '../../components/PropertyCard';
+import { useWishlist } from '../../context/WishlistContext';
+import { useNavigation } from '../../context/NavigationContext';
+import { formatINR, formatDate, formatTenureYears } from '../../../helpers';
 
 const BrokerTabView = () => {
   const { user } = useAuth();
@@ -61,9 +64,9 @@ const BrokerTabView = () => {
             id: item.propertyId,
             title: item.propertyType || 'Property',
             location: `${item.microMarket || ''}, ${item.city || ''}`.trim() || 'N/A',
-            price: item.sellingPrice ? `₹${item.sellingPrice}` : 'N/A',
-            rent: item.annualGrossRent ? `₹${item.annualGrossRent}` : 'N/A',
-            tenure: item.leaseEndDate ? `${new Date(item.leaseEndDate).toLocaleDateString()}` : 'N/A',
+            price: formatINR(item.sellingPrice),
+            rent: formatINR(item.annualGrossRent),
+            tenure: formatTenureYears(item.tenureLeftYears, item.leaseEndDate),
             roi: item.grossRentalYield ? `${item.grossRentalYield}%` : 'N/A',
             type: item.propertyType || 'N/A',
             images: item.media?.length > 0 ? item.media.map((m: any) => m.fileUrl) : null,
@@ -215,13 +218,21 @@ const OwnerTabView = () => {
 
 const InvestorsScreen = () => {
   const { user, updateUser } = useAuth();
+  const { navigate } = useNavigation();
   const { getAvailableRoles } = useAuthAPIs();
+  const { getMyInquiries } = usePropertyAPIs();
+  const { likedPropertyIds } = useWishlist();
   const [activeTab, setActiveTab] = useState<
     'Broker' | 'Investor' | 'Owner' | 'Wishlist'
   >('Broker');
   const [roleStatuses, setRoleStatuses] = useState<any[]>([]);
   const [loadingRoles, setLoadingRoles] = useState(true);
+  const [enquiredCount, setEnquiredCount] = useState(0);
   const { sendOtp, changeMobile, loading: authLoading } = useAuthAPIs();
+
+  // Wishlist/likes count used as a proxy for "properties invested" until a
+  // dedicated investments API exists.
+  const investedCount = likedPropertyIds?.size ?? 0;
 
   // Change Mobile State
   const [isMobileModalVisible, setIsMobileModalVisible] = useState(false);
@@ -301,17 +312,25 @@ const InvestorsScreen = () => {
         setLoadingRoles(false);
       },
     );
+
+    // Bind the "enquired" stat to the user's actual inquiries.
+    getMyInquiries(
+      (data: any) => {
+        if (Array.isArray(data)) setEnquiredCount(data.length);
+      },
+      () => {},
+    );
   }, []);
 
-  // Mock User if not available
+  // Mock User if not available (only used in the logged-out fallback).
+  // createdAt/lastLoginAt are intentionally omitted here so the fallback shows
+  // 'N/A'; for a real logged-in user these come from the login API.
   const userData = user || {
     name: 'Rohit Sharma',
     role: 'Investor',
     email: 'rohit.sharma@example.com',
     mobileNumber: '+91 98765 43210',
     mobile: '+91 98765 43210',
-    joined: '26 Aug 2025',
-    lastLogin: '13 Aug 2025',
   };
 
   const isLocked = (roleName: string) => {
@@ -395,12 +414,12 @@ const InvestorsScreen = () => {
               <View style={styles.statsDivider}>
                 <View style={styles.statItem}>
                   <Text style={styles.statLabel}>{"PROPERTIES\nINVESTED"}</Text>
-                  <Text style={styles.statNumber}>4</Text>
+                  <Text style={styles.statNumber}>{investedCount}</Text>
                 </View>
                 <View style={styles.verticalLine} />
                 <View style={styles.statItem}>
                   <Text style={styles.statLabel}>{"PROPERTIES\nENQUIRED"}</Text>
-                  <Text style={styles.statNumber}>2</Text>
+                  <Text style={styles.statNumber}>{enquiredCount}</Text>
                 </View>
               </View>
 
@@ -431,7 +450,14 @@ const InvestorsScreen = () => {
 
               <View style={styles.cardFooter}>
                 <Text style={styles.footerText}>
-                  Joined on: {userData.joined} Last log in: {userData.lastLogin}
+                  Joined on:{' '}
+                  {formatDate(
+                    (userData as any).createdAt ?? (userData as any).joined,
+                  )}{' '}
+                  Last log in:{' '}
+                  {formatDate(
+                    (userData as any).lastLoginAt ?? (userData as any).lastLogin,
+                  )}
                 </Text>
               </View>
             </View>
@@ -443,7 +469,10 @@ const InvestorsScreen = () => {
                 here to guide you each step. Get clear answers on rental yields,
                 ROI, and compliance directly from our property advisors.
               </Text>
-              <TouchableOpacity style={styles.supportBtn}>
+              <TouchableOpacity
+                style={styles.supportBtn}
+                onPress={() => navigate('/support')}
+              >
                 <Text style={styles.supportBtnText}>Get Support</Text>
               </TouchableOpacity>
             </View>

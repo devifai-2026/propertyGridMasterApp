@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   useWindowDimensions,
+  Alert,
 } from 'react-native';
 import { ChevronDown } from 'lucide-react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -32,13 +33,35 @@ const ContactForm = () => {
   ];
 
   const handleChange = (name: string, value: string) => {
+    const cleanValue =
+      name === 'phone' ? value.replace(/[^0-9]/g, '') : value;
     setFormData(prev => ({
       ...prev,
-      [name]: value,
+      [name]: cleanValue,
     }));
   };
 
   const handleSubmit = () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[6-9]\d{9}$/;
+
+    if (!formData.name.trim()) {
+      Alert.alert('Validation', 'Please enter your name.');
+      return;
+    }
+    if (!emailRegex.test(formData.email.trim())) {
+      Alert.alert('Validation', 'Please enter a valid email address.');
+      return;
+    }
+    if (formData.phone && !phoneRegex.test(formData.phone)) {
+      Alert.alert('Validation', 'Please enter a valid 10-digit mobile number.');
+      return;
+    }
+    if (!formData.message.trim()) {
+      Alert.alert('Validation', 'Please enter a message.');
+      return;
+    }
+
     console.log('Form submitted:', formData);
     // Add submission logic here
   };
@@ -56,6 +79,7 @@ const ContactForm = () => {
               placeholder="Your full name"
               value={formData.name}
               onChangeText={text => handleChange('name', text)}
+              maxLength={60}
             />
           </View>
           <View style={styles.inputGroup}>
@@ -128,6 +152,7 @@ const ContactForm = () => {
             textAlignVertical="top"
             value={formData.message}
             onChangeText={text => handleChange('message', text)}
+            maxLength={1000}
           />
         </View>
 

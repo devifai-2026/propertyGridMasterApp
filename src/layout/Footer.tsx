@@ -6,14 +6,25 @@ import {
   TouchableOpacity,
   StyleSheet,
   useWindowDimensions,
+  Linking,
 } from 'react-native';
 import { useNavigation } from '../context/NavigationContext';
 import instagram from '../assets/Footer/Instagram.png';
 import linkedin from '../assets/Footer/linkedin.png';
 
+// TODO: replace with the brand's real social profiles
+const SOCIAL_LINKS = {
+  instagram: 'https://www.instagram.com/preleasegrid',
+  linkedin: 'https://www.linkedin.com/company/preleasegrid',
+};
+
 const Footer = () => {
   const { width } = useWindowDimensions();
   const { navigate } = useNavigation();
+
+  const openExternal = (url: string) => {
+    Linking.openURL(url).catch(() => {});
+  };
   const isMobile = width < 768;
   const isTablet = width >= 768 && width < 1024;
   const isDesktop = width >= 1024;
@@ -106,13 +117,21 @@ const Footer = () => {
         <View style={styles.bottomSection}>
           <View style={[styles.footerBottomRow, isMobile && styles.footerBottomRowMobile]}>
             <Text style={styles.copyrightLabel}>
-              © 2025 PreLeaseGrid |{'  '}All Rights Reserved
+              © {new Date().getFullYear()} PreLeaseGrid |{'  '}All Rights Reserved
             </Text>
             <View style={styles.socialIcons}>
-              <TouchableOpacity style={styles.iconContainer}>
+              <TouchableOpacity
+                style={styles.iconContainer}
+                onPress={() => openExternal(SOCIAL_LINKS.instagram)}
+                accessibilityLabel="PreLeaseGrid on Instagram"
+              >
                 <Image source={instagram} style={styles.socialIcon} resizeMode="contain" />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.iconContainer}>
+              <TouchableOpacity
+                style={styles.iconContainer}
+                onPress={() => openExternal(SOCIAL_LINKS.linkedin)}
+                accessibilityLabel="PreLeaseGrid on LinkedIn"
+              >
                 <Image source={linkedin} style={styles.socialIcon} resizeMode="contain" />
               </TouchableOpacity>
             </View>

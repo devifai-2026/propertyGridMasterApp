@@ -73,10 +73,17 @@ const refreshAccessToken = async (): Promise<string | null> => {
 };
 
 const handleRefreshFailure = async () => {
-  // Refresh truly failed → clear auth so the app routes back to login,
-  // instead of bubbling the 401 to the UI as "access token expired".
+  // Refresh truly failed (refresh token invalid/expired) → clear auth and kick the
+  // user out to login, instead of bubbling the 401 to the UI as "access token expired".
   try {
-    await AsyncStorage.removeItem('user');
+    await AsyncStorage.multiRemove(['user', 'accessToken', 'token', 'isLoggedIn']);
+  } catch {}
+  // On web, force navigation to the login screen.
+  try {
+    const w: any = typeof window !== 'undefined' ? window : null;
+    if (w?.location && !String(w.location.pathname).startsWith('/login')) {
+      w.location.href = '/login';
+    }
   } catch {}
 };
 

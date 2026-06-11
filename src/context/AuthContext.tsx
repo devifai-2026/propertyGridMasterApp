@@ -23,6 +23,9 @@ interface User {
   mobile?: string;
   joined?: string;
   lastLogin?: string;
+  // Real timestamps now returned by the login API.
+  createdAt?: string;
+  lastLoginAt?: string;
   accessToken: string;
   refreshToken: string;
   profileImage?: string;
@@ -77,6 +80,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         ...userData,
         role: userData.role || (Array.isArray(userData.roles) ? userData.roles[0] : null),
         token: userData.accessToken, // for backward compatibility with headers.ts
+        // Explicitly persist the real timestamps the login API now returns so
+        // they survive into the stored user object (and aren't dropped if the
+        // login payload is ever reshaped before being passed here).
+        createdAt: userData.createdAt ?? userData.joined,
+        lastLoginAt: userData.lastLoginAt ?? userData.lastLogin,
       };
       await AsyncStorage.setItem('user', JSON.stringify(userToStore));
       setIsLoggedIn(true);

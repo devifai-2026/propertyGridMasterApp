@@ -13,7 +13,7 @@ import {
   ScrollView,
   useWindowDimensions,
 } from 'react-native';
-import { ChevronDown, Info, AlertTriangle } from 'lucide-react-native';
+import { ChevronDown } from 'lucide-react-native';
 import InputError from '../../../components/common/InputError';
 import CustomDropdown from './CustomDropdown';
 import CustomDatePicker from './CustomDatePicker';
@@ -43,8 +43,18 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
     const isSmallScreen = width < 768;
     const isMobile = width < 480;
 
+    // Integers only.
     const filterNumeric = (val: string) => {
       return val.replace(/[^0-9]/g, '');
+    };
+
+    // Allows digits and a single decimal point (for money / per-sq-ft fields).
+    const filterDecimal = (val: string) => {
+      const cleaned = val.replace(/[^0-9.]/g, '');
+      const parts = cleaned.split('.');
+      if (parts.length <= 1) return cleaned;
+      // Keep only the first decimal point.
+      return `${parts[0]}.${parts.slice(1).join('')}`;
     };
 
     useImperativeHandle(ref, () => ({
@@ -150,6 +160,8 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
           if (!value) return 'Annual Escalation is required';
           if (!/^\d+(\.\d+)?$/.test(value))
             return 'Please enter a valid percentage';
+          if (parseFloat(value) > 100)
+            return 'Escalation cannot exceed 100%';
           return '';
         case 'escalationFrequency':
           if (!value) return 'Frequency is required';
@@ -252,7 +264,16 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                 placeholder="Months"
                 keyboardType="numeric"
                 value={formData.lockInMonths}
-                onChangeText={v => handleInputChange('lockInMonths', filterNumeric(v))}
+                onChangeText={v => {
+                  // Months must stay within 0-11; anything higher rolls into years.
+                  const digits = filterNumeric(v);
+                  if (digits === '') {
+                    handleInputChange('lockInMonths', '');
+                    return;
+                  }
+                  const clamped = Math.min(11, Math.max(0, parseInt(digits, 10)));
+                  handleInputChange('lockInMonths', String(clamped));
+                }}
               />
             </View>
           </View>
@@ -378,7 +399,8 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                 placeholder="0.00"
                 keyboardType="numeric"
                 value={formData.rentPerSqFt}
-                onChangeText={v => handleInputChange('rentPerSqFt', filterNumeric(v))}
+                onChangeText={v => handleInputChange('rentPerSqFt', filterDecimal(v))}
+                maxLength={15}
                 onBlur={(e: any) =>
                   handleBlur('rentPerSqFt', e.nativeEvent.text)
                 }
@@ -399,7 +421,8 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                 placeholder="0.00"
                 keyboardType="numeric"
                 value={formData.totalMonthlyRent}
-                onChangeText={v => handleInputChange('totalMonthlyRent', filterNumeric(v))}
+                onChangeText={v => handleInputChange('totalMonthlyRent', filterDecimal(v))}
+                maxLength={15}
                 onBlur={(e: any) =>
                   handleBlur('totalMonthlyRent', e.nativeEvent.text)
                 }
@@ -446,8 +469,9 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                 keyboardType="numeric"
                 value={formData.securityDepositAmount}
                 onChangeText={v =>
-                  handleInputChange('securityDepositAmount', filterNumeric(v))
+                  handleInputChange('securityDepositAmount', filterDecimal(v))
                 }
+                maxLength={15}
                 onBlur={(e: any) =>
                   handleBlur('securityDepositAmount', e.nativeEvent.text)
                 }
@@ -492,7 +516,8 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
               placeholder="0 %"
               keyboardType="numeric"
               value={formData.escalationPercentage}
-              onChangeText={v => handleInputChange('escalationPercentage', filterNumeric(v))}
+              onChangeText={v => handleInputChange('escalationPercentage', filterDecimal(v))}
+              maxLength={6}
               onBlur={(e: any) =>
                 handleBlur('escalationPercentage', e.nativeEvent.text)
               }
@@ -545,7 +570,8 @@ const LeaseDetails = forwardRef<any, LeaseDetailsProps>(
                 placeholder="0.00"
                 keyboardType="numeric"
                 value={formData.maintenanceAmount}
-                onChangeText={v => handleInputChange('maintenanceAmount', filterNumeric(v))}
+                onChangeText={v => handleInputChange('maintenanceAmount', filterDecimal(v))}
+                maxLength={15}
               />
             </View>
           </View>

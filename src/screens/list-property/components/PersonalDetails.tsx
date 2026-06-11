@@ -221,6 +221,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
               onChangeText={text => handleChange('firstName', text)}
               placeholder="Enter Your First Name"
               placeholderTextColor="#999"
+              maxLength={60}
               onBlur={(e: any) => handleBlur('firstName', e.nativeEvent.text)}
             />
             <InputError message={errors.firstName} visible={touched.firstName && !!errors.firstName} />
@@ -238,6 +239,7 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
               onChangeText={text => handleChange('lastName', text)}
               placeholder="Enter Your Last Name"
               placeholderTextColor="#999"
+              maxLength={60}
               onBlur={(e: any) => handleBlur('lastName', e.nativeEvent.text)}
             />
             <InputError message={errors.lastName} visible={touched.lastName && !!errors.lastName} />

@@ -281,6 +281,29 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
                 />
               </View>
 
+              {__DEV__ && (
+                <View style={styles.demoBox}>
+                  <Text style={styles.demoTitle}>Demo accounts · OTP 111111</Text>
+                  {[
+                    { label: 'Owner', num: '8000000001' },
+                    { label: 'Investor', num: '8000000002' },
+                    { label: 'Broker', num: '8000000003' },
+                  ].map(d => (
+                    <TouchableOpacity
+                      key={d.num}
+                      onPress={() => {
+                        setPhone(d.num);
+                        setErrorMsg('');
+                      }}
+                    >
+                      <Text style={styles.demoRow}>
+                        {d.label} — {d.num}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+
               <View style={styles.buttonRowMain}>
                 <TouchableOpacity
                   style={styles.btnOutline}
@@ -412,6 +435,28 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
 };
 
 const styles = StyleSheet.create({
+  /* ── Demo credentials (dev only) ── */
+  demoBox: {
+    marginTop: 12,
+    padding: 12,
+    borderRadius: 10,
+    backgroundColor: '#FFF5F5',
+    borderWidth: 1,
+    borderColor: '#FBD5D5',
+  },
+  demoTitle: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#EE2529',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 6,
+  },
+  demoRow: {
+    fontSize: 13,
+    color: '#374151',
+    paddingVertical: 3,
+  },
   /* ── Overlay ── */
   modalOverlay: {
     flex: 1,
