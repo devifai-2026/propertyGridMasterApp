@@ -217,15 +217,20 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
             }
           } else {
             setOtpError(true);
+            // Show the server's reason (e.g. "Account does not exist, please
+            // sign up first") instead of a misleading OTP error.
             setErrorMsg(
-              "That doesn't seem right. Double-check your OTP and try once more.",
+              response?.message ||
+                "That doesn't seem right. Double-check your OTP and try once more.",
             );
           }
         },
         (error: any) => {
           setOtpError(true);
           setErrorMsg(
-            "That doesn't seem right. Double-check your OTP and try once more.",
+            error?.response?.data?.message ||
+              error?.message ||
+              "That doesn't seem right. Double-check your OTP and try once more.",
           );
         },
       );

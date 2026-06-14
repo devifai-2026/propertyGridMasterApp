@@ -54,9 +54,13 @@ module.exports = {
 
   // configures where the build out should go
   output: {
-    filename: 'bundle.web.js',
+    // Content-hashed filename so browsers/CDNs can't serve a stale cached
+    // bundle after a deploy — each build gets a unique name and index.html
+    // (via HtmlWebpackPlugin) references the current one automatically.
+    filename: 'bundle.web.[contenthash].js',
     path: path.resolve(appDirectory, 'dist'),
     publicPath: '/',
+    clean: true,
   },
 
   module: {
