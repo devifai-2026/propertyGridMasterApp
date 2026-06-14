@@ -127,13 +127,13 @@ const EnquiriesScreen = () => {
     setFormData(prev => ({ ...prev, otp: otpValue }));
 
     // Auto-focus next input if digit entered
-    if (digit && index < 5) {
+    if (digit && index < 3) {
       otpInputRefs.current[index + 1]?.focus();
     }
 
-    // Auto-verify when 6th digit is entered
-    if (digit && index === 5) {
-      if (otpValue.length === 6) {
+    // Auto-verify when 4th digit is entered
+    if (digit && index === 3) {
+      if (otpValue.length === 4) {
         setTimeout(() => {
           handleVerifyOTP(otpValue);
         }, 100);
@@ -168,7 +168,7 @@ const EnquiriesScreen = () => {
             }, 100);
             showPopup(
               'OTP Sent',
-              'A 6-digit OTP has been sent to your mobile number',
+              'A 4-digit OTP has been sent to your mobile number',
               'success'
             );
           } else {
@@ -193,8 +193,8 @@ const EnquiriesScreen = () => {
 
   const handleVerifyOTP = (otpValue?: string) => {
     const code = otpValue || formData.otp;
-    if (code.length !== 6) {
-      showPopup('Error', 'Please enter a 6-digit OTP');
+    if (code.length !== 4) {
+      showPopup('Error', 'Please enter a 4-digit OTP');
       return;
     }
 
@@ -471,7 +471,7 @@ const EnquiriesScreen = () => {
                   <View style={styles.inputGroup}>
                     <Text style={styles.label}>OTP</Text>
                     <View style={styles.otpContainer}>
-                      {[0, 1, 2, 3, 4, 5].map(idx => (
+                      {[0, 1, 2, 3].map(idx => (
                         <TextInput
                           key={idx}
                           ref={ref => {
@@ -486,7 +486,7 @@ const EnquiriesScreen = () => {
                           selectTextOnFocus
                         />
                       ))}
-                      {formData.otp.length === 6 && (
+                      {formData.otp.length === 4 && (
                         <TouchableOpacity
                           onPress={() => handleVerifyOTP()}
                           disabled={authLoading}

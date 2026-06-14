@@ -585,7 +585,7 @@ const InvestorsScreen = () => {
                     keyboardType="number-pad"
                     value={otp}
                     onChangeText={setOtp}
-                    maxLength={6}
+                    maxLength={4}
                   />
                   <TouchableOpacity
                     style={styles.modalActionBtn}

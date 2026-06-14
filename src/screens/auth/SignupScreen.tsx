@@ -238,8 +238,8 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
     const newOtp = arr.join('');
     setOtp(newOtp);
     setOtpError('');
-    if (digit && index < 5) otpInputRefs.current[index + 1]?.focus();
-    setOtpFilled(newOtp.length === 6 && !newOtp.includes(''));
+    if (digit && index < 3) otpInputRefs.current[index + 1]?.focus();
+    setOtpFilled(newOtp.length === 4 && !newOtp.includes(''));
   };
 
   const handleOtpKeyPress = (e: any, index: number) => {
@@ -273,7 +273,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
   // ── Screen 3 → Submit
   const handleVerifyAndSignup = async () => {
-    if (otp.length < 6) {
+    if (otp.length < 4) {
       setOtpError('Please enter the complete OTP');
       return;
     }
@@ -962,7 +962,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
       </Text>
 
       <View style={styles.otpRow}>
-        {[0, 1, 2, 3, 4, 5].map(index => (
+        {[0, 1, 2, 3].map(index => (
           <TextInput
             key={index}
             ref={ref => {

@@ -164,12 +164,12 @@ const ContactBrokerScreen = () => {
     const otpValue = newOtp.join('');
     set('otp', otpValue);
 
-    if (digit && index < 5) {
+    if (digit && index < 3) {
       otpInputRefs.current[index + 1]?.focus();
     }
 
-    if (digit && index === 5) {
-      if (otpValue.length === 6) {
+    if (digit && index === 3) {
+      if (otpValue.length === 4) {
         setTimeout(() => {
           handleVerifyOTP(otpValue);
         }, 100);
@@ -198,7 +198,7 @@ const ContactBrokerScreen = () => {
             }, 100);
             showPopup(
               'OTP Sent',
-              'A 6-digit OTP has been sent to your mobile number',
+              'A 4-digit OTP has been sent to your mobile number',
               'success'
             );
           } else {
@@ -219,8 +219,8 @@ const ContactBrokerScreen = () => {
 
   const handleVerifyOTP = (otpValue?: string) => {
     const code = otpValue || form.otp;
-    if (code.length !== 6) {
-      showPopup('Error', 'Please enter a 6-digit OTP');
+    if (code.length !== 4) {
+      showPopup('Error', 'Please enter a 4-digit OTP');
       return;
     }
     if (!verificationId) {
@@ -474,7 +474,7 @@ const ContactBrokerScreen = () => {
             <View style={styles.inputGroup}>
               <Text style={styles.label}>OTP</Text>
               <View style={[styles.otpContainer, isVerified && { opacity: 0.6 }]}>
-                {[0, 1, 2, 3, 4, 5].map(idx => (
+                {[0, 1, 2, 3].map(idx => (
                   <TextInput
                     key={idx}
                     ref={ref => {
@@ -493,7 +493,7 @@ const ContactBrokerScreen = () => {
                     selectTextOnFocus
                   />
                 ))}
-                {!isVerified && form.otp.length === 6 && (
+                {!isVerified && form.otp.length === 4 && (
                   <TouchableOpacity
                     onPress={() => handleVerifyOTP()}
                     disabled={authLoading}

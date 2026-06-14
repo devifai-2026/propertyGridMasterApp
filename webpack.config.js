@@ -68,7 +68,10 @@ module.exports = {
       template: path.resolve(appDirectory, 'web/index.html'),
     }),
     new webpack.DefinePlugin({
-      __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production'),
+      // Default to production-safe: only true when NODE_ENV is explicitly
+      // "development". An unset NODE_ENV resolves to false (prod) so a stray
+      // `webpack --mode production` can't bake in the localhost API URL.
+      __DEV__: JSON.stringify(process.env.NODE_ENV === 'development'),
     }),
   ],
 

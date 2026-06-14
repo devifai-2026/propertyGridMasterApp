@@ -1,0 +1,8 @@
+# SPA fallback: serve index.html for any path that isn't a real file/dir,
+# so client-side routes (deep links, refresh) work instead of 404ing.
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.html$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]

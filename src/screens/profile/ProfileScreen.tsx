@@ -120,7 +120,7 @@ const ProfileScreen = () => {
 
   const handleChangeMobile = () => {
     setMobileApiError('');
-    if (otp.length < 6) {
+    if (otp.length < 4) {
       setMobileApiError('Please enter a valid OTP');
       return;
     }
@@ -408,8 +408,8 @@ const ProfileScreen = () => {
                   value={otp}
                   onChangeText={setOtp}
                   keyboardType="number-pad"
-                  maxLength={6}
-                  placeholder="Enter 6-digit OTP"
+                  maxLength={4}
+                  placeholder="Enter 4-digit OTP"
                 />
                 {mobileApiError ? (
                   <Text style={styles.errorText}>{mobileApiError}</Text>
