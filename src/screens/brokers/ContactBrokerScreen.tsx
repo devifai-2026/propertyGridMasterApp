@@ -8,6 +8,7 @@ import {
   ScrollView,
   useWindowDimensions,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import { ChevronDown, Phone, Mail, CheckCircle2, Check } from 'lucide-react-native';
 import InputError from '../../components/common/InputError';
@@ -400,7 +401,7 @@ const ContactBrokerScreen = () => {
               <Text style={styles.label}>Full Name</Text>
               <TextInput
                 style={[styles.input, errors.fullName && styles.inputError]}
-                placeholder="Rohit Sharma"
+                placeholder="Enter your full name"
                 placeholderTextColor="#aaa"
                 value={form.fullName}
                 onChangeText={t => set('fullName', t)}
@@ -635,14 +636,19 @@ const ContactBrokerScreen = () => {
               <Text style={styles.contactBlockTitle}>Quick Call</Text>
             </View>
             <Text style={styles.contactBlockSub}>Need immediate assistance?</Text>
-            <TouchableOpacity activeOpacity={0.8}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() =>
+                Linking.openURL('tel:+919527044344').catch(() => {})
+              }
+            >
               <LinearGradient
                 colors={['#EE2529', '#C73834']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.contactBtn}
               >
-                <Text style={styles.contactBtnText}>Call +91 1800-XXX-XXXX</Text>
+                <Text style={styles.contactBtnText}>Call +91 95270 44344</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
@@ -657,7 +663,14 @@ const ContactBrokerScreen = () => {
               <Text style={styles.contactBlockTitle}>Email Us</Text>
             </View>
             <Text style={styles.contactBlockSub}>Prefer email communication?</Text>
-            <TouchableOpacity activeOpacity={0.8}>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() =>
+                Linking.openURL('mailto:soham@dolphingroup.net.in').catch(
+                  () => {},
+                )
+              }
+            >
               <LinearGradient
                 colors={['#EE2529', '#C73834']}
                 start={{ x: 0, y: 0 }}

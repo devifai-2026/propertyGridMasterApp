@@ -7,9 +7,11 @@ import {
   StyleSheet,
   useWindowDimensions,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { ChevronDown } from 'lucide-react-native';
 import LinearGradient from 'react-native-linear-gradient';
+import { apiCall } from '../../../../helpers/api';
 
 const ContactForm = () => {
   const { width } = useWindowDimensions();
@@ -23,6 +25,7 @@ const ContactForm = () => {
     message: '',
   });
   const [showRoleDropdown, setShowRoleDropdown] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const roles = [
     { value: 'investor', label: 'Investor' },
@@ -62,8 +65,31 @@ const ContactForm = () => {
       return;
     }
 
-    console.log('Form submitted:', formData);
-    // Add submission logic here
+    apiCall.post({
+      route: '/v1/contact-leads',
+      payload: {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone || undefined,
+        role: formData.role || undefined,
+        message: formData.message.trim(),
+      },
+      setLoading: setSubmitting,
+      onSuccess: () => {
+        Alert.alert(
+          'Message sent',
+          "Thanks for reaching out! Our team will get back to you soon.",
+        );
+        setFormData({ name: '', email: '', phone: '', role: '', message: '' });
+      },
+      onError: (error: any) => {
+        Alert.alert(
+          'Submission failed',
+          error?.response?.data?.message ||
+            'Something went wrong. Please try again.',
+        );
+      },
+    });
   };
 
   return (
@@ -156,14 +182,18 @@ const ContactForm = () => {
           />
         </View>
 
-        <TouchableOpacity onPress={handleSubmit}>
+        <TouchableOpacity onPress={handleSubmit} disabled={submitting}>
           <LinearGradient
             colors={['#EE2529', '#C73834']}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
-            style={styles.submitButton}
+            style={[styles.submitButton, submitting && { opacity: 0.7 }]}
           >
-            <Text style={styles.submitButtonText}>Send Message</Text>
+            {submitting ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.submitButtonText}>Send Message</Text>
+            )}
           </LinearGradient>
         </TouchableOpacity>
       </View>

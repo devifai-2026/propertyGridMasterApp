@@ -55,9 +55,16 @@ const formatRelativeTime = (value?: string) => {
   });
 };
 
+// Map the logged-in user's role to the dashboard tab to open.
+const tabForRole = (role?: string) => {
+  if (role === 'Broker') return 'Broker';
+  if (role === 'Owner') return 'Owner';
+  return 'Investor';
+};
+
 const NotificationsScreen = () => {
   const { width } = useWindowDimensions();
-  const { isLoggedIn, isLoading } = useAuth();
+  const { isLoggedIn, isLoading, user } = useAuth();
   const { navigate } = useNavigation();
   const {
     getNotifications,
@@ -111,6 +118,8 @@ const NotificationsScreen = () => {
     markNotificationRead(id, undefined, err =>
       console.error('Error marking notification read:', err),
     );
+    // Open the dashboard on the tab matching the user's role.
+    navigate(`/my-dashboard?tab=${tabForRole(user?.role)}`);
   };
 
   if (isLoading || !isLoggedIn) {

@@ -20,6 +20,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Heart,
+  MessageSquare,
 } from 'lucide-react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { COLORS, FONTS } from '../constants/theme';
@@ -71,6 +72,11 @@ interface PropertyCardProps {
   onEnquire?: (id: string) => void;
   style?: ViewStyle;
   iscomparePage?: boolean;
+  // Force the "your listing" treatment (hides Enquire/wishlist). When omitted,
+  // it's derived from the property's owner/broker ids vs the logged-in user.
+  isOwnListing?: boolean;
+  // Count of new (approved, unseen) notes on this property — shows a badge.
+  newNoteCount?: number;
 }
 
 const PropertyCard: React.FC<PropertyCardProps> = ({
@@ -85,6 +91,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   onView,
   onEnquire,
   style,
+  isOwnListing: isOwnListingProp,
+  newNoteCount = 0,
 }) => {
   const { width: screenWidth } = useWindowDimensions();
   const isMobile = screenWidth < 768;
@@ -100,7 +108,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
   // be able to enquire on or wishlist their own listing.
   const raw: any = (item as any).raw || {};
   const ownerIds = [raw.ownerId, raw.brokerId, raw.added_by, raw.salesId].filter(Boolean);
-  const isOwnListing = !!user?.userId && ownerIds.includes(user.userId);
+  const isOwnListing =
+    isOwnListingProp ?? (!!user?.userId && ownerIds.includes(user.userId));
 
   useEffect(() => {
     setIsLiked(likedPropertyIds.has(item.id));
@@ -214,6 +223,33 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
 
       {/* Image Section */}
       <View style={styles.propImageContainer}>
+        {/* Pending verification badge — overlaid on the image (top-left) so it
+            doesn't collide with the title/location in the header. Shown on the
+            owner's own listing while admin verification is still pending. */}
+        {isOwnListing &&
+          item.isVerified !== 'partial' &&
+          item.isVerified !== 'completed' && (
+            <View style={styles.pendingBadge}>
+              <Text style={styles.pendingBadgeText}>Awaiting Confirmation</Text>
+            </View>
+          )}
+
+        {/* New approved notes badge — stacks below the pending badge if present. */}
+        {newNoteCount > 0 && (
+          <View
+            style={[
+              styles.newNotesBadge,
+              isOwnListing &&
+                item.isVerified !== 'partial' &&
+                item.isVerified !== 'completed' && { top: 54 },
+            ]}
+          >
+            <MessageSquare size={12} color="#FFFFFF" />
+            <Text style={styles.newNotesBadgeText}>
+              {newNoteCount} new note{newNoteCount > 1 ? 's' : ''}
+            </Text>
+          </View>
+        )}
         {!hasImages ? (
           <View style={[styles.propImage, styles.noImageContainer]}>
             <LucideImage size={40} color={COLORS.textSecondary} />
@@ -362,7 +398,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({
                 if (user) {
                   handleEnquire();
                 } else {
-                  openLoginModal();
+                  // Logged out — open login, then resume to the enquiry page
+                  // for this property after a successful login.
+                  openLoginModal(`/enquiry/${item.id}`);
                 }
               }}
               style={styles.enquireBtnWrapper}
@@ -463,6 +501,43 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     lineHeight: 16,
     letterSpacing: 0,
+  },
+  pendingBadge: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    zIndex: 5,
+    backgroundColor: '#FEF3C7',
+    borderWidth: 1,
+    borderColor: '#FCD34D',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 100,
+  },
+  pendingBadgeText: {
+    fontFamily: 'Montserrat',
+    color: '#92400E',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  newNotesBadge: {
+    position: 'absolute',
+    top: 16,
+    left: 16,
+    zIndex: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    backgroundColor: '#EE2529',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 100,
+  },
+  newNotesBadgeText: {
+    fontFamily: 'Montserrat',
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
   },
   propImageContainer: {
     height: 240,

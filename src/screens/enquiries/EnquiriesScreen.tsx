@@ -78,6 +78,10 @@ const EnquiriesScreen = () => {
         phone: user.mobileNumber || '',
         inquirerRoleType: user.role === 'Broker' ? 'broker' : 'investor',
       }));
+      // The logged-in user already verified this number at login, so pre-verify
+      // it — OTP is only needed if they CHANGE the number (handleInputChange
+      // resets isVerified=false when the phone field changes).
+      if (user.mobileNumber) setIsVerified(true);
     }
   }, [user]);
 
@@ -89,6 +93,15 @@ const EnquiriesScreen = () => {
     }
   }, [propertyId]);
 
+  // Open a legal page in a new browser tab (web). Used by the inline
+  // terms/privacy links so tapping the link doesn't toggle the checkbox.
+  const openLegalPage = (path: string) => {
+    const win = (globalThis as any).window;
+    if (win && win.open) {
+      win.open(path, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   const handleInputChange = (name: string, value: any) => {
     let sanitizedValue = value;
     if (name === 'phone') {
@@ -96,7 +109,10 @@ const EnquiriesScreen = () => {
     }
     setFormData(prev => ({ ...prev, [name]: sanitizedValue }));
     if (name === 'phone') {
-      setIsVerified(false);
+      // The user's own (already-verified) number needs no OTP; any other number
+      // does. Re-checks on every edit so changing back to their own re-verifies.
+      const isOwnNumber = !!user?.mobileNumber && sanitizedValue === user.mobileNumber;
+      setIsVerified(isOwnNumber);
       setOtpSent(false);
     }
   };
@@ -344,9 +360,14 @@ const EnquiriesScreen = () => {
             <View style={styles.descriptionContainer}>
               <Text style={styles.infoLabel}>Description</Text>
               <Text style={styles.descriptionText}>
-                The retail property diversification strategy focuses on spreading
-                investments across various types of retail spaces, such as
-                shopping malls, stand-alone stores, and mixed-use developments.
+                {property.description?.trim()
+                  ? property.description
+                  : `${property.propertyType || 'This'} property` +
+                    `${property.microMarket ? ` in ${property.microMarket}` : ''}` +
+                    `${property.city ? `, ${property.city}` : ''}` +
+                    `${property.buildingGrade ? ` — a ${property.buildingGrade}-grade building` : ''}` +
+                    `${property.netRentalYield ? ` offering a ${property.netRentalYield}% rental yield` : ''}` +
+                    '.'}
               </Text>
             </View>
 
@@ -433,7 +454,7 @@ const EnquiriesScreen = () => {
                       </LinearGradient>
                     </TouchableOpacity>
                   </View>
-                  {!isVerified && (
+                  {otpSent && !isVerified && (
                     <Text style={styles.otpHelpText}>
                       Didn't received OTP?{' '}
                       <Text style={styles.link} onPress={handleSendOTP}>
@@ -443,60 +464,49 @@ const EnquiriesScreen = () => {
                   )}
                 </View>
 
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>OTP</Text>
-                  <View
-                    style={[styles.otpContainer, isVerified && { opacity: 0.6 }]}
-                  >
-                    {[0, 1, 2, 3, 4, 5].map(idx => (
-                      <TextInput
-                        key={idx}
-                        ref={ref => {
-                          otpInputRefs.current[idx] = ref;
-                        }}
-                        style={[
-                          styles.otpInput,
-                          isVerified && styles.otpInputVerified,
-                        ]}
-                        value={formData.otp[idx] || ''}
-                        onChangeText={v => handleOtpChange(idx, v)}
-                        onKeyPress={e => handleOtpKeyPress(e, idx)}
-                        keyboardType="numeric"
-                        maxLength={1}
-                        editable={!isVerified}
-                        selectTextOnFocus
-                      />
-                    ))}
-                    {!isVerified && formData.otp.length === 6 && (
-                      <TouchableOpacity
-                        onPress={() => handleVerifyOTP()}
-                        disabled={authLoading}
-                        style={{ marginLeft: 4, borderRadius: 8, overflow: 'hidden' }}
-                      >
-                        <LinearGradient
-                          colors={['#EE2529', '#C73834']}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 1, y: 0 }}
-                          style={styles.verifyBtn}
+                {/* Only show OTP entry when an OTP has actually been sent and
+                    the number isn't yet verified — i.e. the user entered a new
+                    number. A pre-verified (own) number shows no OTP boxes. */}
+                {otpSent && !isVerified && (
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.label}>OTP</Text>
+                    <View style={styles.otpContainer}>
+                      {[0, 1, 2, 3, 4, 5].map(idx => (
+                        <TextInput
+                          key={idx}
+                          ref={ref => {
+                            otpInputRefs.current[idx] = ref;
+                          }}
+                          style={styles.otpInput}
+                          value={formData.otp[idx] || ''}
+                          onChangeText={v => handleOtpChange(idx, v)}
+                          onKeyPress={e => handleOtpKeyPress(e, idx)}
+                          keyboardType="numeric"
+                          maxLength={1}
+                          selectTextOnFocus
+                        />
+                      ))}
+                      {formData.otp.length === 6 && (
+                        <TouchableOpacity
+                          onPress={() => handleVerifyOTP()}
+                          disabled={authLoading}
+                          style={{ marginLeft: 4, borderRadius: 8, overflow: 'hidden' }}
                         >
-                          <Text style={styles.verifyBtnText}>
-                            {authLoading ? '...' : 'Verify'}
-                          </Text>
-                        </LinearGradient>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                  {isVerified && (
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 8 }}>
-                      <View style={styles.verifiedBadge}>
-                        <Check size={16} color={COLORS.white} />
-                      </View>
-                      <Text style={[styles.verifiedText, { marginTop: 0, marginLeft: 6 }]}>
-                        Verified
-                      </Text>
+                          <LinearGradient
+                            colors={['#EE2529', '#C73834']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.verifyBtn}
+                          >
+                            <Text style={styles.verifyBtnText}>
+                              {authLoading ? '...' : 'Verify'}
+                            </Text>
+                          </LinearGradient>
+                        </TouchableOpacity>
+                      )}
                     </View>
-                  )}
-                </View>
+                  </View>
+                )}
               </View>
 
               <View style={styles.inputGroup}>
@@ -533,7 +543,15 @@ const EnquiriesScreen = () => {
                 </View>
                 <Text style={styles.checkboxLabel}>
                   I agree to the{' '}
-                  <Text style={styles.blueLink}>terms & conditions</Text>
+                  <Text
+                    style={styles.blueLink}
+                    onPress={(e: any) => {
+                      e?.stopPropagation?.();
+                      openLegalPage('/terms-of-service');
+                    }}
+                  >
+                    terms & conditions
+                  </Text>
                 </Text>
               </TouchableOpacity>
 
@@ -554,7 +572,16 @@ const EnquiriesScreen = () => {
                   )}
                 </View>
                 <Text style={styles.checkboxLabel}>
-                  I agree to the <Text style={styles.blueLink}>Privacy Policy</Text>
+                  I agree to the{' '}
+                  <Text
+                    style={styles.blueLink}
+                    onPress={(e: any) => {
+                      e?.stopPropagation?.();
+                      openLegalPage('/privacy-policy');
+                    }}
+                  >
+                    Privacy Policy
+                  </Text>
                 </Text>
               </TouchableOpacity>
 

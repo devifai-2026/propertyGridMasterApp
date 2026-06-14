@@ -54,8 +54,8 @@ const SupportScreen = () => {
     },
   ];
 
-  const SUPPORT_EMAIL = 'support@preleasegrid.com';
-  const SUPPORT_PHONE = '+919876543210';
+  const SUPPORT_EMAIL = 'soham@dolphingroup.net.in';
+  const SUPPORT_PHONE = '+919527044344';
 
   // Prefill from the logged-in user when available.
   const [form, setForm] = useState({

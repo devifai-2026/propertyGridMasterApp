@@ -222,9 +222,21 @@ const InvestorsScreen = () => {
   const { getAvailableRoles } = useAuthAPIs();
   const { getMyInquiries } = usePropertyAPIs();
   const { likedPropertyIds } = useWishlist();
+  // Allow a starting tab via ?tab= (e.g. when arriving from a notification).
+  const initialTab = (() => {
+    const valid = ['Broker', 'Investor', 'Owner', 'Wishlist'];
+    try {
+      const q = (globalThis as any).window?.location?.search || '';
+      const t = new URLSearchParams(q).get('tab');
+      if (t && valid.includes(t)) return t as any;
+    } catch {
+      /* ignore */
+    }
+    return 'Broker';
+  })();
   const [activeTab, setActiveTab] = useState<
     'Broker' | 'Investor' | 'Owner' | 'Wishlist'
-  >('Broker');
+  >(initialTab);
   const [roleStatuses, setRoleStatuses] = useState<any[]>([]);
   const [loadingRoles, setLoadingRoles] = useState(true);
   const [enquiredCount, setEnquiredCount] = useState(0);
@@ -326,11 +338,11 @@ const InvestorsScreen = () => {
   // createdAt/lastLoginAt are intentionally omitted here so the fallback shows
   // 'N/A'; for a real logged-in user these come from the login API.
   const userData = user || {
-    name: 'Rohit Sharma',
+    name: 'Guest',
     role: 'Investor',
-    email: 'rohit.sharma@example.com',
-    mobileNumber: '+91 98765 43210',
-    mobile: '+91 98765 43210',
+    email: '',
+    mobileNumber: '',
+    mobile: '',
   };
 
   const isLocked = (roleName: string) => {

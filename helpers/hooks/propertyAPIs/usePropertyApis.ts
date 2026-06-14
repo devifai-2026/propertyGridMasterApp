@@ -297,6 +297,41 @@ export const usePropertyAPIs = () => {
     });
   };
  
+  // Enquiry conversation thread (inquirer side).
+  const getInquiryMessages = (
+    inquiryId: string,
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: `/v1/inquiries/${inquiryId}/messages`,
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data.data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+    });
+  };
+
+  const postInquiryMessage = (
+    inquiryId: string,
+    message: string,
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.post({
+      route: `/v1/inquiries/${inquiryId}/messages`,
+      payload: { message },
+      onSuccess: data => {
+        if (onSuccess) onSuccess(data);
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+    });
+  };
+
   const getBrokerStats = (
     onSuccess?: (data: any) => void,
     onError?: (error: any) => void,
@@ -508,6 +543,8 @@ export const usePropertyAPIs = () => {
     checkIfLiked,
     getMyInquiries,
     getInquiryById,
+    getInquiryMessages,
+    postInquiryMessage,
     getBrokerStats,
     contactBroker,
     calculatePLG,

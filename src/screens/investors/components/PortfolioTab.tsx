@@ -13,6 +13,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { COLORS } from '../../../constants/theme';
 import { usePropertyAPIs } from '../../../../helpers/hooks/propertyAPIs/usePropertyApis';
 import { formatINR, formatTenureYears } from '../../../../helpers';
+import { getNotesSeenAt, markNotesSeenAt } from '../../../../helpers/ownerNotesSeen';
 
 const { width } = Dimensions.get('window');
 const isDesktop = width > 1024;
@@ -28,12 +29,14 @@ const getFromDate = (filter: string) => {
 
 const PortfolioTab = () => {
   const { user } = useAuth();
-  const { getProperties, loading: propertiesLoading } = usePropertyAPIs();
+  const { getProperties, getOwnerNotes, loading: propertiesLoading } = usePropertyAPIs();
   const [propertiesOwned, setPropertiesOwned] = useState<Property[]>([]);
   const [dateFilter, setDateFilter] = useState('Last 30 Days');
   const [sortBy, setSortBy] = useState('Date');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
   const [showDateDropdown, setShowDateDropdown] = useState(false);
+  // Map of propertyId -> count of approved notes newer than last-seen.
+  const [newNotesByProperty, setNewNotesByProperty] = useState<Record<string, number>>({});
 
   const fetchProperties = (filter: string, sort: string) => {
     if (!user?.userId) return;
@@ -65,9 +68,44 @@ const PortfolioTab = () => {
     }, query);
   };
 
+  // Fetch the owner's approved notes and count, per property, how many were
+  // approved since the owner last viewed them ("new since last visit").
+  const fetchNewNotes = () => {
+    if (!user?.userId) return;
+    getOwnerNotes((data: any) => {
+      const notes: any[] = Array.isArray(data) ? data : data?.notes || [];
+      const counts: Record<string, number> = {};
+      notes.forEach(n => {
+        if (n.status && n.status !== 'approved') return;
+        if (!n.propertyId) return;
+        // "New" = approved after the owner last viewed THIS property's notes.
+        const seenAt = getNotesSeenAt(user.userId, n.propertyId);
+        const ts = new Date(n.updatedAt || n.createdAt).getTime();
+        if (ts > seenAt) {
+          counts[n.propertyId] = (counts[n.propertyId] || 0) + 1;
+        }
+      });
+      setNewNotesByProperty(counts);
+    });
+  };
+
   useEffect(() => {
     fetchProperties(dateFilter, sortBy);
+    fetchNewNotes();
   }, [user?.userId, user?.role]);
+
+  // When the owner opens a property, mark ITS notes as seen so the badge clears
+  // for that property only.
+  const markNotesSeen = (propertyId: string) => {
+    markNotesSeenAt(user?.userId, propertyId);
+    setNewNotesByProperty(prev => {
+      const next = { ...prev };
+      delete next[propertyId];
+      return next;
+    });
+  };
+
+  const totalNewNotes = Object.values(newNotesByProperty).reduce((a, b) => a + b, 0);
 
   const handleDateFilter = (opt: string) => {
     setDateFilter(opt);
@@ -129,6 +167,17 @@ const PortfolioTab = () => {
           </View>
         </View>
 
+        {/* Dashboard-level alert: new approved notes since last visit */}
+        {totalNewNotes > 0 && (
+          <View style={styles.notesBanner}>
+            <View style={styles.notesBannerDot} />
+            <Text style={styles.notesBannerText}>
+              You have {totalNewNotes} new note{totalNewNotes > 1 ? 's' : ''} on your
+              {totalNewNotes > 1 ? ' properties' : ' property'}. Open a property to view.
+            </Text>
+          </View>
+        )}
+
         {/* Content */}
         {propertiesLoading ? (
           <View style={styles.loadingContainer}>
@@ -141,7 +190,14 @@ const PortfolioTab = () => {
               {propertiesOwned.map(property => (
                 <PropertyCard
                   key={property.id}
-                  item={{ ...property, raw: { userId: user?.userId } }}
+                  // Keep the real `raw` (carries ownerId/brokerId) so PropertyCard
+                  // recognises this as the user's own listing and hides Enquire.
+                  // Every property here is fetched with ownerId=current user, so
+                  // also force the own-listing flag as a safeguard.
+                  item={property}
+                  isOwnListing
+                  newNoteCount={newNotesByProperty[property.id] || 0}
+                  onView={() => markNotesSeen(property.id)}
                   width={isDesktop ? '48%' : '100%'}
                   noView={false}
                 />
@@ -262,6 +318,30 @@ const styles = StyleSheet.create({
   sortDivider: {
     fontSize: 13,
     color: '#555',
+  },
+  notesBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: '#FEF3C7',
+    borderWidth: 1,
+    borderColor: '#FCD34D',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: 20,
+  },
+  notesBannerDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#EE2529',
+  },
+  notesBannerText: {
+    flex: 1,
+    fontSize: 13,
+    color: '#92400E',
+    fontWeight: '600',
   },
   propertiesGrid: {
     flexDirection: 'row',

@@ -94,61 +94,65 @@ const AppContent = () => {
       return <OfflineScreen />;
     }
 
+    // Match on the path only — strip any ?query (e.g. /my-dashboard?tab=Broker)
+    // so route matching still works while screens can still read the query.
+    const path = currentPath.split('?')[0];
+
     switch (true) {
-      case currentPath === '/dashboard':
-      case currentPath === '/':
+      case path === '/dashboard':
+      case path === '/':
         return <Dashboard />;
-      case currentPath.startsWith('/compare/'):
-        const ids = currentPath.split('/compare/')[1];
+      case path.startsWith('/compare/'):
+        const ids = path.split('/compare/')[1];
         return <PropertyComparisonScreen propertyIds={ids} />;
-      case currentPath === '/explore-properties':
-      case currentPath.startsWith('/explore-properties'):
+      case path === '/explore-properties':
+      case path.startsWith('/explore-properties'):
         return <ExplorePropertiesScreen />;
-      case currentPath.startsWith('/propertyDetails'):
+      case path.startsWith('/propertyDetails'):
         return <PropertyDetailsScreen />;
-      case currentPath === '/calculators':
+      case path === '/calculators':
         return <CalculatorsScreen />;
-      case currentPath === '/explore-brokers':
+      case path === '/explore-brokers':
         return <ExploreBrokersScreen />;
-      case currentPath.startsWith('/contact-broker/'):
+      case path.startsWith('/contact-broker/'):
         return <ContactBrokerScreen />;
-      case currentPath === '/my-dashboard':
+      case path === '/my-dashboard':
         return isLoggedIn ? <InvestorsScreen /> : <Dashboard />;
-      case currentPath === '/login':
+      case path === '/login':
         return <LoginScreen />;
-      case currentPath === '/list-property':
-      case currentPath.startsWith('/list-property/'):
+      case path === '/list-property':
+      case path.startsWith('/list-property/'):
         return <ListPropertyScreen />;
-      case currentPath === '/contact-us':
+      case path === '/contact-us':
         return <ContactUsScreen />;
-      case currentPath === '/support':
+      case path === '/support':
         return <SupportScreen />;
-      case currentPath === '/how-it-works':
+      case path === '/how-it-works':
         return <HowItWorksScreen />;
-      case currentPath === '/my-profile':
+      case path === '/my-profile':
         return isLoggedIn ? <ProfileScreen /> : <Dashboard />;
-      case currentPath === '/notifications':
+      case path === '/notifications':
         return <NotificationsScreen />;
-      case currentPath === '/my-notes':
+      case path === '/my-notes':
         return <NotesScreen />;
-      case currentPath === '/enquiry':
-      case currentPath.startsWith('/enquiry/'):
+      case path === '/enquiry':
+      case path.startsWith('/enquiry/'):
         return <EnquiriesScreen />;
-      case currentPath.startsWith('/enquiry-details/'):
+      case path.startsWith('/enquiry-details/'):
         return <EnquiryDetailsScreen />;
-      case currentPath.startsWith('/blog/'):
+      case path.startsWith('/blog/'):
         return <BlogDetailScreen />;
-      case currentPath === '/blogs':
+      case path === '/blogs':
         return <BlogsScreen />;
-      case currentPath === '/privacy-policy':
+      case path === '/privacy-policy':
         return <PrivacyPolicyScreen />;
-      case currentPath === '/terms-of-service':
+      case path === '/terms-of-service':
         return <TermsOfServiceScreen />;
-      case currentPath === '/offline':
+      case path === '/offline':
         return <OfflineScreen />;
-      case currentPath === '/error':
+      case path === '/error':
         return <ErrorScreen />;
-      case currentPath === '/server-error':
+      case path === '/server-error':
         return <ServerErrorScreen />;
       default:
         return <NotFoundScreen />;

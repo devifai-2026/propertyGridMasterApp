@@ -4,6 +4,8 @@ import { getHeaders } from './headers';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { decodeResponseData } from './decoder';
 
+declare const window: any;
+
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export interface RequestConfig<T = any> {
@@ -78,10 +80,19 @@ const handleRefreshFailure = async () => {
   try {
     await AsyncStorage.multiRemove(['user', 'accessToken', 'token', 'isLoggedIn']);
   } catch {}
-  // On web, force navigation to the login screen.
+  // On web, force navigation to the login screen. Persist the page the user
+  // was on (a hard redirect wipes in-memory React state, so the in-memory
+  // pendingRedirect would be lost) so we can resume there after re-login.
   try {
     const w: any = typeof window !== 'undefined' ? window : null;
     if (w?.location && !String(w.location.pathname).startsWith('/login')) {
+      try {
+        const current = `${w.location.pathname}${w.location.search || ''}`;
+        // Don't bother persisting public landing pages.
+        if (current && current !== '/' && current !== '/dashboard') {
+          await AsyncStorage.setItem('postLoginRedirect', current);
+        }
+      } catch {}
       w.location.href = '/login';
     }
   } catch {}

@@ -402,6 +402,16 @@ const ListPropertyScreen = () => {
         JSON.stringify(mappedConnectivity),
       );
 
+      // FAQs (optional) — only send entries that have a question; strip the
+      // client-only `id` so the backend stores clean { question, answer } objects.
+      const cleanedFaqs = (finalData.faqs || [])
+        .filter((faq: any) => faq && faq.question && faq.question.trim() !== '')
+        .map((faq: any) => ({
+          question: faq.question.trim(),
+          answer: (faq.answer || '').trim(),
+        }));
+      apiFormData.append('faqs', JSON.stringify(cleanedFaqs));
+
       // Media
       if (finalData.mediaFiles && Array.isArray(finalData.mediaFiles)) {
         finalData.mediaFiles.forEach((file: any) => {

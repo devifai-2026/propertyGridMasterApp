@@ -150,6 +150,15 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
       }
     };
 
+    // Open a legal page in a new browser tab (web). Used by the inline
+    // terms/privacy links so tapping the link doesn't toggle the checkbox.
+    const openLegalPage = (path: string) => {
+      const win = (globalThis as any).window;
+      if (win && win.open) {
+        win.open(path, '_blank', 'noopener,noreferrer');
+      }
+    };
+
     const handleChange = (name: string, value: any) => {
       setFormData(prev => ({ ...prev, [name]: value }));
 
@@ -391,7 +400,15 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
             </View>
             <Text style={[styles.checkboxLabel, isMobile && styles.checkboxLabelMobile]}>
               I agree to the{' '}
-              <Text style={styles.linkText}>terms & conditions</Text>
+              <Text
+                style={styles.linkText}
+                onPress={(e: any) => {
+                  e?.stopPropagation?.();
+                  openLegalPage('/terms-of-service');
+                }}
+              >
+                terms & conditions
+              </Text>
             </Text>
           </TouchableOpacity>
           <InputError message="Please agree to terms & conditions" visible={isSubmitted && !formData.agreeTerms} />
@@ -409,7 +426,16 @@ const PersonalDetails = forwardRef<any, PersonalDetailsProps>(
               {formData.agreePrivacy && <Text style={styles.checkmark}>✓</Text>}
             </View>
             <Text style={[styles.checkboxLabel, isMobile && styles.checkboxLabelMobile]}>
-              I agree to the <Text style={styles.linkText}>Privacy Policy</Text>
+              I agree to the{' '}
+              <Text
+                style={styles.linkText}
+                onPress={(e: any) => {
+                  e?.stopPropagation?.();
+                  openLegalPage('/privacy-policy');
+                }}
+              >
+                Privacy Policy
+              </Text>
             </Text>
           </TouchableOpacity>
           <InputError message="Please agree to Privacy Policy" visible={isSubmitted && !formData.agreePrivacy} />

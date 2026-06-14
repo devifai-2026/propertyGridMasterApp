@@ -1,7 +1,7 @@
 // Note: baseUrl ends with "/api" — the API layer appends "/v1".
 const ENV_CONFIG = {
   dev: {
-    BASE_URL: "https://pre-lease-server-1.onrender.com/api",
+    BASE_URL: "http://localhost:3000/api",
   },
   prod: {
     BASE_URL: "https://pre-lease-server-1.onrender.com/api",

@@ -9,6 +9,8 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Platform,
+  Share,
   useWindowDimensions,
 } from 'react-native';
 import {
@@ -19,6 +21,8 @@ import {
   FileText,
   BarChart2,
   HelpCircle,
+  ChevronDown,
+  ChevronUp,
   Download,
   Plane,
   Train,
@@ -31,6 +35,7 @@ import {
 import Layout from '../../layout/Layout';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAuth } from '../../context/AuthContext';
+import { markNotesSeenAt } from '../../../helpers/ownerNotesSeen';
 import { COLORS } from '../../constants/theme';
 import PropertyCard, { Property } from '../../components/PropertyCard';
 // Missing dashboard components will be defined locally below to prevent tab crash
@@ -46,6 +51,10 @@ import leaseDetails from "../../assets/propertyDetails/leaseDetails.png"
 import location from "../../assets/propertyDetails/locationDetails.png"
 import squaresBg from "../../assets/propertyDetails/squaresbg.png"
  
+
+declare const window: any;
+declare const navigator: any;
+declare const document: any;
 
 const { width } = Dimensions.get('window');
 
@@ -122,10 +131,24 @@ const PropertyDetailsScreen = () => {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
-  const { currentPath, navigate, goBack } = useNavigation();
-  const { user } = useAuth();
-  const propertyId = currentPath.split('/propertyDetails/')[1];
+  const { currentPath, navigate, goBack, openLoginModal } = useNavigation();
+  const { user, isLoggedIn } = useAuth();
+  // Extract just the id from the path. Defensive against share links where
+  // extra text (the share message) or a query/hash got appended after the id,
+  // e.g. "/propertyDetails/<id>%20Check%20out...". We decode, then keep only
+  // the segment up to the first whitespace, slash, query or hash.
+  const propertyId = (() => {
+    const afterRoute = currentPath.split('/propertyDetails/')[1] || '';
+    let decoded = afterRoute;
+    try {
+      decoded = decodeURIComponent(afterRoute);
+    } catch {
+      // Malformed percent-encoding — fall back to the raw segment.
+    }
+    return decoded.split(/[\s/?#]/)[0];
+  })();
   const [property, setProperty] = useState<Property | null>(null);
+  const [fetchFailed, setFetchFailed] = useState(false);
   const [notesData, setNotesData] = useState<any[]>([]);
   const [notesCount, setNotesCount] = useState(0);
   const [isNotesLoading, setIsNotesLoading] = useState(false);
@@ -144,8 +167,122 @@ const PropertyDetailsScreen = () => {
   const [isLiking, setIsLiking] = useState(false);
 
   const isOwner = user?.role === 'Owner';
+
+  const getShareUrl = () => {
+    // Build a clean canonical link from the origin in the URL bar + the parsed
+    // id. We deliberately do NOT use window.location.href verbatim, because a
+    // shared/opened link may already carry trailing junk we don't want to
+    // re-propagate. propertyId is already sanitised above.
+    const origin =
+      typeof window !== 'undefined' && window.location?.origin
+        ? window.location.origin
+        : '';
+    return `${origin}/propertyDetails/${propertyId}`;
+  };
+
+  const handleShareReport = async () => {
+    const url = getShareUrl();
+    const title = property?.title || 'Property';
+    const message = `Check out this property: ${title}${property?.location ? ` in ${property.location}` : ''}\n${url}`;
+
+    try {
+      if (Platform.OS === 'web') {
+        // RN's Share is not implemented on react-native-web, so use the
+        // Web Share API when available and fall back to copying the link.
+        const nav: any = typeof navigator !== 'undefined' ? navigator : undefined;
+        if (nav?.share) {
+          await nav.share({ title, text: message, url });
+          return;
+        }
+        if (nav?.clipboard?.writeText) {
+          await nav.clipboard.writeText(url);
+          Alert.alert('Link copied', 'The property link has been copied to your clipboard.');
+          return;
+        }
+        // Last-resort fallback for browsers without the Clipboard API.
+        if (typeof window !== 'undefined') {
+          window.prompt('Copy this property link:', url);
+        }
+        return;
+      }
+
+      await Share.share({ title, message, url });
+    } catch (error: any) {
+      // The user dismissing the native share sheet is not an error worth showing.
+      if (error?.name === 'AbortError') return;
+      console.error('Error sharing property:', error);
+      Alert.alert('Unable to share', 'Something went wrong while sharing this property.');
+    }
+  };
+
+  const buildReportHtml = () => {
+    const raw = property?.raw || {};
+    const row = (label: string, value: any) =>
+      value === undefined || value === null || value === ''
+        ? ''
+        : `<tr><td style="padding:8px 12px;color:#666;border-bottom:1px solid #eee;">${label}</td><td style="padding:8px 12px;font-weight:600;color:#111;border-bottom:1px solid #eee;">${value}</td></tr>`;
+
+    return `<!doctype html><html><head><meta charset="utf-8"/>
+      <title>${property?.title || 'Property'} - Report</title>
+      <style>
+        body{font-family:Arial,Helvetica,sans-serif;color:#111;margin:0;padding:32px;}
+        h1{font-size:22px;margin:0 0 4px;}
+        h2{font-size:14px;color:#888;font-weight:500;margin:0 0 24px;}
+        table{border-collapse:collapse;width:100%;max-width:640px;}
+        .url{margin-top:24px;font-size:12px;color:#888;word-break:break-all;}
+      </style></head>
+      <body>
+        <h1>${property?.title || 'Property'}</h1>
+        <h2>${property?.location || ''}</h2>
+        <table>
+          ${row('Property Type', raw.propertyType)}
+          ${row('City', raw.city)}
+          ${row('State', raw.state)}
+          ${row('Selling Price', property?.price)}
+          ${row('Annual Gross Rent', property?.rent)}
+          ${row('Net Rental Yield', property?.roi)}
+          ${row('Tenure Left', property?.tenure)}
+          ${row('Tenant Type', raw.tenantType)}
+          ${row('Lease End Date', raw.leaseEndDate)}
+        </table>
+        <div class="url">${getShareUrl()}</div>
+      </body></html>`;
+  };
+
+  const handleDownloadReport = async () => {
+    if (!property) return;
+    try {
+      if (Platform.OS === 'web' && typeof document !== 'undefined') {
+        // Open a printable report the user can save as PDF.
+        const reportWindow = window.open('', '_blank');
+        if (!reportWindow) {
+          Alert.alert('Popup blocked', 'Please allow popups to download the report.');
+          return;
+        }
+        reportWindow.document.write(buildReportHtml());
+        reportWindow.document.close();
+        reportWindow.focus();
+        reportWindow.print();
+        return;
+      }
+
+      // On native there is no print/download; share the report text instead.
+      const url = getShareUrl();
+      await Share.share({
+        title: `${property.title} - Report`,
+        message: `${property.title}${property.location ? `\n${property.location}` : ''}\nPrice: ${property.price}\nRent: ${property.rent}\nYield: ${property.roi}\nTenure: ${property.tenure}\n${url}`,
+        url,
+      });
+    } catch (error: any) {
+      if (error?.name === 'AbortError') return;
+      console.error('Error downloading report:', error);
+      Alert.alert('Unable to download', 'Something went wrong while generating the report.');
+    }
+  };
+
   useEffect(() => {
     if (propertyId) {
+      setFetchFailed(false);
       getPropertyById(propertyId, (data: any) => {
         const mappedProperty: Property = {
           id: data.propertyId,
@@ -167,6 +304,9 @@ const PropertyDetailsScreen = () => {
           raw: data,
         };
         setProperty(mappedProperty);
+      }, () => {
+        // Property could not be loaded (not found, or auth required).
+        setFetchFailed(true);
       });
       if (user) {
         checkIfLiked(propertyId, (data: any) => {
@@ -175,6 +315,14 @@ const PropertyDetailsScreen = () => {
       }
     }
   }, [propertyId, user]);
+
+  // If a logged-out visitor opens a shared link that we couldn't load, prompt
+  // them to sign in and send them back to this property afterwards.
+  useEffect(() => {
+    if (fetchFailed && !isLoggedIn) {
+      openLoginModal(`/propertyDetails/${propertyId}`);
+    }
+  }, [fetchFailed, isLoggedIn, propertyId]);
 
   const isAddedByUser =
     property?.raw?.ownerId === user?.userId ||
@@ -193,10 +341,14 @@ const PropertyDetailsScreen = () => {
         },
         () => {},
       );
+      // The owner is now viewing this property — mark its notes as seen so the
+      // "new note" badge on the dashboard clears for this property.
+      markNotesSeenAt(user?.userId, propertyId);
     }
   }, [propertyId, isAddedByUser]);
 
   const [activeTab, setActiveTab] = useState('property');
+  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
   useEffect(() => {
     if (activeTab === 'notes' && propertyId) {
@@ -246,6 +398,7 @@ const PropertyDetailsScreen = () => {
     { id: 'lease', label: 'Lease Details', icon: leaseDetails },
     { id: 'analytics', label: 'Analytics', icon: <ChartNoAxesColumnIncreasing />},
     { id: 'location', label: 'Location Details', icon: location },
+    { id: 'faqs', label: 'FAQs', icon: <HelpCircle /> },
     ...(isAddedByUser
       ? [{ id: 'notes', label: 'Notes', icon: <MessageSquare /> }]
       : []),
@@ -262,6 +415,24 @@ const PropertyDetailsScreen = () => {
   }
 
   if (!property) {
+    // Logged-out visitor on a shared link: prompt sign-in (the modal is also
+    // auto-opened by the effect above) and offer to redirect back after login.
+    if (!isLoggedIn) {
+      return (
+        <View style={styles.loadingContainer}>
+          <Text style={{ textAlign: 'center', marginBottom: 12 }}>
+            Please sign in to view this property.
+          </Text>
+          <TouchableOpacity
+            onPress={() => openLoginModal(`/propertyDetails/${propertyId}`)}
+          >
+            <Text style={{ color: COLORS.primary, marginTop: 4, fontWeight: '600' }}>
+              Sign In
+            </Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
     return (
       <View style={styles.loadingContainer}>
         <Text>Property not found.</Text>
@@ -296,11 +467,11 @@ const PropertyDetailsScreen = () => {
                 </Text>
               </TouchableOpacity>
             )}
-            <TouchableOpacity style={[styles.actionOutlineBtn, isMobile && styles.actionOutlineBtnMobile]}>
+            <TouchableOpacity style={[styles.actionOutlineBtn, isMobile && styles.actionOutlineBtnMobile]} onPress={handleDownloadReport}>
               <Image source={DownloadIcon} style={{ width: 16, height: 16 }} />
               <Text style={styles.actionOutlineText} numberOfLines={1}>Download Report</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.actionOutlineBtn, isMobile && styles.actionOutlineBtnMobile]}>
+            <TouchableOpacity style={[styles.actionOutlineBtn, isMobile && styles.actionOutlineBtnMobile]} onPress={handleShareReport}>
               <Image source={ShareIcon} style={{ width: 16, height: 16 }} />
               <Text style={styles.actionOutlineText} numberOfLines={1}>Share Report</Text>
             </TouchableOpacity>
@@ -430,10 +601,7 @@ const PropertyDetailsScreen = () => {
                 <View style={styles.col}>
                   <InfoRow
                     label="Maintained By"
-                    value={
-                      property.raw.caretaker?.caretakerName ||
-                      'Professional Facility'
-                    }
+                    value={property.raw.caretaker?.caretakerName || 'N/A'}
                   />
                 </View>
               </View>
@@ -1044,11 +1212,93 @@ const PropertyDetailsScreen = () => {
                     })}
                 </PropertyDetailsCard>
               )}
+
+            {/* Market Intelligence — real backend fields (demandDrivers /
+                upcomingDevelopments). Only shown when at least one is present. */}
+            {(property.raw.demandDrivers || property.raw.upcomingDevelopments) && (
+              <View style={{ marginTop: 16 }}>
+                <PropertyDetailsCard title="Market Intelligence">
+                  {property.raw.demandDrivers ? (
+                    <View style={{ marginBottom: 12 }}>
+                      <Text style={{ fontSize: 12, fontWeight: '700', color: '#888', marginBottom: 4 }}>
+                        DEMAND DRIVERS
+                      </Text>
+                      <Text style={{ fontSize: 13, color: '#444', lineHeight: 20 }}>
+                        {property.raw.demandDrivers}
+                      </Text>
+                    </View>
+                  ) : null}
+                  {property.raw.upcomingDevelopments ? (
+                    <View>
+                      <Text style={{ fontSize: 12, fontWeight: '700', color: '#888', marginBottom: 4 }}>
+                        UPCOMING DEVELOPMENTS
+                      </Text>
+                      <Text style={{ fontSize: 13, color: '#444', lineHeight: 20 }}>
+                        {property.raw.upcomingDevelopments}
+                      </Text>
+                    </View>
+                  ) : null}
+                </PropertyDetailsCard>
+              </View>
+            )}
           </View>
         </View>
       </View>
     </View>
   );
+
+  // FAQs — bound to the property's real faqs array (optional). Shows an empty
+  // state when none were added during listing.
+  const renderFaqContent = () => {
+    const faqs = Array.isArray(property?.raw?.faqs) ? property.raw.faqs : [];
+    return (
+      <View style={styles.tabContent}>
+        {faqs.length === 0 ? (
+          <View style={{ alignItems: 'center', padding: 40 }}>
+            <HelpCircle size={40} color="#CCCCCC" />
+            <Text style={{ marginTop: 12, color: '#999', fontSize: 14 }}>
+              No FAQs were added for this property.
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.faqList}>
+            {faqs.map((faq: any, i: number) => {
+              const open = expandedFaq === i;
+              return (
+                <View key={i} style={[styles.faqItem, open && styles.faqItemOpen]}>
+                  <TouchableOpacity
+                    style={styles.faqHeader}
+                    onPress={() => setExpandedFaq(open ? null : i)}
+                  >
+                    <Text style={[styles.faqQuestion, open && styles.faqTextActive]}>
+                      {faq.question}
+                    </Text>
+                    {/* Wrap the icon in a View and rotate the wrapper — applying
+                        the transform directly to the lucide SVG renders badly on
+                        web. Swap the chevron up/down based on open state. */}
+                    <View style={styles.faqChevron}>
+                      {open ? (
+                        <ChevronUp size={20} color={COLORS.primary} />
+                      ) : (
+                        <ChevronDown size={20} color="#999" />
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                  {open && (
+                    <View style={styles.faqAnswerContainer}>
+                      <Text style={{ fontSize: 14, color: '#555', lineHeight: 22 }}>
+                        {faq.answer || '—'}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              );
+            })}
+          </View>
+        )}
+      </View>
+    );
+  };
 
   const handleAddNote = () => {
     if (!newNote.trim() || !propertyId) return;
@@ -1324,6 +1574,7 @@ const PropertyDetailsScreen = () => {
             {activeTab === 'lease' && renderLeaseContent()}
             {activeTab === 'analytics' && renderAnalyticsContent()}
             {activeTab === 'location' && renderLocationContent()}
+            {activeTab === 'faqs' && renderFaqContent()}
             {activeTab === 'notes' && renderNotesContent()}
           </View>
         </View>
@@ -1674,6 +1925,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
+  },
+  faqChevron: {
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 12,
   },
   faqQuestion: {
     fontSize: 18,

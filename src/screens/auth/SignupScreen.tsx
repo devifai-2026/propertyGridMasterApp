@@ -21,6 +21,7 @@ import {
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import LinearGradient from 'react-native-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
@@ -118,7 +119,8 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
 
   const { login, updateUser } = useAuth();
   const { signup: register, sendOtp, loading: apiLoading } = useAuthAPIs();
-  const { navigate, openLoginModal, closeSignupModal } = useNavigation();
+  const { navigate, openLoginModal, closeSignupModal, consumePendingRedirect } =
+    useNavigation();
   const { width: SCREEN_WIDTH } = useWindowDimensions();
   const isMobile = SCREEN_WIDTH < 768;
 
@@ -348,8 +350,23 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
                 console.error('[Photo upload error]', err);
               }
             }
-            navigate('/my-dashboard');
+            // If the user arrived from a shared link (e.g. a property), resume
+            // there after signup; otherwise land on their dashboard. Prefer the
+            // persisted redirect (survives a hard /login redirect) over the
+            // in-memory one.
+            let persistedRedirect: string | null = null;
+            try {
+              persistedRedirect = await AsyncStorage.getItem('postLoginRedirect');
+              if (persistedRedirect) {
+                await AsyncStorage.removeItem('postLoginRedirect');
+              }
+            } catch {}
+            const redirectTo =
+              persistedRedirect || consumePendingRedirect();
+            navigate(redirectTo || '/my-dashboard');
           } else {
+            // Non-broker: send them through login, preserving any pending
+            // redirect (openLoginModal with no arg does not clear it).
             openLoginModal();
           }
         } else {

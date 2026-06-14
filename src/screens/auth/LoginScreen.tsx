@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import LinearGradient from 'react-native-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '../../context/AuthContext';
 import { useNavigation } from '../../context/NavigationContext';
 import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
@@ -41,7 +42,13 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
   const [isResending, setIsResending] = useState(false);
   const { login } = useAuth();
   const { login: authenticate, sendOtp, loading: apiLoading } = useAuthAPIs();
-  const { openSignupModal, closeLoginModal } = useNavigation();
+  const {
+    openSignupModal,
+    closeLoginModal,
+    navigate,
+    consumePendingRedirect,
+    currentPath,
+  } = useNavigation();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
@@ -181,10 +188,31 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
             const success = await login(response.data);
             if (success) {
               setModalVisible(false);
+              // If a destination was stored (e.g. the property the user tried to
+              // View/Enquire before logging in), resume there. Otherwise fall
+              // back: modal → stay put; standalone /login page → home.
+              // Resume at the stored destination if one was set (e.g. a shared
+              // property link). Priority:
+              //  1. persisted redirect (survives the hard /login redirect that
+              //     a session-expiry triggers and wipes React state),
+              //  2. in-memory pending redirect (set via openLoginModal),
+              //  3. the current path, so the user isn't bounced to home — and
+              //     so pages like PropertyDetails re-fetch now that we're authed.
+              let persistedRedirect: string | null = null;
+              try {
+                persistedRedirect = await AsyncStorage.getItem('postLoginRedirect');
+                if (persistedRedirect) {
+                  await AsyncStorage.removeItem('postLoginRedirect');
+                }
+              } catch {}
+              const redirectTo =
+                persistedRedirect || consumePendingRedirect() || currentPath;
               if (onClose) {
                 onClose();
+                if (redirectTo) navigate(redirectTo);
               } else {
                 closeLoginModal();
+                navigate(redirectTo || '/');
               }
             }
           } else {

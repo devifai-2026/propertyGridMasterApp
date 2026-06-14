@@ -15,10 +15,14 @@ interface NavigationContextType {
   goBack: () => void;
   showLoginModal: boolean;
   showSignupModal: boolean;
-  openLoginModal: () => void;
+  // Optionally pass a path to navigate to after a successful login (e.g. the
+  // property a logged-out user tried to View/Enquire).
+  openLoginModal: (redirectTo?: string) => void;
   closeLoginModal: () => void;
   openSignupModal: () => void;
   closeSignupModal: () => void;
+  // Returns the stored post-login redirect path (and clears it), or null.
+  consumePendingRedirect: () => string | null;
 }
 
 const NavigationContext = createContext<NavigationContextType | undefined>(
@@ -39,9 +43,25 @@ export const NavigationProvider = ({ children }: { children: ReactNode }) => {
 
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
+  const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
 
-  const openLoginModal = () => setShowLoginModal(true);
+  const openLoginModal = (redirectTo?: string) => {
+    // Guard against callers that accidentally pass a non-string (e.g. an
+    // onPress event object via `onPress={openLoginModal}`).
+    if (typeof redirectTo === 'string' && redirectTo.startsWith('/')) {
+      setPendingRedirect(redirectTo);
+    }
+    setShowLoginModal(true);
+  };
   const closeLoginModal = () => setShowLoginModal(false);
+  const consumePendingRedirect = () => {
+    const path =
+      typeof pendingRedirect === 'string' && pendingRedirect.startsWith('/')
+        ? pendingRedirect
+        : null;
+    setPendingRedirect(null);
+    return path;
+  };
   const openSignupModal = () => setShowSignupModal(true);
   const closeSignupModal = () => setShowSignupModal(false);
 
@@ -79,7 +99,7 @@ export const NavigationProvider = ({ children }: { children: ReactNode }) => {
   }, [isWeb]);
 
   return (
-    <NavigationContext.Provider value={{ currentPath, navigate, goBack, showLoginModal, showSignupModal, openLoginModal, closeLoginModal, openSignupModal, closeSignupModal }}>
+    <NavigationContext.Provider value={{ currentPath, navigate, goBack, showLoginModal, showSignupModal, openLoginModal, closeLoginModal, openSignupModal, closeSignupModal, consumePendingRedirect }}>
       {children}
     </NavigationContext.Provider>
   );

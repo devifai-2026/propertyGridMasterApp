@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useState, useEffect } from 'react';
 import {
   StyleSheet,
   Text,
@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '../context/NavigationContext';
 import { useAuth } from '../context/AuthContext';
+import { usePropertyAPIs } from '../../helpers/hooks/propertyAPIs/usePropertyApis';
 import Footer from './Footer';
 import { COLORS, FONTS } from '../constants/theme';
 
@@ -364,7 +365,35 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
   const { width } = useWindowDimensions();
   const { navigate, currentPath, openLoginModal } = useNavigation();
   const { isLoggedIn, user, logout } = useAuth();
+  const { getNotifications } = usePropertyAPIs();
+  const [unreadCount, setUnreadCount] = useState(0);
   const [isLogoutMenuVisible, setIsLogoutMenuVisible] = useState(false);
+
+  // Unread notification count for the header bell (any logged-in user).
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setUnreadCount(0);
+      return;
+    }
+    let cancelled = false;
+    const load = () =>
+      getNotifications(
+        (data: any) => {
+          const list = Array.isArray(data) ? data : data?.notifications || [];
+          if (!cancelled) {
+            setUnreadCount(list.filter((n: any) => !n.isRead && !n.is_read).length);
+          }
+        },
+        () => {},
+      );
+    load();
+    const id = setInterval(load, 60000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoggedIn, currentPath]);
   // Measured position of the profile trigger so the popover anchors right under it.
   const profileBtnRef = React.useRef<any>(null);
   const [menuAnchor, setMenuAnchor] = useState<{ top: number; right: number }>({
@@ -451,14 +480,22 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
         )}
 
         <View style={[styles.headerActions, isMobile && { gap: 8 }]}>
-          {/* {isLoggedIn && user?.role === 'Owner' && (
+          {/* Notifications bell — any logged-in user (owner, broker, investor) */}
+          {isLoggedIn && (
             <TouchableOpacity
               style={styles.notificationBtn}
-              onPress={() => navigate('/my-notes')}
+              onPress={() => navigate('/notifications')}
             >
-              <MessageSquare size={22} color={COLORS.primary} />
+              <Bell size={22} color={COLORS.primary} />
+              {unreadCount > 0 && (
+                <View style={styles.notificationBadge}>
+                  <Text style={styles.notificationBadgeText}>
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </Text>
+                </View>
+              )}
             </TouchableOpacity>
-          )} */}
+          )}
 
           {isLoggedIn ? (
             <TouchableOpacity
@@ -490,7 +527,7 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
               <ChevronDown size={18} color={COLORS.primary} strokeWidth={3} />
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={styles.signInBtn} onPress={openLoginModal}>
+            <TouchableOpacity style={styles.signInBtn} onPress={() => openLoginModal()}>
               <Text style={styles.signInText}>Sign In</Text>
             </TouchableOpacity>
           )}
@@ -1045,6 +1082,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: 2,
+    right: 2,
+    minWidth: 16,
+    height: 16,
+    paddingHorizontal: 3,
+    borderRadius: 8,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  notificationBadgeText: {
+    color: '#fff',
+    fontSize: 9,
+    fontWeight: '700',
   },
   badge: {
     position: 'absolute',

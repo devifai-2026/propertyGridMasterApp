@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Dimensions,
   ActivityIndicator,
   SafeAreaView,
+  TextInput,
 } from 'react-native';
 import {
   ChevronLeft,
@@ -16,6 +17,7 @@ import {
   MapPin,
   ExternalLink,
   MessageSquare,
+  Send,
 } from 'lucide-react-native';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
 import { formatINR } from '../../../helpers/formatPrice';
@@ -31,15 +33,48 @@ const EnquiryDetailsScreen = () => {
   const { currentPath, navigate, goBack } = useNavigation();
   const inquiryId = currentPath.split('/enquiry-details/')[1];
   const [inquiry, setInquiry] = useState<any>(null);
-  const { getInquiryById, loading } = usePropertyAPIs();
+  const {
+    getInquiryById,
+    getInquiryMessages,
+    postInquiryMessage,
+    loading,
+  } = usePropertyAPIs();
+
+  // Conversation thread between the client (this user) and the assigned dealer.
+  const [messages, setMessages] = useState<any[]>([]);
+  const [reply, setReply] = useState('');
+  const [sending, setSending] = useState(false);
+
+  const loadMessages = useCallback(() => {
+    if (!inquiryId) return;
+    getInquiryMessages(inquiryId, (data: any) => {
+      setMessages(Array.isArray(data) ? data : []);
+    });
+  }, [inquiryId]);
 
   useEffect(() => {
     if (inquiryId) {
       getInquiryById(inquiryId, (data: any) => {
         setInquiry(data);
       });
+      loadMessages();
     }
   }, [inquiryId]);
+
+  const sendReply = () => {
+    if (!reply.trim() || !inquiryId) return;
+    setSending(true);
+    postInquiryMessage(
+      inquiryId,
+      reply.trim(),
+      () => {
+        setSending(false);
+        setReply('');
+        loadMessages();
+      },
+      () => setSending(false),
+    );
+  };
 
   if (loading && !inquiry) {
     return (
@@ -152,6 +187,65 @@ const EnquiryDetailsScreen = () => {
                 </View>
             </View>
           </View>
+
+          {/* Conversation with the assigned dealer */}
+          <View style={styles.chatSection}>
+            <View style={styles.sectionHeader}>
+              <MessageSquare size={20} color={COLORS.primary} />
+              <Text style={styles.sectionTitle}>Conversation</Text>
+            </View>
+
+            {messages.length === 0 ? (
+              <Text style={styles.chatEmpty}>
+                No messages yet. Send a message to the assigned dealer below.
+              </Text>
+            ) : (
+              <View style={{ gap: 10 }}>
+                {messages.map((m: any) => {
+                  const mine = m.senderType === 'broker';
+                  return (
+                    <View
+                      key={m.id}
+                      style={[styles.bubbleRow, mine ? styles.bubbleRowMine : styles.bubbleRowTheirs]}
+                    >
+                      <View style={[styles.bubble, mine ? styles.bubbleMine : styles.bubbleTheirs]}>
+                        <Text style={[styles.bubbleText, mine && { color: '#fff' }]}>
+                          {m.displayMessage || m.message}
+                        </Text>
+                      </View>
+                      <Text style={styles.bubbleMeta}>
+                        {mine ? 'You' : 'Dealer'} ·{' '}
+                        {new Date(m.createdAt).toLocaleString('en-GB', {
+                          day: '2-digit',
+                          month: 'short',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </Text>
+                    </View>
+                  );
+                })}
+              </View>
+            )}
+
+            <View style={styles.composer}>
+              <TextInput
+                value={reply}
+                onChangeText={setReply}
+                placeholder="Write a reply…"
+                placeholderTextColor="#9CA3AF"
+                style={styles.composerInput}
+                multiline
+              />
+              <TouchableOpacity
+                onPress={sendReply}
+                disabled={sending || !reply.trim()}
+                style={[styles.composerBtn, (sending || !reply.trim()) && { opacity: 0.5 }]}
+              >
+                <Send size={18} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </ScrollView>
     </Layout>
@@ -159,6 +253,81 @@ const EnquiryDetailsScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  chatSection: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    marginTop: 16,
+    borderWidth: 1,
+    borderColor: '#EEEEEE',
+  },
+  chatEmpty: {
+    fontSize: 13,
+    color: '#999',
+    marginTop: 10,
+    marginBottom: 6,
+  },
+  bubbleRow: {
+    maxWidth: '85%',
+  },
+  bubbleRowMine: {
+    alignSelf: 'flex-end',
+    alignItems: 'flex-end',
+  },
+  bubbleRowTheirs: {
+    alignSelf: 'flex-start',
+    alignItems: 'flex-start',
+  },
+  bubble: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 14,
+  },
+  bubbleMine: {
+    backgroundColor: COLORS.primary,
+    borderBottomRightRadius: 4,
+  },
+  bubbleTheirs: {
+    backgroundColor: '#F2F2F2',
+    borderBottomLeftRadius: 4,
+  },
+  bubbleText: {
+    fontSize: 14,
+    color: '#262626',
+    fontFamily: 'Montserrat',
+  },
+  bubbleMeta: {
+    fontSize: 10,
+    color: '#9CA3AF',
+    marginTop: 4,
+  },
+  composer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 8,
+    marginTop: 16,
+  },
+  composerInput: {
+    flex: 1,
+    minHeight: 44,
+    maxHeight: 120,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: '#262626',
+    backgroundColor: '#FAFAFA',
+  },
+  composerBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: '#F9FAFB',

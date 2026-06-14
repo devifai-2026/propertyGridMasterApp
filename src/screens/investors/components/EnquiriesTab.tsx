@@ -11,13 +11,19 @@ import { usePropertyAPIs } from '../../../../helpers/hooks/propertyAPIs/usePrope
 import { formatINR } from '../../../../helpers/formatPrice';
 import { formatDate } from '../../../../helpers/formatDate';
 import { useNavigation } from '../../../context/NavigationContext';
+import { useAuth } from '../../../context/AuthContext';
 import { COLORS } from '../../../constants/theme';
 import { ActivityIndicator } from 'react-native';
+import {
+  hasUnreadMessages,
+  markMessagesSeenAt,
+} from '../../../../helpers/enquiryMessagesSeen';
 
 const EnquiriesTab = ({ roleType }: { roleType?: 'investor' | 'broker' }) => {
   const [enquiries, setEnquiries] = useState<any[]>([]);
   const { getMyInquiries, loading } = usePropertyAPIs();
   const { navigate } = useNavigation();
+  const { user } = useAuth();
 
   const { width } = Dimensions.get('window');
   const isDesktop = width > 768;
@@ -89,9 +95,15 @@ const EnquiriesTab = ({ roleType }: { roleType?: 'investor' | 'broker' }) => {
                 </Text>
                 <TouchableOpacity
                   style={styles.viewButton}
-                  onPress={() => navigate(`/enquiry-details/${item.id}`)}
+                  onPress={() => {
+                    markMessagesSeenAt(user?.userId, item.id);
+                    navigate(`/enquiry-details/${item.id}`);
+                  }}
                 >
                   <Text style={styles.viewButtonText}>view</Text>
+                  {hasUnreadMessages(user?.userId, item.id, item.latestMessageAt) && (
+                    <View style={styles.unreadDot} />
+                  )}
                 </TouchableOpacity>
               </View>
             ))
@@ -154,6 +166,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 6,
     alignItems: 'center',
+    position: 'relative',
+  },
+  unreadDot: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: COLORS.primary,
+    borderWidth: 2,
+    borderColor: '#fff',
   },
   viewButtonText: {
     fontSize: 12,
