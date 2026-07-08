@@ -357,19 +357,21 @@ const EnquiriesScreen = () => {
               </View>
             ) : null}
 
-            <View style={styles.descriptionContainer}>
-              <Text style={styles.infoLabel}>Description</Text>
-              <Text style={styles.descriptionText}>
-                {property.description?.trim()
-                  ? property.description
-                  : `${property.propertyType || 'This'} property` +
-                    `${property.microMarket ? ` in ${property.microMarket}` : ''}` +
-                    `${property.city ? `, ${property.city}` : ''}` +
-                    `${property.buildingGrade ? ` — a ${property.buildingGrade}-grade building` : ''}` +
-                    `${property.netRentalYield ? ` offering a ${property.netRentalYield}% rental yield` : ''}` +
-                    '.'}
-              </Text>
-            </View>
+            {property ? (
+              <View style={styles.descriptionContainer}>
+                <Text style={styles.infoLabel}>Description</Text>
+                <Text style={styles.descriptionText}>
+                  {property.description?.trim()
+                    ? property.description
+                    : `${property.propertyType || 'This'} property` +
+                      `${property.microMarket ? ` in ${property.microMarket}` : ''}` +
+                      `${property.city ? `, ${property.city}` : ''}` +
+                      `${property.buildingGrade ? ` — a ${property.buildingGrade}-grade building` : ''}` +
+                      `${property.netRentalYield ? ` offering a ${property.netRentalYield}% rental yield` : ''}` +
+                      '.'}
+                </Text>
+              </View>
+            ) : null}
 
             {/* Form */}
             <View style={styles.form}>

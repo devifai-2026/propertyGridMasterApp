@@ -991,7 +991,15 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
         <Text style={[styles.otpResendLink, isResending && { opacity: 0.5 }]} onPress={isResending ? undefined : handleResendOtp}>
           {isResending ? 'Resending...' : 'Resend OTP'}
         </Text>
-        <Text style={styles.otpResendLink}>Contact Support</Text>
+        <Text
+          style={styles.otpResendLink}
+          onPress={() => {
+            closeSignupModal();
+            navigate('/support');
+          }}
+        >
+          Contact Support
+        </Text>
       </View>
 
       <View style={styles.buttonRow_OTP}>
