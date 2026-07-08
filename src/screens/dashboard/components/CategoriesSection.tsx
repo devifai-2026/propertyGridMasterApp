@@ -13,45 +13,45 @@ import LinearGradient from 'react-native-linear-gradient';
 import { useNavigation } from '../../../context/NavigationContext';
 import { usePropertyAPIs } from '../../../../helpers/hooks/propertyAPIs/usePropertyApis';
 
+// Bundled fallback images, keyed by category `value`. Used when the API is
+// unreachable, or when an admin-managed category has no uploaded image yet.
+const FALLBACK_IMAGES: Record<string, any> = {
+  Residential: require('../../../assets/ExploreCategories/one.png'),
+  Retail: require('../../../assets/ExploreCategories/two.png'),
+  Offices: require('../../../assets/ExploreCategories/three.png'),
+  Industrial: require('../../../assets/ExploreCategories/four.png'),
+  Others: require('../../../assets/ExploreCategories/others.png'),
+};
+
+// Shown until the API responds, and as a full fallback if the request fails.
 const INITIAL_CATEGORIES = [
-  {
-    id: '1',
-    title: 'Residential',
-    image: require('../../../assets/ExploreCategories/one.png'),
-    value: 'Residential',
-  },
-  {
-    id: '2',
-    title: 'Retail',
-    image: require('../../../assets/ExploreCategories/two.png'),
-    value: 'Retail',
-  },
-  {
-    id: '3',
-    title: 'Offices',
-    image: require('../../../assets/ExploreCategories/three.png'),
-    value: 'Offices',
-  },
-  {
-    id: '4',
-    title: 'Industrial',
-    image: require('../../../assets/ExploreCategories/four.png'),
-    value: 'Industrial',
-  },
-  {
-    id: '5',
-    title: 'Others',
-    image: require('../../../assets/ExploreCategories/others.png'),
-    value: 'Others',
-  },
+  { id: '1', title: 'Residential', imageUrl: null, value: 'Residential' },
+  { id: '2', title: 'Retail', imageUrl: null, value: 'Retail' },
+  { id: '3', title: 'Offices', imageUrl: null, value: 'Offices' },
+  { id: '4', title: 'Industrial', imageUrl: null, value: 'Industrial' },
+  { id: '5', title: 'Others', imageUrl: null, value: 'Others' },
 ];
+
+// Resolve the image source for a card: prefer the admin-uploaded remote URL,
+// fall back to the bundled PNG for that value, then to Residential's image.
+const resolveImageSource = (item: { imageUrl?: string | null; value: string }) => {
+  if (item.imageUrl) return { uri: item.imageUrl };
+  return FALLBACK_IMAGES[item.value] || FALLBACK_IMAGES.Residential;
+};
+
+type Category = {
+  id: string;
+  title: string;
+  imageUrl?: string | null;
+  value: string;
+};
 
 const CategoryCard = ({
   item,
   width,
   count,
 }: {
-  item: (typeof INITIAL_CATEGORIES)[0];
+  item: Category;
   width: number;
   count: number;
 }) => {
@@ -59,7 +59,11 @@ const CategoryCard = ({
   return (
     <View style={[styles.card, { width }]}>
       <View style={styles.imageContainer}>
-        <Image source={item.image} style={styles.image} resizeMode="cover" />
+        <Image
+          source={resolveImageSource(item)}
+          style={styles.image}
+          resizeMode="cover"
+        />
         <View style={styles.overlay} />
         <Text style={styles.categoryTitle}>{item.title}</Text>
       </View>
@@ -91,8 +95,11 @@ const CategoryCard = ({
 
 const CategoriesSection = () => {
   const { width } = useWindowDimensions();
-  const { getPropertyCounts, loading } = usePropertyAPIs();
+  const { getPropertyCounts, getCategories, loading } = usePropertyAPIs();
   const [counts, setCounts] = useState<Record<string, number>>({});
+  // Start with the bundled defaults so the section renders instantly, then
+  // replace with the admin-managed rows once the API responds.
+  const [categories, setCategories] = useState<Category[]>(INITIAL_CATEGORIES);
   const isMobile = width < 768;
 
   useEffect(() => {
@@ -102,6 +109,26 @@ const CategoriesSection = () => {
       },
       (error: any) => {
         console.error('Failed to fetch category counts:', error);
+      },
+    );
+
+    getCategories(
+      (data: any) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setCategories(
+            data.map((c: any) => ({
+              id: c.categoryId || c.id || c.value,
+              title: c.title,
+              imageUrl: c.imageUrl || null,
+              value: c.value,
+            })),
+          );
+        }
+        // Empty/invalid response → keep the bundled INITIAL_CATEGORIES.
+      },
+      (error: any) => {
+        // On failure, keep the bundled fallback list already in state.
+        console.error('Failed to fetch categories:', error);
       },
     );
   }, []);
@@ -119,7 +146,7 @@ const CategoriesSection = () => {
 
   const cardWidth = (availableWidth - gap * (cols - 1)) / cols;
   const actualCardWidth = 310;
-  const gridWidth = (actualCardWidth * Math.min(INITIAL_CATEGORIES.length, cols)) + (gap * (Math.min(INITIAL_CATEGORIES.length, cols) - 1));
+  const gridWidth = (actualCardWidth * Math.min(categories.length, cols)) + (gap * (Math.min(categories.length, cols) - 1));
 
   return (
     <View style={styles.outerContainer}>
@@ -134,7 +161,7 @@ const CategoriesSection = () => {
           </View>
         </View>
         <View style={[styles.grid, { gap, rowGap: 30, maxWidth: gridWidth, alignSelf: 'center' }]}>
-          {INITIAL_CATEGORIES.map(cat => (
+          {categories.map(cat => (
             <CategoryCard
               key={cat.id}
               item={cat}

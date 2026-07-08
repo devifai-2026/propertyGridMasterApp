@@ -212,6 +212,22 @@ export const usePropertyAPIs = () => {
     });
   };
 
+  const getCategories = (
+    onSuccess?: (data: any) => void,
+    onError?: (error: any) => void,
+  ) => {
+    apiCall.get({
+      route: '/v1/categories',
+      onSuccess: data => {
+        if (onSuccess) onSuccess(decodeResponseData(data.data));
+      },
+      onError: error => {
+        if (onError) onError(error);
+      },
+      setLoading,
+    });
+  };
+
   const getWishlist = (
     onSuccess?: (data: any) => void,
     onError?: (error: any) => void,
@@ -537,6 +553,7 @@ export const usePropertyAPIs = () => {
     getAmenities,
     getCaretakers,
     getPropertyCounts,
+    getCategories,
     getBrokers,
     getWishlist,
     toggleLikeProperty,
