@@ -28,15 +28,15 @@ const TermsOfServiceScreen = () => {
           <Text style={styles.heading}>2. Use License</Text>
           <Text style={styles.paragraph}>
             Permission is granted to temporarily download one copy of the
-            materials (information or software) on PropertyGrid's website for
+            materials (information or software) on PreLeaseGrid's website for
             personal, non-commercial transitory viewing only. This is the grant
             of a license, not a transfer of title.
           </Text>
 
           <Text style={styles.heading}>3. Disclaimer</Text>
           <Text style={styles.paragraph}>
-            The materials on PropertyGrid's website are provided "as is".
-            PropertyGrid makes no warranties, expressed or implied, and hereby
+            The materials on PreLeaseGrid's website are provided "as is".
+            PreLeaseGrid makes no warranties, expressed or implied, and hereby
             disclaims and negates all other warranties, including without
             limitation, implied warranties or conditions of merchantability,
             fitness for a particular purpose, or non-infringement of
@@ -45,18 +45,18 @@ const TermsOfServiceScreen = () => {
 
           <Text style={styles.heading}>4. Limitations</Text>
           <Text style={styles.paragraph}>
-            In no event shall PropertyGrid or its suppliers be liable for any
+            In no event shall PreLeaseGrid or its suppliers be liable for any
             damages (including, without limitation, damages for loss of data or
             profit, or due to business interruption) arising out of the use or
-            inability to use the materials on PropertyGrid's Internet site.
+            inability to use the materials on PreLeaseGrid's Internet site.
           </Text>
 
           <Text style={styles.heading}>5. Revisions and Errata</Text>
           <Text style={styles.paragraph}>
-            The materials appearing on PropertyGrid's website could include
-            technical, typographical, or photographic errors. PropertyGrid does
+            The materials appearing on PreLeaseGrid's website could include
+            technical, typographical, or photographic errors. PreLeaseGrid does
             not warrant that any of the materials on its website are accurate,
-            complete, or current. PropertyGrid may make changes to the materials
+            complete, or current. PreLeaseGrid may make changes to the materials
             contained on its website at any time without notice.
           </Text>
         </View>

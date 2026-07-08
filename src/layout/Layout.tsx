@@ -52,7 +52,7 @@ import {
   MessageSquare,
   ChevronDown,
 } from 'lucide-react-native';
-import logo from "../../src/assets/Navbar/logo.png"
+import logo from "../../src/assets/Navbar/Preleasegrid logo 1.png"
 
 import Svg, { Circle, Path, Line } from 'react-native-svg';
 
@@ -177,13 +177,9 @@ const SideMenu: React.FC<SideMenuProps> = ({
                 <View style={styles.logoWrapper}>
                   <Image
                     source={logo}
-                    style={styles.logoIcon}
+                    style={styles.logoImageFull}
                     resizeMode="contain"
                   />
-                  <View style={styles.logoTextWrapper}>
-                    <Text style={styles.logoTextPrelease}>prelease</Text>
-                    <Text style={styles.logoTextGrid}>grid</Text>
-                  </View>
                 </View>
               )}
               <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
@@ -434,13 +430,9 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
           <View style={styles.logoWrapper}>
             <Image
               source={logo}
-              style={[styles.logoIcon, !isMobile && { width: 66, height: 66 }]}
+              style={[styles.logoImageFull, !isMobile && { width: 172, height: 70 }]}
               resizeMode="contain"
             />
-            <View style={styles.logoTextWrapper}>
-              <Text style={[styles.logoTextPrelease, !isMobile && { fontSize: 26, lineHeight: 26 }]}>prelease</Text>
-              <Text style={[styles.logoTextGrid, !isMobile && { fontSize: 20, lineHeight: 20 }]}>grid</Text>
-            </View>
           </View>
         </TouchableOpacity>
 
@@ -784,6 +776,11 @@ const styles = StyleSheet.create({
   logoIcon: {
     height: 35,
     width: 35,
+  },
+  // Full horizontal lockup (icon + "prelease grid ™"), aspect ~2.45:1.
+  logoImageFull: {
+    height: 40,
+    width: 98,
   },
   logoTextWrapper: {
     justifyContent: 'center',
