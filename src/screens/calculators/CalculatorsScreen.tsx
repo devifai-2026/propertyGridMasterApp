@@ -809,7 +809,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
       <View style={[styles.sectionCard, { zIndex: 100 }]}>
         <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Property Details</Text>
 
-        <View style={[styles.gridRow, { zIndex: 50 }]}>
+        <View style={[styles.gridRow, { zIndex: 95 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }, { zIndex: 1000 }]}>
             <Dropdown
               row
@@ -848,7 +848,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
 
 
       {/* Rental Details */}
-      <View style={styles.sectionCard}>
+      <View style={[styles.sectionCard, { zIndex: 95 }]}>
         <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Rental Details</Text>
         <View style={[styles.gridRow, { zIndex: 87 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
@@ -927,7 +927,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
       </View>
 
       {/* Recurring Expenses (Annual) */}
-      <View style={styles.sectionCard}>
+      <View style={[styles.sectionCard, { zIndex: 87 }]}>
         <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Recurring Expenses (Annual)</Text>
         <View style={[styles.gridRow, { zIndex: 78 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
@@ -980,7 +980,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
       </View>
 
       {/* One-time Costs */}
-      <View style={styles.sectionCard}>
+      <View style={[styles.sectionCard, { zIndex: 79 }]}>
         <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>One-time Costs</Text>
         <View style={[styles.gridRow, { zIndex: 72 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
@@ -1033,7 +1033,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
       </View>
 
       {/* Appreciation Assumption */}
-      <View style={styles.sectionCard}>
+      <View style={[styles.sectionCard, { zIndex: 71 }]}>
         <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Appreciation Assumption</Text>
         <View style={[styles.gridRow, { zIndex: 66 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
@@ -1165,9 +1165,9 @@ const EMICalculatorView = () => {
       <InfoCardsSummary type="emi" />
 
       {/* Property Details */}
-      <View style={styles.sectionCard}>
+      <View style={[styles.sectionCard, { zIndex: 63 }]}>
         <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Property Details</Text>
-        <View style={[styles.gridRow, { zIndex: 10 }]}>
+        <View style={[styles.gridRow, { zIndex: 95 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }, { zIndex: 1000 }]}>
             <Dropdown
               row
@@ -1205,7 +1205,7 @@ const EMICalculatorView = () => {
       </View>
 
       {/* EMI Options */}
-      <View style={styles.sectionCard}>
+      <View style={[styles.sectionCard, { zIndex: 55 }]}>
         <View style={[styles.sectionHeaderRow, !isDesktop && { flexDirection: 'column', alignItems: 'flex-start', gap: 10 }]}>
           <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22, marginBottom: 0 }]}>EMI Options</Text>
           <View style={[styles.toggleRow, !isDesktop && { width: '100%', justifyContent: 'space-between' }]}>
@@ -1279,7 +1279,7 @@ const EMICalculatorView = () => {
       </View>
 
       {/* Rental Details */}
-      <View style={styles.sectionCard}>
+      <View style={[styles.sectionCard, { zIndex: 47 }]}>
         <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Rental Details</Text>
         <View style={[styles.gridRow, { zIndex: 54 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
@@ -1358,7 +1358,7 @@ const EMICalculatorView = () => {
       </View>
 
       {/* Recurring Expenses */}
-      <View style={styles.sectionCard}>
+      <View style={[styles.sectionCard, { zIndex: 39 }]}>
         <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Recurring Expenses (Annual)</Text>
         <View style={[styles.gridRow, { zIndex: 45 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
@@ -1411,7 +1411,7 @@ const EMICalculatorView = () => {
       </View>
 
       {/* One-time Costs */}
-      <View style={styles.sectionCard}>
+      <View style={[styles.sectionCard, { zIndex: 31 }]}>
         <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>One-time Costs</Text>
         <View style={[styles.gridRow, { zIndex: 39 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
