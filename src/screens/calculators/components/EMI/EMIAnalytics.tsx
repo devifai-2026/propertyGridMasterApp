@@ -17,6 +17,8 @@ interface EMIAnalyticsProps {
 const EMIAnalytics: React.FC<EMIAnalyticsProps> = ({ data }) => {
   const { width } = useWindowDimensions();
   const isDesktop = width > 768;
+  // Tap-to-show tooltip for the cumulative-cashflow line chart.
+  const [tooltip, setTooltip] = React.useState<{ x: number; y: number; value: number } | null>(null);
   const chartPadding = 32;
   const desktopWidth = (width - 64) / 2 - chartPadding;
   const chartWidth = isDesktop ? desktopWidth : width - 64;
@@ -196,6 +198,31 @@ const EMIAnalytics: React.FC<EMIAnalyticsProps> = ({ data }) => {
                 yAxisSuffix="L"
                 chartConfig={{ ...chartConfig, color: () => '#ef4444' }}
                 withInnerLines={false}
+                onDataPointClick={({ value, x, y }) => setTooltip({ x, y, value })}
+                decorator={() => {
+                  if (!tooltip) return null;
+                  const boxW = 74;
+                  const left = Math.max(4, Math.min(tooltip.x - boxW / 2, chartWidth - boxW - 4));
+                  return (
+                    <View
+                      style={{
+                        position: 'absolute',
+                        left,
+                        top: Math.max(4, tooltip.y - 36),
+                        backgroundColor: '#262626',
+                        paddingHorizontal: 8,
+                        paddingVertical: 4,
+                        borderRadius: 6,
+                        width: boxW,
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Text style={{ color: '#fff', fontSize: 12, fontFamily: 'Montserrat', fontWeight: '600' }}>
+                        ₹{Number(tooltip.value).toFixed(2)}L
+                      </Text>
+                    </View>
+                  );
+                }}
               />
             </View>
           </View>

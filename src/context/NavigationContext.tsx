@@ -6,6 +6,7 @@ import React, {
   useEffect,
 } from 'react';
 import { Platform } from 'react-native';
+import { setAuthFailureHandler } from '../../helpers/api/request';
 
 declare const window: any;
 
@@ -44,6 +45,17 @@ export const NavigationProvider = ({ children }: { children: ReactNode }) => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
+
+  // When an API call fails auth (401 + refresh failed), open the login modal in
+  // place instead of hard-redirecting to /login. Returning true tells the API
+  // layer it was handled, so it skips the fallback redirect.
+  useEffect(() => {
+    setAuthFailureHandler(() => {
+      setShowLoginModal(true);
+      return true;
+    });
+    return () => setAuthFailureHandler(null);
+  }, []);
 
   const openLoginModal = (redirectTo?: string) => {
     // Guard against callers that accidentally pass a non-string (e.g. an

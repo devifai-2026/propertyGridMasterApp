@@ -15,6 +15,9 @@ interface CustomDatePickerProps {
   onBlur?: () => void;
   placeholder?: string;
   error?: boolean;
+  // Text alignment of the date value. Defaults to 'left' to preserve existing
+  // usages; the calculators pass 'right' to match their right-aligned inputs.
+  align?: 'left' | 'right';
 }
 
 const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
@@ -23,6 +26,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   onBlur,
   placeholder,
   error,
+  align = 'left',
 }) => {
   const { width } = useWindowDimensions();
   const isMobile = width < 480;
@@ -52,6 +56,8 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
             margin: 0,
             cursor: 'pointer',
             boxSizing: 'border-box',
+            textAlign: align,
+            fontWeight: 600,
           }}
         />
       </View>
@@ -65,7 +71,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
   // Web already uses the native <input type="date"> above.
   return (
     <View style={[styles.container, error && styles.errorBorder]}>
-      <Text style={[styles.text, isMobile && styles.textMobile, !value && styles.placeholder]}>
+      <Text style={[styles.text, isMobile && styles.textMobile, !value && styles.placeholder, { textAlign: align }]}>
         {value || placeholder || 'YYYY-MM-DD'}
       </Text>
       <Calendar size={20} color="#999" style={styles.icon} />

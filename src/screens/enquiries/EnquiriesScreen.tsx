@@ -20,6 +20,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useAuthAPIs } from '../../../helpers/hooks/authAPIs/useAuthAPIs';
 import Layout from '../../layout/Layout';
 import Popup from '../../components/common/Popup';
+import { logoDark } from '../../assets/logo';
 
 
 const { width } = Dimensions.get('window');
@@ -311,7 +312,7 @@ const EnquiriesScreen = () => {
           {/* Logo */}
           <View style={styles.logoContainer}>
             <Image
-              source={require('../../assets/Navbar/Preleasegrid logo 1.png')}
+              source={logoDark}
               style={styles.logoImage}
               resizeMode="contain"
             />

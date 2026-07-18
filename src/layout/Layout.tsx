@@ -52,7 +52,7 @@ import {
   MessageSquare,
   ChevronDown,
 } from 'lucide-react-native';
-import logo from "../../src/assets/Navbar/Preleasegrid logo 1.png"
+import { logoDark as logo } from "../assets/logo"
 
 import Svg, { Circle, Path, Line } from 'react-native-svg';
 

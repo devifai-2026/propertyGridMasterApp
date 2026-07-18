@@ -37,6 +37,7 @@ import CoverageAnalysis from './components/EMI/CoverageAnalysis';
 import LinearGradient from 'react-native-linear-gradient';
 import { usePropertyAPIs } from '../../../helpers/hooks/propertyAPIs/usePropertyApis';
 import { FONTS } from '../../constants/theme';
+import CustomDatePicker from '../list-property/components/CustomDatePicker';
 
   const EMICalculatorIcon = ({ size = 20, color = '#767676' }) => (
   <Svg width={size} height={size * (30/37)} viewBox="0 0 37 30" fill="none">
@@ -78,6 +79,31 @@ const RedCardIcon = ({ size = 30, color = '#fff' }) => {
   );
 };
 
+// Help text shown when the (?) icon next to a field label is tapped. Keyed by
+// the field label so existing <LabelWithIcon label="..."/> calls get tooltips
+// for free. Falls back to a generic message for anything not listed.
+const FIELD_HELP: Record<string, string> = {
+  'Property Type': 'The category of the property — Residential, Commercial, or Mixed Use.',
+  'Carpet Area (sq ft)': 'Usable floor area of the property in square feet (excludes walls).',
+  'Purchase Price (₹)': 'The total price paid to acquire the property.',
+  'Monthly Rent (₹)': 'The current monthly rent received from the tenant.',
+  'Security Deposit (₹)': 'Refundable deposit held from the tenant; earns assumed interest.',
+  'Rent Escalation every(yrs)': 'How often the rent increases, in years.',
+  'Rent Escalation(% per year)': 'The percentage the rent rises at each escalation.',
+  'Lease Start Date *': 'The date the lease agreement began.',
+  'Lease Term (Years) *': 'Total duration of the lease in years.',
+  'Include Loan': 'Toggle on to factor a home loan (EMI) into the calculation.',
+  'Property Tax (₹)': 'Annual property tax payable.',
+  'Maintenance (₹/sqft)': 'Monthly maintenance charge per square foot.',
+  'Insurance (₹)': 'Annual property insurance premium.',
+  'Maintenance Lumpsum (₹)': 'One-time / additional maintenance amount included in initial investment.',
+  'Stamp Duty (%)': 'Stamp duty as a percentage of the purchase price.',
+  'Legal Fees (₹)': 'One-time legal and documentation charges.',
+  'Brokerage (₹)': 'One-time brokerage / agent commission.',
+  'Other Costs (₹)': 'Any other one-time acquisition costs.',
+  'Annual Appreciation Rate (%)': 'Assumed yearly growth in property value used for the projection.',
+};
+
 const InfoIcon = ({ size = 15, color = '#909092' }) => (
   <Svg width={size} height={size} viewBox="0 0 15 15" fill="none">
     <Path
@@ -97,13 +123,77 @@ const InfoIcon = ({ size = 15, color = '#909092' }) => (
 );
 
 
-const LabelWithIcon = ({ label, style }: { label: string; style?: any }) => {
+// Single shared "which tooltip is open" store so only ONE tooltip is ever
+// visible: opening one closes any other. Holds the open id + its help text and
+// the on-screen rect of the icon, so the bubble can be rendered in a single
+// screen-level overlay (escaping every parent stacking context — the reason a
+// row-local bubble kept hiding under the next input).
+type TooltipState = { id: string; text: string; x: number; y: number; w: number; h: number } | null;
+let activeTooltip: TooltipState = null;
+const tooltipSubscribers = new Set<() => void>();
+const setActiveTooltip = (t: TooltipState) => {
+  activeTooltip = t;
+  tooltipSubscribers.forEach(fn => fn());
+};
+const useTooltipStore = () => {
+  const [, force] = React.useReducer((x: number) => x + 1, 0);
+  React.useEffect(() => {
+    tooltipSubscribers.add(force);
+    return () => { tooltipSubscribers.delete(force); };
+  }, []);
+  return activeTooltip;
+};
+let tooltipIdSeq = 0;
+
+// No screen-level overlay: the app scrolls inside a transformed ScrollView, so
+// position:fixed anchors to the transformed ancestor (not the viewport) and the
+// bubble lands far from the icon. Instead we render the tooltip INLINE, absolutely
+// positioned relative to the icon — it moves with the content and never drifts.
+const LabelWithIcon = ({ label, style, tooltip }: { label: string; style?: any; tooltip?: string }) => {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
+  const idRef = React.useRef<string>('');
+  if (!idRef.current) idRef.current = `tt-${++tooltipIdSeq}`;
+  const active = useTooltipStore();
+
+  React.useEffect(() => () => {
+    if (activeTooltip?.id === idRef.current) setActiveTooltip(null);
+  }, []);
+
+  const open = active?.id === idRef.current;
+  const help = tooltip ?? FIELD_HELP[label] ?? 'More information about this field.';
+
   return (
-    <View style={[styles.labelRow, !isDesktop && { width: '100%', alignItems: 'center' }, style]}>
+    <View
+      style={[
+        styles.labelRow,
+        !isDesktop && { width: '100%', alignItems: 'center' },
+        open && ({ zIndex: 9999, position: 'relative' } as any),
+        style,
+      ]}
+    >
       <Text style={[styles.label, { flexShrink: 1, flexWrap: 'wrap' }]}>{label}</Text>
-      <InfoIcon />
+      <View style={[{ position: 'relative' }, open && ({ zIndex: 9999 } as any)]}>
+        <TouchableOpacity
+          onPress={() => setActiveTooltip(open ? null : { id: idRef.current, text: help, x: 0, y: 0, w: 0, h: 0 })}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          activeOpacity={0.7}
+        >
+          <InfoIcon color={open ? '#EE2529' : '#909092'} />
+        </TouchableOpacity>
+        {open && (
+          <>
+            <TouchableOpacity
+              style={styles.tooltipBackdrop}
+              activeOpacity={1}
+              onPress={() => setActiveTooltip(null)}
+            />
+            <View style={styles.tooltipBubble}>
+              <Text style={styles.tooltipText}>{help}</Text>
+            </View>
+          </>
+        )}
+      </View>
     </View>
   );
 };
@@ -346,6 +436,37 @@ const CalculatorHeader = ({ type }: { type: 'roi' | 'emi' }) => {
   );
 };
 
+// The calculators store dates as DD/MM/YYYY, but the date picker (HTML
+// <input type="date">) speaks YYYY-MM-DD. These convert between the two.
+const toISODate = (ddmmyyyy?: string): string => {
+  if (!ddmmyyyy) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(ddmmyyyy)) return ddmmyyyy; // already ISO
+  const parts = ddmmyyyy.split('/');
+  if (parts.length !== 3) return '';
+  const [d, m, y] = parts;
+  return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+};
+const fromISODate = (iso?: string): string => {
+  if (!iso) return '';
+  const parts = iso.split('-');
+  if (parts.length !== 3) return iso;
+  const [y, m, d] = parts;
+  return `${d.padStart(2, '0')}/${m.padStart(2, '0')}/${y}`;
+};
+
+// Keep only digits and a single leading decimal point. Used to prevent letters
+// or symbols being typed into numeric inputs (web ignores keyboardType).
+const sanitizeNumeric = (value: string): string => {
+  let cleaned = value.replace(/[^0-9.]/g, '');
+  const firstDot = cleaned.indexOf('.');
+  if (firstDot !== -1) {
+    // remove any additional dots after the first
+    cleaned =
+      cleaned.slice(0, firstDot + 1) + cleaned.slice(firstDot + 1).replace(/\./g, '');
+  }
+  return cleaned;
+};
+
 const computeLeaseBalance = (leaseStartDate: string, leaseTermYears: number) => {
   if (!leaseStartDate || !leaseTermYears) return null;
   let dateStr = leaseStartDate;
@@ -485,10 +606,6 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
     propertyType: 'Residential Space',
     carpetArea: '5000',
     purchasePrice: '45000000',
-    loanAmount: '',
-    interestRate: '',
-    loanTenure: '',
-    downPayment: '',
     monthlyRent: '50000',
     securityDeposit: '300000',
     rentEscalationEvery: '3',
@@ -503,9 +620,9 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
     brokerage: '67500',
     legalFees: '35000',
     otherCosts: '25000',
+    appreciationRate: '4',
   });
 
-  const [includeLoan, setIncludeLoan] = useState(false);
   const [results, setResults] = useState<any>(null);
   const { width } = useWindowDimensions();
   const isDesktop = width >= 1024;
@@ -533,8 +650,12 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
     const brokerage = parseFloat(formData.brokerage.replace(/,/g, '')) || 0;
     const otherCosts = parseFloat(formData.otherCosts.replace(/,/g, '')) || 0;
 
+    // Excel F16 "One Time Expense Total" = propertyTax + insurance + stampDuty
+    //   + legal + brokerage + other.
+    const oneTimeExpenseTotal = propertyTax + insurance + stampDuty + legalFees + brokerage + otherCosts;
+    // Excel I19 "Total Initial Investment" = purchasePrice + F16 + maintenanceLumpSum(C13).
+    const totalInvestment = purchasePrice + oneTimeExpenseTotal + maintenanceLumpSum;
     const totalAcquisitionCosts = stampDuty + legalFees + brokerage + otherCosts;
-    const totalInvestment = purchasePrice + totalAcquisitionCosts;
 
     const annualGrossRent = monthlyRent * 12;
     const annualNetIncome = annualGrossRent - totalAnnualExpenses;
@@ -548,18 +669,12 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
     const annualSecurityDepositInterest = (securityDeposit * securityDepositInterestPct) / 100;
     const totalAnnualReturn = annualNetIncome + annualSecurityDepositInterest;
 
-    // Financing if included
-    let monthlyEMI = 0;
-    let totalLoanInterest = 0;
-    if (includeLoan) {
-      const loanAmount = parseFloat(formData.loanAmount.replace(/,/g, '')) || 0;
-      const rateMonth = (parseFloat(formData.interestRate) || 0) / 12 / 100;
-      const months = (parseFloat(formData.loanTenure) || 0) * 12;
-      if (rateMonth > 0 && months > 0) {
-        monthlyEMI = (loanAmount * rateMonth * Math.pow(1 + rateMonth, months)) / (Math.pow(1 + rateMonth, months) - 1);
-        totalLoanInterest = (monthlyEMI * months) - loanAmount;
-      }
-    }
+    // Excel I18 "Appreciation (Assumed)" = purchasePrice * (1 + rate) ^ roundYearsLeft.
+    const appreciationRate = (parseFloat(formData.appreciationRate) || 0) / 100;
+    const leaseTermYears = parseFloat(formData.leaseTerm) || 0;
+    const balance = computeLeaseBalance(formData.leaseStartDate, leaseTermYears);
+    const roundYearsLeft = balance ? Math.max(0, balance.years) : Math.max(0, Math.floor(leaseTermYears));
+    const appreciation = purchasePrice * Math.pow(1 + appreciationRate, roundYearsLeft);
 
     setResults({
       grossYield: grossYield.toFixed(2) + '%',
@@ -573,13 +688,10 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
       totalAnnualReturn: totalAnnualReturn,
       paybackPeriod: paybackPeriod.toFixed(1) + ' years',
       cashFlow: '₹' + (annualNetIncome / 100000).toFixed(2) + ' Lakhs',
-      monthlyEMI: monthlyEMI,
-      totalLoanInterest: totalLoanInterest,
-      loanAmount: parseFloat(formData.loanAmount.replace(/,/g, '')) || 0,
-      downPayment: parseFloat(formData.downPayment.replace(/,/g, '')) || 0,
+      appreciation: appreciation,
+      appreciationRate: formData.appreciationRate,
+      roundYearsLeft: roundYearsLeft,
       propertyPrice: purchasePrice,
-      interestRate: formData.interestRate,
-      loanTenure: formData.loanTenure,
       propertyTax,
       insurance,
       annualMaintenance,
@@ -589,10 +701,16 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
 
   React.useEffect(() => {
     calculateROIValues();
-  }, [formData, includeLoan]);
+  }, [formData]);
 
   const handleInputChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    // leaseStartDate is DD/MM/YYYY from the date picker; everything else is
+    // numeric — strip non-digits so letters/symbols can't be typed on web.
+    // Text fields (dropdown value, date) must not be numeric-sanitized —
+    // otherwise selecting e.g. "Commercial Space" gets stripped to "".
+    const TEXT_FIELDS = ['propertyType', 'leaseStartDate'];
+    const next = TEXT_FIELDS.includes(name) ? value : sanitizeNumeric(value);
+    setFormData(prev => ({ ...prev, [name]: next }));
   };
 
   const handleCalculate = () => {
@@ -628,11 +746,13 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
         leaseTermYears: resolvedLeaseTermYears,
         propertyTax: parseFloat(formData.propertyTax.replace(/,/g, '')) || 0,
         maintenancePerSqFtPerMonth: parseFloat(formData.maintenancePerSqft) || 0,
+        maintenanceLumpSum: parseFloat(formData.maintenanceLumpSum.replace(/,/g, '')) || 0,
         insurance: parseFloat(formData.insurance.replace(/,/g, '')) || 0,
         stampDutyPercent: (parseFloat(formData.stampDuty) || 0) / 100,
         legalFees: parseFloat(formData.legalFees.replace(/,/g, '')) || 0,
         brokerage: parseFloat(formData.brokerage.replace(/,/g, '')) || 0,
         otherOneTimeCosts: parseFloat(formData.otherCosts.replace(/,/g, '')) || 0,
+        appreciationRatePercent: (parseFloat(formData.appreciationRate) || 0) / 100,
         propertyType:
           formData.propertyType === 'Residential Space' ? 'Residential'
           : formData.propertyType === 'Commercial Space' ? 'Commercial'
@@ -647,6 +767,9 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
         const roiPercent = data?.summary?.roiPercent ?? 0;
         const totalCashFlows = data?.cashFlows?.totalCashFlows ?? 0;
         const maintenanceCost = data?.interimCalculations?.maintenanceCost ?? 0;
+        // Appreciation may be absent until the backend is redeployed — fall back
+        // to the locally computed value so the card always has a number.
+        const appreciation = data?.summary?.appreciation;
 
         setResults((prev: any) =>
           prev
@@ -662,6 +785,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
                 totalAnnualReturn: annualNetIncome + securityDepositInterest,
                 propertyPrice: data?.inputs?.purchasePrice ?? prev.propertyPrice,
                 annualMaintenance: maintenanceCost,
+                appreciation: appreciation ?? prev.appreciation,
                 plgData: data,
               }
             : null,
@@ -707,7 +831,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             />
           </View>
         </View>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 90 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Purchase Price (₹)" />
             <TextInput
@@ -722,85 +846,11 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
         </View>
       </View>
 
-      {/* Financing Options */}
-      <View style={styles.sectionCard}>
-        <View style={[styles.sectionHeaderRow, !isDesktop && { flexDirection: 'column', alignItems: 'flex-start', gap: 10 }]}>
-          <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22, marginBottom: 0 }]}>Financing Options</Text>
-          <View style={[styles.toggleRow, !isDesktop && { width: '100%', justifyContent: 'space-between' }]}>
-            <LabelWithIcon
-              label="Include Loan"
-              style={{ marginBottom: 0, fontSize: 14, width: 'auto' }}
-            />
-            <Switch
-              value={includeLoan}
-              onValueChange={setIncludeLoan}
-              trackColor={{ false: '#767577', true: '#EE2529' }}
-              thumbColor={'#fff'}
-            />
-          </View>
-        </View>
-        <Text style={[styles.sectionNote, !isDesktop && { fontSize: 13, lineHeight: 16 }]}>
-          Note: Loan amount cannot exceed the property purchase price.
-        </Text>
-
-        {includeLoan && (
-          <>
-            <View style={styles.gridRow}>
-              <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
-                <LabelWithIcon label="Loan Amount (₹)" />
-                <TextInput
-                  style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
-                  placeholder="31,50,000"
-                  keyboardType="numeric"
-                  value={formData.loanAmount}
-                  onChangeText={v => handleInputChange('loanAmount', v)}
-                  placeholderTextColor="#262626"
-                />
-              </View>
-              <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
-                <LabelWithIcon label="Down Payment (₹)" />
-                <TextInput
-                  style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
-                  placeholder="13,50,000"
-                  keyboardType="numeric"
-                  value={formData.downPayment}
-                  onChangeText={v => handleInputChange('downPayment', v)}
-                  placeholderTextColor="#262626"
-                />
-              </View>
-            </View>
-            <View style={styles.gridRow}>
-              <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
-                <LabelWithIcon label="Interest Rate (%)" />
-                <TextInput
-                  style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
-                  placeholder="8.5"
-                  keyboardType="numeric"
-                  value={formData.interestRate}
-                  onChangeText={v => handleInputChange('interestRate', v)}
-                  placeholderTextColor="#262626"
-                />
-              </View>
-              <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
-                <LabelWithIcon label="Loan Tenure (Years)" />
-                <TextInput
-                  style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
-                  placeholder="20"
-                  keyboardType="numeric"
-                  value={formData.loanTenure}
-                  onChangeText={v => handleInputChange('loanTenure', v)}
-                  placeholderTextColor="#262626"
-                />
-              </View>
-            </View>
-          </>
-        )}
-      </View>
 
       {/* Rental Details */}
       <View style={styles.sectionCard}>
         <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Rental Details</Text>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 87 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Monthly Rent (₹)" />
             <TextInput
@@ -824,7 +874,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             />
           </View>
         </View>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 84 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Rent Escalation every(yrs)" />
             <TextInput
@@ -848,16 +898,17 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             />
           </View>
         </View>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 81 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Lease Start Date *" />
-            <TextInput
-              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
-              placeholder="DD/MM/YYYY"
-              value={formData.leaseStartDate}
-              onChangeText={v => handleInputChange('leaseStartDate', v)}
-              placeholderTextColor="#262626"
-            />
+            <View style={[{ flex: 1, minWidth: 0 }, !isDesktop && { width: '100%', flex: undefined }]}>
+              <CustomDatePicker
+                value={toISODate(formData.leaseStartDate)}
+                onChange={(iso) => handleInputChange('leaseStartDate', fromISODate(iso))}
+                placeholder="DD/MM/YYYY"
+                align="right"
+              />
+            </View>
           </View>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Lease Term (Years) *" />
@@ -878,7 +929,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
       {/* Recurring Expenses (Annual) */}
       <View style={styles.sectionCard}>
         <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Recurring Expenses (Annual)</Text>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 78 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Property Tax (₹)" />
             <TextInput
@@ -902,7 +953,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             />
           </View>
         </View>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 75 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Insurance (₹)" />
             <TextInput
@@ -931,7 +982,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
       {/* One-time Costs */}
       <View style={styles.sectionCard}>
         <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>One-time Costs</Text>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 72 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Stamp Duty (%)" />
             <TextInput
@@ -955,7 +1006,7 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
             />
           </View>
         </View>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 69 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Brokerage (₹)" />
             <TextInput
@@ -975,6 +1026,24 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
               keyboardType="numeric"
               value={formData.otherCosts}
               onChangeText={v => handleInputChange('otherCosts', v)}
+              placeholderTextColor="#262626"
+            />
+          </View>
+        </View>
+      </View>
+
+      {/* Appreciation Assumption */}
+      <View style={styles.sectionCard}>
+        <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Appreciation Assumption</Text>
+        <View style={[styles.gridRow, { zIndex: 66 }]}>
+          <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
+            <LabelWithIcon label="Annual Appreciation Rate (%)" />
+            <TextInput
+              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
+              placeholder="4"
+              keyboardType="numeric"
+              value={formData.appreciationRate}
+              onChangeText={v => handleInputChange('appreciationRate', v)}
               placeholderTextColor="#262626"
             />
           </View>
@@ -1075,7 +1144,12 @@ const EMICalculatorView = () => {
   }, [formData, includeLoan]);
 
   const handleInputChange = (name: string, value: string) => {
-    setFormData(prev => ({ ...prev, [name]: value }));
+    // leaseStartDate is set via the date picker; everything else is numeric.
+    // Text fields (dropdown value, date) must not be numeric-sanitized —
+    // otherwise selecting e.g. "Commercial Space" gets stripped to "".
+    const TEXT_FIELDS = ['propertyType', 'leaseStartDate'];
+    const next = TEXT_FIELDS.includes(name) ? value : sanitizeNumeric(value);
+    setFormData(prev => ({ ...prev, [name]: next }));
   };
 
   const handleCalculate = () => {
@@ -1115,7 +1189,7 @@ const EMICalculatorView = () => {
             />
           </View>
         </View>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 63 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Purchase Price (₹)" />
             <TextInput
@@ -1150,7 +1224,7 @@ const EMICalculatorView = () => {
         <Text style={[styles.sectionNote, !isDesktop && { fontSize: 13, lineHeight: 16 }]}>
           Note: Loan amount cannot exceed the property purchase price.
         </Text>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 60 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Loan Amount (₹)" />
             <TextInput
@@ -1176,7 +1250,7 @@ const EMICalculatorView = () => {
             />
           </View>
         </View>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 57 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Interest (% per annum)" />
             <TextInput
@@ -1207,7 +1281,7 @@ const EMICalculatorView = () => {
       {/* Rental Details */}
       <View style={styles.sectionCard}>
         <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Rental Details</Text>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 54 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Monthly Rent (₹)" />
             <TextInput
@@ -1231,7 +1305,7 @@ const EMICalculatorView = () => {
             />
           </View>
         </View>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 51 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Days Calculation Gregorian" />
             <TextInput
@@ -1255,16 +1329,17 @@ const EMICalculatorView = () => {
             />
           </View>
         </View>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 48 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Lease Start Date *" />
-            <TextInput
-              style={[styles.input, !isDesktop && { width: '100%', flex: undefined }]}
-              placeholder="DD/MM/YYYY"
-              value={formData.leaseStartDate}
-              onChangeText={v => handleInputChange('leaseStartDate', v)}
-              placeholderTextColor="#262626"
-            />
+            <View style={[{ flex: 1, minWidth: 0 }, !isDesktop && { width: '100%', flex: undefined }]}>
+              <CustomDatePicker
+                value={toISODate(formData.leaseStartDate)}
+                onChange={(iso) => handleInputChange('leaseStartDate', fromISODate(iso))}
+                placeholder="DD/MM/YYYY"
+                align="right"
+              />
+            </View>
           </View>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Lease Term (Yrs) *" />
@@ -1285,7 +1360,7 @@ const EMICalculatorView = () => {
       {/* Recurring Expenses */}
       <View style={styles.sectionCard}>
         <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>Recurring Expenses (Annual)</Text>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 45 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Property Tax (₹)" />
             <TextInput
@@ -1309,7 +1384,7 @@ const EMICalculatorView = () => {
             />
           </View>
         </View>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 42 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Insurance (₹)" />
             <TextInput
@@ -1338,7 +1413,7 @@ const EMICalculatorView = () => {
       {/* One-time Costs */}
       <View style={styles.sectionCard}>
         <Text style={[styles.sectionTitle, !isDesktop && { fontSize: 18, lineHeight: 22 }]}>One-time Costs</Text>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 39 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Stamp Duty (%)" />
             <TextInput
@@ -1362,7 +1437,7 @@ const EMICalculatorView = () => {
             />
           </View>
         </View>
-        <View style={styles.gridRow}>
+        <View style={[styles.gridRow, { zIndex: 36 }]}>
           <View style={[styles.inputCol, !isDesktop && { flexBasis: '100%', maxWidth: '100%', minWidth: '100%', flexDirection: 'column', alignItems: 'flex-start', gap: 8, marginBottom: 20 }]}>
             <LabelWithIcon label="Brokerage (₹)" />
             <TextInput
@@ -1701,7 +1776,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
-    
+    position: 'relative',
+    zIndex: 1,
   },
   inputCol: {
     flexBasis: '48%',
@@ -1748,6 +1824,44 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '35%',
     gap: 6,
+  },
+  tooltipBackdrop: {
+    ...Platform.select({
+      web: { position: 'fixed' as any },
+      default: { position: 'absolute' },
+    }),
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 9998,
+  },
+  tooltipBubble: {
+    position: 'absolute',
+    top: 26,          // open downward, just below the icon
+    left: -8,         // roughly aligned to the icon
+    width: 240,
+    backgroundColor: '#262626',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    zIndex: 9999,
+    elevation: 24,
+    ...Platform.select({
+      web: { boxShadow: '0 4px 12px rgba(0,0,0,0.25)' } as any,
+      default: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.25,
+        shadowRadius: 12,
+      },
+    }),
+  },
+  tooltipText: {
+    color: '#fff',
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: 'Montserrat',
   },
   input: {
     flex: 1,
@@ -1854,6 +1968,9 @@ const styles = StyleSheet.create({
     color: '#262626',
     fontWeight: '600',
     fontFamily: 'Montserrat',
+    flex: 1,
+    textAlign: 'right',
+    marginRight: 8,
   },
   dropdownList: {
     position: 'absolute',

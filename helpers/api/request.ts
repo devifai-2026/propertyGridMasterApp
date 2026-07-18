@@ -3,10 +3,21 @@ import { BASE_URL } from '../environments';
 import { getHeaders } from './headers';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { decodeResponseData } from './decoder';
+import { getFriendlyError } from './errorMessages';
 
 declare const window: any;
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+
+// Optional handler the app can register so an auth failure opens the login
+// modal in place (staying on the current page) instead of a hard redirect to
+// /login. When set, it fully handles the auth failure and returning true means
+// "don't fall back to the hard redirect".
+type AuthFailureHandler = () => boolean | void;
+let authFailureHandler: AuthFailureHandler | null = null;
+export const setAuthFailureHandler = (fn: AuthFailureHandler | null) => {
+  authFailureHandler = fn;
+};
 
 export interface RequestConfig<T = any> {
   route: string;
@@ -80,9 +91,16 @@ const handleRefreshFailure = async () => {
   try {
     await AsyncStorage.multiRemove(['user', 'accessToken', 'token', 'isLoggedIn']);
   } catch {}
-  // On web, force navigation to the login screen. Persist the page the user
-  // was on (a hard redirect wipes in-memory React state, so the in-memory
-  // pendingRedirect would be lost) so we can resume there after re-login.
+  // Preferred path: let the app open the login MODAL in place so the user stays
+  // on the current page (e.g. /calculators) and can dismiss it to return.
+  try {
+    if (authFailureHandler) {
+      const handled = authFailureHandler();
+      if (handled !== false) return;
+    }
+  } catch {}
+  // Fallback (no handler registered): force navigation to the login screen.
+  // Persist the page the user was on so we can resume there after re-login.
   try {
     const w: any = typeof window !== 'undefined' ? window : null;
     if (w?.location && !String(w.location.pathname).startsWith('/login')) {
@@ -159,6 +177,17 @@ export const request = async <T = any, R = any>(
       response.data.data = decodeResponseData(response.data.data);
     }
 
+    // Some endpoints return 200 with { success:false, message:'SOME_CODE' }.
+    // Friendly-ify that message so callers reading response.message show good copy.
+    if (
+      response.data &&
+      typeof response.data === 'object' &&
+      response.data.success === false &&
+      typeof response.data.message === 'string'
+    ) {
+      response.data.message = getFriendlyError(response.data.message, response.data.message);
+    }
+
     if (onSuccess) onSuccess(response.data);
     return response.data;
   } catch (error: any) {
@@ -166,6 +195,17 @@ export const request = async <T = any, R = any>(
     const serverExpiredFlag = error.response?.data?.expired === true;
     const isAuthFailure = status === 401 || serverExpiredFlag;
     const isRefreshRoute = route.includes('refresh-token');
+
+    // Normalize the server error into friendly, user-facing text so raw codes
+    // (e.g. REQUEST_ALREADY_EXISTS) never reach the UI. Every caller reads
+    // error.response.data.message, so overwriting it here fixes them all at once.
+    try {
+      const friendly = getFriendlyError(error);
+      error.friendlyMessage = friendly;
+      if (error.response?.data && typeof error.response.data === 'object') {
+        error.response.data.message = friendly;
+      }
+    } catch {}
 
     if (isAuthFailure && !isRefreshRoute && !_isRetry) {
       const newAccessToken = await refreshAccessToken();

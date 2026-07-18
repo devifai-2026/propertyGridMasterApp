@@ -29,6 +29,7 @@ import { getHeaders } from '../../../helpers/api/headers';
 import { BASE_URL } from '../../../helpers/environments';
 import { decodeResponseData } from '../../../helpers/api/decoder';
 import { COLORS } from '../../constants/theme';
+import { logoDark } from '../../assets/logo';
 
 const CrossIcon = ({ size = 18, color = "#EE2529" }: { size?: number, color?: string }) => (
   <Svg width={size} height={size} viewBox="0 0 18 18" fill="none">
@@ -394,7 +395,7 @@ const SignupScreen = ({ onClose }: { onClose?: () => void }) => {
       <View style={styles.header}>
         <View style={styles.logoContainer}>
           <Image
-            source={require('../../assets/Navbar/Preleasegrid logo 1.png')}
+            source={logoDark}
             style={styles.logoImage}
             resizeMode="contain"
           />

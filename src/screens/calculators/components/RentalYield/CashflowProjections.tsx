@@ -29,6 +29,33 @@ const CashflowProjections = ({ data }: CashFlowProjectionsProps) => {
 
   const chartWidth = isDesktop ? width - 40 : width - 75;
 
+  // Tap-to-show tooltip: react-native-chart-kit has no hover tooltip, so we
+  // capture the clicked point and render a floating value box via `decorator`.
+  // We also resolve which series/year was tapped so overlapping lines are
+  // readable (the small rent/cash-flow lines sit close together).
+  const [tooltip, setTooltip] = React.useState<
+    { x: number; y: number; value: number; label: string; year: string; color: string } | null
+  >(null);
+
+  const SERIES = [
+    { key: 'annualCashFlow', label: 'Annual Cash Flow', color: '#20B2AA' },
+    { key: 'annualRent', label: 'Annual Rent', color: '#C73834' },
+    { key: 'cumulativeCashFlow', label: 'Cumulative Cash Flow', color: '#F7C952' },
+  ] as const;
+
+  // chart-kit's onDataPointClick gives value + index but not which dataset, so
+  // match the clicked value against the three series at that index.
+  const resolveSeries = (index: number, value: number) => {
+    const row: any = cashFlowData[index] || {};
+    let best = SERIES[0];
+    let bestDiff = Infinity;
+    for (const s of SERIES) {
+      const diff = Math.abs((row[s.key] ?? NaN) - value);
+      if (diff < bestDiff) { bestDiff = diff; best = s; }
+    }
+    return best;
+  };
+
   const calculateProjections = () => {
     const projections = [];
     let currentRent = data?.annualGrossRent || 0;
@@ -140,6 +167,40 @@ const CashflowProjections = ({ data }: CashFlowProjectionsProps) => {
             },
           }}
           style={styles.chart}
+          onDataPointClick={({ value, x, y, index }) => {
+            const s = resolveSeries(index, value);
+            setTooltip({ x, y, value, label: s.label, year: cashFlowData[index]?.year ?? '', color: s.color });
+          }}
+          decorator={() => {
+            if (!tooltip) return null;
+            const boxW = 150;
+            const left = Math.max(4, Math.min(tooltip.x - boxW / 2, chartWidth - boxW - 4));
+            const top = Math.max(4, tooltip.y - 58);
+            return (
+              <View
+                style={{
+                  position: 'absolute',
+                  left,
+                  top,
+                  backgroundColor: '#262626',
+                  paddingHorizontal: 10,
+                  paddingVertical: 6,
+                  borderRadius: 8,
+                  width: boxW,
+                }}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
+                  <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: tooltip.color, marginRight: 6 }} />
+                  <Text style={{ color: '#fff', fontSize: 11, fontFamily: 'Montserrat', fontWeight: '600' }}>
+                    {tooltip.label}
+                  </Text>
+                </View>
+                <Text style={{ color: '#bdbdbd', fontSize: 10, fontFamily: 'Montserrat' }}>
+                  {tooltip.year} · <Text style={{ color: '#fff', fontWeight: '700' }}>₹{tooltip.value.toFixed(2)}L</Text>
+                </Text>
+              </View>
+            );
+          }}
           formatYLabel={value => {
             const num = Number(value);
             if (num === 0) return '₹0L';

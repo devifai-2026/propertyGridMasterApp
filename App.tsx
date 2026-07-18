@@ -119,7 +119,9 @@ const AppContent = () => {
       case path === '/my-dashboard':
         return isLoggedIn ? <InvestorsScreen /> : <Dashboard />;
       case path === '/login':
-        return <LoginScreen />;
+        // Closing the routed login screen must not leave a blank page — send
+        // the user to the dashboard/home instead of just hiding the modal.
+        return <LoginScreen onClose={() => navigate('/')} />;
       case path === '/list-property':
       case path.startsWith('/list-property/'):
         return <ListPropertyScreen />;

@@ -9,6 +9,10 @@ interface SummaryCardsProps {
     annualNetIncome?: number;
     securityDepositInterest?: number;
     totalAnnualReturn?: number;
+    appreciation?: number;
+    appreciationRate?: string;
+    roundYearsLeft?: number;
+    propertyPrice?: number;
   };
 }
 
@@ -72,6 +76,28 @@ const SummaryCards = ({ data }: SummaryCardsProps) => {
               <Text style={[styles.labelDark, !isDesktop && { fontSize: 14 }]}>Total Annual Return (₹)</Text>
               <Text style={[styles.valueGreen, !isDesktop && { fontSize: 16 }]}>{formatCurrency(data?.totalAnnualReturn)}</Text>
             </View>
+          </View>
+        </View>
+
+        {/* 3 - Investment Projection (Appreciation) */}
+        <View style={cardStyle}>
+          <Text style={[styles.cardTitle, !isDesktop && { fontSize: 20 }]}>Investment Projection</Text>
+          <View style={styles.spaceY}>
+            <View style={styles.rowBetween}>
+              <Text style={[styles.label, !isDesktop && { fontSize: 14 }]}>Current Property Value (₹)</Text>
+              <Text style={[styles.value, !isDesktop && { fontSize: 14 }]}>{formatCurrency(data?.propertyPrice)}</Text>
+            </View>
+            <View style={styles.rowBetween}>
+              <Text style={[styles.label, !isDesktop && { fontSize: 14 }]}>
+                Appreciation @ {data?.appreciationRate ?? '4'}% ({data?.roundYearsLeft ?? 0} yrs)
+              </Text>
+              <Text style={[styles.value, !isDesktop && { fontSize: 14 }]}>{formatCurrency(data?.appreciation)}</Text>
+            </View>
+          </View>
+          <View style={styles.divider} />
+          <View style={styles.rowBetween}>
+            <Text style={[styles.labelBold, !isDesktop && { fontSize: 14 }]}>Projected Value (₹)</Text>
+            <Text style={[styles.valueGreen, !isDesktop && { fontSize: 16 }]}>{formatCurrency(data?.appreciation)}</Text>
           </View>
         </View>
       </View>

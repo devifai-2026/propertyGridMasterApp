@@ -11,6 +11,7 @@ import {
 import { useNavigation } from '../context/NavigationContext';
 import instagram from '../assets/Footer/Instagram.png';
 import linkedin from '../assets/Footer/linkedin.png';
+import { logoWhite } from '../assets/logo';
 
 // TODO: replace with the brand's real social profiles
 const SOCIAL_LINKS = {
@@ -45,7 +46,7 @@ const Footer = () => {
           <View style={[styles.logoColumn, isMobile && styles.logoColumnMobile]}>
             <TouchableOpacity onPress={() => handleNavigate('/')}>
               <Image
-                source={require('../assets/Footer/logo.png')}
+                source={logoWhite}
                 style={[
                   styles.logo,
                   isMobile && styles.logoMobile,
