@@ -21,10 +21,6 @@ const isDesktop = windowWidth >= 1024;
 type CashFlowRow = {
   year: string;
   annualRent: string;
-  emiPaid: string;
-  principal: string;
-  interest: string;
-  balance: string;
   annualExpenses: string;
   netCashFlow: string;
 };
@@ -53,32 +49,17 @@ const RentalDetailsCashflow = ({ data }: RentalDetailsCashflowProps) => {
     const escalationEvery = data?.rentEscalationEvery ?? 3;
     const escalationPercent = data?.rentEscalationPercent ?? 8;
     const annualExpenses = data?.totalAnnualExpenses || 0;
-    const monthlyEMI = data?.monthlyEMI || 0;
-    const annualEMI = monthlyEMI * 12;
-    
-    // Very simplified principal/interest split for the table
-    // In a real app we'd use an amortization schedule
-    let remainingBalance = data?.loanAmount || 0;
-    const annualRate = parseFloat(data?.interestRate || '0') / 100;
-    
+
     for (let year = 1; year <= 10; year++) {
       if (year > 1 && (year - 1) % escalationEvery === 0) {
         currentRent = currentRent * (1 + escalationPercent / 100);
       }
-      
-      const interestPaid = remainingBalance * annualRate;
-      const principalPaid = Math.min(remainingBalance, Math.max(0, annualEMI - interestPaid));
-      remainingBalance -= principalPaid;
-      
-      const netCashFlow = currentRent - annualExpenses - (data?.loanAmount ? annualEMI : 0);
-      
+
+      const netCashFlow = currentRent - annualExpenses;
+
       details.push({
         year: year.toString(),
         annualRent: `₹${currentRent.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`,
-        emiPaid: data?.loanAmount ? `₹${annualEMI.toLocaleString('en-IN', { maximumFractionDigits: 0 })}` : '-',
-        principal: data?.loanAmount ? `₹${principalPaid.toLocaleString('en-IN', { maximumFractionDigits: 0 })}` : '-',
-        interest: data?.loanAmount ? `₹${interestPaid.toLocaleString('en-IN', { maximumFractionDigits: 0 })}` : '-',
-        balance: data?.loanAmount ? `₹${remainingBalance.toLocaleString('en-IN', { maximumFractionDigits: 0 })}` : '-',
         annualExpenses: `₹${annualExpenses.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`,
         netCashFlow: `₹${netCashFlow.toLocaleString('en-IN', { maximumFractionDigits: 0 })}`,
       });
@@ -90,12 +71,12 @@ const RentalDetailsCashflow = ({ data }: RentalDetailsCashflowProps) => {
 
   const handleDownloadReport = () => {
     const details = calculateDetailedCashflow();
-    const headers = ['Year', 'Annual Rent', 'EMI Paid', 'Principal', 'Interest', 'Balance', 'Annual Expenses', 'Net Cash Flow'];
+    const headers = ['Year', 'Annual Rent', 'Annual Expenses', 'Net Cash Flow'];
     let csv = 'Property Investment Detailed Cashflow Report\n';
     csv += `Generated: ${new Date().toLocaleDateString('en-IN')}\n\n`;
     csv += headers.join(',') + '\n';
     details.forEach(row => {
-      csv += [row.year, row.annualRent, row.emiPaid, row.principal, row.interest, row.balance, row.annualExpenses, row.netCashFlow].join(',') + '\n';
+      csv += [row.year, row.annualRent, row.annualExpenses, row.netCashFlow].join(',') + '\n';
     });
 
     if (Platform.OS === 'web') {
@@ -132,7 +113,7 @@ const RentalDetailsCashflow = ({ data }: RentalDetailsCashflowProps) => {
         horizontal
         showsHorizontalScrollIndicator
         contentContainerStyle={{
-          minWidth: 1040, 
+          minWidth: 520,
           width: isDesktop ? '100%' : undefined,
         }}
       >
@@ -142,10 +123,6 @@ const RentalDetailsCashflow = ({ data }: RentalDetailsCashflowProps) => {
             {[
               'Year',
               'Annual Rent',
-              'EMI Paid',
-              'Principal',
-              'Interest',
-              'Balance',
               'Annual Expenses',
               'Net Cash Flow',
             ].map((title, index) => (
@@ -160,10 +137,6 @@ const RentalDetailsCashflow = ({ data }: RentalDetailsCashflowProps) => {
             <View key={index} style={styles.row}>
               <Text style={styles.cell}>{item.year}</Text>
               <Text style={styles.cell}>{item.annualRent}</Text>
-              <Text style={[styles.cell, styles.red]}>{item.emiPaid}</Text>
-              <Text style={styles.cell}>{item.principal}</Text>
-              <Text style={styles.cell}>{item.interest}</Text>
-              <Text style={[styles.cell, styles.green]}>{item.balance}</Text>
               <Text style={styles.cell}>{item.annualExpenses}</Text>
               <Text style={[styles.cell, styles.green]}>
                 {item.netCashFlow}

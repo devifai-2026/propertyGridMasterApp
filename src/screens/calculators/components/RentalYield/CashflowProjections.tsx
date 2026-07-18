@@ -111,6 +111,43 @@ const CashflowProjections = ({ data }: CashFlowProjectionsProps) => {
     }
   };
 
+  // "View Detailed Report" — a fuller, rupee-value report (Alert.alert is a
+  // no-op on web, which is why the button appeared to do nothing before).
+  const handleDownloadReport = () => {
+    const annualExpenses = data?.totalAnnualExpenses || 0;
+    const totalInvestment = data?.totalInvestment || 0;
+    const inr = (n: number) => `₹${Math.round(n).toLocaleString('en-IN')}`;
+    const headers = ['Year', 'Annual Rent', 'Annual Expenses', 'Net Cash Flow', 'Cumulative Cash Flow'];
+    let csv = 'Property Investment — Detailed Cash Flow Report\n';
+    csv += `Generated: ${new Date().toLocaleDateString('en-IN')}\n`;
+    csv += `Total Initial Investment,${inr(totalInvestment)}\n\n`;
+    csv += headers.join(',') + '\n';
+    let cumulative = -totalInvestment;
+    let rent = data?.annualGrossRent || 0;
+    const every = data?.rentEscalationEvery ?? 3;
+    const pct = data?.rentEscalationPercent ?? 8;
+    for (let year = 1; year <= 10; year++) {
+      if (year > 1 && (year - 1) % every === 0) rent = rent * (1 + pct / 100);
+      const net = rent - annualExpenses;
+      cumulative += net;
+      csv += [`Y${year}`, inr(rent), inr(annualExpenses), inr(net), inr(cumulative)].join(',') + '\n';
+    }
+
+    if (Platform.OS === 'web') {
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'detailed-cashflow-report.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } else {
+      Share.share({ message: csv, title: 'Detailed Cash Flow Report' });
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.card}>
@@ -214,12 +251,7 @@ const CashflowProjections = ({ data }: CashFlowProjectionsProps) => {
 
         <TouchableOpacity
           style={[styles.button, styles.buttonOutline]}
-          onPress={() =>
-            Alert.alert(
-              'Detailed Report',
-              'A detailed downloadable report is coming soon. Use "Download Projections" to export the data as CSV.',
-            )
-          }
+          onPress={handleDownloadReport}
         >
           <Text style={styles.buttonOutlineText}>View Detailed Report</Text>
         </TouchableOpacity>
