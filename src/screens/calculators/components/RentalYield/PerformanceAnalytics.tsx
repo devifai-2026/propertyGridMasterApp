@@ -53,7 +53,7 @@ const PerformanceAnalytics = ({ data }: PerformanceAnalyticsProps) => {
           <Text style={styles.cardTitle}>Annual Expense Breakdown</Text>
 
           {expenseData.length > 0 ? (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <>
               <PieChart
                 data={expenseData.map(item => ({
                   name: item.name,
@@ -63,14 +63,27 @@ const PerformanceAnalytics = ({ data }: PerformanceAnalyticsProps) => {
                   legendFontSize: 14,
                 }))}
                 width={isDesktop ? chartWidth : Math.max(chartWidth, 300)}
-                height={260}
+                height={220}
                 chartConfig={chartConfig}
                 accessor="population"
                 backgroundColor="transparent"
                 paddingLeft="10"
+                hasLegend={false}
                 absolute
               />
-            </ScrollView>
+              {/* Custom legend — chart-kit's built-in legend truncates long
+                  "{value} {name}" strings and doesn't wrap. */}
+              <View style={styles.legend}>
+                {expenseData.map(item => (
+                  <View key={item.name} style={styles.legendRow}>
+                    <View style={[styles.legendDot, { backgroundColor: item.color }]} />
+                    <Text style={styles.legendText} numberOfLines={1}>
+                      {item.name} — ₹{Math.round(item.population).toLocaleString('en-IN')}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </>
           ) : (
             <Text style={{ textAlign: 'center', color: '#999', marginVertical: 100 }}>No expense data available</Text>
           )}
@@ -128,6 +141,8 @@ const styles = StyleSheet.create({
   container: {
     padding: 16,
     backgroundColor: '#fff',
+    maxWidth: '100%',
+    overflow: 'hidden',
   },
   heading: {
     fontSize: 26,
@@ -138,6 +153,7 @@ const styles = StyleSheet.create({
   },
   wrapper: {
     flexDirection: 'column',
+    maxWidth: '100%',
   },
   desktopRow: {
     flexDirection: 'row',
@@ -153,9 +169,32 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
+    maxWidth: '100%',
+    overflow: 'hidden',
   },
   desktopCard: {
     width: '48%',
+  },
+  legend: {
+    marginTop: 12,
+    gap: 10,
+    alignSelf: 'stretch',
+  },
+  legendRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  legendDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  legendText: {
+    fontSize: 14,
+    color: '#333',
+    fontFamily: 'Montserrat',
+    flexShrink: 1,
   },
   cardTitle: {
     fontSize: 22,
