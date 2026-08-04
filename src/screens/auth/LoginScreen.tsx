@@ -100,7 +100,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
 
   const handleSendOtp = () => {
     setErrorMsg('');
-    if (phone.length === 10) {
+    if (/^[6-9]\d{9}$/.test(phone)) {
       sendOtp(
         { mobileNumber: phone },
         (response: any) => {
@@ -117,7 +117,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
         },
       );
     } else {
-      setErrorMsg('Please enter a valid 10-digit number');
+      setErrorMsg('Please enter a valid 10-digit number starting with 6-9');
     }
   };
 
@@ -317,7 +317,7 @@ const LoginScreen = ({ onClose }: { onClose?: () => void }) => {
 
               {__DEV__ && (
                 <View style={styles.demoBox}>
-                  <Text style={styles.demoTitle}>Demo accounts · OTP 111111</Text>
+                  <Text style={styles.demoTitle}>Demo accounts · OTP 1111</Text>
                   {[
                     { label: 'Owner', num: '8000000001' },
                     { label: 'Investor', num: '8000000002' },

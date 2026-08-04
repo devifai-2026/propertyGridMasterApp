@@ -396,7 +396,11 @@ const Header = ({ onMenuPress }: { onMenuPress: () => void }) => {
     top: 78,
     right: 24,
   });
-  const isMobile = width < 768;
+  // The desktop nav row (logo + 3 links + notifications + profile/sign-in +
+  // list-property button) needs ~1150px to lay out on one line without
+  // wrapping — below that (including tablet widths like 768/1024) it
+  // overflows horizontally, so the mobile/hamburger layout kicks in there too.
+  const isMobile = width < 1180;
 
   const openProfileMenu = () => {
     const node = profileBtnRef.current;
@@ -663,7 +667,11 @@ const BottomNav = () => {
 
 const Layout: React.FC<LayoutProps> = ({ children, style, onScroll, scrollEventThrottle, scrollViewRef }) => {
   const { width } = useWindowDimensions();
-  const isMobile = width < 768;
+  // The desktop nav row (logo + 3 links + notifications + profile/sign-in +
+  // list-property button) needs ~1150px to lay out on one line without
+  // wrapping — below that (including tablet widths like 768/1024) it
+  // overflows horizontally, so the mobile/hamburger layout kicks in there too.
+  const isMobile = width < 1180;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isLoggedIn, user, logout } = useAuth();
   const { navigate, openLoginModal } = useNavigation();

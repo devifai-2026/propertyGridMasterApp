@@ -12,10 +12,6 @@ import {
 } from 'react-native';
 import download from '../../../../assets/Calculator/download.png';
 import share from '../../../../assets/Calculator/share.png';
-import { Dimensions } from 'react-native';
-
-const { width: windowWidth } = Dimensions.get('window');
-const isDesktopStatic = windowWidth >= 1024;
 
 interface CoverageAnalysisProps {
   data?: {
@@ -39,7 +35,7 @@ const CoverageAnalysis: React.FC<CoverageAnalysisProps> = ({ data }) => {
     const loanAmount = data?.loanAmount || 0;
     const annualRate = (parseFloat(data?.interestRate || '0') || 0) / 100;
     const monthlyRate = annualRate / 12;
-    const totalYears = Math.min(parseFloat(data?.loanTenure || '10') || 10, 10);
+    const totalYears = parseFloat(data?.loanTenure || '10') || 10;
     const rentEscalationPct = (data?.rentEscalationPercent || 8) / 100;
 
     const rows = [];
@@ -176,15 +172,15 @@ const CoverageAnalysis: React.FC<CoverageAnalysisProps> = ({ data }) => {
         </ScrollView>
       </View>
 
-      <View style={[styles.buttonContainer, isDesktop && { marginTop: 30 }]}>
-        <TouchableOpacity style={styles.button} onPress={handleDownloadReport}>
+      <View style={[styles.buttonContainer, isDesktop && { flexDirection: 'row', marginTop: 30 }]}>
+        <TouchableOpacity style={[styles.button, isDesktop && { paddingHorizontal: 18, width: 'auto' }]} onPress={handleDownloadReport}>
           <Image source={download} style={styles.buttonIcon} />
-          <Text style={styles.buttonText}>Download Report</Text>
+          <Text style={[styles.buttonText, isDesktop && { fontSize: 16 }]}>Download Report</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={handleShare}>
+        <TouchableOpacity style={[styles.button, isDesktop && { paddingHorizontal: 18, width: 'auto' }]} onPress={handleShare}>
           <Image source={share} style={styles.buttonIcon} />
-          <Text style={styles.buttonText}>Share Report</Text>
+          <Text style={[styles.buttonText, isDesktop && { fontSize: 16 }]}>Share Report</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -259,10 +255,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat',
   },
   buttonContainer: {
-    flexDirection: isDesktopStatic ? 'row' : 'column',
+    flexDirection: 'column',
     justifyContent: 'center',
     gap: 12,
-    marginTop: isDesktopStatic ? 30 : 20,
+    marginTop: 20,
     paddingHorizontal: 16,
     paddingBottom: 20,
     width: '100%',
@@ -274,10 +270,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#767676',
     paddingVertical: 10,
-    paddingHorizontal: isDesktopStatic ? 18 : 10,
+    paddingHorizontal: 10,
     borderRadius: 6,
     gap: 8,
-    width: isDesktopStatic ? 'auto' : '100%',
+    width: '100%',
   },
   buttonIcon: {
     width: 18,
@@ -287,7 +283,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#767676',
     fontWeight: '600',
-    fontSize: isDesktopStatic ? 16 : 14,
+    fontSize: 14,
     fontFamily: 'Montserrat',
   },
 });

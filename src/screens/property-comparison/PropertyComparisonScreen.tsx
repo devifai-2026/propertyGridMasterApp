@@ -85,8 +85,8 @@ const PropertyComparisonScreen = ({ propertyIds }: { propertyIds: string }) => {
               data.leaseDetails?.leaseDurationYears,
               data.leaseDetails?.leaseEndDate,
             ),
-            roi: data.financial?.grossRentalYield
-              ? `${data.financial.grossRentalYield}%`
+            roi: data.financial?.netRentalYield
+              ? `${data.financial.netRentalYield}%`
               : 'N/A',
             images:
               data.media && data.media.length > 0

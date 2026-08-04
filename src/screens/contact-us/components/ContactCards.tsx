@@ -55,7 +55,7 @@ const ContactCards = () => {
       content: 'Quick support chat',
       buttonText: 'Start Chat',
       buttonIcon: <ExternalLink size={16} color="#FFF" />,
-      action: () => Linking.openURL('https://wa.me/'), // Placeholder link
+      action: () => Linking.openURL('https://wa.me/919117881717'),
     },
   ];
 

@@ -24,7 +24,7 @@ const PrincipleChart = ({ data }: PrincipleChartProps) => {
 
   const loanAmount = data?.loanAmount || 0;
   const interestRate = parseFloat(data?.interestRate || '0') || 0;
-  const years = Math.min(parseFloat(data?.loanTenure || '10') || 10, 10);
+  const years = parseFloat(data?.loanTenure || '10') || 10;
 
   const calculateAmortization = () => {
     const principal = loanAmount;
@@ -38,7 +38,7 @@ const PrincipleChart = ({ data }: PrincipleChartProps) => {
     const data = [];
     let remainingBalance = principal;
 
-    for (let year = 1; year <= Math.min(years, 10); year++) {
+    for (let year = 1; year <= years; year++) {
       let yearlyPrincipal = 0;
       let yearlyInterest = 0;
 
@@ -137,20 +137,24 @@ const PrincipleChart = ({ data }: PrincipleChartProps) => {
           <Path d={principalPath} fill="#26BFCC" opacity={0.9} stroke="#26BFCC" strokeWidth={2} />
           <Path d={interestPath} fill="#C73834" opacity={0.9} stroke="#C73834" strokeWidth={2} />
 
-          {/* X-axis labels */}
-          {amortData.map((item, i) => (
-            <SvgText
-              key={i}
-              x={getX(i)}
-              y={chartHeight + 25}
-              fontSize="10"
-              fill="#6b7280"
-              textAnchor="middle"
-              fontFamily="Montserrat"
-            >
-              {item.year}
-            </SvgText>
-          ))}
+          {/* X-axis labels — thin them out past ~10 years so they don't overlap */}
+          {amortData.map((item, i) => {
+            const labelStep = Math.max(1, Math.ceil(amortData.length / 10));
+            if (i % labelStep !== 0) return null;
+            return (
+              <SvgText
+                key={i}
+                x={getX(i)}
+                y={chartHeight + 25}
+                fontSize="10"
+                fill="#6b7280"
+                textAnchor="middle"
+                fontFamily="Montserrat"
+              >
+                {item.year}
+              </SvgText>
+            );
+          })}
         </Svg>
 
         {/* Legend */}

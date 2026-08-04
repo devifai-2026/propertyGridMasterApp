@@ -13,7 +13,7 @@ interface FinancialDetailsProps {
     downPayment?: number;
     loanAmount?: number;
     monthlyEMI?: number;
-    totalLoanInterest?: number;
+    totalInterest?: number;
     interestRate?: string;
     loanTenure?: string;
   };
@@ -51,7 +51,7 @@ const FinancialDetails = ({ data }: FinancialDetailsProps) => {
     },
     {
       label: "Total Interest",
-      value: `₹${data?.totalLoanInterest?.toLocaleString('en-IN', { maximumFractionDigits: 2 }) || '0'}`,
+      value: `₹${data?.totalInterest?.toLocaleString('en-IN', { maximumFractionDigits: 2 }) || '0'}`,
       subtext: `Over ${data?.loanTenure || '0'} years`,
       color: "#F7C952",
     },

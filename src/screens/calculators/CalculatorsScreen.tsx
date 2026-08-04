@@ -15,11 +15,6 @@ import Layout from '../../layout/Layout';
 import { TrendingUp, Calculator, ChevronDown } from 'lucide-react-native';
 import bg from "../../assets/Calculator/bg.png"
 import Svg, { Path, Rect } from 'react-native-svg';
-import { Dimensions } from 'react-native';
-
-const { width: windowWidth } = Dimensions.get('window');
-const isDesktop = windowWidth >= 1024;
-
 
 // RentalYield Components
 import RentalCards from './components/RentalYield/RentalCards';
@@ -211,12 +206,13 @@ const CalculatorsScreen = () => {
         <View style={styles.heroSection}>
           <Image
             source={bg}
-            style={styles.heroBg}
+            style={[styles.heroBg, { minHeight: isDesktop ? 593 : 420 }]}
             resizeMode="cover"
           />
           <View
             style={[
               styles.heroContent,
+              { paddingLeft: isDesktop ? '8%' : 20, minHeight: isDesktop ? 380 : 'auto' },
               !isDesktop && { flexDirection: 'column-reverse' },
             ]}
           >
@@ -249,42 +245,42 @@ const CalculatorsScreen = () => {
               </Text>
 
               <View style={[styles.heroStatsRow, !isDesktop && { justifyContent: 'space-between', gap: 8, marginTop: 12 }]}>
-                <View style={[styles.heroStatCard, !isDesktop && { width: '48%', minWidth: undefined, flex: undefined }]}>
+                <View style={[styles.heroStatCard, { minWidth: isDesktop ? 173 : undefined }, !isDesktop && { width: '48%', minWidth: undefined, flex: undefined }]}>
                   <LinearGradient
                     colors={['#F2F2F2', '#FFFFFF']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     locations={[0.0761, 0.7484]}
-                    style={styles.heroStatCardGradient}
+                    style={[styles.heroStatCardGradient, { padding: isDesktop ? 26 : 16 }]}
                   >
-                    <Text style={styles.heroStatLabel}>Yield Analysis</Text>
-                    <Text style={styles.heroStatValue}>Gross & Net{'\n'}Returns</Text>
+                    <Text style={[styles.heroStatLabel, { fontSize: isDesktop ? 16 : 13 }]}>Yield Analysis</Text>
+                    <Text style={[styles.heroStatValue, { fontSize: isDesktop ? 18 : 14 }]}>Gross & Net{'\n'}Returns</Text>
                   </LinearGradient>
                 </View>
 
-                <View style={[styles.heroStatCard, !isDesktop && { width: '48%', minWidth: undefined, flex: undefined }]}>
+                <View style={[styles.heroStatCard, { minWidth: isDesktop ? 173 : undefined }, !isDesktop && { width: '48%', minWidth: undefined, flex: undefined }]}>
                   <LinearGradient
                     colors={['#F2F2F2', '#FFFFFF']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     locations={[0.0761, 0.7484]}
-                    style={styles.heroStatCardGradient}
+                    style={[styles.heroStatCardGradient, { padding: isDesktop ? 26 : 16 }]}
                   >
-                    <Text style={styles.heroStatLabel}>Loan Planning</Text>
-                    <Text style={styles.heroStatValue}>EMI & Coverage{'\n'}Ratio</Text>
+                    <Text style={[styles.heroStatLabel, { fontSize: isDesktop ? 16 : 13 }]}>Loan Planning</Text>
+                    <Text style={[styles.heroStatValue, { fontSize: isDesktop ? 18 : 14 }]}>EMI & Coverage{'\n'}Ratio</Text>
                   </LinearGradient>
                 </View>
 
-                <View style={[styles.heroStatCard, !isDesktop && { width: '100%', minWidth: undefined, flex: undefined, marginTop: 8 }]}>
+                <View style={[styles.heroStatCard, { minWidth: isDesktop ? 173 : undefined }, !isDesktop && { width: '100%', minWidth: undefined, flex: undefined, marginTop: 8 }]}>
                   <LinearGradient
                     colors={['#F2F2F2', '#FFFFFF']}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                     locations={[0.0761, 0.7484]}
-                    style={styles.heroStatCardGradient}
+                    style={[styles.heroStatCardGradient, { padding: isDesktop ? 26 : 16 }]}
                   >
-                    <Text style={styles.heroStatLabel}>Cash Flow</Text>
-                    <Text style={styles.heroStatValue}>10-Year{'\n'}Projections</Text>
+                    <Text style={[styles.heroStatLabel, { fontSize: isDesktop ? 16 : 13 }]}>Cash Flow</Text>
+                    <Text style={[styles.heroStatValue, { fontSize: isDesktop ? 18 : 14 }]}>10-Year{'\n'}Projections</Text>
                   </LinearGradient>
                 </View>
               </View>
@@ -312,6 +308,7 @@ const CalculatorsScreen = () => {
         <View
           style={[
             styles.tabsContainer,
+            { marginTop: isDesktop ? 100 : 20 },
             !isDesktop && { width: '94%', alignSelf: 'center', marginHorizontal: 0 },
             isDesktop && { width: '90%', maxWidth: 1600, alignSelf: 'center' },
           ]}
@@ -696,6 +693,8 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
       insurance,
       annualMaintenance,
       otherExpenses: 0,
+      rentEscalationEvery: parseFloat(formData.rentEscalationEvery) || 3,
+      rentEscalationPercent: parseFloat(formData.rentEscalationPercent) || 8,
     });
   };
 
@@ -1069,7 +1068,6 @@ const RentalYieldCalculator = ({ activeTab }: any) => {
         <>
           <RentalCards data={results} />
           <SummaryCards data={results} />
-          <FinancialDetails data={results} />
           <PerformanceAnalytics data={results} />
           <CashflowProjections data={results} />
           <RentalDetailsCashflow data={results} />
@@ -1472,7 +1470,7 @@ const EMICalculatorView = () => {
           end={{ x: 1, y: 0 }}
         >
           <Text style={styles.calculateBtnText}>
-            Calculate ROI & Rental Yield
+            Calculate EMI
           </Text>
         </LinearGradient>
       </TouchableOpacity>
@@ -1481,6 +1479,7 @@ const EMICalculatorView = () => {
       {results && (
         <>
           <EMISummaryCards data={results} />
+          <FinancialDetails data={results} />
           <EMIAnalytics data={results} />
           <PrincipleChart data={results} />
           <CoverageAnalysis data={results} />
@@ -1509,16 +1508,13 @@ const styles = StyleSheet.create({
     bottom: 0, // Ensure full vertical coverage
     resizeMode: 'cover',
     opacity: 1,
-    minHeight: isDesktop ? 593 : 420,
   },
   heroContent: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingLeft: isDesktop ? '8%' : 20,
     paddingRight: 0,
-    minHeight: isDesktop ? 380 : 'auto',
   },
   heroTextContainer: {
     flex: 1,
@@ -1548,7 +1544,6 @@ const styles = StyleSheet.create({
   },
   heroStatCard: {
     borderRadius: 12,
-    minWidth: isDesktop ? 173 : undefined,
     backgroundColor: '#fff',
     overflow: 'hidden',      // ← critical for gradient to respect borderRadius
     shadowColor: '#000',
@@ -1558,12 +1553,10 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   heroStatCardGradient: {
-    padding: isDesktop ? 26 : 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
   heroStatLabel: {
-    fontSize: isDesktop ? 16 : 13,
     color: '#767676',
     fontWeight: '600',
     marginBottom: 3,
@@ -1571,7 +1564,6 @@ const styles = StyleSheet.create({
     fontFamily:'Montserrat',
   },
   heroStatValue: {
-    fontSize: isDesktop ? 18 : 14,
     color: '#EE2529',
     fontWeight: '400',
     textAlign: 'center',
@@ -1649,8 +1641,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 0,
-    marginTop: isDesktop ? 100 : 20,
-    marginBottom: 30, 
+    marginBottom: 30,
     backgroundColor: '#fff',
     borderRadius: 25,
     shadowColor: '#000',
@@ -2031,7 +2022,8 @@ const styles = StyleSheet.create({
     elevation: 3,
     alignItems: 'center',
     justifyContent: 'center',
-    maxHeight: 100,
+    minHeight: 100,
+    overflow: 'hidden',
   },
   infoSummaryText: {
     fontSize: 18,

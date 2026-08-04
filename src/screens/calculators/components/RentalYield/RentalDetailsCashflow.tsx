@@ -12,11 +12,6 @@ import {
 } from 'react-native';
 import download from "../../../../assets/Calculator/download.png"
 import share from "../../../../assets/Calculator/share.png"
-import { Dimensions } from 'react-native';
-
-const { width: windowWidth } = Dimensions.get('window');
-const isDesktop = windowWidth >= 1024;
-
 
 type CashFlowRow = {
   year: string;
@@ -148,15 +143,15 @@ const RentalDetailsCashflow = ({ data }: RentalDetailsCashflowProps) => {
 
       {/* Buttons */}
       {/* Buttons */}
-           <View style={[styles.buttonContainer, isDesktop && { marginTop: 30 }]}>
-             <TouchableOpacity style={styles.button} onPress={handleDownloadReport}>
+           <View style={[styles.buttonContainer, isDesktop && { flexDirection: 'row', marginTop: 30 }]}>
+             <TouchableOpacity style={[styles.button, isDesktop && { paddingHorizontal: 20, width: 'auto' }]} onPress={handleDownloadReport}>
                <Image source={download} style={styles.buttonIcon} />
-               <Text style={styles.buttonText}>Download Report</Text>
+               <Text style={[styles.buttonText, isDesktop && { fontSize: 16 }]}>Download Report</Text>
              </TouchableOpacity>
-     
-             <TouchableOpacity style={styles.button} onPress={handleShare}>
+
+             <TouchableOpacity style={[styles.button, isDesktop && { paddingHorizontal: 20, width: 'auto' }]} onPress={handleShare}>
                <Image source={share} style={styles.buttonIcon} />
-               <Text style={styles.buttonText}>Share Report</Text>
+               <Text style={[styles.buttonText, isDesktop && { fontSize: 16 }]}>Share Report</Text>
              </TouchableOpacity>
            </View>
     </View>
@@ -218,10 +213,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat',
   },
   buttonContainer: {
-    flexDirection: isDesktop ? 'row' : 'column',
+    flexDirection: 'column',
     justifyContent: 'center',
     gap: 12,
-    marginTop: isDesktop ? 30 : 20,
+    marginTop: 20,
     width: '100%',
   },
   button: {
@@ -232,9 +227,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#767676',
     paddingVertical: 12,
-    paddingHorizontal: isDesktop ? 20 : 10,
+    paddingHorizontal: 10,
     borderRadius: 6,
-    width: isDesktop ? 'auto' : '100%',
+    width: '100%',
   },
   buttonIcon: {
     width: 18,
@@ -244,7 +239,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#767676',
     fontWeight: '600',
-    fontSize: isDesktop ? 16 : 14,
+    fontSize: 14,
     fontFamily: 'Montserrat',
   },
 });

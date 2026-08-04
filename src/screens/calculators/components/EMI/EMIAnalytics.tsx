@@ -29,7 +29,7 @@ const EMIAnalytics: React.FC<EMIAnalyticsProps> = ({ data }) => {
   const totalInterest = data?.totalInterest || 0;
   const annualRate = (parseFloat(data?.interestRate || '0') || 0) / 100;
   const monthlyRate = annualRate / 12;
-  const loanYears = Math.min(parseFloat(data?.loanTenure || '10') || 10, 10);
+  const loanYears = parseFloat(data?.loanTenure || '10') || 10;
   const rentEscalationPct = (data?.rentEscalationPercent || 8) / 100;
 
   // Build year-by-year amortization + rent data
@@ -70,7 +70,10 @@ const EMIAnalytics: React.FC<EMIAnalyticsProps> = ({ data }) => {
   };
 
   const yearlyData = buildYearlyData();
-  const labels = yearlyData.map(d => d.label);
+  // Thin the x-axis labels (not the underlying data) once the tenure runs
+  // past ~12 years, so charts stay readable instead of overlapping.
+  const labelStep = Math.max(1, Math.ceil(yearlyData.length / 12));
+  const labels = yearlyData.map((d, i) => (i % labelStep === 0 ? d.label : ''));
 
   const emiRentData = {
     labels,

@@ -33,7 +33,7 @@ const RentalCards = ({ containerStyle, data }: RentalCardsProps) => {
         <View style={[styles.card, styles.redCard, { width: cardWidth }]}>
           <View style={styles.flexGrow}>
             <Text style={styles.title}>Gross Rental Yield</Text>
-            <Text style={styles.redValue}>{data?.grossYield || '13.33%'}</Text>
+            <Text style={styles.redValue}>{data?.grossYield || '--'}</Text>
             <Text style={styles.subText}>% Before expenses</Text>
           </View>
 
@@ -47,7 +47,7 @@ const RentalCards = ({ containerStyle, data }: RentalCardsProps) => {
         <View style={[styles.card, styles.blueCard, { width: cardWidth }]}>
           <View style={styles.flexGrow}>
             <Text style={styles.title}>Net Rental Yield</Text>
-            <Text style={styles.blueValue}>{data?.netYield || '12.11%'}</Text>
+            <Text style={styles.blueValue}>{data?.netYield || '--'}</Text>
             <Text style={styles.subText}>% After expenses</Text>
           </View>
 
@@ -65,7 +65,7 @@ const RentalCards = ({ containerStyle, data }: RentalCardsProps) => {
               {isDesktop && <TrendingUp size={20} color="#429482" />}
             </View>
             <Text style={styles.greenValue}>
-              {data?.cashFlow || '₹5.35 Lakhs'}
+              {data?.cashFlow || '--'}
             </Text>
             <Text style={styles.subText}>Net annual income</Text>
           </View>
@@ -84,7 +84,7 @@ const RentalCards = ({ containerStyle, data }: RentalCardsProps) => {
               {isDesktop && <Calendar size={20} color="#F7C952" />}
             </View>
             <Text style={styles.yellowValue}>
-              {data?.paybackPeriod || '9.1 years'}
+              {data?.paybackPeriod || '--'}
             </Text>
             <Text style={styles.subText}>Time to break even</Text>
           </View>

@@ -53,7 +53,7 @@ const PortfolioTab = () => {
           price: formatINR(item.sellingPrice),
           rent: formatINR(item.annualGrossRent),
           tenure: formatTenureYears(item.tenureLeftYears, item.leaseEndDate),
-          roi: item.grossRentalYield ? `${item.grossRentalYield}%` : 'N/A',
+          roi: item.netRentalYield ? `${item.netRentalYield}%` : 'N/A',
           type: item.propertyType || 'N/A',
           images: item.media?.length > 0 ? item.media.map((m: any) => m.fileUrl) : null,
           isVerified: item.isVerified,
